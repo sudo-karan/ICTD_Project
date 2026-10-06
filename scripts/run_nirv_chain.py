@@ -293,7 +293,7 @@ class Chain:
         self.step("02_export_nirv_yearly.py (all blocks exist: writes its record)", "nirv_yearly", py + ["scripts/02_export_nirv_yearly.py"] + u)
         self.step("check_nirv_blocks.py (every block after the tiles under it)", "nirv_blocks_check", py + ["scripts/check_nirv_blocks.py"] + u)
         self.step("02_build_nirv.py", "nirv_build", py + ["scripts/02_build_nirv.py"] + u)
-        self.step("02_assemble_degradation.py (fills the NIRv columns)", "assemble", py + ["scripts/02_assemble_degradation.py"] + u)
+        self.step("02_assemble_degradation.py (fills the NIRv columns)", "assemble", py + ["scripts/02_assemble_degradation.py", "--require-nirv"] + u)
         say("every step ended with exit 0: degradation_by_unit.csv now carries the NIRv columns. FINISHED")
 
 
