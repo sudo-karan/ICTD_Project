@@ -1074,6 +1074,18 @@ def main():
             fail(f"{b}: land with a rate exceeds the band's land, or land with a path step exceeds land with a rate")
         if (M["std"][f"full_{b}_trend_m2"] > M["std"][f"rate_{b}_m2"] + 0.01).any():
             fail(f"{b}: land with a standardised trend exceeds land with a rate")
+    # the two stored layers against each other, in every unit and season: land with treecover2000 > 10 that has a first-design
+    # value (from the tiles of observations) must be the land with at least one pass (from the blocks of yearly values). A block
+    # computed while a tile under it was missing breaks this in every unit it touches - the sample pixels need not fall there.
+    cover_gap = 0.0
+    for y in ALL_SEASONS:
+        from_tiles = sum(M["raw"][f"season_{c}_{y}_m2"] for c in CLASSES)
+        gap = (from_tiles - M["raw"][f"day_{y}_m2"]).abs()
+        cover_gap = max(cover_gap, float(gap.max()))
+        if gap.max() > 1.0:
+            worst = M["raw"].loc[gap.idxmax(), "unit_id"]
+            fail(f"season {y}: in {int((gap > 1.0).sum()):,} units the land seen in the tiles of observations is not the land with a pass in the blocks of yearly values "
+                 f"(largest gap {gap.max() / 1e4:,.2f} ha, unit {worst}): a block does not hold all of its tiles")
     stop_if_failed("checking the zonal statistics")
     print(f"OK  {len(units):,} units returned twice; bands add up; tiers nest; area summed over pixels {area['std']['pixels_km2']:,.2f} km2 vs polygons {area['std']['polygons_on_the_ellipsoid_km2']:,.2f} ({area['std']['relative_difference']:+.2e})")
 
@@ -1217,7 +1229,8 @@ def main():
                              "sample_tasks": eu.task_record(status_sample), "sample_eecu_seconds": round(eu.eecu(status_sample), 1)},
             "checks_passed": {"exact_distribution_matches_epa_table": len(EPA_TABLE), "pixel_sample": {"points": int(len(sample)), "check_points": int(len(check)), "largest_gaps": worst,
                                                "stored_values_equal_the_standardisation_redone_from_the_stored_passes": True, "S_n_and_flags_identical_at_the_check_points": True},
-                              "units_returned_each_once": int(len(units)), "bands_add_up": True, "tiers_nest": True, "area_summed_over_pixels_vs_polygons": area},
+                              "units_returned_each_once": int(len(units)), "bands_add_up": True, "tiers_nest": True,
+                              "blocks_hold_what_the_tiles_hold_every_unit_and_season_largest_gap_m2": round(cover_gap, 3), "area_summed_over_pixels_vs_polygons": area},
             "reference_forest_mean_by_season": {s: {str(y): float(v) for y, v in zip(ALL_SEASONS, T[s]["extra"]["reference_series"])} for s in SERIES},
             "tables": {name: {"rows": int(len(t)), "columns": int(len(t.columns)), "blank_cells": blank(t)} for name, t in out_tables.items()},
             "versions": {"python": sys.version.split()[0], "earthengine-api": ee.__version__, "pandas": pd.__version__, "numpy": np.__version__},

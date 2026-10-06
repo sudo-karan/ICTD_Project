@@ -36,3 +36,6 @@ indian_village_boundaries/
 
 # the demo layer is a stage output like the others (the library it embeds is tracked under scripts/vendor/)
 60_layer/
+
+# logs of the unattended NIRv chain (scripts/run_nirv_chain.py)
+logs/

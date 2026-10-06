@@ -57,6 +57,13 @@ BLOCKS. Two-degree blocks with edges on whole grid cells, each cut down to the b
 it. One batch task per block, resumable: blocks that exist are skipped. The run stops unless every tile of
 observations is present and the scene list is the one their export recorded.
 
+THE RECORD DESCRIBES THE BLOCKS THAT ARE THERE, whichever run or person queued their exports: for each block it
+gives the latest successful export task from Earth Engine's own task list (created, started, ended, cost) and
+checks the recipe_sha256 stamped on the block against this script's. A block that exists is not exported again,
+so a run that finds all of them starts no task; block_tasks_this_run says how many this run started.
+(On 6 October 2026 the 13 exports were queued ahead of this script, behind the tile exports; scripts/
+check_nirv_blocks.py checks that each still started after the tiles under it had finished.)
+
 Needs earthengine-api, geopandas, shapely, pandas, numpy; scripts/_ee_units.py, 02_export_nirv_observations.py.
 """
 import argparse, hashlib, importlib.util, inspect, json, math, sys, time
@@ -238,6 +245,20 @@ def export_blocks(collection_id, blocks, stem, stored, days):
     return eu.wait(tasks, "block-export") if tasks else {}
 
 
+def block_tasks(stem, blocks):
+    """{block id: its latest successful export task, from Earth Engine's task list}; a block made before the list begins has none."""
+    prefix, out = f"ictd_{stem}_nirvstd_block_", {}
+    for o in ee.data.listOperations():
+        m = o.get("metadata", {})
+        d = str(m.get("description", ""))
+        if d.startswith(prefix) and m.get("state") == "SUCCEEDED" and d[len(prefix):] in {b[0] for b in blocks}:
+            end = m.get("endTime") or m.get("updateTime")
+            if d[len(prefix):] not in out or end > out[d[len(prefix):]]["ended"]:
+                out[d[len(prefix):]] = {"task": o.get("name", "").split("/")[-1], "created": m.get("createTime"), "started": m.get("startTime"), "ended": end,
+                                        "batch_eecu_usage_seconds": float(m.get("batchEecuUsageSeconds") or 0)}
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--units", required=True, help="the stage-0 layer, e.g. 10_units/units.gpkg")
@@ -271,7 +292,15 @@ def main():
         fail(f"{len({b[0] for b in blocks} - have)} blocks are missing from {collection_id}")
         stop_if_failed("counting the blocks")
     print(f"OK  {collection_id}: {len(blocks)} blocks; {eu.eecu(status):,.0f} EECU-seconds in this run ({time.time() - t0:,.0f} s)")
-    sizes = {b[0]: int(ee.data.getAsset(f"{collection_id}/{b[0]}").get("sizeBytes", 0)) for b in blocks}
+    assets = {b[0]: ee.data.getAsset(f"{collection_id}/{b[0]}") for b in blocks}
+    sizes = {k: int(v.get("sizeBytes", 0)) for k, v in assets.items()}
+    stamped = {k: (v.get("properties") or {}).get("recipe_sha256") for k, v in assets.items()}
+    if any(s != RECIPE_SHA256 for s in stamped.values()):
+        fail(f"blocks {sorted(k for k, s in stamped.items() if s != RECIPE_SHA256)} were not exported by this script as it now is (the recipe stamped on them differs): delete them and export again")
+        stop_if_failed("checking the recipe stamped on each block")
+    made_by = block_tasks(stem, blocks)
+    print(f"    every block carries this script's recipe; {len(made_by)} of {len(blocks)} have their export task in Earth Engine's task list "
+          f"({sum(t['batch_eecu_usage_seconds'] for t in made_by.values()):,.0f} EECU-seconds in all)")
     OUT.mkdir(exist_ok=True)
     with open(OUT / "nirv_yearly.provenance.json", "w", encoding="utf-8") as fh:
         json.dump({
@@ -288,8 +317,11 @@ def main():
                             "std_<season>": "median of the season's passes, each moved to day 30 by g and to the cell's usual path mix by h; 32-bit float",
                             "day_of_a_pass": "mean of the day column of nirv_scenes.csv as printed (five decimals) over the scenes of the season, slot and path",
                             "passes_<season>, day_<season>": "the number of passes of the season at the cell and their mean day"},
-            "earth_engine": {"project": project, "block_tasks_this_run": len(status), "block_eecu_seconds_this_run": round(eu.eecu(status), 1), "tasks": eu.task_record(status)},
-            "checks_passed": {"every_tile_of_observations_present": len(wanted), "scene_list_is_the_one_recorded": True, "blocks_present": len(blocks)},
+            "earth_engine": {"project": project, "block_tasks_this_run": len(status), "block_eecu_seconds_this_run": round(eu.eecu(status), 1), "tasks": eu.task_record(status),
+                             "block_export_tasks": made_by, "block_eecu_seconds_all_blocks": round(sum(t["batch_eecu_usage_seconds"] for t in made_by.values()), 1),
+                             "blocks_exported_between": [min((t["started"] for t in made_by.values()), default=None), max((t["ended"] for t in made_by.values()), default=None)]},
+            "checks_passed": {"every_tile_of_observations_present": len(wanted), "scene_list_is_the_one_recorded": True, "blocks_present": len(blocks),
+                              "every_block_carries_this_recipe": True, "blocks_with_their_export_task_on_record": len(made_by)},
             "tables": {}, "versions": {"python": sys.version.split()[0], "earthengine-api": ee.__version__, "pandas": pd.__version__, "numpy": np.__version__},
         }, fh, indent=2)
     print(f"done. run_utc {started}; record in {OUT.relative_to(ROOT)}/nirv_yearly.provenance.json")
