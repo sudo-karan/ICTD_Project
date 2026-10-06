@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<!--
+  Built by scripts/06_build_layer.py. Self-contained: no network request is made. Keep data.js beside this file.
+  Leaflet __LEAFLET_VERSION__ (BSD 2-Clause, (c) Volodymyr Agafonkin, CloudMade) is embedded below, unmodified.
+-->
+<style>
+/*LEAFLET_CSS*/
+</style>
+<style>
+html, body { height: 100%; margin: 0; font: 14px/1.4 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1c1c1c; background: #fff; }
+#app { display: flex; height: 100%; }
+#side { width: 300px; flex: none; overflow-y: auto; border-right: 1px solid #c8c8c8; padding: 12px 14px; box-sizing: border-box; background: #fafaf7; }
+#mapwrap { flex: 1; position: relative; min-width: 0; }
+#map { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: #e9eef2; }
+#info { width: 360px; flex: none; overflow-y: auto; border-left: 1px solid #c8c8c8; padding: 12px 14px; box-sizing: border-box; }
+h1 { font-size: 16px; margin: 0 0 4px; line-height: 1.25; }
+h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #555; margin: 16px 0 6px; }
+h3 { font-size: 14px; margin: 14px 0 4px; }
+p { margin: 6px 0; }
+.sub { color: #555; font-size: 12.5px; }
+.layer { display: block; padding: 3px 0; cursor: pointer; }
+.layer input { margin-right: 6px; }
+.layer.pending { color: #888; cursor: default; }
+.group { font-size: 12px; color: #555; margin: 10px 0 2px; font-weight: 600; }
+select, input[type=text] { width: 100%; box-sizing: border-box; padding: 4px 6px; font: inherit; border: 1px solid #aaa; border-radius: 3px; background: #fff; }
+button { font: inherit; padding: 4px 10px; border: 1px solid #888; border-radius: 3px; background: #fff; cursor: pointer; margin: 2px 4px 2px 0; }
+button:hover { background: #eee; }
+#legend { position: absolute; right: 10px; bottom: 14px; z-index: 800; background: rgba(255,255,255,.96); border: 1px solid #999; border-radius: 4px; padding: 8px 10px; max-width: 330px; font-size: 12.5px; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+#legend .t { font-weight: 600; margin-bottom: 4px; }
+.sw { display: inline-block; width: 18px; height: 12px; border: 1px solid #555; vertical-align: -2px; margin-right: 6px; box-sizing: border-box; }
+.sw.hatch { background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.55) 0, rgba(0,0,0,.55) 1px, transparent 1px, transparent 5px); }
+.lr { white-space: nowrap; }
+.lr .n { color: #555; }
+.flatsep { border-top: 1px solid #ccc; margin: 5px 0 3px; }
+table.kv { border-collapse: collapse; width: 100%; }
+table.kv td { padding: 2px 0; vertical-align: top; border-bottom: 1px solid #eee; }
+table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tabular-nums; }
+.note { color: #555; font-size: 12px; margin: 3px 0 0; }
+.flag { background: #fff6d6; border: 1px solid #e0c060; border-radius: 3px; padding: 4px 6px; font-size: 12.5px; margin: 6px 0; }
+.bar { display: flex; height: 16px; border: 1px solid #555; margin: 4px 0 2px; }
+.bar span { display: block; height: 100%; }
+#modal { display: none; position: fixed; z-index: 2000; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,.45); }
+#modal .box { position: absolute; top: 4%; bottom: 4%; left: 50%; width: 760px; max-width: 94%; margin-left: -380px; background: #fff; border-radius: 5px; padding: 16px 22px; overflow-y: auto; box-sizing: border-box; }
+@media (max-width: 800px) { #modal .box { left: 3%; margin-left: 0; } }
+#modal table { border-collapse: collapse; width: 100%; font-size: 13px; }
+#modal th, #modal td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; vertical-align: top; }
+.fatal { padding: 30px; font-size: 16px; }
+.dlabel { font-size: 11px; font-weight: 600; color: #222; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff; white-space: nowrap; pointer-events: none; }
+.leaflet-container { font: inherit; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="side">
+    <h1 id="title"></h1>
+    <p class="sub" id="subtitle"></p>
+    <p><button id="b_about">What this is, and how to read it</button><button id="b_sources">Sources and licences</button></p>
+    <h2>Layer</h2>
+    <div id="layers"></div>
+    <h2>Honest colour</h2>
+    <p class="sub">A rate on a few hectares of forest is noise. Units with less than this much of the land a forest layer rests on are shown as <b>insufficient forest to assess</b>, not on the colour scale:</p>
+    <div id="floors"></div>
+    <h2>Units shown</h2>
+    <label class="layer"><input type="checkbox" id="c_lgd" checked> <span id="l_lgd"></span></label>
+    <label class="layer"><input type="checkbox" id="c_out" checked> <span class="sw hatch" style="background-color:#fff"></span><span id="l_out"></span></label>
+    <h2>Go to</h2>
+    <select id="district"></select>
+    <p style="margin-top:6px"><input type="text" id="search" placeholder="Unit name or id, then Enter"></p>
+    <p class="sub" id="searchmsg"></p>
+    <p class="sub" id="built"></p>
+  </div>
+  <div id="mapwrap"><div id="map"></div><div id="legend"></div></div>
+  <div id="info"></div>
+</div>
+<div id="modal"><div class="box"><p style="text-align:right;margin:0"><button id="b_close">Close</button></p><div id="modalbody"></div></div></div>
+<script>
+/*LEAFLET_JS*/
+</script>
+<script src="data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.ICTD_LAYER;
+  if (!D) {
+    document.body.innerHTML = '<p class="fatal">The map\'s data file was not found. Keep <b>data.js</b> in the same folder as this file and open it again.</p>';
+    return;
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var N = D.id.length, CODES = D.codes;
+  var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1 };
+  var layerById = {};
+  D.layers.forEach(function (l) { layerById[l.id] = l; });
+
+  // ---- the map: no tiles, nothing fetched ------------------------------------------------------------------------------
+  var Hatch = L.Canvas.extend({
+    _fillStroke: function (ctx, layer) {
+      L.Canvas.prototype._fillStroke.call(this, ctx, layer);
+      if (layer.options.hatch) {
+        if (!this._pat) {
+          var c = document.createElement("canvas"); c.width = c.height = 7;
+          var x = c.getContext("2d"); x.strokeStyle = "rgba(0,0,0,0.5)"; x.lineWidth = 1;
+          x.beginPath(); x.moveTo(-1, 8); x.lineTo(8, -1); x.stroke();
+          this._pat = ctx.createPattern(c, "repeat");
+        }
+        ctx.globalAlpha = 1; ctx.fillStyle = this._pat; ctx.fill("evenodd");
+      }
+    }
+  });
+  var map = L.map("map", { renderer: new Hatch({ padding: 0.4 }), zoomSnap: 0.25, minZoom: 6, maxZoom: 15, attributionControl: false, zoomControl: true });
+  L.control.scale({ imperial: false }).addTo(map);
+  map.fitBounds(D.bounds);                 // the view is set BEFORE any shape is added: a shape added to a map with no view yet meets a renderer that is not ready
+  function ring(a) {                       // a ring is stored as whole numbers: first point, then steps, in 0.00001 degrees
+    var x = a[0], y = a[1], out = [[y / 1e5, x / 1e5]], i;
+    for (i = 2; i < a.length; i += 2) { x += a[i]; y += a[i + 1]; out.push([y / 1e5, x / 1e5]); }
+    return out;
+  }
+  function shape(g) { return g.map(function (poly) { return poly.map(ring); }); }
+  function classOf(i) {
+    var l = layerById[state.layer], s = l.floored ? l.cls[state.floor] : l.cls.all;
+    return l.classes[CODES.indexOf(s.charAt(i))];
+  }
+  function style(i) {
+    var out = D.out.charAt(i) === "1";
+    return { fillColor: classOf(i).color, fillOpacity: 1, color: out ? "#16321a" : "#5a5a5a", opacity: out ? 0.9 : 0.55, weight: out ? 0.7 : 0.3, hatch: out };
+  }
+  var polys = [], group = L.featureGroup().addTo(map), i;
+  for (i = 0; i < N; i++) {
+    polys[i] = L.polygon(shape(D.g[i]), style(i));
+    polys[i]._u = i;
+    group.addLayer(polys[i]);
+  }
+  group.on("click", function (e) { select(e.layer._u, false); });
+  D.districts.forEach(function (d) {
+    L.polyline(d.outline.map(ring), { color: "#000", weight: 1.3, interactive: false }).addTo(map);
+    L.marker(d.label, { interactive: false, icon: L.divIcon({ className: "dlabel", html: esc(d.name), iconSize: [0, 0] }) }).addTo(map);
+  });
+  var hi = null;
+
+  // ---- controls ---------------------------------------------------------------------------------------------------------
+  $("title").textContent = D.title;
+  $("subtitle").textContent = D.subtitle;
+  $("built").textContent = D.built;
+  $("l_lgd").textContent = D.unit_types.lgd;
+  $("l_out").textContent = D.unit_types.out;
+  var html = "", lastGroup = "";
+  D.layers.forEach(function (l) {
+    if (l.group !== lastGroup) { html += '<div class="group">' + esc(l.group) + "</div>"; lastGroup = l.group; }
+    html += l.pending
+      ? '<span class="layer pending">&#9675; ' + esc(l.title) + " &mdash; " + esc(l.pending) + "</span>"
+      : '<label class="layer"><input type="radio" name="layer" value="' + l.id + '"> ' + esc(l.title) + "</label>";
+  });
+  $("layers").innerHTML = html;
+  html = "";
+  D.floors.forEach(function (f) {
+    html += '<label class="layer"><input type="radio" name="floor" value="' + f.id + '"> ' + esc(f.label) + "</label>";
+  });
+  $("floors").innerHTML = html;
+  html = '<option value="">District&hellip;</option>';
+  D.districts.forEach(function (d, k) { html += '<option value="' + k + '">' + esc(d.name) + "</option>"; });
+  $("district").innerHTML = html;
+
+  function restyle() {
+    for (var k = 0; k < N; k++) { polys[k].setStyle(style(k)); }
+  }
+  function showLegend() {
+    var l = layerById[state.layer], counts = l.floored ? l.counts[state.floor] : l.counts.all, h, k, c, sep = false;
+    h = '<div class="t">' + esc(l.legend_title) + "</div>";
+    for (k = 0; k < l.classes.length; k++) {
+      c = l.classes[k];
+      if (c.flat && !sep) { h += '<div class="flatsep"></div>'; sep = true; }
+      h += '<div class="lr"><span class="sw" style="background:' + c.color + '"></span>' + esc(c.label) + ' <span class="n">(' + esc(counts[k]) + ")</span></div>";
+    }
+    h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
+    h += '<p class="note">' + esc(l.this_shows) + "</p>";
+    if (l.floored) { h += '<p class="note">' + esc(l.floor_note[state.floor]) + "</p>"; }
+    $("legend").innerHTML = h;
+  }
+  function showInfo() {
+    if (state.sel < 0) { $("info").innerHTML = D.info_empty; return; }
+    var f = D.f[state.sel], h = "", bar = D.bar[state.sel];
+    D.panel.forEach(function (sec) {
+      if (sec.heading) { h += (sec.top ? "<h1>" : "<h3>") + esc(sec.heading_field !== undefined ? f[sec.heading_field] : sec.heading) + (sec.top ? "</h1>" : "</h3>"); }
+      if (sec.flag_field !== undefined && f[sec.flag_field]) { h += '<div class="flag">' + esc(f[sec.flag_field]) + "</div>"; }
+      if (sec.rows) {
+        h += '<table class="kv">';
+        sec.rows.forEach(function (r) { h += "<tr><td>" + esc(r[0]) + '</td><td class="v">' + esc(f[r[1]]) + "</td></tr>"; });
+        h += "</table>";
+      }
+      if (sec.bar && bar) {
+        h += '<div class="bar">';
+        D.core_classes.forEach(function (c, k) { h += '<span title="' + esc(c.name) + '" style="width:' + bar[k] + "%;background:" + c.color + '"></span>'; });
+        h += '</div><p class="note">';
+        D.core_classes.forEach(function (c) { h += '<span class="sw" style="background:' + c.color + '"></span>' + esc(c.name) + " &nbsp; "; });
+        h += "</p>";
+      }
+      if (sec.note) { h += '<p class="note">' + esc(sec.note) + "</p>"; }
+    });
+    $("info").innerHTML = h;
+    $("info").scrollTop = 0;
+  }
+  function select(k, fly) {
+    state.sel = k;
+    if (hi) { map.removeLayer(hi); hi = null; }
+    if (k >= 0) {
+      hi = L.polygon(shape(D.g[k]), { fill: false, color: "#000", weight: 3, interactive: false }).addTo(map);
+      if (fly) { map.fitBounds(hi.getBounds(), { maxZoom: 12, padding: [60, 60] }); }
+    }
+    showInfo();
+    writeHash();
+  }
+  function setLayer(id) {
+    if (!layerById[id] || layerById[id].pending) { return; }
+    state.layer = id;
+    var r = document.querySelectorAll('input[name=layer]');
+    for (var k = 0; k < r.length; k++) { r[k].checked = r[k].value === id; }
+    restyle(); showLegend(); writeHash();
+  }
+  function setFloor(id) {
+    state.floor = id;
+    var r = document.querySelectorAll('input[name=floor]');
+    for (var k = 0; k < r.length; k++) { r[k].checked = r[k].value === id; }
+    restyle(); showLegend(); writeHash();
+  }
+  function setShown() {
+    for (var k = 0; k < N; k++) {
+      var want = D.out.charAt(k) === "1" ? state.out : state.lgd, has = group.hasLayer(polys[k]);
+      if (want && !has) { group.addLayer(polys[k]); } else if (!want && has) { group.removeLayer(polys[k]); }
+    }
+  }
+  function writeHash() {
+    var h = "layer=" + state.layer + "&floor=" + state.floor + (state.sel >= 0 ? "&unit=" + encodeURIComponent(D.id[state.sel]) : "");
+    if (window.history && history.replaceState) { history.replaceState(null, "", "#" + h); } else { location.hash = h; }
+  }
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p.length === 2) { out[p[0]] = decodeURIComponent(p[1]); } });
+    return out;
+  }
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.name === "layer") { setLayer(t.value); }
+    else if (t.name === "floor") { setFloor(t.value); }
+    else if (t.id === "c_lgd") { state.lgd = t.checked; setShown(); }
+    else if (t.id === "c_out") { state.out = t.checked; setShown(); }
+    else if (t.id === "district" && t.value !== "") { map.fitBounds(D.districts[+t.value].bbox); }
+  });
+  $("search").addEventListener("keydown", function (e) {
+    if (e.keyCode !== 13) { return; }
+    var q = this.value.trim().toLowerCase(), hits = [], k;
+    if (!q) { return; }
+    for (k = 0; k < N; k++) { if (D.id[k].toLowerCase() === q) { hits = [k]; break; } }
+    if (!hits.length) { for (k = 0; k < N; k++) { if (D.f[k][0].toLowerCase().indexOf(q) >= 0) { hits.push(k); } } }
+    $("searchmsg").textContent = hits.length ? (hits.length > 1 ? D.search_many.replace("{n}", hits.length) : "") : D.search_none;
+    if (hits.length) { select(hits[0], true); }
+  });
+  function modal(html) { $("modalbody").innerHTML = html; $("modal").style.display = "block"; }
+  $("b_about").onclick = function () { modal(D.about_html); };
+  $("b_sources").onclick = function () { modal(D.sources_html); };
+  $("b_close").onclick = function () { $("modal").style.display = "none"; };
+  $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
+
+  // ---- start: the layer, floor and unit can be given in the address after # ---------------------------------------------
+  var h0 = readHash();
+  state.floor = D.floors.some(function (f) { return f.id === h0.floor; }) ? h0.floor : D.default_floor;
+  setFloor(state.floor);
+  setLayer(h0.layer && layerById[h0.layer] && !layerById[h0.layer].pending ? h0.layer : D.default_layer);
+  var start = h0.unit ? D.id.indexOf(h0.unit) : -1;
+  if (start >= 0) { select(start, true); } else { showInfo(); }
+  window.ICTD_READY = true;
+})();
+</script>
+</body>
+</html>
