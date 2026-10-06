@@ -1,0 +1,38 @@
+# raw downloads — large, and reproducible from scripts/collect_data.py
+00_raw/mgnrega_assets/assets_geojson/
+00_raw/boundaries/
+00_raw/socioeconomic/
+*.gpkg
+*.geojson
+!00_raw/mis_reports/*.csv
+
+# stage outputs are derived
+10_units/
+20_degradation/
+30_need/
+40_allocation/
+50_gap/
+
+__pycache__/
+*.pyc
+.DS_Store
+
+# local environment and the DataMeet clone (a git repository of its own)
+.venv/
+indian_village_boundaries/
+.backup_before_rulings_2026-10-05/
+
+# --- added 7 Oct 2026 when the repository was first put under git ---
+# The three raw paths above are the folder names of 4 Oct; collect_data.py now writes the same downloads under
+# numbered folders, which the lines above no longer match. Everything it fetches stays out of git:
+00_raw/01_cfr_fra/
+00_raw/02_mgnrega/
+00_raw/03_socioeconomic/
+00_raw/04_boundaries/
+00_raw/docs/
+
+# session scratch: test outputs, logs, the replication's cache (several GB)
+.session_scratch_*/
+
+# the demo layer is a stage output like the others (the library it embeds is tracked under scripts/vendor/)
+60_layer/

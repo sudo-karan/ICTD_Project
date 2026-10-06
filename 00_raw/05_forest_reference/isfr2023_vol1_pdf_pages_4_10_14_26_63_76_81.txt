@@ -1,0 +1,346 @@
+===== ISFR 2023 Volume I, PDF page 4 =====
+      India State of Forest Report 2023 (Volume 1)
+
+
+
+
+            ISBN 978-81-950073-9-4
+
+            © Forest Survey of India
+
+            Published by
+            Forest Survey of India
+            (Ministry of Environment
+            Forest and Climate Change)
+            Kaulagarh Road, P.O. IPE
+            Dehradun – 248195,
+            Uttarakhand. India
+
+            Phone : (91) 0135-2756139
+            2754507
+            2755037
+            Fax: (91) 0135-2759104
+            2754507
+            2755037
+            Website: www.fsi.nic.in
+
+            Edition 18, 2023
+
+            Printed at Dehradun, India 2024
+            The contents of the bulletin may be used for non-
+            commercial purposes with due acknowledgment
+
+            All rights reserved. No part of the publication may be
+            reproduced, stored in a retrieval system, or transmitted
+            in any form or by any means; electronic, mechanical,
+            photocopying or otherwise, without the prior
+            permission of the copyright owner. Application for such
+            permission, with a statement of the purpose and extent
+            of reproduction, should be addressed to the Director
+            General, Forest survey of India, P.O.-IPE, Dehradun, India.
+
+            Maps are based on the Survey of India maps with the
+            permission of the Surveyor General of India. The territorial
+            waters of India extend into the sea to a distance of twelve
+            nautical miles measured form the appropriate baseline.
+
+            Design & Layout:
+            Asian Paper Products
+            Email.-asianpaper88@gmail.com
+
+            Front Cover Photo: Subharanjan Sen, IFS
+
+
+iii
+      Forest Survey of India
+===== ISFR 2023 Volume I, PDF page 10 =====
+     India State of Forest Report 2023 (Volume 1)
+
+
+
+
+            vuwi flag] egkfuns’kd                   PREFACE
+            Anoop Singh, Director General
+            Hkkjrh; ou losZ{k.k
+            Forest Survey of India
+            i;kZoj.k] ou ,oa tyok;q ifjorZu ea=ky;
+            Ministry of Environment, Forest and Climate Change
+            Hkkjr ljdkj
+            Government of India
+
+           The India State of Forest Report (ISFR) 2023 is the 18th report in the series of biennial assessment
+        reports published by the Forest Survey of India (FSI). The report gives comprehensive assessment
+        of the forest resources of the country based on interpretation of satellite data and field based
+        National Forest Inventory (NFI). While satellite data gives forest cover, NFI provides Growing Stock
+        and Carbon. The data period of the satellite used for this assessment is in general October 2021 to
+        December 2021 and NFI used for this assessment is 2017-22.
+
+           Forest cover mapping/assessment is a biennial exercise in which wall to wall mapping is done
+        using Indian remote sensing satellite data (IRS-LISS III sensor with 23.5 m resolution) as provided by
+        NRSC. The report gives information on forest cover of country at state, district, and forest division
+        level; and changes in forest cover in respect of the previous assessment of 2021. Information on
+        forest cover inside and outside the recorded forest area, forest cover in hills districts, forest cover
+        in North Eastern States, mangrove is also provided. For the first time, forest cover change matrix
+        inside and outside forest areas have been provided separately for clarity in analysis. In the present
+        report, FSI has given forest cover information for 751 districts including those created in the recent
+        past, as against 636 districts given in ISFR 2021. Latest district boundaries were received from the
+        Survey of India. In addition, to making the report more relevant to the Divisional Forest Officers,
+        who are the primary administrative heads in forest administration, for the first time Division
+        wise forest cover information has also been given for those States from where digitized division
+        boundaries were received. FSI has perfected forest cover mapping methods, by enhancing ground
+        truthing (GT). Data of National Forest inventory, as a ready to use KML file, has also been provided
+        to the analysts carrying out Forest Cover mapping for improving quality of mapping. Concurrent
+        monitoring of FCM work by supervisors and frequent visits to the field after every few scenes
+        improved the perception of analysts. PDA based application for GT ensured data fidelity.
+
+           Contemporary issues have also been attempted e.g. Forest Cover change in Western Ghats.
+
+           The report also contains estimates of tree cover, growing stock, carbon stock and important
+        characteristics of forests derived from the data collected from sample plots spread over the entire
+        country under NFI. As another first, the trees between 5-10 cm have been included in the analysis
+        for Tree Cover and Growing stock as they are a major contributor to paper and pulp industry.
+        Bamboo cover has also been estimated for the first time and included in Tree cover. Agroforestry
+        has been analyzed separately as it accounts for 1,27,590 km2 of tree cover and 1,292 M m3 of
+        Growing stock and serves as livelihood enhancer. It has gained further importance due to earning
+ix      carbon credits in Agroforestry.
+
+     Forest Survey of India
+===== ISFR 2023 Volume I, PDF page 14 =====
+       India State of Forest Report 2023 (Volume 1)
+
+
+
+
+                                                EXECUTIVE SUMMARY
+                                Periodic assessment of forest resources of the country based on robust scientific
+                            methodologies is a pre-requisite for monitoring of these resources and better
+                            planning for the forestry sector. Forest Survey of India, an organization under the
+                            Ministry of Environment, Forest and Climate Change, has been mandated to carry
+                            out a regular assessment of forest resources of the country using satellite data and
+                            field based information and publish the results in a biennial report named as India
+                            state of Forest Report (ISFR). The first report was published by FSI in 1987 and since
+                            then 17 such reports have been published by FSI. The ISFR 2023 is 18th in the series.
+                            The information on various forestry parameters given in the ISFR are very useful for
+                            monitoring of the resources, evaluation of the various polices and making better
+                            planning for optimum utilization of the forest resources. In addition, the inputs
+                            given in the report are very useful for monitoring of NDC targets, reporting of Green
+                            House Gas (GHG) inventory to UNFCCC for the forest land under the LULUCF sector,
+                            and country reporting to FAO for the Global Assessment of Forest Resources.
+
+                                The first major input that goes into the ISFR is forest cover mapping of the
+                            country based on nationwide forest cover mapping using satellite data. The forest
+                            cover is defined as “all lands, more than one hectare with a tree canopy density
+                            of more than or equal to 10% irrespective of ownership, legal status and land use.
+                            Such lands may not necessarily be a recorded forest area. It also includes orchards,
+                            bamboo and palm”. In the current cycle, Forest Cover Mapping has been carried
+                            out using medium-resolution indigenous satellite data, with a spatial resolution of
+                            23.5 m sourced from the Indian Space Research Organization’s (ISRO) indigenous
+                            LISS-III sensor, part of the IRS Resourcesat satellite series, at a scale of 1: 50,000.
+                            This satellite data was acquired for all states within the timeframe of October 2021
+                            to December 2021. In certain regions of the country, such as the North Eastern
+                            region, the coastal belt, and the Andaman and Nicobar Islands, additional satellite
+                            images were procured for the period from January 2022 to April 2022, to obtain
+                            better-quality satellite imagery. This specific time window was chosen because
+                            it typically offers cloud-free satellite data and full vegetation foliage, resulting in
+                            enhanced reflectance and precise satellite image interpretation.
+
+                               The classification of forest cover used in the present report is based on tree
+                            canopy density, viz., Very Dense Forest (VDF) having canopy density equal to or
+                            more than 70%, Moderately Dense Forest (MDF) having canopy density equal to
+                            or more than 40% but less than 70%, and Open Forest (OF) having canopy density
+                            equal to or more than 10% but less than 40%.
+
+                               The Forest Cover is assessed using an approach involving satellite digital
+                            image processing; visual image analysis; ground verification by the analysts and
+                            State Forest Departments; incorporation of post-field corrections; quality checks
+xiii
+       Forest Survey of India
+===== ISFR 2023 Volume I, PDF page 26 =====
+      India State of Forest Report 2023 (Volume 1)
+
+
+           Change matrix         It presents change in land use/forest cover classes for a given area during the period of two
+                                 consecutive assessments in a tabular form by showing the changes of area from one class
+                                 to another.
+           Climate change        Climate change means a change of climate which is attributed directly or indirectly to
+                                 human activity that alters the composition of the global atmosphere and which is in
+                                 addition to natural climate variability observed over comparable time periods. (Source –
+                                 UNFCCC)
+           Coral reefs           Corals are colonial marine invertebrates. A coral reef is an underwater ecosystem
+                                 characterised by structure-building stony corals.
+           Correlation           The correlation between two variables is the degree of association between two variables.
+                                 This degree of association is expressed by a single value called a correlation coefficient (r),
+                                 which can take values ranging between -1 and +1.
+           Crop composition      It refers to the type of species or group of species, which are contained in a forest.
+                                 According to crop composition, forest can be either pure or mixed.
+           Culturable Non        It is the net geographical area, lying outside recorded forest, which can support tree
+           Forest Area           vegetation (thus, excluding areas under waterbodies, riverbeds, perennial snow covered
+                                 mountains, Alpine pastures, Sand dunes etc.). CNFA is the area over which the sample data
+                                 on TOF is aggregated for the assessment.
+           Dead wood             All non-living woody biomass not contained in the litter, either standing, lying on the
+                                 ground, or in the soil. Dead wood includes wood lying on the surface, dead roots, and
+                                 stumps larger than or equal to 5 cm in diameter. (Source – 2006 IPCC Guidelines for
+                                 National Greenhouse Gas inventories)
+           Decomposition         It is the process by which dead organic material are broken down into simpler organic or
+                                 inorganic substances such as carbon dioxide, water, simple sugars, and minerals.
+           Deforestation         The conversion of forest to other land use independently whether human-induced or not.
+                                 It includes areas of forest converted to agriculture, pasture, water reservoirs, mining, and
+                                 urban areas. (Source – GFRA, 2020)
+           Desertification       Land degradation in arid, semi-arid, and dry sub-humid areas resulting from various factors,
+                                 including climatic variations and human activities. ( Source - https://catalogue.unccd.
+                                 int/1195_Desertification.pdf, 26.07.2024)
+           Ecological            Ecological (Ecosystem) restoration means assisting in the recovery of ecosystems that
+           restoration           have been degraded or destroyed, as well as conserving the ecosystems that are still intact.
+                                 (source - www.decadeonrestoration.org - What is Ecosystem Restoration? | UN Decade on
+                                 Restoration, 26.07.2024)
+           Edaphic factors       A condition of the soil, whether physical, biological or chemical, that influences the
+                                 organisms and processes that occur in the soil.
+           Emission              The release of greenhouse gases and/or their precursors into the atmosphere over a
+                                 specified area and period of time. (UNFCCC Article 1.4) (Source - 2019 Refinement to the
+                                 2006 IPCC Guidelines for National Greenhouse Gas Inventories – Glossary)
+           Emission factor       A coefficient that quantifies the emissions or removals of a gas per unit activity. Emission
+                                 factors are often based on a sample of measurement data, averaged to develop a
+                                 representative rate of emission for a given activity level under a given set of operating
+                                 conditions. (Source - 2019 Refinement to the 2006 IPCC Guidelines for National
+                                 Greenhouse Gas Inventories – Glossary)
+           Exotic species        Exotic species are organisms that have been introduced into an area outside their normal
+                                 distribution.
+           Forest area           The area recorded as a forest in the Government records. It is also referred to as “Recorded
+                                 Forest Area”.
+           Forest Cover          All lands, more than or equal to one hectare in area, with a tree canopy of more than or
+                                 equal to 10%, irrespective of ownership and legal status; and includes orchards, bamboo,
+                                 and palm
+           Forest ecosystem      A forest ecosystem is a dynamic complex of plant, animal and micro-organism
+                                 communities and their abiotic environment interacting as a functional unit, where trees are
+                                 a key component of the system. Humans, with their cultural, economic and environmental
+                                 needs, are an integral part of many forest ecosystems.
+xxv
+      Forest Survey of India
+===== ISFR 2023 Volume I, PDF page 63 =====
+                                                                                               02
+FOREST AND
+FOREST AND TREE
+           TREE COVER
+                COVER
+                                                                     Introduction              2.1
+   The National Forest Policy (1988) sets a vision of having a minimum of one third of
+the total land area of the country under forest or tree cover. The policy further envisions
+that in the hills and in mountainous regions, the aim should be to maintain two-third of
+the area under such cover in order to prevent erosion.
+
+
+   Forest Cover is defined as follows: “All areas having tree cover with canopy density
+more than or equal to 10% and above and area more than or equal to one ha”. It may be
+located within recorded forests, or on other government, private, or institutional lands.
+   Tree Cover is defined as follows: “Tree Cover implies patches of trees as well as
+isolated trees outside the RFA on areas less than one ha”.
+
+
+    Since 1987, Forest Survey of India (FSI) has been conducting biennial assessments of
+India’s Forest Cover through remotely sensed data. The tree cover is being assessed by
+FSI since the year 2001. The outcomes of these assessments are meticulously recorded
+in the India State of Forest Reports (ISFRs) released biennially. As of now, seventeen
+cycles of Forest Cover Mapping (FCM) have been executed with proficiency, and the
+current ISFR marks the 18th edition within this ongoing series. For Tree cover, this is the
+11th assessment.
+
+
+    These periodic assessments of forest cover and tree cover offer a comprehensive view
+of the state of India’s forests and trees outside the forests; and, their overarching trends
+over the years. This report serves as a crucial and widely recognized source of information
+for forestry experts across various domains, including the Central Government, State
+Governments, State Forest Departments (SFDs), academic institutions, international
+organizations, media, and other stakeholders. It plays a pivotal role in the comprehensive
+evaluation and development of various forest-related policies, the formulation of
+working plans for State Forest Departments, the implementation of diverse programs,
+and formulation of legislations and regulations in the country.
+
+          Objectives of Forest and Tree Cover Mapping 2.2
+
+2.2.1 Objectives of the Nationwide Forest Cover Mapping initiative
+
+   • Assessment of Forest Resources: To systematically evaluate and quantify
+   the extent and distribution of forests across the entire nation.
+===== ISFR 2023 Volume I, PDF page 76 =====
+     India State of Forest Report 2023 (Volume 1)
+
+
+                2.8 Tree Cover
+
+                           Tree cover comprises all tree patches outside the forest area, which are less than one
+                        hectare in extent including all the scattered trees found in the rural and urban settings,
+                        and not captured under the forest cover assessment. As mentioned earlier in the
+                        Chapter, Forest Cover includes all areas more than or equal to 1 ha in extent and having
+                        canopy density of 10% and above irrespective of land use and legal status. However,
+                        there are many small patches of trees less than 1 ha in extent, such as trees in small
+                        scale plantations, compact block woodlots or trees along linear features, such as roads,
+                        canals, bunds, etc., and scattered trees; which are not captured by satellite sensors
+                        used for forest cover mapping, due to technological limitations. Figure 2.6 depicts the
+                        generalized concept of Forest, TOF and Tree Cover.
+
+                           A complete picture of the forest and tree cover of the country is obtained by adding
+                        the Forest cover and the Tree cover assessed by FSI through two different methodologies.
+                        This information is required to compare with the goal of having a minimum of one third
+                        of the total land area of the country under forest or tree cover, as envisaged under
+                        National Forest Policy 1988. Forest cover is obtained from wall to wall mapping of the
+                        country using satellite data, whereas tree cover is estimated through sample survey
+                        using a combination of mid-resolution satellite data and field inventory data of Trees
+                        Outside Forests (TOF). FSI is publishing the information on forest cover since 1987 and
+                        tree cover since 2001.
+
+
+
+
+32
+      Photo: FSI Repository
+     Forest Survey of India
+===== ISFR 2023 Volume I, PDF page 81 =====
+                                                         Forest and Tree Cover
+
+
+
+
+  Forest Cover Inside and Outside Recorded Forest 2.10
+                               Area or Green Wash
+   While assessing the Forest Cover, FSI considers both recorded forest areas and areas
+outside recorded forests. Here is a summary of how these areas are taken into account:
+   1. Recorded Forest Areas: Most of the recorded forest area is indeed covered
+   with vegetation. However, within these recorded forest areas, there may be some
+   areas with less than 10% canopy density. Such areas are excluded from the definition
+   of forest cover.
+   2. Areas Outside Recorded Forests: Beyond the recorded forest areas, there can
+   be tree stands with canopy densities exceeding or equal to 10% and sizes of 1 ha or
+   more. These areas are also considered as part of the Forest Cover assessment by FSI.
+  The above approach ensured that Forest Cover assessment and monitoring could be
+conducted comprehensively for the entire country, even in the absence of specific RFA
+boundary data from State and UTs.
+   The information of Forest Cover within and outside of RFA/Green Wash is shown in
+Table 2.4.
+    The District and Division wise information on forest cover of all State and UTs as given
+in Chapter 10 (Forest and Tree Resources in State/UTs) has been used in this Chapter for
+compilation of State and Country level forest cover figures.
+
+2.10.1 Recorded Forest Areas (RFA)
+
+“Recorded Forest” refers to any area that is officially documented as a forest in
+government records. Typically, these recorded forest areas include Reserved Forests
+(RF) or Protected Forests (PF), which are established under the Indian Forest Act of
+1927. Besides the RFs and PFs, the recorded forest area may also include all such areas
+which have been recorded as ‘Unclassed Forests’, ‘Village Forests’, or by any other
+nomenclature of such description, and all such areas which have been recorded forests
+in the revenue records, or have been constituted so under any State Act or local law.
+These areas are legally designated as forests and are subject to specific regulations and
+management practices.
+
+
+It’s important to note that Forest Survey of India (FSI) uses digitized boundaries of
+Recorded Forest Areas (RFAs) provided by State Forest Departments (SFDs) and Union
+Territories (UTs) for its assessments and monitoring activities.
+
+Currently, FSI has received RFA digitized boundaries from 25 State Forest Departments
+(SFDs/ UTs). These have been used as per the information provided by the SFDs/
+UTs. Due to non-availability of RFAs digitized boundaries from all State/UTs across
+the country, the assessment and monitoring of Forest Cover within RFA for the whole
+country could not be done. In such cases Green Wash Area is used as a proxy for                                   37
+                                                                                         Forest Survey of India
+

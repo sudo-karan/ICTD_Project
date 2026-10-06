@@ -1,0 +1,1898 @@
+
+                <table align="center" width="60%" border="1" bordercolor="#EBEBEB" style="border-collapse: collapse"
+                    cellspacing="0">
+                    <tr bgcolor="#82b4ff">
+                        <td align="center" rowspan="3">
+                            <b>S No.</b>
+                        </td>
+                        
+                        <td rowspan="3" align="center">
+                            <b>District</b>
+                             <a id="ContentPlaceHolder1_Repeater11_LinkButton5" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$Repeater11$ctl00$LinkButton5&#39;,&#39;&#39;)"><i class="up"></i></a>
+                        </td>
+                        
+                        <td align="center" colspan="5">
+                            <b>Length of Road planted in Km</b>
+                        </td>
+                        <td colspan="5" align="center">
+                            <b>Number of Plants planted </b>
+                        </td>
+                        <td colspan="5" align="center">
+                            <b>Number of Beneficiaries identified for providing usufruct rights </b>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#82b4ff">
+                        
+                        <td align="center" colspan="2">
+                            <b>PMGSY</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>National Highways</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Other roads</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Total</b>
+                            <a id="ContentPlaceHolder1_Repeater11_LinkButton2" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$Repeater11$ctl00$LinkButton2&#39;,&#39;&#39;)"><i class="default"></i></a>
+
+                             
+                        </td>
+                        
+                        <td align="center" colspan="2">
+                            <b>PMGSY</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>National Highways</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Other roads</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Total</b>
+                            <a id="ContentPlaceHolder1_Repeater11_LinkButton3" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$Repeater11$ctl00$LinkButton3&#39;,&#39;&#39;)"><i class="default"></i></a>
+                             
+                        </td>
+                        
+                        <td align="center" colspan="2">
+                            <b>PMGSY</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>National Highways</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Other roads</b>
+                        </td>
+                        <td align="center" rowspan="2">
+                            <b>Total</b>
+                            <a id="ContentPlaceHolder1_Repeater11_LinkButton4" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$Repeater11$ctl00$LinkButton4&#39;,&#39;&#39;)"><i class="default"></i></a>
+                             
+                        </td>
+                        
+                    </tr>
+                    <tr bgcolor="#82b4ff">
+                        
+                        <td align="center">
+                            <b>PMGSY With Road code</b>
+                        </td>
+                        <td align="center">
+                            <b>PMGSY Without Road code</b>
+                        </td>
+                        
+                        <td align="center">
+                            <b>PMGSY With Road code</b>
+                        </td>
+                        <td align="center">
+                            <b>PMGSY Without Road code</b>
+                        </td>
+                        
+                        <td align="center">
+                            <b>PMGSY With Road code</b>
+                        </td>
+                        <td align="center">
+                            <b>PMGSY Without Road code</b>
+                        </td>
+                        
+                    </tr>
+                    <tr bgcolor="#82b4ff" align="center">
+                        
+                        <td>
+                            1
+                        </td>
+                        
+                        <td>
+                            2
+                        </td>
+                        
+                        <td>
+                            3
+                        </td>
+                        
+                        <td>
+                            4
+                        </td>
+                        
+                        <td>
+                            5
+                        </td>
+                        
+                        <td>
+                            6
+                        </td>
+                        
+                        <td>
+                            7=3+4+5+6
+                        </td>
+                        
+                        <td>
+                            8
+                        </td>
+                        
+                        <td>
+                            9
+                        </td>
+                        
+                        <td>
+                            10
+                        </td>
+                        
+                        <td>
+                            11
+                        </td>
+                        
+                        <td>
+                            12=8+9+10+11
+                        </td>
+                        
+                        <td>
+                            13
+                        </td>
+                        
+                        <td>
+                            14
+                        </td>
+                        
+                        <td>
+                            15
+                        </td>
+                        
+                        <td>
+                            16
+                        </td>
+                        
+                        <td>
+                            17=13+14+15+16
+                        </td>
+                        
+                    </tr>
+            
+                <tr>
+                    <td align="center">
+                        
+                    </td>
+                    <td align="left">
+                        <b>Total</b>
+                    </td>
+                    <td align="right">
+                        717.75
+                    </td>
+                    <td align="right">
+                        29
+                    </td>
+                    <td align="right">
+                        52.5
+                    </td>
+                    <td align="right">
+                        3649.1
+                    </td>
+                    <td align="right">
+                        4448.35
+                    </td>
+                    <td align="right">
+                        238850
+                    </td>
+                    <td align="right">
+                        7400
+                    </td>
+                    <td align="right">
+                        16250
+                    </td>
+                    <td align="right">
+                        1286772
+                    </td>
+                    <td align="right">
+                        1549272
+                    </td>
+                    <td align="right">
+                        10646
+                    </td>
+                    <td align="right">
+                        86
+                    </td>
+                    <td align="right">
+                        2873
+                    </td>
+                    <td align="right">
+                        2041165
+                    </td>
+                    <td align="right">
+                        2054770
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        1
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=ANGUL&district_code=2421&fin_year=2016-2017&Digest=Loumb4YT7JSRIs1p/8jL9g'>ANGUL</a>
+                    </td>
+                    <td align="right">
+                        29
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        59
+                    </td>
+                    <td align="right">
+                        88
+                    </td>
+                    <td align="right">
+                        7250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        14750
+                    </td>
+                    <td align="right">
+                        22000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        2
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=BALESHWAR&district_code=2405&fin_year=2016-2017&Digest=iSXKicN1D6ZyaIyNlXQ9zA'>BALESHWAR</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        39.5
+                    </td>
+                    <td align="right">
+                        39.5
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        9875
+                    </td>
+                    <td align="right">
+                        9875
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        3
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=BARGARH&district_code=2414&fin_year=2016-2017&Digest=r4EDiu7+laDq9HRZWZHtLQ'>BARGARH</a>
+                    </td>
+                    <td align="right">
+                        62.75
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        17.6
+                    </td>
+                    <td align="right">
+                        80.35
+                    </td>
+                    <td align="right">
+                        31600
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        7550
+                    </td>
+                    <td align="right">
+                        39150
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        4
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=BHADRAK&district_code=2417&fin_year=2016-2017&Digest=im/1+4gjqxZZG2gFnaxQ1A'>BHADRAK</a>
+                    </td>
+                    <td align="right">
+                        18
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        40.2
+                    </td>
+                    <td align="right">
+                        58.2
+                    </td>
+                    <td align="right">
+                        4500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        10050
+                    </td>
+                    <td align="right">
+                        14550
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        5
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=BOLANGIR&district_code=2409&fin_year=2016-2017&Digest=U+2/z31lcXcdBIqiiOfUIw'>BOLANGIR</a>
+                    </td>
+                    <td align="right">
+                        63.5
+                    </td>
+                    <td align="right">
+                        4
+                    </td>
+                    <td align="right">
+                        10
+                    </td>
+                    <td align="right">
+                        83
+                    </td>
+                    <td align="right">
+                        160.5
+                    </td>
+                    <td align="right">
+                        30500
+                    </td>
+                    <td align="right">
+                        1000
+                    </td>
+                    <td align="right">
+                        5000
+                    </td>
+                    <td align="right">
+                        29000
+                    </td>
+                    <td align="right">
+                        65500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        30
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        30
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        6
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=BOUDH&district_code=2426&fin_year=2016-2017&Digest=uKv9Qc1/8EMTO8imelia7Q'>BOUDH</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        10
+                    </td>
+                    <td align="right">
+                        60
+                    </td>
+                    <td align="right">
+                        70
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2500
+                    </td>
+                    <td align="right">
+                        15000
+                    </td>
+                    <td align="right">
+                        17500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        7
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=CUTTACK&district_code=2406&fin_year=2016-2017&Digest=oYiyjSkbfFJNb1FJV/+zUQ'>CUTTACK</a>
+                    </td>
+                    <td align="right">
+                        8
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        8
+                    </td>
+                    <td align="right">
+                        2000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        8
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=DEOGARH&district_code=2416&fin_year=2016-2017&Digest=pECYtln+xm8u0H6R/lHT4A'>DEOGARH</a>
+                    </td>
+                    <td align="right">
+                        7
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        9
+                    </td>
+                    <td align="right">
+                        15
+                    </td>
+                    <td align="right">
+                        31
+                    </td>
+                    <td align="right">
+                        1750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2250
+                    </td>
+                    <td align="right">
+                        3750
+                    </td>
+                    <td align="right">
+                        7750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        9
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=DHENKANAL&district_code=2407&fin_year=2016-2017&Digest=6mbe8CSBf439eL6PmC1ntA'>DHENKANAL</a>
+                    </td>
+                    <td align="right">
+                        35
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        144
+                    </td>
+                    <td align="right">
+                        179
+                    </td>
+                    <td align="right">
+                        7000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        32800
+                    </td>
+                    <td align="right">
+                        39800
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        10
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=GAJAPATI&district_code=2424&fin_year=2016-2017&Digest=/OhcgD7SdPzQ+yhLvrxnnw'>GAJAPATI</a>
+                    </td>
+                    <td align="right">
+                        50
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        35
+                    </td>
+                    <td align="right">
+                        85
+                    </td>
+                    <td align="right">
+                        12500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        8750
+                    </td>
+                    <td align="right">
+                        21250
+                    </td>
+                    <td align="right">
+                        332
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        208
+                    </td>
+                    <td align="right">
+                        540
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        11
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=GANJAM&district_code=2412&fin_year=2016-2017&Digest=/sYaK6Nvr+sveYhBXDpJ8A'>GANJAM</a>
+                    </td>
+                    <td align="right">
+                        1
+                    </td>
+                    <td align="right">
+                        1
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        570.05
+                    </td>
+                    <td align="right">
+                        572.05
+                    </td>
+                    <td align="right">
+                        500
+                    </td>
+                    <td align="right">
+                        400
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        175360
+                    </td>
+                    <td align="right">
+                        176260
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        28
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2008980
+                    </td>
+                    <td align="right">
+                        2009008
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        12
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=JAGATSINGHAPUR&district_code=2419&fin_year=2016-2017&Digest=E1qgrlSV+V17lDTctUz11Q'>JAGATSINGHAPUR</a>
+                    </td>
+                    <td align="right">
+                        10
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        46.5
+                    </td>
+                    <td align="right">
+                        56.5
+                    </td>
+                    <td align="right">
+                        3500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        20250
+                    </td>
+                    <td align="right">
+                        23750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        13
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=JAJPUR&district_code=2420&fin_year=2016-2017&Digest=1+l1J4BZU1uLl+XANQ+nyA'>JAJPUR</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        30.5
+                    </td>
+                    <td align="right">
+                        30.5
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        18250
+                    </td>
+                    <td align="right">
+                        18250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        14
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=JHARSUGUDA&district_code=2415&fin_year=2016-2017&Digest=itTdmFj5HkqgHgNhLLseBQ'>JHARSUGUDA</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        100
+                    </td>
+                    <td align="right">
+                        100
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        24550
+                    </td>
+                    <td align="right">
+                        24550
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        15
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KALAHANDI&district_code=2410&fin_year=2016-2017&Digest=eYdgtVMyF5OWk4lFJtl+jA'>KALAHANDI</a>
+                    </td>
+                    <td align="right">
+                        16.5
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2.5
+                    </td>
+                    <td align="right">
+                        187
+                    </td>
+                    <td align="right">
+                        206
+                    </td>
+                    <td align="right">
+                        8250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        1250
+                    </td>
+                    <td align="right">
+                        63500
+                    </td>
+                    <td align="right">
+                        73000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        16
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KANDHAMAL&district_code=2408&fin_year=2016-2017&Digest=y/lFNUR4wa84fkJDwDOCXA'>KANDHAMAL</a>
+                    </td>
+                    <td align="right">
+                        4
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        108
+                    </td>
+                    <td align="right">
+                        112
+                    </td>
+                    <td align="right">
+                        2000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        30500
+                    </td>
+                    <td align="right">
+                        32500
+                    </td>
+                    <td align="right">
+                        800
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        10585
+                    </td>
+                    <td align="right">
+                        11385
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        17
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KENDRAPARA&district_code=2418&fin_year=2016-2017&Digest=aNfDpL6IiR2kWEey+QndJQ'>KENDRAPARA</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        75
+                    </td>
+                    <td align="right">
+                        75
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        26500
+                    </td>
+                    <td align="right">
+                        26500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        18
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KENDUJHAR&district_code=2403&fin_year=2016-2017&Digest=Gg8Rcv/B3nKYQg2AtVk+tw'>KENDUJHAR</a>
+                    </td>
+                    <td align="right">
+                        84
+                    </td>
+                    <td align="right">
+                        24
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        188
+                    </td>
+                    <td align="right">
+                        296
+                    </td>
+                    <td align="right">
+                        21000
+                    </td>
+                    <td align="right">
+                        6000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        49012
+                    </td>
+                    <td align="right">
+                        76012
+                    </td>
+                    <td align="right">
+                        27
+                    </td>
+                    <td align="right">
+                        28
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        301
+                    </td>
+                    <td align="right">
+                        356
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        19
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KHORDHA&district_code=2423&fin_year=2016-2017&Digest=kovCYUlpIeqZDydFqHOFig'>KHORDHA</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        144
+                    </td>
+                    <td align="right">
+                        144
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        61500
+                    </td>
+                    <td align="right">
+                        61500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        20
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=KORAPUT&district_code=2411&fin_year=2016-2017&Digest=2u7hY7Gn9VS5rQBrpbQZBw'>KORAPUT</a>
+                    </td>
+                    <td align="right">
+                        40
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        5
+                    </td>
+                    <td align="right">
+                        222
+                    </td>
+                    <td align="right">
+                        267
+                    </td>
+                    <td align="right">
+                        11250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        1250
+                    </td>
+                    <td align="right">
+                        210250
+                    </td>
+                    <td align="right">
+                        222750
+                    </td>
+                    <td align="right">
+                        160
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        25
+                    </td>
+                    <td align="right">
+                        280
+                    </td>
+                    <td align="right">
+                        465
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        21
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=MALKANGIRI&district_code=2431&fin_year=2016-2017&Digest=IW8w3BF9i6mdGHoSTU5HjA'>MALKANGIRI</a>
+                    </td>
+                    <td align="right">
+                        7
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        16
+                    </td>
+                    <td align="right">
+                        112
+                    </td>
+                    <td align="right">
+                        135
+                    </td>
+                    <td align="right">
+                        1750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        4000
+                    </td>
+                    <td align="right">
+                        28000
+                    </td>
+                    <td align="right">
+                        33750
+                    </td>
+                    <td align="right">
+                        640
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        2848
+                    </td>
+                    <td align="right">
+                        14095
+                    </td>
+                    <td align="right">
+                        17583
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        22
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=MAYURBHANJ&district_code=2404&fin_year=2016-2017&Digest=ZPIgiuztfqxgt6nQKxKY7g'>MAYURBHANJ</a>
+                    </td>
+                    <td align="right">
+                        89
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        209.25
+                    </td>
+                    <td align="right">
+                        298.25
+                    </td>
+                    <td align="right">
+                        31750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        66525
+                    </td>
+                    <td align="right">
+                        98275
+                    </td>
+                    <td align="right">
+                        687
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        1624
+                    </td>
+                    <td align="right">
+                        2311
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        23
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=NABARANGAPUR&district_code=2430&fin_year=2016-2017&Digest=c/F7XBXe4yxy4lqu0y916g'>NABARANGAPUR</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        30
+                    </td>
+                    <td align="right">
+                        30
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        7500
+                    </td>
+                    <td align="right">
+                        7500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        24
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=NAYAGARH&district_code=2422&fin_year=2016-2017&Digest=Eqkg7FHsnYkZpedCyXfITw'>NAYAGARH</a>
+                    </td>
+                    <td align="right">
+                        14.5
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        130
+                    </td>
+                    <td align="right">
+                        144.5
+                    </td>
+                    <td align="right">
+                        7250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        59250
+                    </td>
+                    <td align="right">
+                        66500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        25
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=NUAPADA&district_code=2428&fin_year=2016-2017&Digest=cPR/qcH+8M6vlkF2L/aswQ'>NUAPADA</a>
+                    </td>
+                    <td align="right">
+                        39
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        88
+                    </td>
+                    <td align="right">
+                        127
+                    </td>
+                    <td align="right">
+                        9700
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        22000
+                    </td>
+                    <td align="right">
+                        31700
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        26
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=PURI&district_code=2413&fin_year=2016-2017&Digest=h2m1r8tqvBH8+IELKzztjw'>PURI</a>
+                    </td>
+                    <td align="right">
+                        2
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        274.5
+                    </td>
+                    <td align="right">
+                        276.5
+                    </td>
+                    <td align="right">
+                        800
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        111550
+                    </td>
+                    <td align="right">
+                        112350
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        92
+                    </td>
+                    <td align="right">
+                        92
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        27
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=RAYAGADA&district_code=2429&fin_year=2016-2017&Digest=Vp5sY6LLKnGws63M02AQeQ'>RAYAGADA</a>
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        195
+                    </td>
+                    <td align="right">
+                        195
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        48750
+                    </td>
+                    <td align="right">
+                        48750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        28
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=SAMBALPUR&district_code=2401&fin_year=2016-2017&Digest=06xLyIo42DEcF4qQI0TtUQ'>SAMBALPUR</a>
+                    </td>
+                    <td align="right">
+                        38.5
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        81.5
+                    </td>
+                    <td align="right">
+                        120
+                    </td>
+                    <td align="right">
+                        19250
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        40250
+                    </td>
+                    <td align="right">
+                        59500
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        5000
+                    </td>
+                    <td align="right">
+                        5000
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        29
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=SONEPUR&district_code=2427&fin_year=2016-2017&Digest=/fFFGYVS6CgIc1V7y6n4Yg'>SONEPUR</a>
+                    </td>
+                    <td align="right">
+                        51
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        104
+                    </td>
+                    <td align="right">
+                        155
+                    </td>
+                    <td align="right">
+                        12750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        26000
+                    </td>
+                    <td align="right">
+                        38750
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        30
+                    </td>
+                    <td align="left">
+                        <a href='road_plantation_rpt.aspx?lflag=local&page=D&state_name=ODISHA &state_code=24&district_name=SUNDARGARH&district_code=2402&fin_year=2016-2017&Digest=MgnzkKYEnCFMuanI+sJ7mg'>SUNDARGARH</a>
+                    </td>
+                    <td align="right">
+                        48
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        260.5
+                    </td>
+                    <td align="right">
+                        308.5
+                    </td>
+                    <td align="right">
+                        12000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        65750
+                    </td>
+                    <td align="right">
+                        77750
+                    </td>
+                    <td align="right">
+                        8000
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        0
+                    </td>
+                    <td align="right">
+                        8000
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td align="center">
+                        
+                    </td>
+                    <td align="left">
+                        <b>Total</b>
+                    </td>
+                    <td align="right">
+                        717.75
+                    </td>
+                    <td align="right">
+                        29
+                    </td>
+                    <td align="right">
+                        52.5
+                    </td>
+                    <td align="right">
+                        3649.1
+                    </td>
+                    <td align="right">
+                        4448.35
+                    </td>
+                    <td align="right">
+                        238850
+                    </td>
+                    <td align="right">
+                        7400
+                    </td>
+                    <td align="right">
+                        16250
+                    </td>
+                    <td align="right">
+                        1286772
+                    </td>
+                    <td align="right">
+                        1549272
+                    </td>
+                    <td align="right">
+                        10646
+                    </td>
+                    <td align="right">
+                        86
+                    </td>
+                    <td align="right">
+                        2873
+                    </td>
+                    <td align="right">
+                        2041165
+                    </td>
+                    <td align="right">
+                        2054770
+                    </td>
+                </tr>
+            
+                </table>
+            

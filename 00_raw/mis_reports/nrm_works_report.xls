@@ -1,0 +1,364 @@
+
+                    <table align="center" width="80%" border="1" bordercolor="#EBEBEB" style="border-collapse: collapse"
+                        cellspacing="0">
+                        <tr bgcolor="#82b4ff">
+                            <td align="center" rowspan="2">
+                                <b>S No.</b>
+                            </td>
+                            
+                            <td rowspan="2" align="center">
+                                <b>District</b>
+                            </td>
+                            
+                            <td rowspan="2" align="center">
+                                <b>Number of Blocks</b>
+                            </td>
+                            
+                            <td colspan="2" align="center">
+                                <b>Number of NRM works</b>
+                            </td>
+                            <td rowspan="2" align="center">
+                                <b>%age of works on NRM works against total works</b>
+                            </td>
+                            <td rowspan="2" align="center">
+                                <b>Expenditure on NRM works[In. Lakhs]</b>
+                            </td>
+                            
+                            <td rowspan="2" align="center">
+                                <b>Expenditure on All works[In. Lakhs]</b>
+                            </td>
+                            
+                            <td rowspan="2" align="center">
+                                <b>%age of expenditure on NRM works against total Expenditure</b>
+                            </td>
+                            
+                        </tr>
+                        <tr bgcolor="#82b4ff">
+                            <td align="center">
+                                <b>Ongoing</b>
+                            </td>
+                            <td align="center">
+                                <b>Completed</b>
+                            </td>
+                        </tr>
+                        <tr bgcolor="#82b4ff" align="center">
+                         
+                            <td align="center">
+
+                            </td>
+                              
+                                    <td align="center">
+                                <b>2</b> <a id="Repeater1_LinkButton5" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton5&#39;,&#39;&#39;)"><i class="up"></i></a> </td>
+                              
+                                 <td align="center"><b>3</b><a id="Repeater1_LinkButton2" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton2&#39;,&#39;&#39;)"><i class="default"></i></a> </td>
+                             
+                
+
+                                  <td align="center"><b>4</b>   <a id="Repeater1_LinkButton16" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton16&#39;,&#39;&#39;)"><i class="default"></i></a></td>
+                           
+                                <td align="center"><b>5</b> <a id="Repeater1_LinkButton17" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton17&#39;,&#39;&#39;)"><i class="default"></i></a></td>
+                              
+                                <td align="center"><b>6</b> </td>
+                            
+                               <td align="center"><b>7 </b> <a id="Repeater1_LinkButton19" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton19&#39;,&#39;&#39;)"><i class="default"></i></a></td>
+                             
+                                <td align="center"><b>8</b> <a id="Repeater1_LinkButton20" href="javascript:__doPostBack(&#39;Repeater1$ctl11$LinkButton20&#39;,&#39;&#39;)"><i class="default"></i></a></td>
+
+                               <td align="center">
+                                <b>9=7/8*100</b>
+                                 
+                            </td>
+                                 
+
+                        </tr>
+                
+                    <tr>
+                        <td align="center">
+                            
+                        </td>
+                        <td align="left">
+                            <b>Total</b>
+                        </td>
+                        <td align="right">
+                            9
+                        </td>
+                        
+                        <td align="right">
+                            1607
+                        </td>
+                        <td align="right">
+                            1126
+                        </td>
+                        <td align="right">
+                            12.25
+                        </td>
+                        <td align="right">
+                            1384.35
+                        </td>
+                        <td align="right">
+                            3369.25
+                        </td>
+                        <td align="right">
+                            <font color='red'>41.09</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            1
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=ANGUL&district_code=2421&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=PoOGugfZnBtg4PI4Clmn8Q'>ANGUL</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            61
+                        </td>
+                        <td align="right">
+                            17
+                        </td>
+                        <td align="right">
+                            7.57
+                        </td>
+                        <td align="right">
+                            29.87
+                        </td>
+                        <td align="right">
+                            75.77
+                        </td>
+                        <td align="right">
+                            <font color='red'>39.42</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            2
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=BALESHWAR&district_code=2405&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=7qLZqxahnQx2DRM8W6TnDQ'>BALESHWAR</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            39
+                        </td>
+                        <td align="right">
+                            121
+                        </td>
+                        <td align="right">
+                            3.51
+                        </td>
+                        <td align="right">
+                            26.24
+                        </td>
+                        <td align="right">
+                            329.22
+                        </td>
+                        <td align="right">
+                            <font color='red'>7.97</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            3
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=JAJPUR&district_code=2420&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=k2kJEAJRPE+vqIEPO9YqJg'>JAJPUR</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            231
+                        </td>
+                        <td align="right">
+                            48
+                        </td>
+                        <td align="right">
+                            18.05
+                        </td>
+                        <td align="right">
+                            238.31
+                        </td>
+                        <td align="right">
+                            440.41
+                        </td>
+                        <td align="right">
+                            <font color='red'>54.11</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            4
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=JHARSUGUDA&district_code=2415&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=Q+anWlchhKhkDYC+wm2+Sg'>JHARSUGUDA</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            363
+                        </td>
+                        <td align="right">
+                            109
+                        </td>
+                        <td align="right">
+                            19.98
+                        </td>
+                        <td align="right">
+                            51.94
+                        </td>
+                        <td align="right">
+                            139.81
+                        </td>
+                        <td align="right">
+                            <font color='red'>37.15</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            5
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=KHORDHA&district_code=2423&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=FIbTdf6NLo8eoTSVRYiFRQ'>KHORDHA</a>
+                        </td>
+                        <td align="right">
+                            3
+                        </td>
+                        
+                        <td align="right">
+                            443
+                        </td>
+                        <td align="right">
+                            391
+                        </td>
+                        <td align="right">
+                            13.06
+                        </td>
+                        <td align="right">
+                            171.42
+                        </td>
+                        <td align="right">
+                            570.09
+                        </td>
+                        <td align="right">
+                            <font color='red'>30.07</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            6
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=NAYAGARH&district_code=2422&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=6wAJMkGaQ5eU9Q8hPFQVYQ'>NAYAGARH</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            175
+                        </td>
+                        <td align="right">
+                            109
+                        </td>
+                        <td align="right">
+                            15.8
+                        </td>
+                        <td align="right">
+                            411.47
+                        </td>
+                        <td align="right">
+                            641.29
+                        </td>
+                        <td align="right">
+                            <font color='red'>64.16</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            7
+                        </td>
+                        <td align="left">
+                            <a href='nrm_works_report.aspx?live=&lflag=&page=D&state_name=ODISHA &state_code=24&district_name=NUAPADA&district_code=2428&fin_year=2016-2017&rbl=4&rbl1=2&rbl2=0&Digest=RYOvDiBQAaPrbq4eOGAT7g'>NUAPADA</a>
+                        </td>
+                        <td align="right">
+                            1
+                        </td>
+                        
+                        <td align="right">
+                            295
+                        </td>
+                        <td align="right">
+                            331
+                        </td>
+                        <td align="right">
+                            13.53
+                        </td>
+                        <td align="right">
+                            455.1
+                        </td>
+                        <td align="right">
+                            1172.66
+                        </td>
+                        <td align="right">
+                            <font color='red'>38.81</font>
+                        </td>
+                        
+                    </tr>
+                
+                    <tr>
+                        <td align="center">
+                            
+                        </td>
+                        <td align="left">
+                            <b>Total</b>
+                        </td>
+                        <td align="right">
+                            9
+                        </td>
+                        
+                        <td align="right">
+                            1607
+                        </td>
+                        <td align="right">
+                            1126
+                        </td>
+                        <td align="right">
+                            12.25
+                        </td>
+                        <td align="right">
+                            1384.35
+                        </td>
+                        <td align="right">
+                            3369.25
+                        </td>
+                        <td align="right">
+                            <font color='red'>41.09</font>
+                        </td>
+                        
+                    </tr>
+                
+                    </table>
+                
