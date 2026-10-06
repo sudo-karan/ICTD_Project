@@ -1,518 +1,381 @@
 #!/usr/bin/env python3
 """
-Stage 1 - the three measures of forest condition set beside one another, pixel by pixel and unit by unit.
+Stage 1 - do the two measures of forest condition point at the same units? Hansen beside CoRE Stack.
 
     python scripts/02_build_agreement.py --units 10_units/units.gpkg
 
-In : --units    the stage-0 layer and its Earth Engine table asset (see 02_upload_units_asset.py)
-     projects/<project>/assets/ictd/nirv_std_<layer stem>       the stored date-standardised yearly NIRv of every grid cell
-                                                                 (02_export_nirv_yearly.py), band std_<season>
-     20_degradation/nirv_scenes.csv, nirv_observations.provenance.json, nirv_yearly.provenance.json
-                                                                 the scenes behind it and the records of the two exports
-     UMD/hansen/global_forest_change_2025_v1_13                  bands treecover2000, lossyear
-     projects/corestack-trees/assets/tree_characteristics/overall_change_2017_2023
-     20_degradation/hansen_loss_by_canopy_band_by_unit.csv, nirv_by_unit_bands.csv, corestack_by_unit_bands.csv
-                                                                 the three sources' own tables: this script's margins
-                                                                 are checked against them before anything is written
+In : --units                                                 the stage-0 layer: which units there are, and their type
+     20_degradation/hansen_loss_by_canopy_band_by_unit.csv   02_build_hansen.py: land and yearly loss by band of year-2000 canopy
+     20_degradation/corestack_by_unit_bands.csv              02_build_corestack.py: every class by the same bands
+     20_degradation/corestack_by_unit.csv                    the same source's own per-unit totals on treecover2000 > 10
+     20_degradation/hansen_loss_by_canopy_band.csv, corestack_by_unit_level.csv
+                                                             the two sources' own summary tables: what the margins must add up to
+     and the two provenance records, which must name this layer
 Out: 20_degradation/ and nowhere else
-     agreement_by_unit.csv            per unit: the eight cells of the headline table, rates, and which measures flag it
-     agreement_cells_by_unit.csv      per unit: every cell of both cross-tabulations
-     agreement_summary.csv            all units, lgd_panchayat units, outside_village units: cells and margins
-     agreement_pairs.csv              every pair of flags: overlap, overlap expected by chance, odds ratio, conditional rates
-     agreement_units.csv              unit by unit: rank agreement of the three rates, and the units all three flag
-     agreement_positive_control.csv   does NIRv see what Hansen dates? its flags on Hansen-loss pixels, by year of loss
-     agreement.provenance.json        inputs, UTC run time, definitions, checks, n and missingness
+     agreement_by_unit.csv        per unit: the rates of each measure, its flags, and the agreement class
+     agreement_summary.csv        by window, unit type and minimum forest: how many units each measure flags, how many
+                                  both flag beside the number chance would give, and the rank correlations
+     agreement_definitions.csv    the same headline for other readings of "CoRE Stack says degraded"
+     agreement.provenance.json    inputs, UTC run time, definitions, checks, n and missingness
 
-THE THREE MEASURES DO NOT MEASURE THE SAME THING, and the table is built so that this can be seen, not hidden.
-  Hansen      a year in which a 30 m pixel's tree cover was removed outright
-  NIRv        canopy greenness of a pixel around 1 December, season by season: the DATE-STANDARDISED yearly value of
-              02_build_nirv.py (every clear pass moved to 1 December by the pixel's own rate), not the first design's
-  CoRE Stack  a class of change between two three-year periods, inside its own tree mask: tree cover lost (-2),
-              canopy density or height down a class (-1), up a class (1)
-A cleared pixel should show in all three (Hansen loss, NIRv lower, CoRE -2). A pixel that thinned under a standing
-canopy can show only in NIRv and CoRE -1. So CoRE Stack is kept in four states, not two.
+It reads tables and calls no Earth Engine. NIRv is not in this table: since 7 Oct 2026 it is a reported column, not
+a degradation measure (docs/DEGRADATION.md).
 
-TWO VERSIONS. THE FIRST IS THE HEADLINE.
-1. THE COMMON WINDOW: change between the three years to mid-2019 and the three years from mid-2022.
-     CoRE Stack compares the agricultural years 2016-17 to 2018-19 with 2022-23 to 2024-25 (each of its "years" is
-     the mode of three). So:
-     NIRv    LOWER  = every one of the seasons (Nov-Dec) 2022, 2023, 2024 below every one of 2016, 2017, 2018;
-             HIGHER = the mirror; otherwise NEITHER. All six seasons needed. Both sets of seasons lie inside CoRE
-             Stack's two periods. (Not a trend test: over seven seasons a trend test cannot see a one-step loss.)
-     Hansen  loss dated 2019, 2020, 2021 or 2022: the calendar years between the two periods. A loss dated 2023
-             cannot make NIRv "lower" by this rule (the 2022 season precedes it), so it is not in the window; the
-             positive-control table shows the losses of 2016-2018 and of 2023 beside it.
-     CoRE    class -2 (LOST), -1 (DEGRADATION), 1 (IMPROVEMENT), or any of 0, 2, 3, 4 (REST).
-   REFERENCE LAND, the same for all three: grid cells with treecover2000 > 10, where CoRE Stack has a class from
-   -2 to 4 (so inside its tree mask in at least one period, and not "missing"), and where NIRv has all six
-   seasons. What that leaves out, and why, is tallied per unit. Every reference cell is in exactly one of
-   2 x 3 x 4 = 24 cells, separately for 10 < treecover2000 <= 30 and treecover2000 > 30.
-   THE HEADLINE TABLE is those 24 folded to 2 x 2 x 2: Hansen loss 2019-2022 x NIRv lower x CoRE class -1.
-   Improvement (class 1) and NIRv higher are in the cross-tabulation as placebos: if NIRv "lower" is as common
-   on CoRE "improvement" as on CoRE "degradation", the two do not agree, whatever the overlap in hectares.
-2. THE FULL SPAN, each measure over all it covers - which is NOT one period, and is reported for that reason only:
-     Hansen loss in any year 2001-2025; NIRv declining / increasing / neither by the 13-season test of
-     02_build_nirv.py (2013-2025); CoRE as above (2017-2023). Reference: treecover2000 > 10 with a CoRE class from
-     -2 to 4 and an NIRv trend. A pixel cleared in 2005 and regrown is "Hansen loss" and "NIRv increasing" here:
-     disagreement by construction. Do not read this version as a test of agreement.
+WHAT IS COMPARED, AND WHY UNIT BY UNIT.
+  Hansen      a year in which a 30 m pixel's tree cover was removed outright (lossyear).
+  CoRE Stack  a class of change between two three-year periods inside its own tree mask: -2 tree cover lost,
+              -1 canopy density or height down a class ("degradation"), 1 up a class ("improvement"), 3 and 4 one
+              up and one down ("partially degraded").
+They do not measure the same thing and are not expected to mark the same pixels: Hansen sees clearance and is
+blind to thinning; CoRE Stack's class -1 is thinning under a canopy that still stands. The question this table
+answers is the one the project needs: DO THE TWO POINT AT THE SAME UNITS? A pixel-by-pixel overlap needs one more
+Earth Engine job and is not in this table.
 
-EVERYTHING IS ON HANSEN'S GRID (EPSG:4326, 0.00025 degrees). NIRv is stored on it. CoRE Stack is 25 m: each grid cell
-takes the CoRE pixel that contains its centre, so the CoRE margins here differ slightly from 02_build_corestack.py's,
-which are summed on CoRE's own grid; the difference is measured and reported. The NIRv and Hansen flags are built by
-the same code as 02_build_nirv.py (imported, not copied), from its date-standardised yearly values.
+THE REFERENCE LAND, the same for both: land with treecover2000 > 10 (the two canopy bands 10 < treecover2000 <= 30
+and treecover2000 > 30 of both sources' tables). Hansen's loss inside its own mask (treecover2000 > 30) is the
+larger part of it; the band 10 < treecover2000 <= 30 is land Hansen's mask leaves out and CoRE Stack covers.
+  hansen rate      Hansen loss dated in the window on that land / that land (Hansen's grid)
+  corestack rates  the area of a class on that land / the land there that has a CoRE Stack class from -2 to 4
+                   (CoRE Stack's own 25 m grid; class 5, "missing", is left out of the denominator)
 
-WHAT "AGREEMENT" IS MEASURED BY. For two flags A and B on the reference land:
-  expected overlap by chance   area(A) x area(B) / reference area: what two unrelated flags of these sizes share
-  observed / expected          1 = no better than chance
-  odds ratio                   (A and B)(neither) / (A only)(B only), with a 95 per cent interval from resampling
-                               UNITS (pixels are not independent; units are the nearest thing to it)
-  conditional rates            the share of A that is also B, beside the share of not-A that is B
-Overlap in hectares alone says nothing: two flags that each cover a tenth of the land share a hundredth by chance.
+THE WINDOWS. THE FIRST IS THE HEADLINE. They are never averaged or pooled.
+  common_2017_2023      Hansen loss dated 2017 to 2023 beside CoRE Stack's change 2017-2023: the span the CoRE Stack
+                        product itself names. THE HEADLINE.
+  between_2019_2022     Hansen loss dated 2019 to 2022 only. CoRE Stack's "2017" is the mode of the agricultural
+                        years 2016-17 to 2018-19 and its "2023" that of 2022-23 to 2024-25, so a loss dated 2017 or
+                        2018 falls inside its first period and one dated 2023 inside its second. This narrower
+                        window holds only the years strictly between the two periods. A sensitivity row.
+  full_span_2001_2025   Hansen loss in any year 2001 to 2025 beside the same CoRE Stack classes. NOT ONE PERIOD:
+                        reported separately and labelled, and not a test of agreement - a unit cleared in 2005
+                        counts for Hansen and cannot count for a product that starts in 2017.
 
-UNIT BY UNIT. For each unit with at least 50 ha of reference land: the three rates (Hansen loss, NIRv lower, CoRE
-class -1, each as a share of its reference land) and the two net rates (NIRv lower minus higher; CoRE -1 minus 1).
-A unit is FLAGGED by a measure if its rate is above the 80th percentile of such units (or above zero, if the 80th
-percentile is zero). agreement_units.csv gives the rank correlations and how many units are flagged by all three,
-two, one and none, beside the number expected if the three flags were unrelated. Where all three flag a unit the
-claim that it degraded is as strong as these data can make it; where they disagree the table says which disagree.
+A UNIT IS ASSESSED only if it has at least MIN_REFERENCE_HA (50 ha) of reference land by Hansen's grid AND at least
+that much land with a CoRE Stack class there. Below that a rate is noise: one 30 m pixel is more than a thousandth
+of 50 ha, and the year-to-year repeatability of a unit's Hansen loss rate falls away under it
+(forest_floor_repeatability.csv). The summary repeats the headline at 10 and 100 ha. Units below the floor get the
+class "insufficient_forest" - they are not "neither".
 
-Needs earthengine-api, geopandas, pyproj, pandas, numpy, scipy; scripts/_ee_units.py, 02_build_nirv.py (and through it
-02_export_nirv_yearly.py and 02_export_nirv_observations.py), 02_build_corestack.py.
+FLAGS. Among the assessed units of the layer (all unit types together, so that a flag means the same thing in an
+lgd_panchayat unit and an outside_village one): a unit is flagged by Hansen if its Hansen rate is above the 80th
+percentile of those units' rates (or above zero, if that percentile is zero), and by CoRE Stack if its class -1
+rate is above the 80th percentile of theirs. THE FLAG IS RELATIVE: it says "in the top fifth", not "degraded by
+some absolute amount" - no absolute threshold has a basis.
+  agreement class   both | hansen_only | corestack_only | neither | insufficient_forest
+Where both flag a unit the claim that it degraded is as strong as these two sources can make it; where one
+flags it the table says which, and neither is preferred.
+
+WHAT "AGREEMENT" IS MEASURED BY.
+  expected if unrelated   n x (share flagged by Hansen) x (share flagged by CoRE Stack): what two unrelated flags of
+                          these sizes would share. With two flags of a fifth each that is a twenty-fifth of the units.
+  observed / expected     1 = no better than chance
+  odds ratio              (both)(neither) / (hansen_only)(corestack_only), with a 95 per cent interval from
+                          resampling units (percentiles 2.5 and 97.5 of BOOTSTRAP resamples)
+  rank correlation        Spearman's, between the Hansen rate and each CoRE Stack rate over the assessed units,
+                          with the same kind of interval. Class 1 ("improvement") is there as the placebo: if
+                          Hansen's rate goes with improvement as much as with degradation, the two do not agree,
+                          whatever the count of units flagged by both.
+  where the area is       the share of all Hansen loss in the window that lies in units CoRE Stack flags, and of all
+                          class -1 area that lies in units Hansen flags, each beside the share of the reference
+                          land in those units (what an unrelated flag would hold)
+
+OTHER READINGS OF "CORE STACK SAYS DEGRADED" (agreement_definitions.csv, headline window): class -1 alone (the
+delivered one); class -1 with classes 3 and 4; the net, class -1 minus class 1; class -2 (tree cover lost), which is
+the class that should go with Hansen if either product sees what the other sees. Classes -1 and 1 come from
+classifiers the producers report as right about two times in three, and the two agro-climatic zone models differ
+(the downward share is 0.75 in one and 0.54 in the other), so a class -1 rate carries the zone it lies in.
+
+Needs geopandas, pandas, numpy, scipy.
 """
-import argparse, importlib.util, itertools, json, sys
+import argparse, datetime, hashlib, json, sys
 from pathlib import Path
 
-import ee
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _ee_units as eu
-from _ee_units import OUT, ROOT, fail, now, sha256, stop_if_failed
-
-
-def load(name):
-    """A sibling script as a module: its definitions are used here, not copied."""
-    path = Path(__file__).with_name(name)
-    spec = importlib.util.spec_from_file_location(name[:-3].replace("02_build_", ""), path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-NIRV = load("02_build_nirv.py")
-CORE = load("02_build_corestack.py")
-HANSEN, GRID = NIRV.HANSEN, NIRV.GRID
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "20_degradation"
 TREE = ("gt10le30", "gt30")                                  # the two canopy bands that make up treecover2000 > 10
-HANSEN_WINDOW = (2019, 2022)                                 # loss years between CoRE Stack's two periods
-H_STATES = ("h0", "h1")                                      # no loss in the window / loss in the window
-N_STATES = ("nl", "nn", "nh")                                # NIRv lower / neither / higher
-T_STATES = ("nd", "nn", "ni")                                # full span: NIRv declining / neither / increasing
-C_STATES = {"lost": (-2,), "deg": (-1,), "imp": (1,), "rest": (0, 2, 3, 4)}
-C_VALUED = (-2, -1, 0, 1, 2, 3, 4)
-LOSS_GROUPS = {"none": (0, 0), "2001_2012": (1, 12), "2013_2015": (13, 15), "2016_2018": (16, 18), "2019_2020": (19, 20),
-               "2021_2022": (21, 22), "2023": (23, 23), "2024_2025": (24, 25)}
-CONTROL = ("land", "evalid", "lower", "higher", "trend", "declining", "increasing")
-UNIT_MIN_REFERENCE_HA = 50.0
+WINDOWS = {"common_2017_2023": (2017, 2023), "between_2019_2022": (2019, 2022), "full_span_2001_2025": (2001, 2025)}
+HEADLINE = "common_2017_2023"
+WINDOW_IS = {"common_2017_2023": "HEADLINE: Hansen loss 2017-2023 beside CoRE Stack change 2017-2023", "between_2019_2022": "sensitivity: Hansen loss 2019-2022 (the years between CoRE Stack's two periods)",
+             "full_span_2001_2025": "NOT ONE PERIOD: Hansen loss 2001-2025 beside CoRE Stack change 2017-2023"}
+VALUED = ("lost", "degradation", "nochange", "improvement", "gained", "partial3", "partial4")       # classes -2 to 4; class 5 (missing) is not valued
+CORE_RATES = {"degradation": ("degradation",), "degradation_with_partial": ("degradation", "partial3", "partial4"), "lost": ("lost",), "improvement": ("improvement",)}
+MIN_REFERENCE_HA = 50.0
+FLOORS = (10.0, 50.0, 100.0)
 FLAG_PERCENTILE = 80
 BOOTSTRAP, BOOTSTRAP_SEED = 2000, 20261008
-CORE_GRID_TOLERANCE = 0.05                                   # CoRE class -1 on treecover2000 > 10, this grid against CoRE's own, all units
-GROUPS, TILE_SCALE = 8, 4
+LEVELS = {"all units": None, "lgd_panchayat": "lgd_panchayat", "outside_village": "outside_village"}
+HA_TOLERANCE = 0.003
+GRID_TOLERANCE = 0.0005                                      # the reference land summed on Hansen's grid against the same land on CoRE Stack's, all units
+fails = []
 
 
-def images(yearly, tables):
-    """0/1 images of every flag, all on whatever grid the reduction asks for (Hansen's). `yearly` is the stored yearly values."""
-    annual, _ = NIRV.stored_standardised(yearly)               # the date-standardised yearly values, as stored
-    px = NIRV.pixel_image(annual)
-    tier = NIRV.flags(px, tables)
-    in_band, _, cover, lossyear = NIRV.canopy_images()
-    value = ee.ImageCollection([ee.Image(f"{CORE.CHANGE}/{z}").select(0) for z in CORE.ZONES]).mosaic()       # as 02_build_corestack.py: the last zone listed wins
-    full = lambda image: image.unmask(0, False)
-    c = {name: full(value.eq(codes[0]) if len(codes) == 1 else value.remap(list(codes), [1] * len(codes), 0)) for name, codes in C_STATES.items()}
-    e_valid, e_lower, e_higher = px.select("e_valid").unmask(0), px.select("e_lower").unmask(0), px.select("e_higher").unmask(0)
-    trend, declining, increasing = tier["full"]["trend"], tier["full"]["declining"], tier["full"]["increasing"]
-    return {"in_band": {b: in_band[b] for b in TREE}, "lossyear": lossyear,
-            "h": {"h1": lossyear.gte(HANSEN_WINDOW[0] - 2000).And(lossyear.lte(HANSEN_WINDOW[1] - 2000))}, "hf": {"h1": lossyear.gte(1)},
-            "n": {"nl": e_lower, "nh": e_higher, "valid": e_valid}, "t": {"nd": declining, "ni": increasing, "valid": trend},
-            "c": c, "c_valued": full(value.remap(list(C_VALUED), [1] * len(C_VALUED), 0)), "c_missing": full(value.eq(5)), "c_any": full(value.mask().gt(0))}
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for b in iter(lambda: fh.read(1 << 20), b""):
+            h.update(b)
+    return h.hexdigest()
 
 
-def unit_bands(yearly, tables):
-    """Square metres per unit for every cell and every check. Returns the image and its band names in order."""
-    f = images(yearly, tables)
-    area = ee.Image.pixelArea()
-    tree = f["in_band"]["gt10le30"].Or(f["in_band"]["gt30"])
-    named = [("area_m2", area)]
-    states = lambda flags, names: {names[0]: flags[names[0]], names[2]: flags[names[2]], names[1]: flags[names[0]].Or(flags[names[2]]).Not()} if len(names) == 3 else None
-    n3, t3 = states(f["n"], N_STATES), states(f["t"], T_STATES)
-    h2, hf2 = {"h1": f["h"]["h1"], "h0": f["h"]["h1"].Not()}, {"h1": f["hf"]["h1"], "h0": f["hf"]["h1"].Not()}
-    for b, cond in f["in_band"].items():                                               # the common window, by canopy band
-        ref = cond.And(f["c_valued"]).And(f["n"]["valid"])
-        named.append((f"land_{b}_m2", area.multiply(cond)))
-        named.append((f"cref_{b}_m2", area.multiply(ref)))
-        named.append((f"x_{b}_novalue_m2", area.multiply(cond.And(f["c_any"].Not()))))
-        named.append((f"x_{b}_missing_m2", area.multiply(cond.And(f["c_missing"]))))
-        named.append((f"x_{b}_nirv6_m2", area.multiply(cond.And(f["n"]["valid"].Not()))))
-        named.append((f"m_{b}_hloss_m2", area.multiply(cond.And(f["h"]["h1"]))))       # margins over ALL the band's land, for the checks against the sources' own tables
-        named.append((f"m_{b}_nlower_m2", area.multiply(cond.And(f["n"]["nl"]))))
-        named.append((f"m_{b}_nvalid_m2", area.multiply(cond.And(f["n"]["valid"]))))
-        named.append((f"m_{b}_cdeg_m2", area.multiply(cond.And(f["c"]["deg"]))))
-        named.append((f"m_{b}_cvalue_m2", area.multiply(cond.And(f["c_any"]))))
-        for h, n, c in itertools.product(H_STATES, N_STATES, C_STATES):
-            named.append((f"c_{b}_{h}_{n}_{c}_m2", area.multiply(ref.And(h2[h]).And(n3[n]).And(f["c"][c]))))
-    reff = tree.And(f["c_valued"]).And(f["t"]["valid"])                                # the full span, treecover2000 > 10 together
-    named.append(("fref_m2", area.multiply(reff)))
-    named.append(("xf_notrend_m2", area.multiply(tree.And(f["t"]["valid"].Not()))))
-    for h, n, c in itertools.product(H_STATES, T_STATES, C_STATES):
-        named.append((f"f_{h}_{n}_{c}_m2", area.multiply(reff.And(hf2[h]).And(t3[n]).And(f["c"][c]))))
-    control = {"land": None, "evalid": f["n"]["valid"], "lower": f["n"]["nl"], "higher": f["n"]["nh"], "trend": f["t"]["valid"], "declining": f["t"]["nd"], "increasing": f["t"]["ni"]}
-    for g, (lo, hi) in LOSS_GROUPS.items():                                            # the positive control, treecover2000 > 10 together
-        in_group = tree.And(f["lossyear"].gte(lo)).And(f["lossyear"].lte(hi))
-        for k, flag in control.items():
-            named.append((f"p_{g}_{k}_m2", area.multiply(in_group if flag is None else in_group.And(flag))))
-    names = [n for n, _ in named]
-    return ee.Image.cat([im.rename(n) for n, im in named]), names
+def stop_if_failed(stage):
+    if fails:
+        print(f"\nFAILED at {stage} - {len(fails)} check(s). Stopped before writing this step's tables.", file=sys.stderr)
+        for m in fails:
+            print(f"  {m}", file=sys.stderr)
+        sys.exit(1)
 
 
-# ---- the arithmetic, on plain arrays ---------------------------------------------------------------------------------
-def fold(cells, h_states, n_states, a, b):
-    """The 2 x 2 of two flags from an array of cells [..., h, n, c]. A flag is ("h", "h1"), ("n", "nl"), ("c", "deg") and so on."""
-    axis = {"h": (-3, h_states), "n": (-2, n_states), "c": (-1, tuple(C_STATES))}
-
-    def member(flag):
-        ax, names = axis[flag[0]]
-        shape = [1, 1, 1]
-        sel = np.array([name == flag[1] for name in names])
-        shape[ax] = len(names)
-        return sel.reshape(shape)
-
-    A, B = member(a), member(b)
-    tot = lambda mask: (cells * mask).sum(axis=(-3, -2, -1))
-    return tot(A & B), tot(A & ~B), tot(~A & B), tot(~A & ~B)
+def cut_and_flag(rate, assessed):
+    """The 80th percentile of the assessed units' rates, and which units lie above it (above zero if it is zero)."""
+    cut = float(np.percentile(rate[assessed], FLAG_PERCENTILE))
+    return cut, assessed & (rate > cut)
 
 
-def pair_stats(n11, n10, n01, n00):
-    total = n11 + n10 + n01 + n00
-    a, b = n11 + n10, n11 + n01
-    with np.errstate(divide="ignore", invalid="ignore"):
-        expected = a * b / total
-        return {"both": n11, "expected_by_chance": expected, "observed_over_expected": n11 / expected, "odds_ratio": (n11 * n00) / (n10 * n01),
-                "share_of_first_that_is_second": n11 / a, "share_of_not_first_that_is_second": n01 / (n01 + n00),
-                "share_of_second_that_is_first": n11 / b, "share_of_not_second_that_is_first": n10 / (n10 + n00), "first": a, "second": b, "reference": total}
-
-
-def pairs_table(cells, sel_groups, h_states, n_states, pairs, window, land, rng):
-    """One row per (group of units, pair of flags): the statistics, with an interval for the odds ratio from resampling units."""
-    rows = []
-    for gname, sel in sel_groups.items():
-        sub = cells[sel]
-        boot_cells = np.stack([sub[rng.integers(0, len(sub), len(sub))].sum(axis=0) for _ in range(BOOTSTRAP)]) if len(sub) else None
-        for a, b in pairs:
-            s = pair_stats(*[v.sum() for v in fold(sub, h_states, n_states, a, b)])
-            bs = pair_stats(*fold(boot_cells, h_states, n_states, a, b))["odds_ratio"] if len(sub) else np.array([np.nan])
-            bs = bs[np.isfinite(bs)]
-            lo, hi = (np.percentile(bs, [2.5, 97.5]) if len(bs) >= BOOTSTRAP * 0.9 else (np.nan, np.nan))
-            km2 = lambda v: round(float(v) / 1e6, 3)
-            r4 = lambda v: round(float(v), 4) if np.isfinite(v) else None
-            rows.append({"window": window, "land": land, "units": gname, "n_units": int(sel.sum()), "first": "_".join(a), "second": "_".join(b),
-                         "reference_km2": km2(s["reference"]), "first_km2": km2(s["first"]), "second_km2": km2(s["second"]), "both_km2": km2(s["both"]),
-                         "expected_by_chance_km2": km2(s["expected_by_chance"]) if np.isfinite(s["expected_by_chance"]) else None,
-                         "observed_over_expected": r4(s["observed_over_expected"]), "odds_ratio": r4(s["odds_ratio"]), "odds_ratio_lo95": r4(lo), "odds_ratio_hi95": r4(hi),
-                         "pct_of_first_that_is_second": r4(100 * s["share_of_first_that_is_second"]), "pct_of_not_first_that_is_second": r4(100 * s["share_of_not_first_that_is_second"]),
-                         "pct_of_second_that_is_first": r4(100 * s["share_of_second_that_is_first"]), "pct_of_not_second_that_is_first": r4(100 * s["share_of_not_second_that_is_first"])})
-    return rows
-
-
-def headline(cells, h_states, n_states, n_flag):
-    """The eight cells of (Hansen loss) x (NIRv lower, or declining) x (CoRE class -1), in the order of HEADLINE_CELLS."""
-    h1 = np.array([s == "h1" for s in h_states])[:, None, None]
-    n1 = np.array([s == n_flag for s in n_states])[None, :, None]
-    c1 = np.array([s == "deg" for s in C_STATES])[None, None, :]
-    out = []
-    for hv, nv, cv in itertools.product((True, False), repeat=3):
-        out.append((cells * ((h1 == hv) & (n1 == nv) & (c1 == cv))).sum(axis=(-3, -2, -1)))
+def classes(h_flag, c_flag, assessed):
+    out = np.full(len(assessed), "insufficient_forest", dtype=object)
+    out[assessed & h_flag & c_flag] = "both"
+    out[assessed & h_flag & ~c_flag] = "hansen_only"
+    out[assessed & ~h_flag & c_flag] = "corestack_only"
+    out[assessed & ~h_flag & ~c_flag] = "neither"
     return out
 
 
-HEADLINE_CELLS = ["hansen_nirv_corestack", "hansen_nirv_only", "hansen_corestack_only", "hansen_only", "nirv_corestack_only", "nirv_only", "corestack_only", "none"]
+def odds_ratio(a, b, c, d):
+    """(both)(neither) / (hansen_only)(corestack_only); None if a cell of the denominator is empty."""
+    return float(a * d / (b * c)) if b > 0 and c > 0 else None
 
 
-def cell_arrays(m):
-    """The cells as arrays [unit, h, n, c]: the common window by canopy band and for treecover2000 > 10, and the full span."""
-    def cell(stub, n_states):
-        return np.stack([np.stack([np.stack([m[stub.format(h=h, n=n, c=c)].to_numpy(float) for c in C_STATES], axis=-1) for n in n_states], axis=-2) for h in H_STATES], axis=-3)
-
-    common = {b: cell("c_" + b + "_{h}_{n}_{c}_m2", N_STATES) for b in TREE}
-    common["gt10"] = common["gt10le30"] + common["gt30"]
-    return common, cell("f_{h}_{n}_{c}_m2", T_STATES)
+def interval(values):
+    v = np.asarray([x for x in values if x is not None and not np.isnan(x)], float)
+    return (round(float(np.percentile(v, 2.5)), 4), round(float(np.percentile(v, 97.5)), 4)) if len(v) >= 0.9 * BOOTSTRAP else (None, None)
 
 
-def check_cells(m, common, fullspan):
-    """The arithmetic the cells must obey, whatever the data."""
-    tol = 0.02
-    for b in TREE:
-        if np.abs(common[b].sum(axis=(1, 2, 3)) - m[f"cref_{b}_m2"]).max() > tol:
-            fail(f"{b}: the 24 cells do not add up to the reference land")
-        if (m[f"cref_{b}_m2"] > m[f"land_{b}_m2"] + tol).any() or (m[f"cref_{b}_m2"] > m[f"m_{b}_nvalid_m2"] + tol).any():
-            fail(f"{b}: the reference land exceeds the band's land, or the land with all six NIRv seasons")
-        left_out = m[f"land_{b}_m2"] - m[f"cref_{b}_m2"]
-        if (left_out > m[f"x_{b}_novalue_m2"] + m[f"x_{b}_missing_m2"] + m[f"x_{b}_nirv6_m2"] + tol).any():
-            fail(f"{b}: land outside the reference that none of the three reasons accounts for")
-    if np.abs(fullspan.sum(axis=(1, 2, 3)) - m["fref_m2"]).max() > tol:
-        fail("full span: the 24 cells do not add up to the reference land")
-    land_tree = m[[f"land_{b}_m2" for b in TREE]].sum(axis=1)
-    if np.abs(m[[f"p_{g}_land_m2" for g in LOSS_GROUPS]].sum(axis=1) - land_tree).max() > tol:
-        fail("positive control: the loss-year groups do not add up to the land with treecover2000 > 10")
-    for g in LOSS_GROUPS:
-        if (m[f"p_{g}_lower_m2"] + m[f"p_{g}_higher_m2"] > m[f"p_{g}_evalid_m2"] + tol).any() or (m[f"p_{g}_declining_m2"] + m[f"p_{g}_increasing_m2"] > m[f"p_{g}_trend_m2"] + tol).any():
-            fail(f"positive control {g}: flags exceed the land they are defined on")
-    return land_tree
-
-
-def check_margins(m, sources):
-    """This table's margins against the three sources' own per-unit tables. Hansen and NIRv must be equal; CoRE is on another grid."""
-    hansen = pd.read_csv(sources["hansen"], dtype={"unit_id": str}).set_index("unit_id").loc[m["unit_id"]]
-    nirv = pd.read_csv(sources["nirv"], dtype={"unit_id": str}).set_index("unit_id").loc[m["unit_id"]]
-    core = pd.read_csv(sources["corestack"], dtype={"unit_id": str}).set_index("unit_id").loc[m["unit_id"]]
-    years, checks = range(HANSEN_WINDOW[0], HANSEN_WINDOW[1] + 1), {}
-    for b in TREE:
-        theirs = hansen[[f"loss_ha_{b}_{y}" for y in years]].sum(axis=1).to_numpy()
-        gap = np.abs(m[f"m_{b}_hloss_m2"].to_numpy() / 1e4 - theirs)
-        checks[f"hansen_loss_{HANSEN_WINDOW[0]}_{HANSEN_WINDOW[1]}_{b}"] = {"this_ha": float(m[f"m_{b}_hloss_m2"].sum() / 1e4), "source_table_ha": float(theirs.sum()), "largest_gap_for_a_unit_ha": float(gap.max())}
-        if gap.max() > 0.001:
-            fail(f"Hansen loss {HANSEN_WINDOW[0]}-{HANSEN_WINDOW[1]} on {b}: differs from {sources['hansen'].name} by up to {gap.max():.4f} ha in a unit")
-        for mine, col in ((f"m_{b}_nlower_m2", f"std_epoch_{b}_lower_ha"), (f"m_{b}_nvalid_m2", f"std_epoch_{b}_valid_ha")):
-            gap = np.abs(m[mine].to_numpy() / 1e4 - nirv[col].to_numpy())
-            checks[f"nirv_{col}"] = {"this_ha": float(m[mine].sum() / 1e4), "source_table_ha": float(nirv[col].sum()), "largest_gap_for_a_unit_ha": float(gap.max())}
-            if gap.max() > 0.001:
-                fail(f"NIRv {col}: differs from {sources['nirv'].name} by up to {gap.max():.4f} ha in a unit")
-        theirs = core[f"class_degradation_ha_{b}"].to_numpy()
-        mine = m[f"m_{b}_cdeg_m2"].to_numpy() / 1e4
-        rel = (mine.sum() - theirs.sum()) / theirs.sum() if theirs.sum() else float("nan")
-        checks[f"corestack_degradation_{b}"] = {"this_grid_ha": float(mine.sum()), "corestack_grid_ha": float(theirs.sum()), "relative_difference": float(rel),
-                                                 "note": "not expected to be equal: here each Hansen grid cell takes the CoRE pixel at its centre"}
-        if not abs(rel) <= CORE_GRID_TOLERANCE:
-            fail(f"CoRE class -1 on {b}: {mine.sum():,.0f} ha on this grid against {theirs.sum():,.0f} on CoRE's own ({rel:+.1%}); more than the {CORE_GRID_TOLERANCE:.0%} a change of grid can explain")
-    return checks
-
-
-def build_tables(m, common, fullspan, land_tree):
-    """Every table, from the per-unit sums. Returns ({file name: table}, the cuts used for the unit flags)."""
-    level = m["unit_level"].to_numpy()
-    groups = {"all units": np.ones(len(m), bool), **{k: level == k for k in sorted(set(level))}}
-    rng = np.random.default_rng(BOOTSTRAP_SEED)
-    pairs_c = [(("h", "h1"), ("n", "nl")), (("h", "h1"), ("c", "lost")), (("h", "h1"), ("c", "deg")), (("h", "h1"), ("c", "imp")), (("h", "h1"), ("n", "nh")),
-               (("n", "nl"), ("c", "lost")), (("n", "nl"), ("c", "deg")), (("n", "nl"), ("c", "imp")), (("n", "nh"), ("c", "deg")), (("n", "nh"), ("c", "imp")), (("n", "nh"), ("c", "lost"))]
-    pairs_f = [(("h", "h1"), ("n", "nd")), (("h", "h1"), ("n", "ni")), (("h", "h1"), ("c", "lost")), (("h", "h1"), ("c", "deg")),
-               (("n", "nd"), ("c", "lost")), (("n", "nd"), ("c", "deg")), (("n", "nd"), ("c", "imp")), (("n", "ni"), ("c", "deg")), (("n", "ni"), ("c", "imp"))]
-    pair_rows = []
-    for land in ("gt10", "gt10le30", "gt30"):
-        pair_rows += pairs_table(common[land], groups, H_STATES, N_STATES, pairs_c, "common window", land, rng)
-    pair_rows += pairs_table(fullspan, groups, H_STATES, T_STATES, pairs_f, "full span (not one period)", "gt10", rng)
-    pairs = pd.DataFrame(pair_rows)
-
-    summary_rows = []
-    for window, land, cells, ns, nflag in ([("common window", land, common[land], N_STATES, "nl") for land in ("gt10", "gt10le30", "gt30")]
-                                           + [("full span (not one period)", "gt10", fullspan, T_STATES, "nd")]):
-        for gname, sel in groups.items():
-            sub = cells[sel].sum(axis=0)
-            ref = float(sub.sum())
-            row = {"window": window, "land": land, "units": gname, "n_units": int(sel.sum()), "reference_km2": round(ref / 1e6, 2)}
-            if window == "common window":
-                lb = TREE if land == "gt10" else (land,)
-                tot = lambda stub: float(sum(m.loc[sel, stub.format(b=b)].sum() for b in lb))
-                row["land_km2"] = round(tot("land_{b}_m2") / 1e6, 2)
-                row["left_out_no_corestack_value_km2"], row["left_out_corestack_missing_km2"], row["left_out_nirv_lacks_a_season_km2"] = (round(tot(s) / 1e6, 2) for s in ("x_{b}_novalue_m2", "x_{b}_missing_m2", "x_{b}_nirv6_m2"))
-            else:
-                row["land_km2"] = round(float(land_tree[sel].sum()) / 1e6, 2)
-                row["left_out_nirv_has_no_trend_km2"] = round(float(m.loc[sel, "xf_notrend_m2"].sum()) / 1e6, 2)
-            eight = headline(sub, H_STATES, ns, nflag)
-            for name, v in zip(HEADLINE_CELLS, eight):
-                row[f"{name}_km2"] = round(float(v) / 1e6, 3)
-            margins = {"hansen": sub[1].sum(), "nirv_down": sub[:, 0].sum(), "nirv_up": sub[:, 2].sum(),
-                       "corestack_lost": sub[:, :, 0].sum(), "corestack_degradation": sub[:, :, 1].sum(), "corestack_improvement": sub[:, :, 2].sum()}
-            for k, v in margins.items():
-                row[f"{k}_km2"], row[f"{k}_pct_of_reference"] = round(float(v) / 1e6, 2), round(100 * float(v) / ref, 3) if ref else None
-            exp3 = margins["hansen"] * margins["nirv_down"] * margins["corestack_degradation"] / ref ** 2 if ref else float("nan")
-            row["all_three_expected_by_chance_km2"] = round(float(exp3) / 1e6, 4) if ref else None
-            row["all_three_observed_over_expected"] = round(float(eight[0] / exp3), 3) if ref and exp3 > 0 else None
-            summary_rows.append(row)
-    summary = pd.DataFrame(summary_rows)
-
-    # per unit
-    ha = lambda v: np.round(np.asarray(v, float) / 1e4, 4)
-    cg = common["gt10"]
-    ref = cg.sum(axis=(1, 2, 3))
-    by_unit = pd.DataFrame({"unit_id": m["unit_id"], "unit_level": m["unit_level"], "outside_village": m["outside_village"],
-                            "land_treecover2000_gt10_ha": ha(land_tree), "reference_ha": ha(ref)})
-    for name, v in zip(HEADLINE_CELLS, headline(cg, H_STATES, N_STATES, "nl")):
-        by_unit[f"{name}_ha"] = ha(v)
-    marg = {"hansen_loss_2019_2022": cg[:, 1].sum(axis=(1, 2)), "nirv_lower": cg[:, :, 0].sum(axis=(1, 2)), "nirv_higher": cg[:, :, 2].sum(axis=(1, 2)),
-            "corestack_lost": cg[:, :, :, 0].sum(axis=(1, 2)), "corestack_degradation": cg[:, :, :, 1].sum(axis=(1, 2)), "corestack_improvement": cg[:, :, :, 2].sum(axis=(1, 2))}
-    for k, v in marg.items():
-        by_unit[f"{k}_ha"] = ha(v)
-    big = ref >= UNIT_MIN_REFERENCE_HA * 1e4
-    with np.errstate(divide="ignore", invalid="ignore"):
-        rate = {"hansen": marg["hansen_loss_2019_2022"] / ref, "nirv": marg["nirv_lower"] / ref, "corestack": marg["corestack_degradation"] / ref,
-                "nirv_net": (marg["nirv_lower"] - marg["nirv_higher"]) / ref, "corestack_net": (marg["corestack_degradation"] - marg["corestack_improvement"]) / ref}
-    flagged, cuts = {}, {}
-    for k in ("hansen", "nirv", "corestack"):
-        by_unit[f"rate_{k}"] = np.where(ref > 0, rate[k], np.nan).round(6)
-        cuts[k] = float(np.percentile(rate[k][big], FLAG_PERCENTILE)) if big.any() else float("nan")
-        flagged[k] = big & (rate[k] > cuts[k])
-        by_unit[f"flagged_{k}"] = np.where(big, flagged[k], None)
-    for k in ("nirv_net", "corestack_net"):
-        by_unit[f"rate_{k}"] = np.where(ref > 0, rate[k], np.nan).round(6)
-    by_unit["flagged_by"] = np.where(big, flagged["hansen"].astype(int) + flagged["nirv"].astype(int) + flagged["corestack"].astype(int), None)
-    by_unit["in_unit_level_comparison"] = big
-    by_unit["full_span_reference_ha"] = ha(fullspan.sum(axis=(1, 2, 3)))
-    for name, v in zip(HEADLINE_CELLS, headline(fullspan, H_STATES, T_STATES, "nd")):
-        by_unit[f"full_span_{name}_ha"] = ha(v)
-
-    cells_by_unit = pd.DataFrame({"unit_id": m["unit_id"], "unit_level": m["unit_level"], "outside_village": m["outside_village"]})
-    for c in m.columns:
-        if c.startswith(("c_", "f_", "cref_", "fref_", "x_", "xf_", "land_")) and c.endswith("_m2"):
-            cells_by_unit[c[:-3] + "_ha"] = ha(m[c])
-
-    # unit by unit: rank agreement and the pattern of flags
-    unit_rows = []
-    for gname, sel0 in groups.items():
-        sel = sel0 & big
-        n = int(sel.sum())
-        row = {"units": gname, "n_units_with_enough_reference_land": n, "of_units": int(sel0.sum()), "minimum_reference_ha": UNIT_MIN_REFERENCE_HA,
-               "reference_km2_in_them": round(float(ref[sel].sum()) / 1e6, 1), "share_of_all_reference_land_pct": round(100 * float(ref[sel].sum() / ref[sel0].sum()), 2) if ref[sel0].sum() else None}
-        for x, y in (("hansen", "nirv"), ("hansen", "corestack"), ("nirv", "corestack"), ("hansen", "nirv_net"), ("hansen", "corestack_net"), ("nirv_net", "corestack_net")):
-            row[f"spearman_{x}_vs_{y}"] = round(float(spearmanr(rate[x][sel], rate[y][sel])[0]), 4) if n > 2 else None
-        p = {k: float(flagged[k][sel].mean()) if n else float("nan") for k in flagged}
-        for k in flagged:
-            row[f"flagged_{k}"], row[f"cut_{k}_rate"] = int(flagged[k][sel].sum()), cuts[k]
-        count = flagged["hansen"][sel].astype(int) + flagged["nirv"][sel].astype(int) + flagged["corestack"][sel].astype(int)
-        ph, pn, pc = p["hansen"], p["nirv"], p["corestack"]
-        expected = {3: ph * pn * pc, 2: ph * pn * (1 - pc) + ph * (1 - pn) * pc + (1 - ph) * pn * pc,
-                    1: ph * (1 - pn) * (1 - pc) + (1 - ph) * pn * (1 - pc) + (1 - ph) * (1 - pn) * pc, 0: (1 - ph) * (1 - pn) * (1 - pc)}
-        for k in (3, 2, 1, 0):
-            row[f"flagged_by_{k}"] = int((count == k).sum())
-            row[f"flagged_by_{k}_expected_if_unrelated"] = round(n * expected[k], 1) if n else None
-        for x, y in (("hansen", "nirv"), ("hansen", "corestack"), ("nirv", "corestack")):
-            row[f"flagged_by_both_{x}_and_{y}"] = int((flagged[x][sel] & flagged[y][sel]).sum())
-            row[f"flagged_by_both_{x}_and_{y}_expected_if_unrelated"] = round(n * p[x] * p[y], 1) if n else None
-        unit_rows.append(row)
-    units_table = pd.DataFrame(unit_rows)
-
-    # positive control
-    control_rows = []
-    for gname, sel in groups.items():
-        for g in LOSS_GROUPS:
-            t = {k: float(m.loc[sel, f"p_{g}_{k}_m2"].sum()) for k in CONTROL}
-            pct = lambda x, y: round(100 * x / y, 3) if y else None
-            control_rows.append({"units": gname, "n_units": int(sel.sum()), "hansen_loss_year": "no loss" if g == "none" else g.replace("_", "-"), "land_km2": round(t["land"] / 1e6, 3),
-                                 "with_all_six_seasons_km2": round(t["evalid"] / 1e6, 3), "nirv_lower_pct": pct(t["lower"], t["evalid"]), "nirv_higher_pct": pct(t["higher"], t["evalid"]),
-                                 "with_a_trend_km2": round(t["trend"] / 1e6, 3), "nirv_declining_pct": pct(t["declining"], t["trend"]), "nirv_increasing_pct": pct(t["increasing"], t["trend"])})
-    control_table = pd.DataFrame(control_rows)
-    return {"agreement_by_unit.csv": by_unit, "agreement_cells_by_unit.csv": cells_by_unit, "agreement_summary.csv": summary, "agreement_pairs.csv": pairs,
-            "agreement_units.csv": units_table, "agreement_positive_control.csv": control_table}, cuts
+def agreement_row(sel, h_flag, c_flag, h_rate, c_rate_by, land, h_loss, c_deg, rng):
+    """The figures for one set of assessed units: counts, chance, odds ratio, correlations, and where the area lies."""
+    n = int(sel.sum())
+    row = {"n_assessed": n}
+    if n == 0:
+        return row
+    hf, cf = h_flag[sel], c_flag[sel]
+    a, b, c, d = int((hf & cf).sum()), int((hf & ~cf).sum()), int((~hf & cf).sum()), int((~hf & ~cf).sum())
+    expected = n * hf.mean() * cf.mean()
+    row.update({"flagged_by_hansen": a + b, "flagged_by_corestack": a + c, "both": a, "hansen_only": b, "corestack_only": c, "neither": d,
+                "both_expected_if_unrelated": round(float(expected), 2), "both_observed_over_expected": round(a / expected, 3) if expected > 0 else None,
+                "odds_ratio": round(odds_ratio(a, b, c, d), 3) if odds_ratio(a, b, c, d) is not None else None})
+    idx = np.flatnonzero(sel)
+    draws = rng.integers(0, n, size=(BOOTSTRAP, n))
+    ors, ratios = [], []
+    for k in range(BOOTSTRAP):
+        h_, c_ = hf[draws[k]], cf[draws[k]]
+        a_, b_, c__, d_ = (h_ & c_).sum(), (h_ & ~c_).sum(), (~h_ & c_).sum(), (~h_ & ~c_).sum()
+        ors.append(odds_ratio(a_, b_, c__, d_))
+        e_ = n * h_.mean() * c_.mean()
+        ratios.append(a_ / e_ if e_ > 0 else None)
+    row["odds_ratio_lo95"], row["odds_ratio_hi95"] = interval(ors)
+    row["both_observed_over_expected_lo95"], row["both_observed_over_expected_hi95"] = interval(ratios)
+    for name, rate in c_rate_by.items():
+        x, y = h_rate[idx], rate[idx]
+        if np.std(x) == 0 or np.std(y) == 0:
+            row[f"spearman_hansen_vs_corestack_{name}"] = None
+            continue
+        row[f"spearman_hansen_vs_corestack_{name}"] = round(float(spearmanr(x, y)[0]), 4)
+        if name in ("degradation", "net", "improvement", "lost"):
+            boot = [spearmanr(x[draws[k]], y[draws[k]])[0] for k in range(0, BOOTSTRAP, 4)]          # every fourth resample: 500 are enough for an interval
+            v = np.asarray(boot, float); v = v[~np.isnan(v)]
+            row[f"spearman_hansen_vs_corestack_{name}_lo95"], row[f"spearman_hansen_vs_corestack_{name}_hi95"] = round(float(np.percentile(v, 2.5)), 4), round(float(np.percentile(v, 97.5)), 4)
+    tot_land, tot_loss, tot_deg = land[sel].sum(), h_loss[sel].sum(), c_deg[sel].sum()
+    row.update({"reference_km2": round(float(tot_land) / 100, 2), "hansen_loss_km2": round(float(tot_loss) / 100, 2), "corestack_degradation_km2": round(float(tot_deg) / 100, 2),
+                "hansen_loss_pct_in_units_corestack_flags": round(100 * float(h_loss[sel & c_flag].sum() / tot_loss), 2) if tot_loss > 0 else None,
+                "reference_land_pct_in_units_corestack_flags": round(100 * float(land[sel & c_flag].sum() / tot_land), 2),
+                "corestack_degradation_pct_in_units_hansen_flags": round(100 * float(c_deg[sel & h_flag].sum() / tot_deg), 2) if tot_deg > 0 else None,
+                "reference_land_pct_in_units_hansen_flags": round(100 * float(land[sel & h_flag].sum() / tot_land), 2)})
+    return row
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--units", required=True, help="the stage-0 layer, e.g. 10_units/units.gpkg")
-    ap.add_argument("--project", help="Cloud project; default is the one in the Earth Engine credentials file")
-    ap.add_argument("--asset", help="the layer's table asset; default projects/<project>/assets/ictd/<layer stem>")
     a = ap.parse_args()
-    started = now()
-    project = eu.init(a.project)
-    stem = Path(a.units).stem
-    asset = a.asset or f"projects/{project}/assets/ictd/{stem}"
-    obs_collection, std_collection = f"projects/{project}/assets/ictd/nirv_obs_{stem}", f"projects/{project}/assets/ictd/nirv_std_{stem}"
-    units, fc, record = eu.load_units(a.units, asset)
-    print(f"{a.units}: n = {len(units):,} units ({dict(units['unit_level'].value_counts())}); asset {asset}")
-    sources = {"hansen": OUT / "hansen_loss_by_canopy_band_by_unit.csv", "nirv": OUT / "nirv_by_unit_bands.csv", "corestack": OUT / "corestack_by_unit_bands.csv"}
-    for k, p in sources.items():
-        if not p.exists():
-            fail(f"{p.relative_to(ROOT)} is missing: build that source first (its figures are what this table's margins are checked against)")
-    stop_if_failed("finding the three sources' tables")
-    scenes, obs_prov, yearly_prov = NIRV.load_records(obs_collection, std_collection)
-    stop_if_failed("reading the records of the two exports")
-    blocks = set(yearly_prov["outputs_in_earth_engine"]["block_boxes"])
-    have = {x["name"].split("/")[-1] for x in ee.data.listAssets({"parent": std_collection}).get("assets", [])}
-    if blocks - have:
-        fail(f"{len(blocks - have)} of {len(blocks)} blocks of stored yearly values are missing from {std_collection}")
-    nirv_prov = json.load(open(OUT / "nirv.provenance.json")) if (OUT / "nirv.provenance.json").exists() else None
-    made = [(i.get("recipe_sha256"), i.get("sha256")) for i in nirv_prov["inputs"]] if nirv_prov else []
-    if (NIRV.YEARLY.RECIPE_SHA256 not in [x[0] for x in made] or sha256(OUT / "nirv_scenes.csv") not in [x[1] for x in made] or sha256(a.units) not in [x[1] for x in made]
-            or nirv_prov["script_sha256"] != sha256(Path(__file__).with_name("02_build_nirv.py"))):
-        fail("20_degradation/nirv_by_unit_bands.csv was not built by 02_build_nirv.py as it now is, from this layer, this scene list and stored yearly values of this recipe: run scripts/02_build_nirv.py again")
-    stop_if_failed("finding the inputs")
-    tables = {w: NIRV.critical_table(NIRV.SEASONS[w], NIRV.MIN_SEASONS[w]) for w in NIRV.SEASONS}
-    _, yearly = NIRV.stored_images(obs_collection, std_collection)
-    image, bands = unit_bands(yearly, tables)
-    if image.bandNames().getInfo() != bands:
-        fail("the per-unit image's bands are not the ones named")
-        stop_if_failed("building the per-unit image")
-    # the folder's name carries a fingerprint of what its tables hold, so that a table left by other code or other stored values is never reused
-    folder = f"{asset}_agreement_parts_" + NIRV.fingerprint(image, repr(bands), str(GROUPS), str(TILE_SCALE), sha256(a.units), sha256(OUT / "nirv_scenes.csv"),
-                                                            NIRV.OBS.RECIPE_SHA256, NIRV.YEARLY.RECIPE_SHA256, repr(GRID))
-    print(f"{len(bands)} bands per unit; group tables in {folder.split('/')[-1]}", flush=True)
-    raw, status, cleanup = eu.zonal(image, bands, fc, units, folder, f"{stem}_agreement", GRID, GROUPS, TILE_SCALE)
-    m = units[["unit_id", "unit_level", "outside_village", "polygon_m2"]].merge(raw, on="unit_id", validate="one_to_one")
-    area = eu.area_check(m)
-    common, fullspan = cell_arrays(m)
-    land_tree = check_cells(m, common, fullspan)
-    stop_if_failed("checking the cells")
-    checks = check_margins(m, sources)
-    stop_if_failed("checking the margins against the three sources' own tables")
-    print("OK  cells add up to the reference land; the Hansen and NIRv margins equal the sources' own tables unit by unit; the CoRE margin is within "
-          + ", ".join(f"{checks[f'corestack_degradation_{b}']['relative_difference']:+.2%}" for b in TREE) + " of CoRE's own grid")
-    out_tables, cuts = build_tables(m, common, fullspan, land_tree)
-    summary, pairs, units_table, control_table = (out_tables[k] for k in ("agreement_summary.csv", "agreement_pairs.csv", "agreement_units.csv", "agreement_positive_control.csv"))
+    started = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    layer_sha = sha256(a.units)
+    units = pd.DataFrame(gpd.read_file(a.units, layer="units", ignore_geometry=True))[["unit_id", "unit_level", "outside_village"]]
+    units["unit_id"] = units["unit_id"].astype(str)
+    units = units.sort_values("unit_id").reset_index(drop=True)
+    inputs = [{"path": str(a.units), "bytes": Path(a.units).stat().st_size, "sha256": layer_sha}]
 
-    OUT.mkdir(exist_ok=True)
+    def load(table, record):
+        tp, rp = OUT / table, OUT / record
+        if not tp.exists() or not rp.exists():
+            fails.append(f"{table} or {record} is missing: build that source first")
+            return None
+        prov = json.load(open(rp))
+        if layer_sha not in [i.get("sha256") for i in prov.get("inputs", []) if i.get("path") == str(a.units)]:
+            fails.append(f"{record} does not name this layer ({a.units}, sha256 {layer_sha[:12]}...)")
+        t = pd.read_csv(tp, dtype={"unit_id": str})
+        if len(t) != len(units) or not t["unit_id"].is_unique or set(t["unit_id"]) != set(units["unit_id"]):
+            fails.append(f"{table} holds {len(t):,} rows and {t['unit_id'].nunique():,} distinct unit_id; the layer has {len(units):,} units")
+            return None
+        inputs.append({"path": str(tp.relative_to(ROOT)), "bytes": tp.stat().st_size, "sha256": sha256(tp), "built_by": prov.get("script"), "run_utc": prov.get("run_utc")})
+        return t.set_index("unit_id").loc[units["unit_id"]]
+
+    hb = load("hansen_loss_by_canopy_band_by_unit.csv", "hansen.provenance.json")
+    cb = load("corestack_by_unit_bands.csv", "corestack.provenance.json")
+    cu = load("corestack_by_unit.csv", "corestack.provenance.json")
+    stop_if_failed("reading the two sources' tables")
+    level = units["unit_level"].to_numpy()
+    print(f"{a.units}: n = {len(units):,} units ({dict(units['unit_level'].value_counts())})")
+
+    # ---- the margins, and what they must add up to -----------------------------------------------------------------------
+    land = sum(hb[f"area_ha_{b}"].to_numpy(float) for b in TREE)                                   # Hansen's grid
+    loss = {w: sum(hb[f"loss_ha_{b}_{y}"].to_numpy(float) for b in TREE for y in range(lo, hi + 1)) for w, (lo, hi) in WINDOWS.items()}
+    cls = {k: sum(cb[f"class_{k}_ha_{b}"].to_numpy(float) for b in TREE) for k in VALUED + ("missing",)}
+    valued = sum(cls[k] for k in VALUED)                                                           # CoRE Stack's grid
+    checks = {}
+    for b in TREE + ("le10",):                                                                      # the yearly columns are what the windows are made of
+        gap = float(np.abs(sum(hb[f"loss_ha_{b}_{y}"].to_numpy(float) for y in range(2001, 2026)) - hb[f"loss_ha_{b}"].to_numpy(float)).max())
+        if gap > HA_TOLERANCE:
+            fails.append(f"band {b}: the yearly loss columns do not add up to loss_ha_{b} (largest gap {gap:.4f} ha)")
+    hs = pd.read_csv(OUT / "hansen_loss_by_canopy_band.csv").set_index(["units", "canopy_band"])
+    cl = pd.read_csv(OUT / "corestack_by_unit_level.csv").set_index(["units", "land"])
+    worst = 0.0
+    for label, lv in LEVELS.items():
+        sel = level == lv if lv else np.ones(len(units), bool)
+        for b in TREE:
+            for theirs, years in (("loss_km2_2001_2010", range(2001, 2011)), ("loss_km2_2011_2017", range(2011, 2018)), ("loss_km2_2018_2025", range(2018, 2026)), ("loss_km2_2001_2025", range(2001, 2026))):
+                mine = float(sum(hb.loc[sel, f"loss_ha_{b}_{y}"].sum() for y in years)) / 100
+                worst = max(worst, abs(mine - float(hs.loc[(label, b), theirs])))
+                if abs(mine - float(hs.loc[(label, b), theirs])) > 0.006:
+                    fails.append(f"{label}, band {b}: yearly loss sums to {mine:,.3f} km2 over {years[0]}-{years[-1]}; hansen_loss_by_canopy_band.csv prints {float(hs.loc[(label, b), theirs]):,.2f}")
+            mine = float(hb.loc[sel, f"area_ha_{b}"].sum()) / 100
+            if abs(mine - float(hs.loc[(label, b), "land_km2"])) > 0.006:
+                fails.append(f"{label}, band {b}: land sums to {mine:,.3f} km2; hansen_loss_by_canopy_band.csv prints {float(hs.loc[(label, b), 'land_km2']):,.2f}")
+        for k, theirs in (("degradation", "degradation_km2"), ("lost", "loss_km2"), ("improvement", "improvement_km2"), ("gained", "gain_km2")):
+            mine = float(cls[k][sel].sum()) / 100
+            worst = max(worst, abs(mine - float(cl.loc[(label, "treecover2000 > 10"), theirs])))
+            if abs(mine - float(cl.loc[(label, "treecover2000 > 10"), theirs])) > 0.006:
+                fails.append(f"{label}: CoRE Stack class {k} on treecover2000 > 10 sums to {mine:,.3f} km2; corestack_by_unit_level.csv prints {float(cl.loc[(label, 'treecover2000 > 10'), theirs]):,.2f}")
+        mine = float((cls["partial3"] + cls["partial4"])[sel].sum()) / 100
+        if abs(mine - float(cl.loc[(label, "treecover2000 > 10"), "partial_degradation_km2"])) > 0.006:
+            fails.append(f"{label}: classes 3 and 4 on treecover2000 > 10 sum to {mine:,.3f} km2; corestack_by_unit_level.csv prints {float(cl.loc[(label, 'treecover2000 > 10'), 'partial_degradation_km2']):,.2f}")
+    checks["margins_against_the_sources_own_summary_tables_largest_gap_km2"] = round(worst, 4)
+    gap = float(np.abs(cls["degradation"] - cu["corestack_degradation_ha_tc_gt10"].to_numpy(float)).max())
+    checks["corestack_degradation_on_reference_land_two_tables_largest_gap_ha"] = round(gap, 5)
+    if gap > HA_TOLERANCE:
+        fails.append(f"class -1 on treecover2000 > 10 differs between corestack_by_unit_bands.csv and corestack_by_unit.csv (largest gap {gap:.4f} ha)")
+    grid = float(sum(cb[f"land_ha_{b}"].to_numpy(float) for b in TREE).sum() / land.sum() - 1)
+    checks["reference_land_on_corestack_grid_vs_hansen_grid_all_units"] = round(grid, 6)
+    if abs(grid) > GRID_TOLERANCE:
+        fails.append(f"the reference land summed on CoRE Stack's grid differs from Hansen's by {grid:+.4%} over all units")
+    stop_if_failed("checking the margins against the two sources' own tables")
+    print(f"OK  the windows' yearly columns and the CoRE Stack classes add up to the two sources' own summary tables (largest gap {worst:.4f} km2); "
+          f"the reference land is {land.sum() / 100:,.1f} km2 on Hansen's grid and {grid:+.4%} from that on CoRE Stack's")
+
+    # ---- rates, flags and classes, at the delivered floor -----------------------------------------------------------------
+    with np.errstate(invalid="ignore", divide="ignore"):
+        h_rate = {w: np.where(land > 0, loss[w] / land, np.nan) for w in WINDOWS}
+        c_rate = {name: np.where(valued > 0, sum(cls[k] for k in parts) / valued, np.nan) for name, parts in CORE_RATES.items()}
+        c_rate["net"] = np.where(valued > 0, (cls["degradation"] - cls["improvement"]) / valued, np.nan)
+    assessed_at = {f: (land >= f) & (valued >= f) for f in FLOORS}
+    assessed = assessed_at[MIN_REFERENCE_HA]
+    by_unit = units.copy()
+    by_unit["reference_ha"] = np.round(land, 4)
+    by_unit["corestack_valued_ha"] = np.round(valued, 4)
+    by_unit["assessed"] = assessed.astype(int)
+    cuts, flag = {}, {}
+    cuts["corestack_degradation"], flag["corestack"] = cut_and_flag(np.nan_to_num(c_rate["degradation"]), assessed)
+    for w in WINDOWS:
+        cuts[f"hansen_{w}"], flag[f"hansen_{w}"] = cut_and_flag(np.nan_to_num(h_rate[w]), assessed)
+        by_unit[f"hansen_loss_ha_{w}"] = np.round(loss[w], 4)
+        by_unit[f"hansen_rate_{w}"] = np.round(h_rate[w], 6)
+    for k, parts in (("degradation", ("degradation",)), ("partial_degradation", ("partial3", "partial4")), ("lost", ("lost",)), ("improvement", ("improvement",))):
+        by_unit[f"corestack_{k}_ha"] = np.round(sum(cls[p] for p in parts), 4)
+    for name in ("degradation", "degradation_with_partial", "net", "lost", "improvement"):
+        by_unit[f"corestack_rate_{name}"] = np.round(c_rate[name], 6)
+    by_unit["corestack_flag"] = pd.array(np.where(assessed, flag["corestack"].astype(int), 0), dtype="Int64")
+    by_unit.loc[~assessed, "corestack_flag"] = pd.NA
+    for w in WINDOWS:
+        by_unit[f"hansen_flag_{w}"] = pd.array(np.where(assessed, flag[f"hansen_{w}"].astype(int), 0), dtype="Int64")
+        by_unit.loc[~assessed, f"hansen_flag_{w}"] = pd.NA
+        by_unit[f"agreement_class_{w}"] = classes(flag[f"hansen_{w}"], flag["corestack"], assessed)
+    by_unit = by_unit.rename(columns={f"agreement_class_{HEADLINE}": "agreement_class"})
+    order = ["unit_id", "unit_level", "outside_village", "reference_ha", "corestack_valued_ha", "assessed", "agreement_class"]
+    by_unit = by_unit[order + [c for c in by_unit.columns if c not in order]]
+    counted = by_unit["agreement_class"].value_counts()
+    if int(counted.drop("insufficient_forest", errors="ignore").sum()) != int(assessed.sum()) or int(counted.get("insufficient_forest", 0)) != int((~assessed).sum()):
+        fails.append("the agreement classes do not add up to the assessed and the unassessed units")
+    stop_if_failed("classifying the units")
+
+    # ---- the summary: every window, unit type and floor ---------------------------------------------------------------------
+    rng = np.random.default_rng(BOOTSTRAP_SEED)
+    rows = []
+    for w in WINDOWS:
+        for floor in FLOORS:
+            ok = assessed_at[floor]
+            cut_h, hf = cut_and_flag(np.nan_to_num(h_rate[w]), ok)
+            cut_c, cf = cut_and_flag(np.nan_to_num(c_rate["degradation"]), ok)
+            for label, lv in LEVELS.items():
+                in_level = level == lv if lv else np.ones(len(units), bool)
+                row = {"window": w, "window_is": WINDOW_IS[w], "minimum_reference_ha": floor, "delivered": int(w == HEADLINE and floor == MIN_REFERENCE_HA), "units": label,
+                       "n_units": int(in_level.sum()), "n_insufficient_forest": int((in_level & ~ok).sum()), "hansen_rate_cut": round(cut_h, 6), "corestack_degradation_rate_cut": round(cut_c, 6)}
+                row.update(agreement_row(in_level & ok, hf, cf, np.nan_to_num(h_rate[w]), {k: np.nan_to_num(v) for k, v in c_rate.items()}, land, loss[w], cls["degradation"], rng))
+                rows.append(row)
+    summary = pd.DataFrame(rows)
+    head = summary[(summary.window == HEADLINE) & (summary.minimum_reference_ha == MIN_REFERENCE_HA)].set_index("units")
+    for label, lv in LEVELS.items():                                       # the summary's counts are the per-unit table's
+        sel = by_unit["unit_level"] == lv if lv else np.ones(len(by_unit), bool)
+        n_ = by_unit.loc[sel, "agreement_class"].value_counts()
+        for k in ("both", "hansen_only", "corestack_only", "neither"):
+            if int(n_.get(k, 0)) != int(head.loc[label, k]):
+                fails.append(f"{label}: {int(n_.get(k, 0))} units are '{k}' in agreement_by_unit.csv and {int(head.loc[label, k])} in the summary")
+    stop_if_failed("checking the summary against the per-unit table")
+
+    drows = []
+    ok = assessed
+    hf = flag[f"hansen_{HEADLINE}"]
+    for name, what in (("degradation", "class -1 (delivered)"), ("degradation_with_partial", "classes -1, 3 and 4"), ("net", "class -1 minus class 1"), ("lost", "class -2, tree cover lost"),
+                       ("improvement", "class 1, improvement (the placebo)")):
+        cut_c, cf = cut_and_flag(np.nan_to_num(c_rate[name]), ok)
+        for label, lv in LEVELS.items():
+            in_level = level == lv if lv else np.ones(len(units), bool)
+            row = {"window": HEADLINE, "minimum_reference_ha": MIN_REFERENCE_HA, "corestack_flag_is": what, "corestack_rate": name, "units": label, "corestack_rate_cut": round(cut_c, 6)}
+            r = agreement_row(in_level & ok, hf, cf, np.nan_to_num(h_rate[HEADLINE]), {name: np.nan_to_num(c_rate[name])}, land, loss[HEADLINE], sum(cls[k] for k in CORE_RATES.get(name, ("degradation",))), rng)
+            row.update({k: v for k, v in r.items() if not k.startswith(("hansen_loss_pct", "reference_land_pct", "corestack_degradation_pct", "reference_km2", "hansen_loss_km2", "corestack_degradation_km2"))})
+            drows.append(row)
+    definitions = pd.DataFrame(drows)
+
+    out_tables = {"agreement_by_unit.csv": by_unit, "agreement_summary.csv": summary, "agreement_definitions.csv": definitions}
     for name, t in out_tables.items():
         t.to_csv(OUT / name, index=False)
     blank = lambda t: {c: int(t[c].isna().sum()) for c in t.columns if t[c].isna().any()}
     with open(OUT / "agreement.provenance.json", "w", encoding="utf-8") as fh:
-        json.dump({
-            "script": "scripts/02_build_agreement.py", "script_sha256": sha256(__file__),
-            "uses": {n: sha256(Path(__file__).with_name(n)) for n in ("_ee_units.py", "02_build_nirv.py", "02_export_nirv_yearly.py", "02_export_nirv_observations.py", "02_build_corestack.py")},
-            "run_utc": started, "finished_utc": now(),
-            "inputs": [{"path": str(a.units), "bytes": Path(a.units).stat().st_size, "sha256": sha256(a.units)},
-                       {"earth_engine_asset": asset, "checked_against_the_layer_by": str(record.relative_to(ROOT))},
-                       {"earth_engine_image_collection": std_collection, "blocks": len(blocks), "recipe_sha256": NIRV.YEARLY.RECIPE_SHA256, "exported_by_run": yearly_prov["run_utc"],
-                        "recorded_in": yearly_prov.get("_read_from"),
-                        "made_from": {"earth_engine_image_collection": obs_collection, "recipe_sha256": NIRV.OBS.RECIPE_SHA256, "exported_by_run": obs_prov["run_utc"], "recorded_in": obs_prov.get("_read_from")}},
-                       {"path": "20_degradation/nirv.provenance.json", "sha256": sha256(OUT / "nirv.provenance.json"), "run_utc": nirv_prov["run_utc"]},
-                       {"path": "20_degradation/nirv_scenes.csv", "sha256": sha256(OUT / "nirv_scenes.csv"), "scenes": int(len(scenes))},
-                       {"earth_engine_dataset": HANSEN, "bands": ["treecover2000", "lossyear"]}, {"earth_engine_image_collection": CORE.CHANGE, "zones_in_order": CORE.ZONES}]
-                      + [{"path": str(p.relative_to(ROOT)), "bytes": p.stat().st_size, "sha256": sha256(p)} for p in sources.values()],
-            "definitions": {"grid": GRID, "reference_common": "treecover2000 > 10, CoRE Stack class in -2..4 at the cell's centre, NIRv has all six seasons 2016-2018 and 2022-2024",
-                            "hansen_common": f"lossyear in {HANSEN_WINDOW[0]}..{HANSEN_WINDOW[1]}", "nirv_common": "lower / higher as in 02_build_nirv.py (before-and-after contrast), on its date-standardised yearly values",
-                            "corestack_states": {k: list(v) for k, v in C_STATES.items()}, "reference_full_span": "treecover2000 > 10, CoRE Stack class in -2..4, NIRv has a trend (at least 10 seasons)",
-                            "hansen_full_span": "lossyear in 1..25", "nirv_full_span": "declining / increasing as in 02_build_nirv.py (13-season exact Mann-Kendall)",
-                            "headline_cells": HEADLINE_CELLS, "unit_flag": f"rate above the {FLAG_PERCENTILE}th percentile of units with at least {UNIT_MIN_REFERENCE_HA:g} ha of reference land",
-                            "unit_flag_cuts": cuts, "odds_ratio_interval": f"percentiles 2.5 and 97.5 of {BOOTSTRAP} resamplings of units, seed {BOOTSTRAP_SEED}", "loss_year_groups": {k: list(v) for k, v in LOSS_GROUPS.items()}},
-            "earth_engine": {"project": project, "zonal_tasks": eu.task_record(status), "zonal_eecu_seconds": round(eu.eecu(status), 1),
-                             "group_tables_taken_from_an_earlier_attempt_of_the_same_computation": GROUPS - len(status), "group_table_folder": folder},
-            "checks_passed": {"units_returned_each_once": int(len(m)), "cells_add_up_to_the_reference_land": True, "area_summed_over_pixels_vs_polygons": area, "margins_against_the_sources_own_tables": checks},
-            "tables": {name: {"rows": int(len(t)), "columns": int(len(t.columns)), "blank_cells": blank(t)} for name, t in out_tables.items()},
-            "versions": {"python": sys.version.split()[0], "earthengine-api": ee.__version__, "pandas": pd.__version__, "numpy": np.__version__},
-        }, fh, indent=2)
-    try:                                                   # only now that the tables and their record are written; a failed delete loses nothing
-        cleanup()
-    except Exception as e:
-        print(f"NOTE  the intermediate tables could not all be deleted ({type(e).__name__}: {e}). Left in Earth Engine, to delete by hand: {folder.split('/')[-1]}")
+        json.dump({"script": "scripts/02_build_agreement.py", "script_sha256": sha256(__file__), "run_utc": started,
+                   "inputs": inputs + [{"path": f"20_degradation/{n}", "sha256": sha256(OUT / n), "role": "the source's own summary table, checked against"} for n in ("hansen_loss_by_canopy_band.csv", "corestack_by_unit_level.csv")],
+                   "definitions": {"measures": ["Hansen tree-cover loss", "CoRE Stack tree-change classes 2017-2023"], "not_in_this_table": "NIRv (a reported column since 7 Oct 2026)",
+                                   "reference_land": "treecover2000 > 10 (canopy bands gt10le30 and gt30)", "windows": {w: {"hansen_loss_years": list(v), "is": WINDOW_IS[w]} for w, v in WINDOWS.items()},
+                                   "headline_window": HEADLINE, "assessed": f"at least {MIN_REFERENCE_HA:g} ha of reference land on Hansen's grid and at least that much with a CoRE Stack class from -2 to 4",
+                                   "flag": f"rate above the {FLAG_PERCENTILE}th percentile of the assessed units' rates (above zero if that is zero); all unit types together",
+                                   "cuts_at_the_delivered_floor": {k: round(v, 6) for k, v in cuts.items()}, "corestack_flag_rate": "class -1 over the valued land",
+                                   "intervals": f"percentiles 2.5 and 97.5 of {BOOTSTRAP} resamples of units (every fourth for the correlations), seed {BOOTSTRAP_SEED}"},
+                   "checks_passed": {**checks, "classes_add_up_to_the_units": True, "summary_counts_equal_the_per_unit_table": True},
+                   "counts": {"units": int(len(units)), "assessed": int(assessed.sum()), "by_level": {lab: {k: int(v) for k, v in by_unit.loc[(by_unit['unit_level'] == lv) if lv else slice(None), "agreement_class"].value_counts().items()} for lab, lv in LEVELS.items()}},
+                   "tables": {name: {"rows": int(len(t)), "columns": int(len(t.columns)), "blank_cells": blank(t)} for name, t in out_tables.items()},
+                   "versions": {"python": sys.version.split()[0], "pandas": pd.__version__, "numpy": np.__version__}}, fh, indent=2)
 
     pd.set_option("display.width", 250)
     pd.set_option("display.max_columns", 60)
-    print(f"\nagreement_summary.csv: n = {len(summary)} rows; the headline (common window, treecover2000 > 10):")
-    print(summary[(summary.window == "common window") & (summary.land == "gt10")].drop(columns=["window", "land"]).T.to_string(header=False))
-    print(f"\nagreement_pairs.csv: n = {len(pairs)} rows; common window, treecover2000 > 10, all units:")
-    print(pairs[(pairs.window == "common window") & (pairs.land == "gt10") & (pairs.units == "all units")].drop(columns=["window", "land", "units", "n_units"]).to_string(index=False))
-    print(f"\nagreement_units.csv: n = {len(units_table)} rows")
-    print(units_table.T.to_string(header=False))
-    print(f"\nagreement_positive_control.csv: n = {len(control_table)} rows; all units:")
-    print(control_table[control_table.units == "all units"].drop(columns=["units", "n_units"]).to_string(index=False))
-    print(f"\nEarth Engine: {eu.eecu(status):,.0f} EECU-seconds; done. run_utc {started}; outputs in {OUT.relative_to(ROOT)}/")
+    print(f"\nagreement_by_unit.csv: n = {len(by_unit):,} units; assessed (at least {MIN_REFERENCE_HA:g} ha of reference land on both grids): {int(assessed.sum()):,}; "
+          f"insufficient forest: {int((~assessed).sum()):,}. Cuts: Hansen {HEADLINE} rate > {cuts['hansen_' + HEADLINE]:.4%}; CoRE Stack class -1 rate > {cuts['corestack_degradation']:.2%}")
+    show = ["window", "units", "n_units", "n_insufficient_forest", "n_assessed", "both", "hansen_only", "corestack_only", "neither", "both_expected_if_unrelated", "both_observed_over_expected",
+            "odds_ratio", "odds_ratio_lo95", "odds_ratio_hi95", "spearman_hansen_vs_corestack_degradation", "spearman_hansen_vs_corestack_net", "spearman_hansen_vs_corestack_lost", "spearman_hansen_vs_corestack_improvement"]
+    print(f"\nagreement_summary.csv: n = {len(summary)} rows; shown: the delivered floor, every window")
+    print(summary[summary.minimum_reference_ha == MIN_REFERENCE_HA][show].T.to_string(header=False))
+    print(f"\nagreement_definitions.csv: n = {len(definitions)} rows; all units:")
+    print(definitions[definitions.units == "all units"][["corestack_flag_is", "corestack_rate_cut", "both", "both_expected_if_unrelated", "both_observed_over_expected", "odds_ratio", "odds_ratio_lo95", "odds_ratio_hi95"]].to_string(index=False))
+    print(f"\ndone. run_utc {started}; outputs in {OUT.relative_to(ROOT)}/")
 
 
 if __name__ == "__main__":
