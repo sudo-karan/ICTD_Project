@@ -6,6 +6,7 @@ The demo layer - one offline map of what stages 1, 2 and 3 hold, for every unit.
 
 In : --units                                       the stage-0 layer: geometry, names, unit type, district of the lgd_panchayat units
      10_units/outside_village_district.csv         the district of each outside_village unit (01_assign_outside_district.py)
+     10_units/units.provenance.json                the layer's own counts (the villages that belong to no unit)
      00_raw/cfr_fra/odisha_fra_mpr_district_2025-12-31.csv   district names beside their Census-2011 codes
      20_degradation/degradation_by_unit.csv        stage 1: Hansen, the canopy bands, CoRE Stack (NIRv pending)
      20_degradation/corestack_by_unit_bands.csv    stage 1: every CoRE Stack class by band of year-2000 canopy - the six classes
@@ -472,6 +473,7 @@ def main():
     summ = pd.read_csv(ROOT / "20_degradation/agreement_summary.csv")
     head = summ[(summ.delivered == 1) & (summ.units == "all units")].iloc[0]
     por = pd.read_csv(ROOT / "40_allocation/panchayat_of_record_check.csv").set_index("scope").loc["all units"]
+    uc = json.load(open(ROOT / "10_units/units.provenance.json"))["counts"]
     spent_all = float(alloc["expenditure_total"].sum())
     fig = {"out_area": float(ov["share_of_all_area_pct"]), "out_forest": float(ov["share_of_all_forest_pct"]), "out_loss": float(ov["share_of_all_loss_pct"]),
            "rep_1": float(rep.loc[1.0]), "rep_5": float(rep.loc[5.0]), "rep_50": float(rep.loc[50.0]), "kept_50": float(ff.loc[50.0, "forest_kept_pct"]),
@@ -490,7 +492,9 @@ forest conservation and restoration, tracking of carbon credits, etc. by suitabl
 datasets (tree canopy, its loss, tree-cover change), indicators per unit, and one view of them. It is a demonstration for discussion, to be checked against what people who know these places observe - not a verdict on any place.</p>
 <p><b>The unit.</b> Commons Connect computes its landscape-level indicators per micro-watershed, and the consultation catalogue lists its forest variables per forest beat. This map uses administrative polygons instead, because MGNREGA funds and the census are
 administrative: an LGD panchayat unit is the villages mapped to one LGD panchayat id (not always a whole gram panchayat). <b>Outside-village units</b> (hatched) are the land outside any revenue village - mostly reserved forest. They are {fig['out_area']:.0f} % of the area and hold {fig['out_forest']:.0f} % of
-the forest and {fig['out_loss']:.0f} % of its loss, and they have no census rows.</p>
+the forest and {fig['out_loss']:.0f} % of its loss, and they have no census rows. The few blank patches inside the state are {uc['villages_with_no_lgd_panchayat']} villages
+({uc['villages_with_no_lgd_panchayat_km2']:,.0f} km<sup>2</sup>) that have a census code but no row in the village-to-panchayat mapping: they belong to no unit. The district of an outside-village unit is the district named on its boundary polygon,
+checked against the villages round it; the panel says so where it was assigned another way or is ambiguous.</p>
 <p><b>Honest colour.</b> More than half of the units ({checks['units_under_1_ha_of_forest'][0]:,} of {n:,}) have under one hectare of forest, and a rate on a few hectares is noise: between odd and even years the rank correlation of a unit's loss rate is {fig['rep_1']:.2f} for units
 with 1 to 2 ha of forest, {fig['rep_5']:.2f} at 5 to 10 ha and {fig['rep_50']:.2f} at 50 to 100 ha. So on the forest layers a unit with too little of the land a layer rests on is grey - <i>insufficient forest to assess</i> - and never on the colour scale. You can set the minimum to 50 ha (the default; {checks['units_under_50_ha_of_forest'][0]:,} units grey on the
 Hansen layer, and the coloured units still hold {fig['kept_50']:.1f} % of the forest) or to 1 ha. On the census layers the outside-village units are <i>no census data for this land</i>, never zero.</p>
@@ -533,8 +537,8 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
         "unit_types": {"lgd": f"LGD panchayat units ({n_lgd:,})", "out": f"Outside-village units ({n_out:,})", "out_legend": "Hatched: outside-village unit (land outside any revenue village)"},
         "codes": CODES, "default_layer": "hansen_loss", "default_floor": "50",
         "floors": [{"id": f, "label": f"{v:g} ha" + (" (default: the floor proposed for the analysis)" if f == "50" else " (every unit with measurable forest)")} for f, v in FLOORS.items()],
-        "layers": [{k: v for k, v in L.items() if not k.startswith("_")} for L in layers]
-                  + [{"id": "nirv", "group": "Forests", "title": "NIRv trend (Landsat 8, 2013-2025)", "pending": "pending, not yet computed"}],
+        "layers": [x for L in layers for x in ([{k: v for k, v in L.items() if not k.startswith("_")}]
+                                               + ([{"id": "nirv", "group": "Forests", "title": "NIRv trend (Landsat 8, 2013-2025)", "pending": "pending, not yet computed"}] if L["id"] == "agreement" else []))],
         "core_classes": [{"name": name, "color": color} for name, color, _ in CORE_CLASSES],
         "panel": panel, "info_empty": "<h3>Click a unit</h3><p class='sub'>Its figures appear here. Hatched units are land outside any revenue village.</p>",
         "search_none": "No unit with that name or id.", "search_many": "{n} units match; showing the first. Add more of the name, or use the id.",

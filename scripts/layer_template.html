@@ -35,11 +35,13 @@ button:hover { background: #eee; }
 .sw { display: inline-block; width: 18px; height: 12px; border: 1px solid #555; vertical-align: -2px; margin-right: 6px; box-sizing: border-box; }
 .sw.hatch { background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.55) 0, rgba(0,0,0,.55) 1px, transparent 1px, transparent 5px); }
 .lr { white-space: nowrap; }
+.lr.wrap { white-space: normal; }
 .lr .n { color: #555; }
 .flatsep { border-top: 1px solid #ccc; margin: 5px 0 3px; }
 table.kv { border-collapse: collapse; width: 100%; }
 table.kv td { padding: 2px 0; vertical-align: top; border-bottom: 1px solid #eee; }
 table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tabular-nums; }
+table.kv td.num { white-space: nowrap; }
 .note { color: #555; font-size: 12px; margin: 3px 0 0; }
 .flag { background: #fff6d6; border: 1px solid #e0c060; border-radius: 3px; padding: 4px 6px; font-size: 12.5px; margin: 6px 0; }
 .bar { display: flex; height: 16px; border: 1px solid #555; margin: 4px 0 2px; }
@@ -176,7 +178,7 @@ table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tab
       if (c.flat && !sep) { h += '<div class="flatsep"></div>'; sep = true; }
       h += '<div class="lr"><span class="sw" style="background:' + c.color + '"></span>' + esc(c.label) + ' <span class="n">(' + esc(counts[k]) + ")</span></div>";
     }
-    h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
+    h += '<div class="flatsep"></div><div class="lr wrap"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
     h += '<p class="note">' + esc(l.this_shows) + "</p>";
     if (l.floored) { h += '<p class="note">' + esc(l.floor_note[state.floor]) + "</p>"; }
     $("legend").innerHTML = h;
@@ -189,7 +191,7 @@ table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tab
       if (sec.flag_field !== undefined && f[sec.flag_field]) { h += '<div class="flag">' + esc(f[sec.flag_field]) + "</div>"; }
       if (sec.rows) {
         h += '<table class="kv">';
-        sec.rows.forEach(function (r) { h += "<tr><td>" + esc(r[0]) + '</td><td class="v">' + esc(f[r[1]]) + "</td></tr>"; });
+        sec.rows.forEach(function (r) { h += "<tr><td>" + esc(r[0]) + '</td><td class="v' + (/^(Rs |-)?[0-9]/.test(f[r[1]]) ? " num" : "") + '">' + esc(f[r[1]]) + "</td></tr>"; });
         h += "</table>";
       }
       if (sec.bar && bar) {
@@ -265,13 +267,16 @@ table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tab
   $("b_close").onclick = function () { $("modal").style.display = "none"; };
   $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
 
-  // ---- start: the layer, floor and unit can be given in the address after # ---------------------------------------------
-  var h0 = readHash();
-  state.floor = D.floors.some(function (f) { return f.id === h0.floor; }) ? h0.floor : D.default_floor;
-  setFloor(state.floor);
-  setLayer(h0.layer && layerById[h0.layer] && !layerById[h0.layer].pending ? h0.layer : D.default_layer);
-  var start = h0.unit ? D.id.indexOf(h0.unit) : -1;
-  if (start >= 0) { select(start, true); } else { showInfo(); }
+  // ---- start: the layer, floor and unit can be given in the address after #, and followed when the address changes -----
+  function fromAddress(first) {
+    var h0 = readHash(), k;
+    if (first || (h0.floor && h0.floor !== state.floor)) { setFloor(D.floors.some(function (f) { return f.id === h0.floor; }) ? h0.floor : D.default_floor); }
+    if (first || (h0.layer && h0.layer !== state.layer)) { setLayer(h0.layer && layerById[h0.layer] && !layerById[h0.layer].pending ? h0.layer : D.default_layer); }
+    k = h0.unit ? D.id.indexOf(h0.unit) : -1;
+    if (k >= 0 && k !== state.sel) { select(k, true); } else if (first) { showInfo(); }
+  }
+  fromAddress(true);
+  window.addEventListener("hashchange", function () { fromAddress(false); });
   window.ICTD_READY = true;
 })();
 </script>
