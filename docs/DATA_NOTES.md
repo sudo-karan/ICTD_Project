@@ -137,6 +137,25 @@ out of the released artifact and cite them only in the paper.** The pipeline doe
 `st_share` is the marginalisation axis and `adi_2011` the development control — so dropping them from a
 release loses a robustness reading and nothing else.
 
+**The demo layer (`60_layer/`), 7 October 2026 — the fallback applied, and flagged.** The layer built for the Foundation for
+Ecological Security is the first artifact of this project meant to leave the machine. On the project owner's
+instruction the SHRUG-derived columns are **omitted from it**: `poverty_rate`, `poverty_rate_ppp2`, `poverty_rate_population_covered_share`, `poverty_rate_population_rated`, `poverty_rate_shared_shrid_population_share`.
+They stay in `30_need/need_by_unit.csv` and in the analysis. `scripts/06_build_layer.py` stops if one of them, or
+the word "poverty" outside the licence note, appears in the layer's files; `scripts/verify_layer.py` checks it again.
+The layer's *Sources and licences* panel names SHRUG and its licence and says that no SHRUG-derived figure is
+included. Three things follow that the owner should know before the layer is sent:
+
+- **The unit shapes are a derived database under the ODbL.** They are built from DataMeet's village boundaries
+  (ODbL 1.0), so `60_layer/data.js` may be shared, with attribution, under that licence and no narrower one. The
+  panel says so. This binds the shapes; the figures attached to them are facts from other sources.
+- **`adi_2011` is kept, and is the one judgement call.** The index's documentation says SHRUG's keys were used to
+  link 2001 and 2011 villages. The 2011 index itself is computed from Census 2011 rows, and it is the project's
+  development control, so it is in the layer. If the licence is read more strictly, drop it from the layer.
+- **ISFR is cited in the panel but no ISFR figure is on the map**; its terms (non-commercial use with
+  acknowledgment) are therefore not engaged by the layer.
+
+Not decided here: whether the layer may be passed on by the Foundation to others, and under what statement.
+
 **Other terms on file** (from `00_raw/data_manifest.csv`; none of these files is redistributed by the
 pipeline, only figures read from them):
 

@@ -114,6 +114,80 @@ n = 1,302,664 geotagged works and ₹12,816.8 crore in every row.
 - 161 coded villages have no row in the mapping and are in no layer.
 - Outside-village units have no census rows, so stage 2 leaves every column blank for them.
 
+## A district for each outside-village unit
+
+*Added 7 October 2026. `scripts/01_assign_outside_district.py`, run 2026-10-06T19:19:40Z; every figure is from
+`10_units/outside_village_district.csv`, its summary or its provenance record. n = 3,492 units, 41,358.3 km².*
+
+The outside-village units have no Census-2011 code, so `pc11_district_code` is blank for them in `units.gpkg`. The
+instruction was to assign a district "by spatial majority against the district boundaries already in 00_raw".
+**There is no district boundary file in `00_raw/`.** The only district geometry among the inputs is the DataMeet
+village layer itself. So the method is not the one asked for, and is this:
+
+1. Each outside-village unit is one DataMeet polygon that carries no census code — one for one, 3,492 of them. The
+   polygon does carry a **Census-2001 district name**.
+2. A name becomes a Census-2011 district through the 49,039 coded polygons that carry a name: each of the
+   30 names goes with one code and each code with one name, and at least 99.30 per cent of a name's coded polygons
+   carry that code.
+3. The name is **checked against the neighbours**: a 100 m collar is drawn round the unit and the part of it lying on
+   coded villages is tallied by district — once by the villages' 2011 codes and once by their 2001 names.
+4. The name is kept unless its district is absent from the collar in both tallies; then the unit takes the
+   neighbours' largest district. A polygon with no name takes the neighbours' largest.
+
+| a unit's district is | units | km² |
+|---|---|---|
+| the district its polygon names | 3,441 | 41,281.2 |
+| its coded neighbours' district — the polygon names none | 19 | 4.8 |
+| its coded neighbours' district — the one it names is nowhere round it | 32 | 72.3 |
+| **all outside-village units** | **3,492** | **41,358.3** |
+
+**Ambiguous** — the two largest districts in the collar within 0.05 of each other by area — **5 units**:
+
+| unit | name | district assigned | the collar's two largest shares | area, ha |
+|---|---|---|---|---|
+| `OUTSIDE_1229` | Kanpur | Cuttack | Nayagarh 0.50, Cuttack 0.50 | 2,416.8 |
+| `OUTSIDE_1287` | Barang | Cuttack | Khordha 0.52, Cuttack 0.48 | 11.2 |
+| `OUTSIDE_2003` | Khalikote | Ganjam | Cuttack 0.52, Ganjam 0.48 | 47.5 |
+| `OUTSIDE_3344` | Lakshmipur | Koraput | Rayagada 0.52, Koraput 0.48 | 829.0 |
+| `OUTSIDE_3412` | Khalikote | Ganjam | Cuttack 0.52, Ganjam 0.48 | 25.8 |
+
+2 of the 5 — `OUTSIDE_2003`, `OUTSIDE_3412` — are ambiguous only because of a fault in the layer (below): tallied by their neighbours' 2001 names instead of their 2011 codes, each has one district round it (Ganjam 1.00). 3 units lie on a district boundary in both tallies.
+
+How that moves with the width of the collar:
+
+| collar | units with a coded neighbour | without | ambiguous | name differs from the neighbours' largest |
+|---|---|---|---|---|
+| 50 m | 3,128 | 364 | 7 | 85 |
+| 100 m (used) | 3,138 | 354 | 5 | 89 |
+| 250 m | 3,166 | 326 | 10 | 60 |
+
+What to hold against it:
+
+- **354 units have no coded village within 100 m** — they are surrounded by other outside-village units — and
+  rest on the polygon's name alone, unchecked.
+- In 89 units the name is not the neighbours' largest district. In 57 of them the named district is present
+  in the collar and the name is kept: a tract on a district boundary has neighbours on both sides. In the other
+  32 it is nowhere round the unit and the neighbours' district is taken:
+
+| the polygon names | assigned | units | km² |
+|---|---|---|---|
+| Cuttack | Jajapur | 12 | 10.1 |
+| Cuttack | Khordha | 7 | 37.0 |
+| Ganjam | Gajapati | 5 | 10.1 |
+| Gajapati | Ganjam | 4 | 5.3 |
+| Rayagada | Koraput | 2 | 0.7 |
+| Cuttack | Kendrapara | 1 | 8.9 |
+| Sonapur | Balangir | 1 | 0.3 |
+
+- **The layer's own crosswalk has faults, which is why the neighbours are tallied two ways.** 41 coded polygons carry
+  a 2011 district code that is not their 2001 name's — the largest group, 15 polygons named Ganjam with the code
+  of Cuttack. A tally by code alone would have moved units into districts they are not in. The faults
+  are in `00_raw/`-derived data and are recorded here, not corrected.
+- The five districts with the most such land: Kandhamal 3,595 km² in 152 units, Kalahandi 2,954 km² in 193 units, Koraput 2,915 km² in 255 units, Ganjam 2,908 km² in 556 units, Sundargarh 2,588 km² in 143 units.
+
+**Use.** For descriptive tables and for the demo layer (`docs/LAYER.md`). `units.gpkg` is unchanged, and these units
+stay out of any regression: they have no census rows whatever district they are in.
+
 ## Withdrawn
 
 Unit counts of 13,438 and 9,946 and areas of 154,046 and 112,609 km² appeared in an earlier brief. They were

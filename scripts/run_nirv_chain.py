@@ -175,7 +175,8 @@ class Chain:
             if kind.startswith(SIBLINGS):
                 for o in ops:
                     m = o.get("metadata", {})
-                    if m.get("state") == "PENDING" and str(m.get("description", ""))[len(f"ictd_{self.stem}_"):].startswith(SIBLINGS):
+                    own = f"ictd_{self.stem}_"
+                    if m.get("state") == "PENDING" and str(m.get("description", "")).startswith(own) and str(m["description"])[len(own):].startswith(SIBLINGS):
                         try:
                             self.ee.data.cancelOperation(o["name"])
                             say(f"  also cancelled the pending {m['description']} (the same computation)")

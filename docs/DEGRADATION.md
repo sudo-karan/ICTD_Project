@@ -1,18 +1,23 @@
 # Stage 1 — forest condition per unit
 
-*Built by `scripts/02_upload_units_asset.py`, `02_build_hansen.py`, `02_build_corestack.py`, `02_build_nirv.py`,
-`02_build_agreement.py`, `02_assemble_degradation.py` and `02_propose_forest_floor.py` (shared code in
-`scripts/_ee_units.py`). Every figure below is from `20_degradation/*.provenance.json`, the tables beside
+*Built by `scripts/02_upload_units_asset.py`, `02_build_hansen.py`, `02_build_corestack.py`, `02_build_agreement.py`,
+`02_assemble_degradation.py` and `02_propose_forest_floor.py` (shared code in `scripts/_ee_units.py`); NIRv by
+`02_export_nirv_observations.py`, `02_export_nirv_yearly.py` and `02_build_nirv.py`. Every figure below is from `20_degradation/*.provenance.json`, the tables beside
 them, or `00_raw/`. All 11,468 units of the base layer are measured, the 3,492 outside-village units included, and
 every table gives them separately.*
 
-Three sources, three different things:
+**Stage 1 rests on two measures (ruling of 7 October 2026).** Hansen is the validated floor. What Hansen cannot see —
+thinning under a standing canopy, and change on land that was already open in 2000 — is what CoRE Stack's
+degradation classes record. `degradation_by_unit.csv` holds the two side by side for every unit, and §4b sets them
+against each other. A third source, an NIRv trend from Landsat 8, was built, independently replicated, and found
+unfit to be a degradation measure: its trend moves one for one with the correction applied for the date of each
+image. That is a result, and it is §5. NIRv stays in the table as a reported column.
 
-| source | what it measures | state |
-|---|---|---|
-| Hansen Global Forest Change | stand-replacing loss of tree cover, by year 2001–2025, on a year-2000 canopy mask | built, independently replicated twice |
-| CoRE Stack tree-change classes | a change of class in canopy density or height between about 2016–19 and 2022–25, inside the producers' tree mask | built (run 2026-10-05T21:40:02Z); reconciled to the producers' one published Odisha figure |
-| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | redesigned on 6 October after the independent replication; the observations are being exported, the yearly values are queued behind them, and the per-unit scripts are rewritten and tested (§9) |
+| source | what it measures | role | state |
+|---|---|---|---|
+| Hansen Global Forest Change | stand-replacing loss of tree cover, by year 2001–2025, on a year-2000 canopy mask | measure: the validated floor | built, independently replicated twice |
+| CoRE Stack tree-change classes | a change of class in canopy density or height between about 2016–19 and 2022–25, inside the producers' tree mask | measure: thinning, and change outside Hansen's mask | built (run 2026-10-05T21:40:02Z); reconciled to the producers' one published Odisha figure |
+| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | **a reported column, not a measure** (§5) | pending — 52 of 84 tiles of stored observations exported at 2026-10-06T20:59:37Z, the 13 blocks of yearly values queued behind them; the columns of `degradation_by_unit.csv` are blank until the chain of §6 ends (§10) |
 
 ## 1. Hansen: forest, and the land the planning system has no population figures for
 
@@ -83,7 +88,7 @@ producers mapped 2011 onward with an updated method, so the step between 2010 an
 written form in the literature, "greater than 30%" (the project owner's reading; not checked here). And it is
 what Global Forest Watch, which distributes this dataset, actually computes. Its notes say "The Global Forest Watch website uses a >=30% canopy cover threshold as a default for all statistics" — yet on
 its own boundary the public tiles reproduce its published Odisha figures to within about a hectare with > 30 and
-miss them by 0.43 per cent with ≥ 30 (independent replication, §8). The notes and the numbers disagree; this
+miss them by 0.43 per cent with ≥ 30 (independent replication, §9). The notes and the numbers disagree; this
 pipeline follows the numbers and writes the inequality out everywhere. There is no bare "at 30" in any output.
 
 | mask | forest, km² | in LGD panchayat units | in outside-village units | outside-village share, % | relative to the mask used | loss 2001–2025, km² |
@@ -143,7 +148,7 @@ What this does and does not show:
   grew after 2000 and was then removed (a plantation felled, regrowth cleared), or an artefact of detection.
 - **Its rise over time is largely the method.** Loss on `treecover2000` ≤ 10 goes 45 → 245 → 627 km² across
   the three periods, a 14-fold rise, while loss in the mask goes 435 → 444 → 674. The independent check
-  (§8) dated the steps to 2011, 2013 and 2023 and found the same pattern in Global Forest Watch's own published
+  (§9) dated the steps to 2011, 2013 and 2023 and found the same pattern in Global Forest Watch's own published
   figures. Do not read it as a trend on the ground.
 - **The band 10 < `treecover2000` ≤ 30 is the one that bears on open forest**: 10,887 km² of land, 3.3 per cent
   of it lost, half of it in outside-village units. It is small beside the mask (26,630 km², 5.8 per cent lost).
@@ -154,14 +159,14 @@ So the mask does hide a large area of recorded loss, but Hansen cannot say that 
 it shows is tree cover coming and going on land that was open in 2000. Whether forest that was already open is
 getting worse is a question for a measure of condition, not of clearance.
 
-## 4. The two measures of condition, and what they can bear
+## 4. CoRE Stack, and whether it agrees with Hansen
 
 ### 4a. CoRE Stack tree-change classes (task C)
 
 `corestack_by_unit.csv`, n = 11,468 units; blank cells: `corestack_missing_share` in 11 units that have no value at all.
 
 **What the product is** (from the producers' own code, metadata and paper; every statement below was opened and
-re-opened by a second reader, sources in §10). `overall_change_2017_2023` is a 25 m raster in eleven pieces, one per
+re-opened by a second reader, sources in §11). `overall_change_2017_2023` is a 25 m raster in eleven pieces, one per
 agro-climatic zone; two of them cover the units. Its classes: −2 tree cover lost, −1 degradation, 0 no change,
 1 improvement, 2 tree cover gained, 3 and 4 partially degraded, 5 missing; no value outside the producers' tree mask.
 Three things decide how it can be used:
@@ -222,7 +227,7 @@ What it shows:
   classifier's "trees" takes in orchards, trees on farms and, by the producers' rule, steep cropland.
 - **"Lost" and "gained" are mostly farmland changing label.** In the sample, 527 of 539 "lost" points have no Hansen
   canopy at all in 2000, and 0 of them has Hansen loss dated 2018–2023. Class −2 is 86 per cent in LGD
-  panchayat units. It is not forest loss; §4c carries it as a state of its own beside class −1.
+  panchayat units. It is not forest loss; §4b carries it as a state of its own beside class −1.
 - **Most of classes −1 and 1 is churn, and what is left over is in the denser forest.** On land with `treecover2000` > 10 the product puts 24 per cent of the
   tree cover in class −1 and 15 per cent in class 1. Two fifths of the forest changing class in six years is more than a forest does; it is what
   classifiers that are right about two times in three produce. The downward share — class −1 over class −1 plus class 1, one half meaning no net signal — is 0.47 (0.47–0.48) on land with no canopy in 2000,
@@ -247,18 +252,299 @@ ellipsoid a pixel of this grid is 582.4 m² here, so their convention gives 7.3 
 pixels. All figures in this document are ellipsoidal. The two zone images lie on one lattice (origins a whole
 number of pixels apart), so nothing is resampled; they both have a value on 17.5 km² and differ on 0.00 km² of it.
 
-### 4b. NIRv from Landsat 8 (task B)
+### 4b. Do Hansen and CoRE Stack point at the same units? (task D)
 
-**State: redesigned on 6 October after the independent replication; the observations are being exported, the yearly values are queued behind them, and the per-unit scripts are rewritten and tested (§9).** `nirv_by_unit.csv` does not exist yet. 23 of 84 tiles of stored observations had been exported when this was written (2026-10-06T04:41:15Z).
+**State: built for all 11,468 units (run 2026-10-06T19:28:04Z), from the two sources' own per-unit tables; no Earth Engine. Its
+arithmetic was then rebuilt cell by cell by a script that shares no code with the builder (`scripts/verify_agreement.py`:
+42 of 42 checks passed).** Tables: `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`. NIRv is not
+in this table (§5).
 
-NIRv is the near-infrared reflectance of vegetation, NDVI × NIR (Badgley, Field and Berry 2017): the part of a
-pixel's near-infrared reflectance that comes from vegetation. It tracks canopy structure.
+**What is compared, and at what scale.** Hansen dates the outright removal of tree cover. CoRE Stack classes a 25 m
+pixel inside its own tree mask by whether canopy density or height moved a class between two three-year periods. They
+do not measure the same thing and are not expected to mark the same pixels: Hansen is blind to thinning, and CoRE
+Stack's class −1 is thinning under a canopy that still stands. The question the project needs answered is whether
+they point at the same *units*. So this is a table of units, not of pixels.
 
-#### What the replication found, and what was changed
+- **One reference land for both:** land with `treecover2000` > 10 (36,853 km² in the assessed units). A unit's Hansen rate is its loss dated in the
+  window on that land, over that land; its CoRE Stack rates are the area of a class on that land over the land there
+  that has a class from −2 to 4.
+- **A unit is assessed** only if it has at least 50 ha of that land on both sources' grids: 3,711 of 11,468 units
+  (2,504 LGD panchayat, 1,207 outside-village). The other 7,757 are *insufficient forest*, a class of their own — not "neither".
+- **A unit is flagged** by a measure if its rate is in the top fifth of the assessed units' rates (Hansen: more than
+  2.27 per cent of the reference land lost in 2017–2023; CoRE Stack: more than 24.0 per cent of the valued land in class −1). The
+  flag is relative. It says "among the worst fifth", not "degraded by some amount": no absolute threshold has a basis.
+
+**The headline window is 2017–2023:** Hansen loss dated 2017 to 2023 beside CoRE Stack's change 2017–2023, the span
+the CoRE Stack product itself names. Two other windows are given below in rows of their own and are never pooled or
+averaged with it.
+
+**That window is the period of the change in allocation this project sets out to explain — which is a reason to
+prefer it, not a limitation.** In the scheme's own district reports (R6.20, `00_raw/mis_reports/`) plantation was
+24.2 per cent of Odisha's MGNREGA expenditure in 2016-17 and 18.6 in 2017-18; in 2018-19 it was 3.3, and it has not reached
+one per cent in any year since. Over the same years water rose from 40 to 64 per cent of natural-resource
+expenditure. The window opens as the plantation money stops:
+
+| financial year | plantation, % of all expenditure | water, % of NRM expenditure |
+|---|---|---|
+| 2014-2015 | 21.39 | 40.1 |
+| 2015-2016 | 17.55 | 39.8 |
+| 2016-2017 | 24.17 | 44.6 |
+| 2017-2018 | 18.62 | 41.3 |
+| 2018-2019 | 3.34 | 50.5 |
+| 2019-2020 | 0.33 | 50.9 |
+| 2020-2021 | 0.03 | 56.0 |
+| 2021-2022 | 0.01 | 58.0 |
+| 2022-2023 | 0.02 | 60.8 |
+| 2023-2024 | 0.03 | 62.0 |
+| 2024-2025 | 0.63 | 63.7 |
+
+So what the two measures record over 2017–2023 is the condition of the forest in exactly the years in which the
+scheme stopped paying for it. A measure ending in 2016 could say nothing about that. (This is alignment in time. It
+is not, by itself, evidence that one caused the other; stage 4 is where that is argued.)
+
+**The headline.** Units flagged by both, beside the number two unrelated flags of those sizes would share; intervals
+are 95 per cent, from resampling units.
+
+| | units | insufficient forest | assessed | flagged by Hansen | flagged by CoRE Stack | **by both** | expected if unrelated | observed / expected | odds ratio | Hansen only | CoRE Stack only | neither |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| all units | 11,468 | 7,757 | 3,711 | 742 | 742 | **255** | 148.4 | 1.72 (1.57–1.87) | 2.67 (2.20–3.19) | 487 | 487 | 2,482 |
+| LGD panchayat units | 7,976 | 5,472 | 2,504 | 456 | 391 | **129** | 71.2 | 1.81 (1.59–2.04) | 2.69 (2.11–3.42) | 327 | 262 | 1,786 |
+| outside-village units | 3,492 | 2,285 | 1,207 | 286 | 351 | **126** | 83.2 | 1.51 (1.35–1.69) | 2.44 (1.86–3.23) | 160 | 225 | 696 |
+
+Rank correlation (Spearman) across assessed units between the Hansen rate 2017–2023 and each CoRE Stack rate. Class 1,
+*improvement*, is the placebo: it comes from the same classifiers as class −1 and should not go with clearance.
+
+| | class −1 (degradation) | class −1 minus class 1 (net) | classes −1, 3, 4 | class −2 (tree cover lost) | class 1 (improvement, the placebo) |
+|---|---|---|---|---|---|
+| all units | 0.36 (0.34–0.39) | 0.25 (0.21–0.27) | 0.36 | 0.18 (0.15–0.21) | 0.03 (-0.00–0.06) |
+| LGD panchayat units | 0.37 (0.33–0.40) | 0.24 (0.20–0.28) | 0.36 | 0.15 (0.11–0.18) | 0.03 (-0.01–0.06) |
+| outside-village units | 0.32 (0.28–0.37) | 0.23 (0.18–0.28) | 0.32 | 0.32 (0.27–0.37) | -0.00 (-0.06–0.05) |
+
+**What this shows.**
+
+1. **The two measures agree more than chance, and far from fully.** 255 units are in the top fifth on both, against
+   148 expected of unrelated flags: 1.72 times as many, odds ratio 2.67 (2.20–3.19). But 487 units are flagged by
+   Hansen alone and 487 by CoRE Stack alone: of the units either measure puts in its worst fifth, 34 per cent are in
+   the other's. Where both flag a unit the claim that it degraded is as strong as these two sources can make it. Where
+   one does, the table says which, and neither is preferred.
+2. **The placebo behaves.** A unit's Hansen rate rises with its CoRE Stack degradation rate (Spearman 0.36) and not with
+   its improvement rate (+0.03); units in Hansen's worst fifth are *less* often in the top fifth for improvement than
+   chance would give (105 against 148; odds ratio 0.60, 0.48–0.75). So the agreement is with degradation, not with
+   CoRE Stack's classifier simply being busy where there is forest.
+3. **It holds in both kinds of unit**, a little more strongly in the LGD panchayat units (observed over expected
+   1.81) than in the outside-village units (1.51).
+4. **The class that should match Hansen best matches it worst.** Class −2, "tree cover lost", is the class the producers
+   validated and the one that names what Hansen measures; its rank correlation with the Hansen rate is 0.18 over all
+   assessed units (0.32 in the outside-village units, 0.15 in the LGD panchayat ones), below that of class −1. On land with
+   canopy above 10 per cent in 2000 class −2 is small (0.61 per cent of valued land marks a unit's top fifth), and most of
+   the product's class −2 lies on land with no canopy in 2000 (§4a). The two products do not see clearance the same way.
+5. **Where the area is.** Units CoRE Stack flags hold 56 per cent of all Hansen loss 2017–2023 on the reference land, and
+   45 per cent of the land; units Hansen flags hold 29 per cent of all class −1 area, and 29 per cent of the land. **By
+   area, then, the agreement runs one way:** the units CoRE Stack marks hold more than their share of Hansen's loss,
+   but the units Hansen marks hold no more than their share of class −1. Clearance is concentrated where thinning is common;
+   thinning is not concentrated where clearance is. The
+   two also differ by more than an order of magnitude in what they count: 799 km² of Hansen loss in the window against
+   9,046 km² of class −1 in the same units.
+
+**The other windows, reported separately** (all units, 50 ha floor). The full-span row sets Hansen's loss in any year
+2001–2025 beside a product that starts in 2017; it is not one period and is not a test of agreement.
+
+| Hansen loss dated | Hansen top-fifth cut, % of reference land | Hansen loss in the window, km² | both | expected | observed / expected | odds ratio | Spearman with class −1 | with class 1 |
+|---|---|---|---|---|---|---|---|---|
+| **2017–2023 (headline)** | 2.27 | 798.7 | 255 | 148.4 | 1.72 (1.57–1.87) | 2.67 (2.20–3.19) | 0.36 | +0.03 |
+| 2019–2022 only (sensitivity) | 0.85 | 380.2 | 251 | 148.4 | 1.69 (1.55–1.84) | 2.58 (2.16–3.11) | 0.37 | +0.02 |
+| 2001–2025, Hansen's full span (not one period) | 6.50 | 1,902.0 | 236 | 148.4 | 1.59 (1.45–1.74) | 2.27 (1.89–2.73) | 0.30 | +0.02 |
+
+CoRE Stack's "2017" is the mode of the agricultural years 2016-17 to 2018-19 and its "2023" that of 2022-23 to 2024-25,
+so a loss dated 2017 or 2018 falls inside its first period and one dated 2023 inside its second. Keeping only the
+years strictly between the two periods (2019–2022) changes little.
+
+**The minimum forest** (headline window, all units). A unit's rate on a few hectares is noise (§4c); the finding does
+not depend on where the floor is set.
+
+| at least | assessed units | both | expected | observed / expected | odds ratio | Spearman with class −1 |
+|---|---|---|---|---|---|---|
+| 10 ha | 5,693 | 437 | 227.9 | 1.92 (1.80–2.04) | 3.42 (2.96–3.94) | 0.40 |
+| 50 ha (delivered) | 3,711 | 255 | 148.4 | 1.72 (1.57–1.87) | 2.67 (2.20–3.19) | 0.36 |
+| 100 ha | 2,891 | 184 | 115.6 | 1.59 (1.43–1.76) | 2.27 (1.86–2.79) | 0.33 |
+
+**Other readings of "CoRE Stack says degraded"** (headline window, all units, 50 ha floor; `agreement_definitions.csv`).
+
+| CoRE Stack flag on | top-fifth cut, % of valued land | both | expected | observed / expected | odds ratio |
+|---|---|---|---|---|---|
+| class -1 (delivered) | 23.99 | 255 | 148.4 | 1.72 | 2.67 (2.22–3.18) |
+| classes -1, 3 and 4 | 25.82 | 251 | 148.4 | 1.69 | 2.58 (2.14–3.09) |
+| class -1 minus class 1 | 10.80 | 234 | 148.4 | 1.58 | 2.23 (1.86–2.68) |
+| class -2, tree cover lost | 0.61 | 217 | 148.4 | 1.46 | 1.92 (1.58–2.31) |
+| class 1, improvement (the placebo) | 24.29 | 105 | 148.4 | 0.71 | 0.60 (0.48–0.75) |
+
+**What this table is not.**
+
+- **It is not a pixel-by-pixel overlap.** That needs one more Earth Engine job, which was not run: the project's queue
+  runs one task at a time in the order submitted (§10), and the job would have waited behind the NIRv exports for
+  about two days. A random sample of 12,813 points taken on 5 October gives the direction (a sample, not a table):
+  on land with `treecover2000` > 10, of 64 valued points with Hansen loss dated 2017–2023, 18 are CoRE Stack class −1
+  (28 per cent) and 0 are class −2; of 2,914 valued points with no Hansen loss in any year, 668 are class −1
+  (23 per cent) and 8 are class −2.
+- **The flag is relative** to the assessed units of this layer; a different set of units would move the cuts.
+- **A class −1 rate carries the zone it lies in.** The two agro-climatic zone models differ (§4a: the downward share is
+  0.75 in one and 0.54 in the other), so part of what CoRE Stack "flags" follows the zone boundary.
+- **The two rates stand on two grids**, Hansen's 30 m and CoRE Stack's 25 m; over all units the reference land differs
+  by +0.0037 per cent between them.
+
+### 4c. A minimum forest area for stage 4 (task E) — a recommendation, applied to nothing
+
+Stage 1 covers all 11,468 units whatever this section says. `scripts/02_propose_forest_floor.py` writes
+`forest_floor_options.csv` and `forest_floor_repeatability.csv` (run 2026-10-05T21:46:29Z).
+
+**The rule used to choose.** A unit's loss rate — `hansen_loss_ha / forest_ha` — is worth entering in a model only if
+it is a property of the unit and not of chance. That can be measured from the data alone: compute each unit's rate
+from the odd years and from the even years, and see how alike the two halves rank the units, by class of forest area.
+
+| `forest_ha` | units | LGD panchayat | outside-village | with no loss at all | odd years against even years, rank correlation |
+|---|---|---|---|---|---|
+| 0 – 0.5 | 1,564 | 1,233 | 331 | 1,398 | 0.23 |
+| 0.5 – 1 | 391 | 299 | 92 | 306 | 0.31 |
+| 1 – 2 | 382 | 281 | 101 | 277 | 0.34 |
+| 2 – 5 | 528 | 374 | 154 | 335 | 0.53 |
+| 5 – 10 | 438 | 281 | 157 | 237 | 0.61 |
+| 10 – 25 | 657 | 385 | 272 | 317 | 0.72 |
+| 25 – 50 | 563 | 347 | 216 | 200 | 0.77 |
+| 50 – 100 | 568 | 343 | 225 | 120 | 0.81 |
+| 100 – 250 | 696 | 437 | 259 | 105 | 0.89 |
+| 250 – 500 | 460 | 328 | 132 | 28 | 0.91 |
+| 500 – 1000 | 401 | 303 | 98 | 5 | 0.94 |
+| 1000 –  | 510 | 276 | 234 | 0 | 0.96 |
+
+Below 10 ha the two halves barely agree; the rate is noise. **The proposal is 50 ha**: the bottom of the smallest
+class from which every class reaches 0.8, a conventional mark for a measure being reliable enough to use (the mark
+is a convention, and the table lets another be read off).
+
+| floor on `forest_ha` | units kept | LGD panchayat | outside-village | forest kept, % | loss kept, % | odd against even among those kept | units kept if the floor were on `treecover2000` > 10 | pass on > 10 but fail on the mask (of them LGD) |
+|---|---|---|---|---|---|---|---|---|
+| 1 ha | 5,203 | 3,355 | 1,848 | 99.98 | 99.97 | 0.75 | 8,870 | 3,667 (3,080) |
+| 10 ha (alternative) | 3,855 | 2,419 | 1,436 | 99.77 | 99.77 | 0.84 | 5,824 | 1,969 (1,599) |
+| **50 ha** (proposed) | 2,635 | 1,687 | 948 | 98.60 | 98.81 | 0.89 | 3,751 | 1,116 (854) |
+| 100 ha (alternative) | 2,067 | 1,344 | 723 | 97.03 | 97.49 | 0.92 | 2,912 | 845 (653) |
+| 500 ha | 911 | 579 | 332 | 86.52 | 88.83 | 0.95 | 1,302 | 391 (303) |
+
+- At 50 ha, 2,635 of 11,468 units remain (1,687 LGD panchayat, 948 outside-village) and they hold 98.6 per cent of the
+  forest and 98.8 per cent of the loss. Three quarters of the units drop out and take about one per cent of the
+  forest with them.
+- **The floor selects.** 1,116 units have at least 50 ha of land with canopy above 10 per cent but less than
+  that above 30 — by construction the units whose tree cover is open — and 854 of them are LGD panchayat units. If
+  the measure that enters stage 4 is one defined on canopy above 10 per cent, the floor belongs on that land instead.
+- A floor is needed for a *rate*. A model of hectares lost, weighted by forest area, needs none.
+
+## 5. NIRv from Landsat 8: a negative methodological result (task B)
+
+**The finding.** A Theil–Sen NIRv trend over dry-deciduous forest is dominated by the phenology of the acquisition
+dates, and correcting for it makes the trend a function of the correction. The measure was specified, built, and
+reproduced bit for bit by an independent replication; the replication then showed what the yearly value was made of;
+the value was redesigned to remove the date; and a second replication round measured how far the redesigned trend can
+be trusted. It cannot carry the weight of a degradation measure. Others who fit a trend to seasonal Landsat composites
+over deciduous forest should expect the same.
+
+**What follows (ruling of 7 October 2026).** NIRv is not a measure of degradation in this project and nothing in
+stage 1 waits for it. It is a *reported column* of `degradation_by_unit.csv`: `nirv_slope` and `nirv_declining_ha` from
+the date-standardised value, with the first design's beside them as `_unadjusted`, and the caveats of §5.4 attached.
+**State: pending — 52 of 84 tiles of stored observations exported at 2026-10-06T20:59:37Z, the 13 blocks of yearly values queued behind them; the columns of `degradation_by_unit.csv` are blank until the chain of §6 ends (§10).** `nirv_by_unit.csv` does not exist yet; nothing below is a state-wide figure.
+
+### 5.1 The design
+
+NIRv is the near-infrared reflectance of vegetation, NDVI × NIR (Badgley, Field and Berry 2017): the part of a pixel's
+near-infrared reflectance that comes from vegetation. It tracks canopy structure, and a multi-year decline in it was
+to be the measure of thinning that Hansen cannot see.
+
+As specified and first built: Landsat 8 alone, the thirteen seasons 2013–2025; for each pixel and season, the median
+NIRv of the clear scenes of 1 November – 31 December, after the monsoon and before leaf fall; the Theil–Sen slope of
+those thirteen values on the year; and a pixel called *declining* when an exact Mann–Kendall test rejects no-trend at
+two-sided 5 per cent. The reasons for each choice are under *The four decisions* below.
+
+An independent replication, written from the scripts' docstrings alone and reading the same scenes from a different
+archive, reproduced it: in 2,467,997 of 2,600,000 pixel-seasons the stored value is identical to the last bit of a
+32-bit float (the other 132,003 lie under 34 scenes its archive could not serve), and per-unit areas agree to a few
+parts in 100,000. **The design was implemented correctly. That is what makes the next finding about the design and
+not about the code.**
+
+### 5.2 The calendar problem
+
+The replication then asked what a season's median is a median *of*.
+
+- Inside the window a forest pixel's NIRv falls by **13 to 18 per cent of its mean per 30 days** on land with
+  `treecover2000` > 10 (28 to 31 per cent on `treecover2000` ≤ 10): leaves age and dry, and the sun gets lower.
+- The mean day of the clear observations **moves by two to three and a half weeks** from one season to the next,
+  because cloud decides which scenes are kept.
+- So the yearly value follows the calendar: over nine seasons of the replication's test blocks its **correlation
+  with the mean day of the clear scenes is −0.90**; unit by unit over 97 units the median is −0.80.
+- Three missing scene-dates moved a 97-unit total of declining area by 3 to 35 per cent.
+
+A trend fitted to such medians is in part a trend in scene dates, and the median cannot be put right afterwards,
+because it has thrown the dates away. Moving every observation to one date with one rate — as a sensitivity test —
+took the declining share of the test blocks from 13.5 to about 6 per cent and the increasing share from 0.8 to about
+5. A fixed window is not a fixed point in the season.
+
+### 5.3 The redesign
+
+Every clear pass is now stored with its date (`02_export_nirv_observations.py`). For each pixel, NIRv is modelled
+within seasons as a level plus a rate × (day − 30) plus a step for the odd Landsat path, fitted over all the pixel's
+passes of all thirteen seasons; each pass is moved to 1 December by the pixel's own rate; and the yearly value is the
+median of the season's moved passes (`02_export_nirv_yearly.py`, computed once per grid cell and stored). The trend
+and the test are as before.
+
+It does what it was built to do. Given the pipeline's own stored passes, the replicator's code reproduces all 255,748
+date-standardised values to within 2 × 10⁻¹⁶. The correlation between a unit's series and the mean day it was seen on
+goes from −0.79 to +0.19 (south-west, 61 units) and from −0.71 to +0.04 (state-wide, 21 units); the year-to-year
+scatter falls by 41 and 32 per cent; and on no-trend values placed on the real passes, dates and paths the test flags
+2.1 to 2.5 per cent each way against a nominal 2.1 — the standardisation does not manufacture a trend.
+
+**The first design's value is kept beside it**, as `raw_` in the detailed tables and `_unadjusted` in the delivered
+ones (`nirv_slope_unadjusted`, `nirv_declining_ha_unadjusted`, `nirv_increasing_ha_unadjusted`), so that any reader can
+see what the correction changes. It is known to follow the calendar and is there for comparison only.
+
+### 5.4 Three measurements of instability
+
+Measured by the replication's second round on its own 177 units — 97 in the south-west and 80 drawn across the state —
+with its own scenes (`.session_scratch_2026-10-05/replicate_nirv/REPORT_round2.md`).
+
+| | what was measured | result |
+|---|---|---|
+| 1 | **The trend moves with the fitted phenology rate.** Every pixel's rate multiplied by 0.9, 1.0, 1.1 before its passes are moved | the declining share is **6.3, 5.8, 5.3 per cent** (south-west): a tenth more or less rate, about a tenth less or more decline. And the rate is not known that well: a season's own rate differs from the pooled one by a fifth to two fifths |
+| 2 | **A single pass decides the flag.** One pass, drawn at random, taken away from every pixel and everything fitted again | **20 to 24 per cent of the declining flags turn over** (32 per cent for a plain median of passes). One hazy scene of 5 November 2023 pulls that season down by 18 per cent where it is the early pass |
+| 3 | **The declining share is not beyond chance.** The thirteen seasons put in random order, the same order for every pixel, and the test run again | re-ordered seasons reach the observed declining share in **7 per cent of orderings in the south-west and 22 per cent state-wide**. (The *increasing* share state-wide is beyond chance: 1.6 per cent of orderings) |
+
+Also measured: across regions the trend still goes with the drift of the scene dates (rank correlation −0.38 over 243
+blocks state-wide, down from −0.66 for the first design); and on those units the shares themselves — south-west, 5.8
+per cent declining and 4.4 increasing (first design 8.7 and 0.7); state-wide sample, 3.3 declining and 10.0 increasing
+(first design 5.0 and 5.7).
+
+**How to read the three.** The third could be a matter of power: 177 units is a small sample, and the state-wide run
+will have every unit. The first two are not. They are properties of the measure, not of the sample: where scene dates
+have drifted over the years the correction is itself trended, so the trend is proportional to a nuisance parameter
+that cannot be pinned down to better than a fifth; and a flag that a single observation can reverse is not a
+measurement of the canopy. More units will not change either. A measure whose output moves one for one with a nuisance
+parameter cannot be defended, whatever the state-wide run returns — which is why the ruling was made before it
+returned.
+
+**What the state-wide run will add** when its queue ends (§10): the same three measurements on every unit
+(`nirv_rate_sensitivity.csv`, `nirv_null.csv`, `nirv_date_check.csv`). They will give n. They cannot repair 1 and 2.
+
+### 5.5 What is delivered
+
+- In `degradation_by_unit.csv`: `nirv_status` (pending until the run ends), `nirv_slope`, `nirv_declining_ha`,
+  `nirv_increasing_ha`, `nirv_trend_ha` from the date-standardised value; the three `_unadjusted` columns from the
+  first design; `missing_data_share_nirv`. Never read the declining area without the increasing one.
+- Not delivered: NIRv in the agreement table (§4b), or as an input to stage 4.
+- The negative result is the deliverable: a seasonal-composite greenness trend over this kind of forest needs its
+  acquisition dates controlled, and once they are, it needs the sensitivity to the control reported beside it.
+
+### 5.6 The record
+
+#### The calendar problem and the redesign, in full
 
 **The first design measured the calendar.** It stored, for each pixel and season, the median NIRv of the clear
 scenes of 1 November – 31 December, and fitted the trend to those thirteen values. An independent replication
-(§8) reproduced the stored values bit for bit — and then showed what they are made of. Inside the window a forest
+(§9) reproduced the stored values bit for bit — and then showed what they are made of. Inside the window a forest
 pixel's NIRv falls by 13 to 18 per cent a month: leaves age and dry, and the sun gets lower. And the dates of the
 clear scenes move by two to three and a half weeks from one season to the next. So a season's median is as much a
 measure of *when* the clear scenes fell as of the canopy: over nine seasons of the replication's five test blocks its
@@ -287,7 +573,7 @@ the median cannot be put right afterwards, because it has thrown the dates away.
    batch test of the rewritten script cost: with the standardisation computed on the fly inside the per-unit sums,
    Earth Engine recomputed it for every output band — **one group of 1,432 units used 380,962 EECU-seconds (106
    EECU-hours) in ten minutes and was cancelled by hand; it had not finished.** The same arithmetic exported once
-   as an image cost 722 EECU-seconds for a pilot block of 1.84 million cells (§9).
+   as an image cost 722 EECU-seconds for a pilot block of 1.84 million cells (§10).
 4. **What is stored is checked at every run, before anything is summed**: at 4,000 random pixels the per-unit
    script reads every stored pass and every stored yearly band, redoes the whole standardisation in numpy, and stops
    unless the stored values, rates, passes and mean days agree; at 400 of them Earth Engine's slopes, S, n and
@@ -314,7 +600,7 @@ quadratic rate, a proportional rate and one rate pooled over a box did no better
 (Malkangiri) and are tests, not results** — but they show the size of the thing: in four of five, most of what the first design called decline was
 dates.
 
-**What the standardisation does not do, and what it costs** (measured by the replication's second round, §8, on its
+**What the standardisation does not do, and what it costs** (measured by the replication's second round, §9, on its
 own 177 units; the state-wide run will measure the same in `nirv_rate_sensitivity.csv` and `nirv_date_check.csv`):
 
 - It uses one straight-line rate per pixel for all thirteen seasons. A season's own rate differs from the pooled
@@ -424,10 +710,10 @@ stored observations:
   for all three images. On the same box with seasons deliberately taken away column by column — cells with no
   season, one, two, … thirteen, 60 of them without a rate — the gate still passes and every band still matches:
   a cell without a rate has no yearly value, no slope and no flag, on both sides.
-- *The whole script.* Last, the whole script was run on 7 small units inside the pilot block of stored yearly values (run 2026-10-06T04:45:03Z; the sums and the point reads by small interactive requests instead of batch tasks): every gate passed. At 120 sampled pixels the stored standardised values, rates, passes and mean days equal the ones recomputed from the stored passes (largest gaps 0e+00 in the value, 5e-08 of itself in the rate), and at 40 of them Earth Engine's slopes, S, n and contrasts equal numpy's (largest slope gap 2e-10; S, n and flags identical). On those units the correlation of a unit's series with the mean day it was seen on goes from -0.60 (first design) to +0.20, its year-to-year scatter from 6.0 to 3.9 per cent, and the declining share of their 26 km² of land with `treecover2000` > 10 from 4 to 2 per cent. That is test output on a few square kilometres, not a result.
+- *The whole script.* Last, the whole script was run on 7 small units inside the pilot block of stored yearly values (run 2026-10-06T19:37:57Z; the sums and the point reads by small interactive requests instead of batch tasks): every gate passed. At 120 sampled pixels the stored standardised values, rates, passes and mean days equal the ones recomputed from the stored passes (largest gaps 0e+00 in the value, 5e-08 of itself in the rate), and at 40 of them Earth Engine's slopes, S, n and contrasts equal numpy's (largest slope gap 2e-10; S, n and flags identical). On those units the correlation of a unit's series with the mean day it was seen on goes from -0.60 (first design) to +0.20, its year-to-year scatter from 6.0 to 3.9 per cent, and the declining share of their 26 km² of land with `treecover2000` > 10 from 4 to 2 per cent. That is test output on a few square kilometres, not a result.
 - *Not yet run when this was written:* the two per-unit scripts' own batch path (the point reads and the group
-  tables as real batch tasks). The unattended chain is its first run; the gate comes before the sums, and a
-  watchdog bounds what a task may cost.
+  tables as real batch tasks). The chain (`scripts/run_nirv_chain.py`) is its first run; the gate comes before the
+  sums, and the driver bounds what a task may cost.
 
 #### What a sample of the first design showed — superseded, do not quote
 
@@ -482,124 +768,13 @@ Flags on the full thirteen seasons, 1 November – 31 December. Under no change,
    (n = 429); in outside-village units 6.3 against 7.6 (n = 490). This is a reading from a few hundred points
    and one choice of reference; the reference forest's own pixels scatter both ways at about 6 to 8 per cent.
 
-**What this means for the columns.** `nirv_slope` and `nirv_declining_ha` will be produced for every unit from the
+**What this means for the columns.** `nirv_slope` and `nirv_declining_ha` will be filled for every unit from the
 date-standardised value, with the first design's beside them as `_unadjusted`, the increasing area, and the
-measured false-alarm rate. Which of the two the project uses is the owner's ruling; the delivered pair is the
-date-standardised one because the other is known to follow the calendar. Whether NIRv then carries a signal of
-degradation is what the state-wide run has to show. Nothing so far shows it.
+measured false-alarm rate. By the ruling of 7 October 2026 they are reported columns, not a measure of degradation,
+and no state-wide result can change that: the first two of the three measurements of instability above are
+properties of the measure. Nothing so far shows that NIRv carries a signal of degradation in these forests.
 
-### 4c. Setting the three beside one another (task D)
-
-**State: `scripts/02_build_agreement.py` is written and tested; it has not run, because it needs the stored NIRv values and the NIRv tables.**
-
-**An interim reading from the two sources that exist, unit by unit — not the table this section is for.** From
-`hansen_loss_by_canopy_band_by_unit.csv` and `corestack_by_unit_bands.csv`, on land with `treecover2000` > 10, for units
-with at least 50 ha of it under both: the rank correlation of Hansen's loss rate 2019–2022 with CoRE Stack's class −1
-rate, with its net rate (−1 minus 1) and with its class −2 rate; and how many units are in the top fifth on Hansen, on
-class −1, and on both, beside the number expected if the two were unrelated.
-
-| | units | Hansen vs class −1 | Hansen vs net | Hansen vs class −2 | top fifth, Hansen | top fifth, class −1 | both | both, if unrelated |
-|---|---|---|---|---|---|---|---|---|
-| all units | 3,711 | +0.37 | +0.26 | +0.18 | 742 | 742 | 251 | 148 |
-| outside-village units | 1,207 | +0.31 | +0.24 | +0.31 | 299 | 351 | 124 | 87 |
-| LGD panchayat units | 2,504 | +0.38 | +0.26 | +0.15 | 443 | 391 | 127 | 69 |
-
-This compares rates per unit on two different grids and says nothing about whether the two flag the same pixels.
-
-From the random sample (12,813 points; CoRE Stack and Hansen only): on land with `treecover2000` > 10, CoRE Stack class −1 is
-16 of 40 valued points that have Hansen loss dated 2019–2023 (40 per cent) and 668 of 2,914 that have no Hansen loss
-(23 per cent). None of the 65 Hansen-loss points of those years is CoRE Stack class −2. With one flag on for about
-2 per cent of the land and another for about a quarter, raw overlap restates base rates; the table therefore gives,
-beside every overlap, the area expected if the flags were unrelated.
-
-**The three do not measure the same thing**, and the table is built so that this shows. Hansen dates the outright
-removal of a pixel's tree cover. NIRv is a pixel's November–December greenness, season by season. CoRE Stack is a
-class of change between two three-year periods. A cleared pixel should show in all three; a pixel that thinned under
-a standing canopy can show only in NIRv and in CoRE Stack's class −1.
-
-**The design, as changed by three independent critiques** (`.session_scratch_2026-10-05/phase2/critique_*.txt`):
-
-- **The common window is the headline: change between the three years to mid-2019 and the three years from
-  mid-2022**, which is what CoRE Stack compares (each of its "years" is three agricultural years taken together).
-  NIRv: the before-and-after contrast of §4b on the date-standardised value, whose two sets of seasons lie inside
-  CoRE Stack's two periods — *lower*, *higher* or neither. Hansen: loss dated 2019, 2020, 2021 or 2022, the calendar years between the periods (a loss
-  dated 2023 cannot make NIRv "lower" by that rule, because the 2022 season precedes it; losses of 2016–2018 and of 2023 are
-  shown beside it in the control below). CoRE Stack in four states: class −2, class −1, class 1, and the rest (0, 2, 3, 4).
-- **One reference for all three:** grid cells with `treecover2000` > 10 where CoRE Stack has a class from −2 to 4 and
-  NIRv has all six seasons. What that leaves out, and why, is tallied per unit. Every reference cell falls in exactly
-  one of 2 × 3 × 4 = 24 cells, separately for 10 < `treecover2000` ≤ 30 and for `treecover2000` > 30, and every table
-  is given for all units, LGD panchayat units and outside-village units.
-- **The headline table** is those 24 folded to 2 × 2 × 2: Hansen loss 2019–2022 × NIRv lower × CoRE Stack class −1.
-  Class 1 and NIRv *higher* stay in the cross-tabulation as placebos: if NIRv "lower" is as common on CoRE Stack's
-  "improvement" as on its "degradation", the two do not agree, whatever their overlap in hectares.
-- **What is reported for every pair of flags:** the overlap; the overlap expected by chance (the product of the
-  two areas over the reference area) and the ratio of the two; the odds ratio, with a 95 per cent interval from
-  resampling units; and the share of one flag that carries the other beside the share of the rest that does.
-- **Unit by unit:** each unit's eight areas, so that "all three agree" is an area and not a vote; and, for units
-  with at least 50 ha of reference land, the rank correlations of the three rates and the number of units in the
-  top fifth on all three, two, one and none, beside the number expected if the three were unrelated.
-- **The full span, separately, and not one period:** Hansen loss in any year 2001–2025, NIRv declining or increasing
-  over 2013–2025, CoRE Stack as it is. A pixel cleared in 2005 and regrown is "Hansen loss" and "NIRv increasing" in
-  that version — disagreement by construction — so it is reported and is not a test of agreement.
-- **A positive control:** the share of Hansen-loss pixels each NIRv rule flags, by year of loss. If that is flat near
-  the chance rate, NIRv does not see even clearance and cannot be claimed to see thinning.
-
-Everything is on Hansen's grid. CoRE Stack is 25 m, so each grid cell takes the CoRE Stack pixel that contains its
-centre; the script measures how far that moves CoRE Stack's margins from the ones summed on its own grid, and stops
-unless its Hansen and NIRv margins equal the two sources' own per-unit tables.
-
-**Checked before the state-wide run** (`.session_scratch_2026-10-05/phase2/tests/`): all 151 bands of the per-unit
-image, summed by Earth Engine over a box of 4,096 cells, equal the same sums rebuilt in numpy from arrays of the
-stored yearly NIRv values, `treecover2000`, `lossyear` and the CoRE Stack class of that box (no difference at all);
-and the delivered tables — the eight cells, every pair's overlap, chance expectation, odds ratio and conditional
-rates, the per-unit cells and rates — equal a brute-force recomputation straight from the pixels on pretend units cut
-from those boxes. Last, the whole script was run on 7 small units inside the pilot block of stored yearly values (run 2026-10-06T04:45:53Z; the sums by small interactive requests): the cells add up to the reference land in every unit, and its Hansen and NIRv margins equal the two sources' own per-unit tables unit by unit (largest gap 0.0000 ha, which is rounding). An earlier run of the same script on 97 units used the first design's NIRv and is superseded. The arithmetic check on the real table is owed when it exists.
-
-### 4d. A minimum forest area for stage 4 (task E) — a recommendation, applied to nothing
-
-Stage 1 covers all 11,468 units whatever this section says. `scripts/02_propose_forest_floor.py` writes
-`forest_floor_options.csv` and `forest_floor_repeatability.csv` (run 2026-10-05T21:46:29Z).
-
-**The rule used to choose.** A unit's loss rate — `hansen_loss_ha / forest_ha` — is worth entering in a model only if
-it is a property of the unit and not of chance. That can be measured from the data alone: compute each unit's rate
-from the odd years and from the even years, and see how alike the two halves rank the units, by class of forest area.
-
-| `forest_ha` | units | LGD panchayat | outside-village | with no loss at all | odd years against even years, rank correlation |
-|---|---|---|---|---|---|
-| 0 – 0.5 | 1,564 | 1,233 | 331 | 1,398 | 0.23 |
-| 0.5 – 1 | 391 | 299 | 92 | 306 | 0.31 |
-| 1 – 2 | 382 | 281 | 101 | 277 | 0.34 |
-| 2 – 5 | 528 | 374 | 154 | 335 | 0.53 |
-| 5 – 10 | 438 | 281 | 157 | 237 | 0.61 |
-| 10 – 25 | 657 | 385 | 272 | 317 | 0.72 |
-| 25 – 50 | 563 | 347 | 216 | 200 | 0.77 |
-| 50 – 100 | 568 | 343 | 225 | 120 | 0.81 |
-| 100 – 250 | 696 | 437 | 259 | 105 | 0.89 |
-| 250 – 500 | 460 | 328 | 132 | 28 | 0.91 |
-| 500 – 1000 | 401 | 303 | 98 | 5 | 0.94 |
-| 1000 –  | 510 | 276 | 234 | 0 | 0.96 |
-
-Below 10 ha the two halves barely agree; the rate is noise. **The proposal is 50 ha**: the bottom of the smallest
-class from which every class reaches 0.8, a conventional mark for a measure being reliable enough to use (the mark
-is a convention, and the table lets another be read off).
-
-| floor on `forest_ha` | units kept | LGD panchayat | outside-village | forest kept, % | loss kept, % | odd against even among those kept | units kept if the floor were on `treecover2000` > 10 | pass on > 10 but fail on the mask (of them LGD) |
-|---|---|---|---|---|---|---|---|---|
-| 1 ha | 5,203 | 3,355 | 1,848 | 99.98 | 99.97 | 0.75 | 8,870 | 3,667 (3,080) |
-| 10 ha (alternative) | 3,855 | 2,419 | 1,436 | 99.77 | 99.77 | 0.84 | 5,824 | 1,969 (1,599) |
-| **50 ha** (proposed) | 2,635 | 1,687 | 948 | 98.60 | 98.81 | 0.89 | 3,751 | 1,116 (854) |
-| 100 ha (alternative) | 2,067 | 1,344 | 723 | 97.03 | 97.49 | 0.92 | 2,912 | 845 (653) |
-| 500 ha | 911 | 579 | 332 | 86.52 | 88.83 | 0.95 | 1,302 | 391 (303) |
-
-- At 50 ha, 2,635 of 11,468 units remain (1,687 LGD panchayat, 948 outside-village) and they hold 98.6 per cent of the
-  forest and 98.8 per cent of the loss. Three quarters of the units drop out and take about one per cent of the
-  forest with them.
-- **The floor selects.** 1,116 units have at least 50 ha of land with canopy above 10 per cent but less than
-  that above 30 — by construction the units whose tree cover is open — and 854 of them are LGD panchayat units. If
-  the measure that enters stage 4 is one defined on canopy above 10 per cent, the floor belongs on that land instead.
-- A floor is needed for a *rate*. A model of hectares lost, weighted by forest area, needs none.
-
-## 5. Getting 11,468 polygons into and out of Earth Engine
+## 6. Getting 11,468 polygons into and out of Earth Engine
 
 **The limit.** Earth Engine refused a single request of 11.5 MB with "Request payload size exceeds the limit: 10485760 bytes."
 The base layer is 94.6 MB as GeoJSON (2,447,144 vertices; the largest unit alone is 1.6 MB), and the project
@@ -607,7 +782,7 @@ has no Cloud Storage bucket to stage a file in. So it was sent in 18 parts, each
 its own table asset with the encoded request held under 9,071,819 bytes; Earth Engine then merged the parts
 into one asset and the parts were deleted. The asset is `projects/replicating-paper/assets/ictd/units`; its properties are
 `unit_id`, `unit_level`, `outside_village`. It carries no area: the first upload did, a UTM figure that stage 0 has
-since replaced (§7), so on 6 October 2026 the asset was re-exported server-side without it and checked again.
+since replaced (§8), so on 6 October 2026 the asset was re-exported server-side without it and checked again.
 
 **Nothing was simplified or rounded by the pipeline. Earth Engine does not store a polygon exactly, though,
 and that is measured.** Every unit's geometry was read back from the asset and set against the layer's:
@@ -665,13 +840,26 @@ the band list, the grouping, the layer's hash, the scene list's hash and both ex
 decides what a table holds and the name changes with it. The record says how many group tables were taken from an
 earlier attempt of the same computation.
 
-**The unattended chain.** In restricted mode (§9) the work takes most of a day, so the steps after the export of
-the observations are run by a driver in the session folder (`run_phase2_chain.sh`): the yearly values, a check that
-every block of them was computed after every tile was finished, `02_build_nirv.py`, `02_build_agreement.py`, the
-assembly and the direct arithmetic check — each only if the one before ended with exit 0. A step that ends without
-a failed check (a dropped connection) is run again, three times at most; a step that ends at a failed check or a
-failed task is not. A watchdog cancels any task that uses far more compute than was measured for its kind and
-stops the chain — the stop condition whose absence cost about 106 EECU-hours on 6 October (§9).
+**The unattended chain.** In restricted mode (§10) the work takes days, not hours, so what is left of it is run by one
+process, `scripts/run_nirv_chain.py`, which decides from Earth Engine's own record of the tasks and not from anything
+it remembers. It waits for the tiles of observations; submits whatever tiles are still missing; waits for the blocks
+of yearly values; runs `scripts/check_nirv_blocks.py`; then `02_build_nirv.py` and `02_assemble_degradation.py`, which
+fills the NIRv columns of `degradation_by_unit.csv` — each only if the one before ended with exit 0. A step that ends
+without a failed check (a dropped connection) is run again, three times at most; a step that ends at a failed check
+or a failed task is not, and the chain stops and says why in `logs/nirv_chain.log`. The same process watches cost: a
+task that has used far more compute than was measured for its kind is cancelled and the chain stops — the stop
+condition whose absence cost about 106 EECU-hours on 6 October (§10). It cancels nothing else and resubmits nothing
+that failed. It refuses to start while `logs/STOP_THE_CHAIN` exists.
+
+**The blocks were queued before the tiles were done, and that is checked, not assumed.** To save a day of queue the
+13 blocks of yearly values were submitted behind the tiles on 6 October, on the reasoning that a restricted project
+runs one task at a time in the order submitted, so every block starts after every tile under it has finished.
+`check_nirv_blocks.py` tests that three ways before anything is built on the blocks: each block's export task
+started after the last successful export of every tile it reads; the scene list the blocks were queued with gives
+the same day for every scene as the list on disk; and (`--probe`) on a 16 × 16-cell box of one block the cells that
+have a stored pass in a season are exactly the cells the tiles hold an observation for. `02_build_nirv.py` then
+checks the same thing for every unit and season (the land the blocks cover equals the land the tiles cover, to
+1 m²). A block that fails is named, with the tile; nothing is exported again without the owner's word.
 
 **How exact the areas are.** Two boxes are tested at every run:
 
@@ -698,7 +886,7 @@ total by more than 0.1%. The 2 units more than 1 % out are slivers smaller than 
 56 more than 0.1 % out are all under 23 ha. Every column carries the same small shortfall at each unit's
 edge and none in its interior. The CoRE Stack and NIRv tallies use the same machinery and the same gate.
 
-## 6. Reconciliation of the Hansen totals
+## 7. Reconciliation of the Hansen totals
 
 No expected values were supplied for this stage, so the state totals are set beside the sources' own.
 
@@ -717,7 +905,7 @@ The > T columns are like for like and are the ones the script gates: extents at 
 10%. **That gate cannot tell > from ≥.** Both readings land well inside the tolerance and ≥ even lands nearer,
 because the units cover less area than GADM and the pixels at exactly T happen to offset that. The gate catches a
 gross error — a wrong band, wrong units, a lost group of polygons — and nothing finer. What shows that Global
-Forest Watch computes > T is the replication on its own boundary (§8). Year by year the two are in
+Forest Watch computes > T is the replication on its own boundary (§9). Year by year the two are in
 `hansen_reconciliation.csv`.
 
 **Forest Survey of India, ISFR 2023** (Vol. II, Table 10.20.2; extracts in `00_raw/05_forest_reference/`). These are
@@ -753,7 +941,7 @@ Why the gap, at the matching canopy line:
 Nobody should quote this pipeline's forest area as Odisha's forest cover. It is Hansen's year-2000 tree cover at a
 stated inequality, used as a mask that is the same for every unit.
 
-## 7. The area basis
+## 8. The area basis
 
 Every area in stage 1 is a sum of pixel areas on the WGS84 ellipsoid. Since 6 October 2026 stage 0's `area_ha` is
 on the same basis (`docs/UNITS.md` states the layer's area once: 154,929.33 km², ellipsoidal, WGS84). Before that
@@ -762,7 +950,7 @@ changed `area_ha` and nothing else, and stages 1, 2 and 3 were re-run on the reb
 out byte-identical. `area_ha` in `hansen_by_unit_thresholds.csv` is the unit's area summed over Hansen pixels and
 `polygon_area_ha` its polygon's; the first is the right denominator for a share of pixels.
 
-## 8. Verification applied
+## 9. Verification applied
 
 What was applied, and where:
 
@@ -771,9 +959,12 @@ What was applied, and where:
 | Hansen forest and loss per unit (§1–2) | **full independent replication, twice**, without Earth Engine |
 | loss by canopy band (§3, task A) | covered by the second replication, column by column — more than the one careful pass asked for |
 | CoRE Stack tallies (§4a, task C) | **one careful pass**: the script's gates, a hand check on three units, and a reconciliation to the producers' one published Odisha figure |
-| NIRv (§4b, task B) | **full independent replication, two rounds** — a separate agent, docstring only, no Earth Engine, the same scenes from another archive. Round 1 confirmed the first design's values bit for bit and found that they follow the calendar; the design was changed on that finding. Round 2 confirmed the stored observations, the standardisation's arithmetic and the per-unit figures on test areas, and set out the new measure's limits. Its units are saved for comparison with the state-wide run, which does not exist yet. Before any of it: three independent critics of the design, and every band and table tested against a local recomputation |
-| agreement table (§4c, task D) | **not built.** Its arithmetic was checked directly on test areas — every band against numpy, every table against brute force from the pixels, and a 35-check script that re-derives the delivered figures from the per-unit cells. The same check on the real table is owed with it |
-| minimum forest area (§4d, task E) | one careful pass; it is arithmetic on the replicated Hansen table |
+| NIRv (§5, task B) | **full independent replication, two rounds** — a separate agent, docstring only, no Earth Engine, the same scenes from another archive. Round 1 confirmed the first design's values bit for bit and found that they follow the calendar; the design was changed on that finding. Round 2 confirmed the stored observations, the standardisation's arithmetic and the per-unit figures on test areas, and set out the new measure's limits. Its units are saved for comparison with the state-wide run, which does not exist yet. Before any of it: three independent critics of the design, and every band and table tested against a local recomputation |
+| the assembly, `degradation_by_unit.csv` (task 1 of 7 October) | **one careful pass**: the script's own gates — every unit once, the yearly columns adding to the total, the > 30 band equal to the Hansen table, and 66 sums against the three sources' own summary tables — and an independent reviewer who rebuilt the columns from the sources (*The careful pass of 7 October*, below) |
+| agreement table (§4b, task D) | **its arithmetic checked directly**: `scripts/verify_agreement.py` shares no code with the builder and rebuilds, from the two sources' per-unit tables, each unit's reference land, rates, flags and class and every count, expected count, odds ratio and rank correlation of the summary — 42 of 42 checks passed; n = 11,468 units, 3,711 assessed. Then **one careful pass** by an independent reviewer (below) |
+| housekeeping: a district for each outside-village unit, the git repository (task 5) | **one careful pass**: the script's gates and an independent reviewer (below) |
+| the demo layer, `60_layer/` (task 6; `docs/LAYER.md`) | **by hand, in a browser**: the map was opened, 16 units were clicked — forest from none to the largest, both kinds of unit — and all 656 values displayed for them were read off the page and compared with the stage tables. Then, because sixteen is not 11,468, `scripts/verify_layer.py` rebuilt every displayed field of every unit from the stage tables: 78 of 78 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays |
+| minimum forest area (§4c, task E) | one careful pass; it is arithmetic on the replicated Hansen table |
 | stage 0 rebuild, manifest rows, README and docs edits | one careful pass, with byte-level checks where a check exists |
 
 **The Hansen replications.** Each was a separate agent allowed to read only the script's docstring, rebuilding every
@@ -817,7 +1008,7 @@ and a closed-form WGS84 pixel area. Each saved and hashed its own figures before
 
 **What the second replication found wrong, none of it a number, and what was done:**
 
-1. The Global Forest Watch gate cannot tell > from ≥: both readings pass it. Said plainly in §6 and in the docstring;
+1. The Global Forest Watch gate cannot tell > from ≥: both readings pass it. Said plainly in §7 and in the docstring;
    the evidence for > is the replication on Global Forest Watch's own boundary, not the gate.
 2. "The source repeats one row at 20°N" was only partly true: tree cover and the data mask are identical in the two
    tiles' copies of that row, but the loss year differs in 254 of its pixels. Corrected in the docstring.
@@ -825,7 +1016,7 @@ and a closed-form WGS84 pixel area. Each saved and hashed its own figures before
    a sliver; and two count columns were named loosely. Renamed, and said in §1.
 4. "Clearance of closed canopy" overstated the mask: a seventh of it has canopy of 31 to 39 per cent. Reworded.
 5. The asset stores geodesic edges but the sums behave as straight-edged polygons. Immaterial (at most 0.094 ha for
-   a unit); said in §5.
+   a unit); said in §6.
 6. "To the hectare" should be "to within about a hectare". Corrected.
 7. The caution about 2010/2011 named one of three steps in the series; in the lower bands the larger steps are at
    2013 and 2023. Said in §3, with the replicator's table of loss by period.
@@ -898,7 +1089,7 @@ per cent for thirteen seasons) are confirmed, as is the one-in-twenty chance of 
    seasons; and the yearly value follows it (correlation −0.90 over nine seasons of the blocks; unit by unit over the
    97 units, a median of −0.80). Moving every observation to one date with one rate — a sensitivity test, not a
    correction — took the declining share of the blocks from 13.5 to about 6 per cent and the increasing share from
-   0.8 to about 5. **The export was stopped and the design changed (§4b).**
+   0.8 to about 5. **The export was stopped and the design changed (§5).**
 2. *"The nominal rate is a floor" was false.* About 2 per cent is the average over orderings of the seasons; most
    orderings flag less and a few flag four to twelve times more. By the script's own criterion the first design's
    declining share was not clearly beyond chance (re-ordered seasons reach it in 5 to 14 per cent of orderings).
@@ -938,7 +1129,7 @@ missing scenes did not touch, no unit is flagged in any of 37 value columns. The
 
 *What it could not test against the pipeline:* the path step and the rule for too few dates — no cell of the files it
 was given is seen from two paths, and none has few dates. (The path step was then tested inside Earth Engine on a box
-where every cell has one: all 154, 134 and 151 bands of the three per-unit images equal numpy, §4b. The rule for too
+where every cell has one: all 154, 134 and 151 bands of the three per-unit images equal numpy, §5. The rule for too
 few dates excludes nothing in the replicator's 4.5 million cells.)
 
 *What a user of the new value must know — the replicator's findings on the measure, on its own 97 units of the
@@ -976,10 +1167,14 @@ were added to the script's output so that points 2 to 4 are measured on the full
 dates. Its per-unit figures for 97 and 80 units under the new definitions are saved and hashed for comparison with the
 full run.
 
-**The tests of the new scripts** (`.session_scratch_2026-10-05/phase2/tests/`, all re-runnable) are listed in §4b and
-§4c: the stored tiles against per-scene pixel values; the standardisation against a second implementation; every
-band of the per-unit images against numpy; the tables against brute force from pixels; and both scripts run whole on
-a few real units. These are tests of arithmetic on small areas. They are not results and not replication.
+**The tests of the NIRv scripts** (`.session_scratch_2026-10-05/phase2/tests/`, all re-runnable) are listed in §5:
+the stored tiles against per-scene pixel values; the standardisation against a second implementation; every band of
+the per-unit images against numpy; the tables against brute force from pixels; and the script run whole on a few
+real units. These are tests of arithmetic on small areas. They are not results and not replication. The same folder
+holds the tests of the three-measure agreement script of 6 October; that script was replaced on 7 October by one that
+reads tables only (§4b), and its tests are retired with it.
+
+**The careful pass of 7 October** had not reported when this was written.
 
 **The reviews before the unattended run.** Before the rewritten NIRv and agreement scripts were left to run for most
 of a day, four independent reviewers read them, each with one question — will Earth Engine run this at state size;
@@ -987,18 +1182,27 @@ does the arithmetic do what the docstring says; are the tables and records right
 watching — none of them allowed Earth Engine, and each finding was then attacked by a second agent told to refute it.
 Nineteen findings came back. What was changed because of them, before the run: the record is written before the
 intermediate tables are deleted, and a failed delete no longer fails the run; the gate on the stored values runs
-before the per-unit sums, not after; intermediate tables carry a fingerprint of what they hold (§5); a unit series
+before the per-unit sums, not after; intermediate tables carry a fingerprint of what they hold (§6); a unit series
 that was not tested has a blank S and flag, where it had 0 and an empty string that the record's count of blanks
 missed; the "one pass taken away" row of the sensitivity table rests on the same pixels as the rows it is read
 against; Sqq is formed locally in Earth Engine's order of operations, because real pass patterns land exactly on its
 threshold of 4 and the two orders round differently there; the records name the records they read; and the driver
-was rewritten (§5). Two things the reviewers raised could only be settled on Earth Engine and were: a cell without a
+was rewritten (§6). Two things the reviewers raised could only be settled on Earth Engine and were: a cell without a
 rate comes back with no slope and no flag, and a cell with fewer than ten seasons has no trend (the "thin" test of
-§4b). One reviewer had computed, from the expression graph alone, some 4 × 10⁹ operations per cell for the
+§5). One reviewer had computed, from the expression graph alone, some 4 × 10⁹ operations per cell for the
 standardisation done on the fly against 2 × 10⁴ for the first design — the cost the batch test had by then
-shown at 106 EECU-hours (§9). Had the review come before the test, it would have been found for nothing. Not
+shown at 106 EECU-hours (§10). Had the review come before the test, it would have been found for nothing. Not
 applied: a retry wrapper inside the shared helper, which was left untouched because the Hansen and CoRE Stack
 records carry its hash; the driver retries a whole step instead.
+
+**A second review, of the driver, the cost watch and the blocks queued ahead of their tiles** (6 October, three
+reviewers asked for; two reported before the session's agent limit ended it, and four of their findings were
+attacked by a second agent). What was changed because of it is the driver of §6: one process that reads Earth
+Engine's own task records and holds no state of its own, in place of a shell script and a separate watchdog; the
+order check done per block against the tiles under that block, not against the newest tile anywhere; the scene
+list a block was queued with compared with the list on disk; the probe of one block against its tiles; and the
+per-unit check that blocks and tiles cover the same land. The third reviewer's part — the yearly-values script
+itself — was not reviewed a second time.
 
 **Not checked:** why Earth Engine's fractions run low; Earth Engine's Hansen asset against the tiles other than
 through these sums; the ISFR figures against the PDF itself (only against the registered extract); the claim that
@@ -1009,40 +1213,52 @@ The replications' scripts and tables are in `.session_scratch_2026-10-05/replica
 The Hansen tiles they read were deleted on 6 October 2026 on the project owner's instruction; they are public, and a
 note in the first directory says where to fetch them.
 
-## 9. Earth Engine compute, and the quota that slowed the NIRv run to a crawl
+## 10. Earth Engine compute, and the quota that slowed the NIRv run to a crawl
 
 The project (`replicating-paper`) is a registered noncommercial Earth Engine project on the free Community tier:
 150 EECU-hours a calendar month, reset on the first of the month (Pacific time). **On 5 October 2026 at about
 21:35 UTC it exceeded that and went into restricted mode** ("Your project has exceeded its noncommercial compute
 quota and is now in restricted mode").
 
-| batch tasks since 1 October (read 2026-10-06T04:41:15Z) | tasks | EECU-seconds |
+| batch tasks since 1 October (read 2026-10-06T20:59:37Z) | tasks | EECU-seconds |
 |---|---|---|
-| nirv | 777 | 433,145 |
+| other | 20 | 3 |
+| nirv | 777 | 462,082 |
 | agreement | 1 | 622 |
 | corestack | 40 | 59,751 |
 | hansen | 40 | 61,392 |
 | units asset (upload, merge, re-export) | 39 | 0 |
-| other | 3 | 3 |
-| **all batch tasks** | 900 | **554,913** = 154.1 EECU-hours |
+| **all batch tasks** | 917 | **583,850** = 162.2 EECU-hours |
 
-(The task counts include cancelled tasks, which cost nothing.) Batch tasks account for 154.1 of the 150 hours.
-The rest went on **interactive requests**, which task records do not show and which could not be measured (Cloud
-Monitoring needs billing on the project). The likeliest cause is this stage's own scouting on 5 October —
-clear-observation counts, yearly values and class cross-tabs pulled at 4,000 to 12,813 scattered points over Landsat
-collections — though earlier use of the project this month cannot be ruled out. A query at scattered points makes
+(The task counts include cancelled tasks that never started, which cost nothing.) The quota does not stop tasks, it
+slows them, so the total has gone on rising past 150. **Batch tasks that had started before the restriction account
+for 88,185 EECU-seconds, 24.5 of the 150 hours**; the other 495,665 were spent after it. What took
+the project to its limit was therefore **interactive requests**, which task records do not show and which could not
+be measured (Cloud Monitoring needs billing on the project). The likeliest cause is this stage's own scouting on
+5 October — clear-observation counts, yearly values and class cross-tabs pulled at 4,000 to 12,813 scattered points
+over Landsat collections. Other use of the project this month cannot be ruled out: it carries work that is not this
+pipeline's (8 export tasks of another job were waiting in its queue when this was read). A query at scattered points makes
 Earth Engine process a whole tile around every point, so each one cost about as much as the whole state. It should
 have been piloted and costed like the batch runs were. Everything heavy now goes through batch tasks, each of which
 records its cost, and the pixel sample is one batch task on stored images.
 
 **What restricted mode does, measured.** Tasks still run, one at a time, in the order they were submitted, with
 several idle minutes between one and the next; a task priority is refused ("Custom priority can only be set on tasks
-in registered commercial projects"). Since it began, 48 tasks have started and finished in 6.44 hours
-(7.5 an hour): 23 tile of stored observationss, median 7.6 minutes running; 1 block of yearly values, median 11.9 minutes running; 3 nirv per-unit groups, median 1.0 minutes running; 3 nirv point tables, median 1.7 minutes running; 1 agreement, median 1.4 minutes running; 8 corestack lulc groups, median 1.0 minutes running; 8 corestack change groups, median 1.3 minutes running; 1 tile of yearly medians (first design), median 11.8 minutes running.
-61 tiles of observations were still to come when this was read, at about nine minutes a tile; the thirteen
-blocks of yearly values are queued behind them, and the per-unit sums and the agreement table follow, two to four
-hours of queue more. Before the quota ran out the same project ran three or four tile exports at once, each in
-four to seven minutes; at that pace the remaining work is two to three hours.
+in registered commercial projects"). Since it began, 77 tasks have started and finished in 22.75 hours
+(3.4 an hour): 52 tile of stored observationss, median 8.1 minutes running; 1 block of yearly values, median 11.9 minutes running; 3 nirv per-unit groups, median 1.0 minutes running; 3 nirv point tables, median 1.7 minutes running; 1 agreement, median 1.4 minutes running; 8 corestack lulc groups, median 1.0 minutes running; 8 corestack change groups, median 1.3 minutes running; 1 tile of yearly medians (first design), median 11.8 minutes running.
+**The pace fell during the day.** 52 tiles of observations finished between 2026-10-06T00:19:44Z and 2026-10-06T20:43:37Z. From one
+finish to the next the median is 17 minutes — 6 over the first ten, 25 over the last ten, and once 5.7 hours — for a
+task that runs for 8: most of the time is spent waiting. 32 tiles were still to come when this was read, which at
+the pace of the last ten is about 13 hours; the thirteen blocks of yearly values are queued behind them and the
+per-unit tasks follow. An earlier estimate in this session (nine minutes a tile, the tiles done by early afternoon
+of 6 October) was wrong by a factor of three. Before the quota ran out the same project ran three or four tile
+exports at once, each in four to seven minutes. Nothing in stage 1 waits for any of this (§5).
+
+**Tasks in the queue that are not this pipeline's.** When this was read the project's queue also held
+8 pending export tasks submitted by something else (`odisha_v120_3ha_kendujhar_clustering_cluster_labels`, `odisha_v120_3ha_kendujhar_clustering_feature_stack`, …; created 2026-10-06T20:29:48Z to 2026-10-06T20:31:39Z). They were
+left alone: the driver counts and may cancel only tasks named `ictd_units_…`. In a queue that runs in the order
+submitted they come after the NIRv tiles and blocks already queued and before the per-unit tasks, which are
+submitted only when the blocks exist.
 
 **What the redesign cost.** 5 tiles of the first design had been exported when the replication reported; they are superseded
 (the first design's values are in the new tiles too) and their collection, `ictd/nirv_yearly_units`, can be deleted.
@@ -1057,16 +1273,16 @@ between them. The same arithmetic exported once as an image shares it: the pilot
 `02_export_nirv_yearly.py` cost 722 EECU-seconds for 1.84 million cells, about 0.0004 a cell against roughly 0.1.
 Two things were wrong on this side: the small interactive tests had passed and were taken as evidence about cost,
 which they are not; and nothing limited what a task could spend — the script's own wait has no such stop. Both
-are changed: derived per-pixel quantities are stored before they are reduced, and a watchdog cancels a task far
-above the measured cost of its kind (§5). The project was already in restricted mode, so the waste was queue time,
+are changed: derived per-pixel quantities are stored before they are reduced, and the driver cancels a task far
+above the measured cost of its kind (§6). The project was already in restricted mode, so the waste was queue time,
 not money; it is in the table above under NIRv.
 
-**The ways forward are the project owner's:** let restricted mode work through the queue (about a day, if the
-machine that submits the later steps stays awake); wait for the reset on 1 November; or move the project to the
+**The ways forward are the project owner's:** let restricted mode work through the queue (a day or two, if the
+machine that submits the later steps stays awake; this is what is happening); wait for the reset on 1 November; or move the project to the
 Contributor tier (1,000 EECU-hours a month; it needs a billing account on the project, and noncommercial use is not
 charged). Using a second project to get round the limit is against Earth Engine's terms and was not done.
 
-## 10. Sources opened for this stage
+## 11. Sources opened for this stage
 
 Each was opened on 6 October 2026 by one agent and re-opened by a second, which confirmed the statements this
 document relies on (full record, with the words quoted: `.session_scratch_2026-10-05/phase2/research_results.json`).
