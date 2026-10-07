@@ -5,6 +5,7 @@ NIRv scripts in order and writes only its own logs (logs/, which git ignores).
 
     nohup .venv/bin/python scripts/run_nirv_chain.py --units 10_units/units.gpkg > /dev/null 2>&1 &
     .venv/bin/python scripts/run_nirv_chain.py --self-test          (no Earth Engine: checks the decisions on made-up task lists)
+    ... --resubmit-cancelled                                          (queue again what was CANCELLED; see below. Never the default)
 
 NIRv IS A BACKGROUND COLUMN (ruling of 7 Oct 2026): nothing in stage 1 waits for this. When it ends,
 degradation_by_unit.csv has its NIRv columns filled and nirv_status "built".
@@ -23,6 +24,14 @@ so it can be started again at any point.
      02_assemble_degradation.py.
 Its log, logs/nirv_chain.log, ends with a line that says FINISHED or STOPPED, whatever happens short of the
 machine losing power - including being killed.
+
+--resubmit-cancelled. On 7 Oct 2026 at 08:19-08:21 UTC every pending task of the project - this pipeline's 12
+remaining tiles and 13 blocks, and another job's exports - was cancelled from outside this pipeline, and the chain
+stopped as step 1 says. Queueing them again is a decision (the queue is shared), so it is asked for by name. With
+this flag: tiles whose last export was cancelled, or never queued, are queued again by
+02_export_nirv_observations.py - but only if no block is queued behind them - and blocks likewise by
+02_export_nirv_yearly.py, which then runs only after every tile exists, so no block can be computed without a
+tile. A task that FAILED is never queued again by this script: it has to be looked at. Nothing is cancelled.
 
 A STEP THAT FAILS. If its log holds "still running" (tasks of an earlier attempt), or check_nirv_blocks.py says
 "not decided yet", it waits five minutes and asks again, without limit. If it ended in a Python traceback and not
@@ -84,7 +93,19 @@ def queue_state(ops, prefix, wanted, present):
     live = sorted(i for i in wanted if any(str(o.get("metadata", {}).get("description", "")) == prefix + i and o["metadata"].get("state") in LIVE for o in ops))
     failed = sorted(i for i in wanted if i not in present and i not in live and i in latest and latest[i][1] in ("FAILED", "CANCELLED", "CANCELLING"))
     nothing = sorted(i for i in wanted if i not in present and i not in live and i not in latest)
-    return {"wanted": len(wanted), "present": sorted(set(wanted) & set(present)), "live": live, "failed": failed, "nothing": nothing}
+    errored = [i for i in failed if latest[i][1] == "FAILED"]                      # ended in an error, as against cancelled by someone
+    return {"wanted": len(wanted), "present": sorted(set(wanted) & set(present)), "live": live, "failed": failed, "errored": errored, "nothing": nothing}
+
+
+def may_resubmit(state, anything_queued_behind):
+    """With --resubmit-cancelled: 'now' if the missing exports may be queued again now, 'wait' if others of the kind are
+    still running (the export scripts refuse to start beside them), 'no' if one of them failed or something is queued
+    behind them that would run without them."""
+    if not (state["failed"] or state["nothing"]):
+        return "nothing to do"
+    if state["errored"] or anything_queued_behind:
+        return "no"
+    return "wait" if state["live"] else "now"
 
 
 def over_limit(ops, stem):
@@ -128,12 +149,18 @@ def self_test():
     assert verdict(1, "Traceback (most recent call last):\n ConnectionError") == "retry" and verdict(-9, "") == "retry"
     assert verdict(1, "FAILED at checking the stored values") == "stop" and verdict(1, "NOT ASSEMBLED:") == "stop" and verdict(1, "some refusal") == "stop"
     assert verdict(1, "Traceback (most recent call last):\n ...\nFAILED at the zonal-statistics tasks") == "stop"
-    print("self-test passed: queue states, cost limits and the verdict on a failed step")
+    assert s["errored"] == ["t_3"], s
+    c = queue_state(ops + [op("ictd_units_nirvobs_t_7", "CANCELLED")], "ictd_units_nirvobs_", ["t_1", "t_5", "t_6", "t_7"], {"t_1", "t_5"})
+    assert c["failed"] == ["t_7"] and c["errored"] == [] and c["nothing"] == ["t_6"] and may_resubmit(c, False) == "now" and may_resubmit(c, True) == "no", c
+    assert may_resubmit(s, False) == "no"                                                           # t_3 failed: never queued again from here
+    c2 = queue_state(ops + [op("ictd_units_nirvobs_t_7", "CANCELLED")], "ictd_units_nirvobs_", ["t_1", "t_2", "t_7"], {"t_1"})
+    assert may_resubmit(c2, False) == "wait" and may_resubmit(queue_state(ops, "ictd_units_nirvobs_", ["t_1", "t_5"], {"t_1", "t_5"}), False) == "nothing to do"
+    print("self-test passed: queue states, cost limits, the verdict on a failed step, and when a cancelled export may be queued again")
 
 
 # ---- the chain ---------------------------------------------------------------------------------------------------------------
 class Chain:
-    def __init__(self, units, project):
+    def __init__(self, units, project, resubmit=False):
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         import ee, _ee_units as eu
         self.ee, self.eu = ee, eu
@@ -144,7 +171,7 @@ class Chain:
         spec.loader.exec_module(Y)
         self.tiles = [t[0] for t in Y.OBS.tiles_over(units)[0]]
         self.blocks = [b[0] for b in Y.blocks_over(units)[0]]
-        self.child, self.stopped, self.last_line = None, False, {}
+        self.child, self.stopped, self.last_line, self.resubmit = None, False, {}, resubmit
 
     def ops(self):
         try:
@@ -208,7 +235,9 @@ class Chain:
             say(message)
             self.last_line[key] = (message, time.time())
 
-    def wait_for(self, what, prefix, wanted, collection, each_poll=None):
+    def wait_for(self, what, prefix, wanted, collection, each_poll=None, behind=None):
+        """Waits until every wanted export exists. Returns 'exist', or 'queue again' when --resubmit-cancelled was given and
+        the missing ones were cancelled, none failed, none of the kind is running and nothing is queued behind them."""
         while True:
             ops, have = self.ops(), self.present(collection)
             if ops is None or have is None:
@@ -219,12 +248,20 @@ class Chain:
             s = queue_state(ops, prefix, wanted, have)
             self.note(what, f"{what}: {len(s['present'])} of {s['wanted']} exported, {len(s['live'])} queued or running")
             if s["failed"] or s["nothing"]:
-                self.stop(f"{what}: the export of {s['failed'] + s['nothing']} failed, was cancelled, or was never queued, and nothing is queued for it. Nothing was resubmitted and nothing cancelled: "
-                          "anything queued behind it runs without it. This needs a decision.")
+                queued_behind = bool(behind) and any(str(o.get("metadata", {}).get("description", "")).startswith(behind) and o["metadata"].get("state") in LIVE for o in ops)
+                again = may_resubmit(s, queued_behind) if self.resubmit else "no"
+                if again == "now":
+                    say(f"{what}: the export of {s['failed'] + s['nothing']} was cancelled or never queued, none failed, and nothing is queued behind them. --resubmit-cancelled: they are queued again by the next step")
+                    return "queue again"
+                if again != "wait":
+                    self.stop(f"{what}: the export of {s['failed'] + s['nothing']} failed, was cancelled, or was never queued, and nothing is queued for it. Nothing was resubmitted and nothing cancelled: "
+                              "anything queued behind it runs without it. This needs a decision" + (f" (--resubmit-cancelled does not cover it: failed {s['errored']}, queued behind {queued_behind})." if self.resubmit else
+                                                                                                    " (to queue again what was cancelled: start with --resubmit-cancelled)."))
+                self.note(what + " again", f"{what}: {len(s['failed'] + s['nothing'])} are to be queued again once the {len(s['live'])} still queued or running have ended")
             if each_poll is not None:
                 each_poll(have)
             if len(s["present"]) == s["wanted"] and not s["live"]:
-                return
+                return "exist"
             time.sleep(POLL_S)
 
     def step(self, label, stem, command):
@@ -268,8 +305,10 @@ class Chain:
     def run(self):
         py, u = [PYTHON], ["--units", self.units]
         say(f"chain {os.getpid()} started for {self.units}: {len(self.tiles)} tiles, {len(self.blocks)} blocks; project {self.project}")
-        self.wait_for("tiles of observations", f"ictd_{self.stem}_nirvobs_", self.tiles, f"nirv_obs_{self.stem}")
-        self.step("02_export_nirv_observations.py (all tiles exist: writes the scene list and its record)", "nirv_observations", py + ["scripts/02_export_nirv_observations.py"] + u)
+        say(f"chain {os.getpid()}: " + ("--resubmit-cancelled: exports that were cancelled are queued again; failed ones are not" if self.resubmit else "nothing is queued again by this run"))
+        got = self.wait_for("tiles of observations", f"ictd_{self.stem}_nirvobs_", self.tiles, f"nirv_obs_{self.stem}", behind=f"ictd_{self.stem}_nirvstd_block_")
+        self.step("02_export_nirv_observations.py (" + ("queues the missing tiles, waits for them, then" if got == "queue again" else "all tiles exist:") + " writes the scene list and its record)",
+                  "nirv_observations", py + ["scripts/02_export_nirv_observations.py"] + u)
         probed = {"done": False, "tries": 0}
 
         def probe(have):
@@ -289,8 +328,12 @@ class Chain:
                     probed["done"] = probed["tries"] >= 6               # asked again at the next polls; after six, the order check and the build's own gates remain
                     say(f"probe of block {PROBE_BLOCK}: not decided (exit {r.returncode}; see {log.relative_to(ROOT)}). {last}" + (" Not asked again." if probed["done"] else ""))
 
-        self.wait_for("blocks of yearly values", f"ictd_{self.stem}_nirvstd_block_", self.blocks, f"nirv_std_{self.stem}", each_poll=probe)
-        self.step("02_export_nirv_yearly.py (all blocks exist: writes its record)", "nirv_yearly", py + ["scripts/02_export_nirv_yearly.py"] + u)
+        got = self.wait_for("blocks of yearly values", f"ictd_{self.stem}_nirvstd_block_", self.blocks, f"nirv_std_{self.stem}", each_poll=probe)
+        self.step("02_export_nirv_yearly.py (" + ("queues the missing blocks - every tile exists now - waits for them, then" if got == "queue again" else "all blocks exist:") + " writes its record)",
+                  "nirv_yearly", py + ["scripts/02_export_nirv_yearly.py"] + u)
+        have = self.present(f"nirv_std_{self.stem}")
+        if not probed["done"] and have:
+            probe(have)                                                    # blocks queued in this run were never polled: probe the one block once, here
         self.step("check_nirv_blocks.py (every block after the tiles under it)", "nirv_blocks_check", py + ["scripts/check_nirv_blocks.py"] + u)
         self.step("02_build_nirv.py", "nirv_build", py + ["scripts/02_build_nirv.py"] + u)
         self.step("02_assemble_degradation.py (fills the NIRv columns)", "assemble", py + ["scripts/02_assemble_degradation.py", "--require-nirv"] + u)
@@ -302,6 +345,7 @@ def main():
     ap.add_argument("--units", help="the stage-0 layer, e.g. 10_units/units.gpkg")
     ap.add_argument("--project", help="Cloud project; default is the one in the Earth Engine credentials file")
     ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--resubmit-cancelled", action="store_true", help="queue again the tile and block exports that were CANCELLED (never a failed one); see the docstring")
     a = ap.parse_args()
     if a.self_test:
         return self_test()
@@ -332,7 +376,7 @@ def main():
     except OSError:
         pass
     try:
-        Chain(a.units, a.project).run()
+        Chain(a.units, a.project, a.resubmit_cancelled).run()
     except SystemExit:
         raise
     except BaseException as e:

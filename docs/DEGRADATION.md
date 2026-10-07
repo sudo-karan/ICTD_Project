@@ -17,7 +17,7 @@ image. That is a result, and it is §5. NIRv stays in the table as a reported co
 |---|---|---|---|
 | Hansen Global Forest Change | stand-replacing loss of tree cover, by year 2001–2025, on a year-2000 canopy mask | measure: the validated floor | built, independently replicated twice |
 | CoRE Stack tree-change classes | a change of class in canopy density or height between about 2016–19 and 2022–25, inside the producers' tree mask | measure: thinning, and change outside Hansen's mask | built (run 2026-10-05T21:40:02Z); reconciled to the producers' one published Odisha figure |
-| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | **a reported column, not a measure** (§5) | pending — 52 of 84 tiles of stored observations exported at 2026-10-06T20:59:37Z, the 13 blocks of yearly values queued behind them; the columns of `degradation_by_unit.csv` are blank until the chain of §6 ends (§10) |
+| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | **a reported column, not a measure** (§5) | pending, and **nothing is queued** — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then |
 
 ## 1. Hansen: forest, and the land the planning system has no population figures for
 
@@ -515,7 +515,7 @@ over deciduous forest should expect the same.
 **What follows (ruling of 7 October 2026).** NIRv is not a measure of degradation in this project and nothing in
 stage 1 waits for it. It is a *reported column* of `degradation_by_unit.csv`: `nirv_slope` and `nirv_declining_ha` from
 the date-standardised value, with the first design's beside them as `_unadjusted`, and the caveats of §5.4 attached.
-**State: pending — 52 of 84 tiles of stored observations exported at 2026-10-06T20:59:37Z, the 13 blocks of yearly values queued behind them; the columns of `degradation_by_unit.csv` are blank until the chain of §6 ends (§10).** `nirv_by_unit.csv` does not exist yet; nothing below is a state-wide figure.
+**State: pending, and **nothing is queued** — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then.** `nirv_by_unit.csv` does not exist yet; nothing below is a state-wide figure.
 
 ### 5.1 The design
 
@@ -917,6 +917,18 @@ or a failed task is not, and the chain stops and says why in `logs/nirv_chain.lo
 task that has used far more compute than was measured for its kind is cancelled and the chain stops — the stop
 condition whose absence cost about 106 EECU-hours on 6 October (§10). It cancels nothing else and resubmits nothing
 that failed. It refuses to start while `logs/STOP_THE_CHAIN` exists.
+
+**What happened to it.** Started on 6 October at 19:39 UTC, it ran for thirteen hours. On 7 October between
+08:19:10 and 08:21:30 UTC every pending task of the project was cancelled: 12 tiles and 13 blocks of this pipeline and
+8 export tasks of another job (§10). Not by this pipeline: its driver logs every cancellation it makes and made none,
+it can cancel only a running task of its own that is over a cost limit, and neither the working session nor any of
+its reviewers called Earth Engine in the forty minutes before (their transcripts were searched). At its next poll the driver found 12 tiles neither exported nor queued, said so, and
+stopped, as it is written to: a tile that is gone while blocks wait behind it would give a block without that tile.
+**Nothing was queued again.** 72 of 84 tiles exist and are untouched; no block had started. Whoever cancelled the tasks may
+have meant to, and the queue is shared, so resuming is the project owner's decision. It is one command:
+`run_nirv_chain.py --units 10_units/units.gpkg --resubmit-cancelled` queues the missing tiles again, and the blocks
+only once every tile exists — which also retires the assumption of the next paragraph, since no block will then
+have been queued ahead of a tile. It queues again only what was cancelled, never a task that failed.
 
 **The blocks were queued before the tiles were done, and that is checked, not assumed.** To save a day of queue the
 13 blocks of yearly values were submitted behind the tiles on 6 October, on the reasoning that a restricted project
@@ -1352,45 +1364,47 @@ The project (`replicating-paper`) is a registered noncommercial Earth Engine pro
 21:35 UTC it exceeded that and went into restricted mode** ("Your project has exceeded its noncommercial compute
 quota and is now in restricted mode").
 
-| batch tasks since 1 October (read 2026-10-06T20:59:37Z) | tasks | EECU-seconds |
+| batch tasks since 1 October (read 2026-10-07T08:36:08Z) | tasks | EECU-seconds |
 |---|---|---|
 | other | 20 | 3 |
-| nirv | 777 | 462,082 |
+| nirv | 777 | 483,830 |
 | agreement | 1 | 622 |
 | corestack | 40 | 59,751 |
 | hansen | 40 | 61,392 |
 | units asset (upload, merge, re-export) | 39 | 0 |
-| **all batch tasks** | 917 | **583,850** = 162.2 EECU-hours |
+| **all batch tasks** | 917 | **605,598** = 168.2 EECU-hours |
 
 (The task counts include cancelled tasks that never started, which cost nothing.) The quota does not stop tasks, it
 slows them, so the total has gone on rising past 150. **Batch tasks that had started before the restriction account
-for 88,185 EECU-seconds, 24.5 of the 150 hours**; the other 495,665 were spent after it. What took
+for 88,185 EECU-seconds, 24.5 of the 150 hours**; the other 517,412 were spent after it. What took
 the project to its limit was therefore **interactive requests**, which task records do not show and which could not
 be measured (Cloud Monitoring needs billing on the project). The likeliest cause is this stage's own scouting on
 5 October — clear-observation counts, yearly values and class cross-tabs pulled at 4,000 to 12,813 scattered points
 over Landsat collections. Other use of the project this month cannot be ruled out: it carries work that is not this
-pipeline's (8 export tasks of another job were waiting in its queue when this was read). A query at scattered points makes
+pipeline's (0 export tasks of another job were waiting in its queue when this was read). A query at scattered points makes
 Earth Engine process a whole tile around every point, so each one cost about as much as the whole state. It should
 have been piloted and costed like the batch runs were. Everything heavy now goes through batch tasks, each of which
 records its cost, and the pixel sample is one batch task on stored images.
 
 **What restricted mode does, measured.** Tasks still run, one at a time, in the order they were submitted, with
 several idle minutes between one and the next; a task priority is refused ("Custom priority can only be set on tasks
-in registered commercial projects"). Since it began, 77 tasks have started and finished in 22.75 hours
-(3.4 an hour): 52 tile of stored observationss, median 8.1 minutes running; 1 block of yearly values, median 11.9 minutes running; 3 nirv per-unit groups, median 1.0 minutes running; 3 nirv point tables, median 1.7 minutes running; 1 agreement, median 1.4 minutes running; 8 corestack lulc groups, median 1.0 minutes running; 8 corestack change groups, median 1.3 minutes running; 1 tile of yearly medians (first design), median 11.8 minutes running.
-**The pace fell during the day.** 52 tiles of observations finished between 2026-10-06T00:19:44Z and 2026-10-06T20:43:37Z. From one
-finish to the next the median is 17 minutes — 6 over the first ten, 25 over the last ten, and once 5.7 hours — for a
-task that runs for 8: most of the time is spent waiting. 32 tiles were still to come when this was read, which at
-the pace of the last ten is about 13 hours; the thirteen blocks of yearly values are queued behind them and the
+in registered commercial projects"). Since it began, 97 tasks have started and finished in 34.32 hours
+(2.8 an hour): 72 tile of stored observationss, median 9.3 minutes running; 1 block of yearly values, median 11.9 minutes running; 3 nirv per-unit groups, median 1.0 minutes running; 3 nirv point tables, median 1.7 minutes running; 1 agreement, median 1.4 minutes running; 8 corestack lulc groups, median 1.0 minutes running; 8 corestack change groups, median 1.3 minutes running; 1 tile of yearly medians (first design), median 11.8 minutes running.
+**The pace fell during the day.** 72 tiles of observations finished between 2026-10-06T00:19:44Z and 2026-10-07T08:17:44Z. From one
+finish to the next the median is 23 minutes — 6 over the first ten, 30 over the last ten, and once 5.7 hours — for a
+task that runs for 9: most of the time is spent waiting. 12 tiles were still to come when this was read, which at
+the pace of the last ten is about 6 hours once they are queued; the thirteen blocks of yearly values and the
 per-unit tasks follow. An earlier estimate in this session (nine minutes a tile, the tiles done by early afternoon
 of 6 October) was wrong by a factor of three. Before the quota ran out the same project ran three or four tile
 exports at once, each in four to seven minutes. Nothing in stage 1 waits for any of this (§5).
 
-**Tasks in the queue that are not this pipeline's.** When this was read the project's queue also held
-8 pending export tasks submitted by something else (`odisha_v120_3ha_kendujhar_clustering_cluster_labels`, `odisha_v120_3ha_kendujhar_clustering_feature_stack`, …; created 2026-10-06T20:29:48Z to 2026-10-06T20:31:39Z). They were
-left alone: the driver counts and may cancel only tasks named `ictd_units_…`. In a queue that runs in the order
-submitted they come after the NIRv tiles and blocks already queued and before the per-unit tasks, which are
-submitted only when the blocks exist.
+**The queue is shared, and on 7 October it was emptied.** The project carries work that is not this pipeline's: on
+6 October at 20:29–20:31 UTC eight export tasks of another job (`odisha_v120_3ha_…_clustering_…`) were queued behind
+the NIRv tasks, where a queue that runs in the order submitted would have kept them for a day. They were left alone;
+the driver counts and may cancel only tasks named `ictd_units_…`. On 7 October between 08:19:10 and 08:21:30 UTC
+every task still pending was cancelled before it had started — 8 of the other job's, 13 blocks of yearly values and 12 tiles of stored observations — in
+one sweep, newest first. This pipeline did not do it (§6). When this was read (2026-10-07T08:36:08Z) nothing was queued in the project at all.
+What it cost this pipeline is queue time: the 72 tiles already exported are stored and are not affected.
 
 **What the redesign cost.** 5 tiles of the first design had been exported when the replication reported; they are superseded
 (the first design's values are in the new tiles too) and their collection, `ictd/nirv_yearly_units`, can be deleted.
@@ -1410,7 +1424,7 @@ above the measured cost of its kind (§6). The project was already in restricted
 not money; it is in the table above under NIRv.
 
 **The ways forward are the project owner's:** let restricted mode work through the queue (a day or two, if the
-machine that submits the later steps stays awake; this is what is happening); wait for the reset on 1 November; or move the project to the
+machine that submits the later steps stays awake; it was happening until the queue was emptied on 7 October); wait for the reset on 1 November; or move the project to the
 Contributor tier (1,000 EECU-hours a month; it needs a billing account on the project, and noncommercial use is not
 charged). Using a second project to get round the limit is against Earth Engine's terms and was not done.
 
