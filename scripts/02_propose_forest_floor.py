@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stage 1, task E - a minimum forest area for a unit to enter stage 4: a RECOMMENDATION, applied to nothing.
+Stage 1, task E - a minimum forest area for a unit to enter stage 4. THE FLOOR IS 100 HA, BY RULING (7 Oct 2026).
 
     python scripts/02_propose_forest_floor.py
 
@@ -9,9 +9,17 @@ Out: 20_degradation/ and nowhere else
      forest_floor_options.csv          for each candidate floor: units kept, by unit type, and the share of forest
                                        and of loss they hold
      forest_floor_repeatability.csv    by class of forest area: how repeatable a unit's loss rate is
-     forest_floor.provenance.json      inputs, UTC run time, the rule, the proposal
+     forest_floor.provenance.json      inputs, UTC run time, the rule, its proposal, and the ruling that superseded it
 
 Stage 1 covers all 11,468 units whatever this says. Nothing here removes a row from any table.
+
+THE RULING. This script's rule (below) proposed 50 ha, measured on the Hansen mask. On 7 October 2026 the project
+owner ruled 100 ha. The reason is in 02_build_agreement.py's agreement_floor_repeatability.csv: on the land the two
+measures are set beside each other on - treecover2000 > 10, not the mask - a unit with 50 to 100 ha has a loss
+rate repeatable at 0.73, and the 0.8 mark is passed only from 100 ha. So: 100 ha is the floor (role "RULED"); 50 ha
+stays in the table as the rule's own proposal, superseded, a sensitivity; 10 ha as the looser alternative. The
+table counts every floor BOTH on the mask (forest_ha) and on land with treecover2000 > 10: which of the two a
+respecified stage 4 floors on is part of that respecification, and the ruling's evidence is on the second.
 
 THE PROBLEM. Thousands of units have no forest by the mask (treecover2000 > 30) and thousands more have under
 a hectare. A loss RATE for such a unit - hansen_loss_ha / forest_ha - is a ratio of a few pixels, and one pixel
@@ -46,6 +54,9 @@ YEARS = list(range(2001, 2026))
 CLASS_EDGES = [0, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, float("inf")]     # hectares of forest; a class is [lower, upper)
 FLOORS = [0.5, 1, 5, 10, 25, 50, 100, 250, 500, 1000]                                # candidate floors, hectares
 REPEATABILITY = 0.8
+RULED_FLOOR_HA = 100.0                                                               # the project owner, 7 Oct 2026; supersedes the rule's proposal
+RULING = ("100 ha, ruled by the project owner on 7 Oct 2026. It supersedes this script's proposal: on land with treecover2000 > 10, where Hansen and CoRE Stack are compared, "
+          "a unit's loss rate is repeatable at 0.8 only from 100 ha (20_degradation/agreement_floor_repeatability.csv); the proposal's evidence was on the treecover2000 > 30 mask")
 PIXEL_HA = 0.0725                                                                    # one Hansen pixel in the middle of the state (722 m2)
 
 
@@ -91,7 +102,10 @@ def main():
     if first is None:
         sys.exit(f"no class of forest area reaches a repeatability of {REPEATABILITY}: there is nothing to propose")
     proposal = float(rep["forest_ha_from"].iloc[first])
-    alternatives = [f for f in (10.0, 100.0) if f != proposal][:2]
+    alternatives = [f for f in (10.0,) if f not in (proposal, RULED_FLOOR_HA)]
+    if RULED_FLOOR_HA not in FLOORS:
+        sys.exit(f"the ruled floor of {RULED_FLOOR_HA:g} ha is not among the candidate floors")
+    role = lambda f: ("RULED" if f == RULED_FLOOR_HA else "proposed by the rule, superseded: a sensitivity" if f == proposal else "alternative" if f in alternatives else "")
 
     rows = []
     tot = {"forest": d["forest_ha"].sum(), "loss": d["hansen_loss_ha"].sum(), "forest_gt10": d["forest_ha_gt10"].sum(), "loss_gt10": d["hansen_loss_ha_gt10"].sum()}
@@ -99,7 +113,7 @@ def main():
         keep, keep10 = d["forest_ha"] >= f, d["forest_ha_gt10"] >= f
         g = d[keep]
         rho = float(spearmanr(g["rate_odd"], g["rate_even"])[0])
-        row = {"floor_ha": f, "role": "PROPOSED" if f == proposal else "alternative" if f in alternatives else "",
+        row = {"floor_ha": f, "role": role(f),
                "units_kept": int(keep.sum()), "units_kept_pct": round(100 * keep.mean(), 2),
                "lgd_panchayat_kept": int((keep & lgd).sum()), "lgd_panchayat_kept_pct": round(100 * (keep & lgd).sum() / lgd.sum(), 2),
                "outside_village_kept": int((keep & ~lgd).sum()), "outside_village_kept_pct": round(100 * (keep & ~lgd).sum() / (~lgd).sum(), 2),
@@ -120,7 +134,8 @@ def main():
     with open(OUT / "forest_floor.provenance.json", "w", encoding="utf-8") as fh:
         json.dump({"script": "scripts/02_propose_forest_floor.py", "script_sha256": sha256(__file__), "run_utc": started,
                    "inputs": [{"path": str(p.relative_to(ROOT)), "bytes": p.stat().st_size, "sha256": sha256(p)} for p in (BY_UNIT, THRESHOLDS)],
-                   "status": "A RECOMMENDATION FOR STAGE 4, for the project owner to rule on. Applied to no table.",
+                   "status": "RULED. The floor is 100 ha. This table removes no row from any stage-1 table; the agreement table and the demo layer apply the floor themselves.",
+                   "ruled_ha": RULED_FLOOR_HA, "ruling": RULING,
                    "rule": f"the bottom of the smallest class of forest_ha from which every larger class has a rank correlation of at least {REPEATABILITY} "
                            "between a unit's loss rate in odd years and in even years",
                    "proposal_ha": proposal, "alternatives_ha": alternatives, "repeatability_mark": REPEATABILITY, "pooled_25_year_loss_rate": pooled,
@@ -132,7 +147,8 @@ def main():
     pd.set_option("display.width", 250)
     print(f"\nforest_floor_repeatability.csv: n = {len(rep)} classes of forest_ha (units with no forest are in none)")
     print(rep[["forest_ha_from", "forest_ha_below", "n_units", "n_lgd_panchayat", "n_outside_village", "units_with_no_loss", "median_loss_rate", "odd_years_vs_even_years_spearman"]].to_string(index=False))
-    print(f"\nPROPOSAL: forest_ha >= {proposal:g} ha - the smallest class from which every class reaches {REPEATABILITY}. Alternatives shown: {alternatives}")
+    print(f"\nTHE RULE'S PROPOSAL: forest_ha >= {proposal:g} ha - the smallest class from which every class reaches {REPEATABILITY} on the mask. SUPERSEDED.")
+    print(f"THE FLOOR: {RULING}")
     print(f"\nforest_floor_options.csv: n = {len(options)} candidate floors")
     print(options[["floor_ha", "role", "units_kept", "lgd_panchayat_kept", "outside_village_kept", "forest_kept_pct", "loss_kept_pct", "odd_vs_even_spearman_among_kept",
                    "units_kept_if_the_floor_were_on_treecover2000_gt10", "units_passing_gt10_but_failing_the_mask", "of_them_lgd_panchayat"]].to_string(index=False))
