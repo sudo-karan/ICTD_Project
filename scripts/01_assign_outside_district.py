@@ -6,60 +6,85 @@ Stage 0, an addition - a district for each outside-village unit.
 
 In : --units                                           the stage-0 layer (--outside keep): its outside_village units
      10_units/odisha_villages_pc11_datameet.gpkg        the DataMeet village polygons the layer was built from
+     00_raw/04_boundaries/corestack_gp_odisha.json      panchayat polygons, each with a Census-2011 district code
      00_raw/cfr_fra/odisha_fra_mpr_district_2025-12-31.csv   the 30 districts' names beside their Census-2011 codes
+     10_units/units.provenance.json                     the layer's own count and area of these units, checked against
 Out: 10_units/ and nowhere else
      outside_village_district.csv              one row per outside_village unit
      outside_village_district_summary.csv      per district: how many such units and how much land
-     outside_village_district.provenance.json  inputs, UTC run time, method, checks, n
+     outside_village_district.provenance.json  inputs, UTC run time, method, checks, n and missingness
 
 WHY. The outside-village units are the DataMeet polygons that carry no Census-2011 village code - the land outside
 any revenue village, mostly reserved forest. The layer gives them no district, because the layer's district column
 is a Census-2011 code and they have none. Descriptive tables and the map need one. THEY STAY OUT OF ANY REGRESSION:
 this column is for description, not for a district fixed effect.
 
-THERE IS NO DISTRICT BOUNDARY FILE IN 00_raw/. The only district geometry among the inputs is the DataMeet layer
-itself, in which EVERY polygon - the uncoded ones included - carries the name of its district as of the 2001
-Census (Odisha has had the same 30 districts since 1993). So the district is assigned in two ways, and both are
-reported:
+WHAT WAS ASKED, AND WHAT 00_raw/ HOLDS. The instruction was a spatial majority against the district boundaries in
+00_raw/. There is no file of district boundaries there. There is one file of polygons that carry a district code:
+the panchayat polygons of 00_raw/04_boundaries/. They are not wall to wall - they cover about a third of the
+outside-village land, because that land is where no panchayat is - so a majority against them can be taken for some
+units and not for others. And every DataMeet polygon, the uncoded ones included, carries the NAME of its district
+as of the 2001 Census (Odisha has had the same 30 districts since 1993).
 
-1. BY THE SOURCE'S OWN LABEL (the column that is delivered). An outside-village unit is one DataMeet polygon; its
-   district is the district name on that polygon, turned into a Census-2011 code through the polygons that carry
-   both (each 2001 name must go to exactly one 2011 code, and each code to one name, or the run stops). This is
-   also what "spatial majority against district polygons" gives if the district polygons are made by dissolving
-   the DataMeet layer on its district name: every such unit lies wholly inside its own district, by construction.
-2. BY ITS NEIGHBOURS (an independent check, and the measure of ambiguity). For each outside-village unit, a collar
-   of COLLAR_M metres is drawn round it and the area of the collar that falls on CODED villages is tallied by
-   those villages' Census-2011 district. The district with the largest share is the neighbours' district. A unit
-   is AMBIGUOUS when the two largest shares are within AMBIGUOUS_WITHIN of each other (5 percentage points of the
-   collar on coded land) - a block on a district boundary, with as much of one district round it as of the other.
-   A unit whose collar touches no coded village (it is surrounded by other outside-village units, or by sea or
-   the state boundary) has no neighbours' district. Collar areas are measured in UTM zone 45N; only their shares
-   are used.
-THE RULE, where the two differ (measured 7 Oct 2026: 89 of the 3,138 units that have a coded neighbour):
-  - Neither side is always right. Some coded villages carry a 2011 district code that differs from their own 2001
-    name (the crosswalk's doing), so the neighbours can be wrong; and some labels name a district that is nowhere
-    near (polygons labelled Rayagada in the middle of Nayagarh), so the label can be wrong.
-  - So the collar is tallied twice, by the coded villages' 2011 codes and by their 2001 names. The LABEL IS KEPT
-    whenever its district is present in the collar by either tally - the unit is then a block on or near that
-    district's boundary, or its neighbours' codes are the odd ones. The label is OVERRIDDEN by the neighbours'
-    district only when the unit touches coded villages and none of them belongs to the label's district by
-    either tally: districts are contiguous, so such a label cannot be right. assigned_by says which happened.
-  - A FEW POLYGONS CARRY NO DISTRICT NAME AT ALL (19, 4.8 km2 between them): those take the neighbours' district.
+So there are three sources of a district for one of these units, and all three are in the table:
+
+1. THE POLYGON'S OWN NAME. An outside-village unit is one DataMeet polygon; its district name is turned into a
+   Census-2011 code through the polygons that carry both (each name must go to exactly one code and each code to
+   one name, or the run stops).
+2. THE AREA MAJORITY - the method asked for, where it can be applied. The share of the UNIT'S OWN AREA that lies on
+   panchayat polygons of each district. It is taken as measurable only where at least COVER_MIN of the unit is
+   covered. Where it is, the unit is AMBIGUOUS BY AREA if its two largest districts are within AMBIGUOUS_WITHIN of
+   each other (5 percentage points of the unit's area): the definition asked for.
+3. THE NEIGHBOURS. A collar of COLLAR_M metres is drawn round the unit and the part of it that falls on CODED
+   villages is tallied by district - by the villages' 2001 district NAMES, and again by their 2011 CODES. The two
+   tallies differ because some coded villages carry a 2011 code that is not their name's; where they differ the
+   villages lie where their names say, so the tally by name is the one used and the other is reported beside it.
+   A unit whose collar touches no coded village has no neighbours' district. AMBIGUOUS BY THE COLLAR: the two
+   largest shares within AMBIGUOUS_WITHIN of each other.
+
+HOW GOOD EACH IS can be measured on the coded villages, whose district is known from their own Census code. The run
+does that and records it (measured 7 Oct 2026: the name gives the village's own district for 99.92 per cent of
+them; the area majority, among villages at least half covered, for 97.88 per cent). The name is the better of the
+two where the truth is known, so:
+
+THE RULE.
+  - A unit takes THE DISTRICT ITS POLYGON NAMES.
+  - The name is OVERRIDDEN only when both checks contradict it and agree with each other: no coded village of the
+    named district lies in the collar by either tally, AND the unit is at least half covered and its area majority
+    is another district, AND that district is the neighbours' largest. One check alone does not move a unit: a
+    tract on a district boundary can have all its coded neighbours across the line, and the panchayat polygons are
+    wrong about one village in fifty. Where one check contradicts the name the unit is flagged, not moved.
+  - A polygon with NO district name takes the area majority where it is at least half covered, and otherwise the
+    neighbours' largest district by the tally by name.
+assigned_by says which happened. An earlier version of this script (6 Oct 2026) said there was no district polygon
+file, overrode the name on the collar alone, and took the override from the tally by code; all three were wrong.
 
 COLUMNS of outside_village_district.csv
   unit_id, unit_name                    as in the layer
-  district_2001_label, subdistrict_2001_label   the names on the DataMeet polygon
-  pc11_district_code, district          the district assigned, code and name
-  assigned_by                           "label"; "neighbours: the polygon has no district name"; or "neighbours: the
-                                        label's district is nowhere round the unit"
+  district_2001_label, subdistrict_2001_label   the names on the DataMeet polygon (blank on 19 polygons)
+  pc11_district_code, district          THE DISTRICT ASSIGNED, code and name
+  assigned_by                           "label" | "two checks against the label" | "area majority: the polygon has no
+                                        district name" | "neighbours: the polygon has no district name"
+  area_cover_share                      the share of the unit's area on panchayat polygons of any district
+  area_majority_district_code, area_majority_district, area_majority_share_of_unit,
+  area_second_district_code, area_second_share_of_unit
+                                        the two districts holding most of the unit's area (blank: no cover at all)
+  area_majority_agrees_with_assigned    1 / 0; blank where the unit is less than COVER_MIN covered
+  ambiguous_by_area                     1 / 0; blank where the unit is less than COVER_MIN covered
+  neighbours_district_code, neighbours_district, neighbours_share, neighbours_second_district_code,
+  neighbours_second_share, neighbours_n_districts
+                                        the collar, tallied by the coded villages' 2001 names (0 districts: no coded
+                                        neighbour)
+  neighbours_by_code_district_code      the largest district of the same collar tallied by 2011 codes
+  neighbours_agree_with_assigned        1 / 0; blank where there is no coded neighbour
   label_district_share_in_collar        the share of the collar on coded villages of the LABEL's district (the larger
                                         of the two tallies); blank where there is no label or no coded neighbour
-  neighbours_district_code, neighbours_district   the district with the largest share of the collar
-  neighbours_share, neighbours_second_district_code, neighbours_second_share
-  neighbours_n_districts                how many districts the collar touches (0: no coded neighbour)
-  ambiguous                             1 if the two largest shares are within AMBIGUOUS_WITHIN of each other
-  label_agrees_with_neighbours          1 / 0; blank where there is no coded neighbour or no label
+  label_absent_from_collar              1 / 0: the named district is in the collar by neither tally; blank likewise
+  ambiguous_by_collar                   1 / 0; blank where there is no coded neighbour
+  ambiguous, ambiguous_basis            the one flag to use: by area where that is measurable ("area of the unit"),
+                                        otherwise by the collar ("collar"), otherwise 0 ("not measurable")
   area_ha                               the unit's area as the layer has it (ellipsoidal)
+Shares are of areas measured in UTM zone 45N; no area that is reported is measured in it.
 
 Needs geopandas, shapely, pandas, numpy.
 """
@@ -74,10 +99,13 @@ import shapely
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "10_units"
 VILLAGES = OUT / "odisha_villages_pc11_datameet.gpkg"
+PANCHAYATS = ROOT / "00_raw" / "04_boundaries" / "corestack_gp_odisha.json"
 DISTRICTS = ROOT / "00_raw" / "cfr_fra" / "odisha_fra_mpr_district_2025-12-31.csv"
-WORK_CRS = "EPSG:32645"        # UTM 45N: for the collar only; no area that is reported is measured in it
+LAYER_RECORD = OUT / "units.provenance.json"
+WORK_CRS = "EPSG:32645"        # UTM 45N: for shares of area only
+COVER_MIN = 0.5                # the area majority is taken as measurable where this share of the unit lies on panchayat polygons
 COLLAR_M = 100.0
-COLLARS_TRIED = (50.0, 100.0, 250.0)          # the count of ambiguous units is reported at each; COLLAR_M is the one delivered
+COLLARS_TRIED = (50.0, 100.0, 250.0)          # the collar's counts are reported at each; COLLAR_M is the one delivered
 AMBIGUOUS_WITHIN = 0.05
 fails = []
 
@@ -104,14 +132,34 @@ def neighbours(out_geoms, coded_geoms, coded_district, collar_m):
     collars = shapely.buffer(out_geoms, collar_m)
     oi, ci = tree.query(collars, predicate="intersects")
     area = shapely.area(shapely.intersection(collars[oi], coded_geoms[ci]))
-    t = pd.DataFrame({"o": oi, "d": coded_district[ci], "a": area})
+    t = pd.DataFrame({"o": oi, "d": coded_district[ci], "a": area}).dropna(subset=["d"])
     t = t[t["a"] > 0].groupby(["o", "d"], as_index=False)["a"].sum()
     t["share"] = t["a"] / t.groupby("o")["a"].transform("sum")
     return t
 
 
+def on_district_polygons(geoms, poly_geoms, poly_district):
+    """For each polygon of geoms: {district code: share of ITS OWN area on the polygons of that district}. Polygons
+    of one district that overlap each other are counted once."""
+    tree = shapely.STRtree(poly_geoms)
+    oi, ci = tree.query(geoms, predicate="intersects")
+    pairs = pd.DataFrame({"o": oi, "c": ci, "d": poly_district[ci]})
+    size = pairs.groupby(["o", "d"])["c"].transform("size").to_numpy()
+    one = pairs[size == 1]
+    rows = [pd.DataFrame({"o": one["o"].to_numpy(), "d": one["d"].to_numpy(), "a": shapely.area(shapely.intersection(geoms[one["o"].to_numpy()], poly_geoms[one["c"].to_numpy()]))})]
+    many = pairs[size > 1].groupby(["o", "d"])["c"].apply(list)
+    if len(many):
+        merged = np.array([shapely.union_all(poly_geoms[c]) for c in many.to_numpy()], dtype=object)
+        o = many.index.get_level_values("o").to_numpy()
+        rows.append(pd.DataFrame({"o": o, "d": many.index.get_level_values("d").to_numpy(), "a": shapely.area(shapely.intersection(geoms[o], merged))}))
+    t = pd.concat(rows, ignore_index=True)
+    t = t[t["a"] > 0].copy()
+    t["share"] = t["a"].to_numpy() / shapely.area(geoms)[t["o"].to_numpy()]
+    return t
+
+
 def top_two(t, n):
-    """Arrays over the n outside polygons: top district, its share, second district, its share, number of districts."""
+    """Arrays over the n polygons: top district, its share, second district, its share, number of districts."""
     t = t.sort_values(["o", "share", "d"], ascending=[True, False, True])
     first = t.groupby("o").nth(0).set_index("o")
     second = t.groupby("o").nth(1).set_index("o")
@@ -119,7 +167,14 @@ def top_two(t, n):
     d1 = first["d"].reindex(idx); s1 = first["share"].reindex(idx)
     d2 = second["d"].reindex(idx); s2 = second["share"].reindex(idx).fillna(0.0).where(s1.notna())
     k = t.groupby("o").size().reindex(idx).fillna(0).astype(int)
-    return d1.to_numpy(), s1.to_numpy(float), d2.to_numpy(), s2.to_numpy(float), k.to_numpy()
+    return d1.to_numpy(dtype=object), s1.to_numpy(float), d2.to_numpy(dtype=object), s2.to_numpy(float), k.to_numpy()
+
+
+def flag(values, known):
+    """1 / 0 where known, blank elsewhere."""
+    out = pd.array(np.where(known, np.asarray(values).astype(int), 0), dtype="Int64")
+    out[~np.asarray(known)] = pd.NA
+    return out
 
 
 def main():
@@ -129,7 +184,8 @@ def main():
     started = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     v = gpd.read_file(VILLAGES, layer="villages")
-    coded, out = v[v["pc11_village_code"].notna()].copy(), v[v["pc11_village_code"].isna()].copy()
+    is_coded = v["pc11_village_code"].notna().to_numpy()
+    coded, out = v[is_coded].copy(), v[~is_coded].copy()
     out["unit_id"] = ["OUTSIDE_" + str(i) for i in range(1, len(out) + 1)]          # as 01_build_units.py numbers them
     units = gpd.read_file(a.units, layer="units")
     u = units[units["outside_village"] == 1].set_index("unit_id")
@@ -145,10 +201,13 @@ def main():
     moved = shapely.hausdorff_distance(shapely.make_valid(u.geometry.values), shapely.make_valid(out.geometry.values))
     if np.nanmax(moved) > 1e-7:
         fails.append(f"{int((moved > 1e-7).sum())} units do not have the geometry of the polygon with their number (largest distance {np.nanmax(moved):.2e} degrees)")
+    rec = json.load(open(LAYER_RECORD))["counts"]
+    if int(rec["outside_village_polygons"]) != len(u) or abs(float(rec["outside_village_km2"]) - u["area_ha"].sum() / 100) > 0.01:
+        fails.append(f"{LAYER_RECORD.name} records {rec['outside_village_polygons']} outside-village polygons and {rec['outside_village_km2']} km2; the layer read here has {len(u):,} and {u['area_ha'].sum() / 100:,.2f}")
     stop_if_failed("matching the units to the polygons")
-    print(f"OK  the {len(out):,} outside_village units are the uncoded polygons, one for one: same number, same name, same geometry")
+    print(f"OK  the {len(out):,} outside_village units are the uncoded polygons, one for one: same number, same name, same geometry; {u['area_ha'].sum() / 100:,.2f} km2, as the layer's record has it")
 
-    # ---- 1. the label: 2001 district name -> 2011 district code, through the polygons that carry both -----------------
+    # ---- 1. the name: 2001 district name -> 2011 district code, through the polygons that carry both -------------------
     names = pd.read_csv(DISTRICTS, dtype=str)[["district", "pc11_district_code"]]
     if len(names) != 30 or names["pc11_district_code"].nunique() != 30:
         fails.append(f"{DISTRICTS.name} does not list 30 districts with distinct codes")
@@ -164,49 +223,101 @@ def main():
     stop_if_failed("building the 2001-name to 2011-code crosswalk")
     code_of = by_name["pc11_district_code"].to_dict()
     name_of = names.set_index("pc11_district_code")["district"].to_dict()
-    print(f"OK  the {len(by_name)} district names of 2001 go one to one onto the {names['pc11_district_code'].nunique()} Census-2011 codes; of the coded polygons under a name, "
-          f"between {100 * purity.min():.2f} and {100 * purity.max():.2f} per cent carry that name's code (the rest: {int(cross['n'].sum() - by_name['n'].sum()):,} polygons whose 2011 district differs from their 2001 one)")
-    res = pd.DataFrame({"unit_id": out["unit_id"].to_numpy(), "unit_name": out["name_2001"].to_numpy(), "district_2001_label": label.to_numpy(),
-                        "subdistrict_2001_label": out["subdistrict_2001"].fillna("").str.strip().to_numpy()})
-    res["pc11_district_code"] = res["district_2001_label"].map(code_of)
-    res["assigned_by"] = np.where(unlabelled, "neighbours: the polygon has no district name", "label")
-    print(f"    {int(unlabelled.sum())} outside-village polygons carry no district name ({out.loc[unlabelled, 'area_ha'].sum() / 100:,.1f} km2): they take their neighbours' district")
+    own_code = coded["pc11_district_code"].astype(str).to_numpy()
+    named_code = coded["district_2001"].map(code_of).to_numpy(dtype=object)                 # the coded villages by their own 2001 district name
+    off_name = int((named_code != own_code).sum())
+    print(f"OK  the {len(by_name)} district names of 2001 go one to one onto the 30 Census-2011 codes. On the {len(coded):,} coded villages the name gives the village's own code for "
+          f"{100 * (1 - off_name / len(coded)):.2f} per cent ({off_name} do not)")
+    n = len(out)
+    label_code = label.map(code_of).to_numpy(dtype=object)
+    label_code[unlabelled] = None
 
-    # ---- 2. the neighbours: which district's coded villages lie round each unit ----------------------------------------
+    # ---- 2. the area majority against the panchayat polygons -----------------------------------------------------------
+    gp = gpd.read_file(PANCHAYATS)
+    if gp["District census code"].isna().any() or set(gp["District census code"].astype(int).astype(str)) != set(names["pc11_district_code"]):
+        fails.append(f"{PANCHAYATS.name}: a polygon has no district code, or its codes are not the 30 districts'")
+        stop_if_failed("reading the panchayat polygons")
+    pg = shapely.make_valid(gp.to_crs(WORK_CRS).geometry.values)
+    pd_code = gp["District census code"].astype(int).astype(str).to_numpy()
     og = shapely.make_valid(out.to_crs(WORK_CRS).geometry.values)
     cg = shapely.make_valid(coded.to_crs(WORK_CRS).geometry.values)
-    cd = coded["pc11_district_code"].to_numpy()
-    cd_2001 = coded["district_2001"].map(code_of).to_numpy()                       # the same villages by their own 2001 district name
-    label_code = res["pc11_district_code"].to_numpy()
-    both = pd.concat([neighbours(og, cg, cd, COLLAR_M), neighbours(og, cg, cd_2001, COLLAR_M)])
-    own = both[both["d"].to_numpy() == pd.Series(label_code).reindex(both["o"]).to_numpy()].groupby("o")["share"].max()
-    tried = {}
+    ta = on_district_polygons(og, pg, pd_code)
+    cover = ta.groupby("o")["share"].sum().reindex(np.arange(n)).fillna(0.0).to_numpy()
+    a1, as1, a2, as2, ak = top_two(ta, n)
+    covered = cover >= COVER_MIN
+    if cover.max() > 1.02:
+        fails.append(f"a unit is {cover.max():.3f} covered by panchayat polygons of different districts: they overlap each other across districts")
+    amb_area = covered & ((as1 - as2) < AMBIGUOUS_WITHIN)
+    tc = on_district_polygons(cg, pg, pd_code)                                                    # the same on the coded villages, whose district is known
+    c_cover = tc.groupby("o")["share"].sum().reindex(np.arange(len(coded))).fillna(0.0).to_numpy()
+    c1 = top_two(tc, len(coded))[0]
+    c_cov = c_cover >= COVER_MIN
+    calib = {"coded_villages": int(len(coded)), "name_gives_the_villages_own_district": int(len(coded) - off_name), "name_gives_it_pct": round(100 * (1 - off_name / len(coded)), 2),
+             "coded_villages_at_least_half_covered_by_panchayat_polygons": int(c_cov.sum()), "area_majority_gives_the_villages_own_district": int((c1[c_cov] == own_code[c_cov]).sum()),
+             "area_majority_gives_it_pct": round(100 * float((c1[c_cov] == own_code[c_cov]).mean()), 2)}
+    ua = shapely.area(og)
+    print(f"OK  panchayat polygons: n = {len(gp):,}, {len(set(pd_code))} districts. They cover {100 * float((ua * np.minimum(cover, 1)).sum() / ua.sum()):.1f} per cent of the outside-village land; "
+          f"{int(covered.sum()):,} units are at least half covered, {int((cover == 0).sum()):,} not at all")
+    print(f"    where the truth is known - coded villages at least half covered, n = {calib['coded_villages_at_least_half_covered_by_panchayat_polygons']:,} - the area majority gives the village's own district for "
+          f"{calib['area_majority_gives_it_pct']:.2f} per cent; the name gives it for {calib['name_gives_it_pct']:.2f} per cent of all {len(coded):,}")
+
+    # ---- 3. the neighbours: which district's coded villages lie round each unit -----------------------------------------
+    tried, at = {}, {}
     for collar in COLLARS_TRIED:
-        d1, s1, d2, s2, k = top_two(neighbours(og, cg, cd, collar), len(out))
+        by_n, by_c = neighbours(og, cg, named_code, collar), neighbours(og, cg, own_code, collar)
+        d1, s1, d2, s2, k = top_two(by_n, n)
+        e1, t1, e2, t2, _ = top_two(by_c, n)
         has = k > 0
-        amb = has & ((s1 - s2) < AMBIGUOUS_WITHIN)
-        agree = has & ~unlabelled & (d1 == res["pc11_district_code"].to_numpy())
-        differs = has & ~unlabelled & ~agree
-        tried[collar] = {"with_a_coded_neighbour": int(has.sum()), "without": int((~has).sum()), "ambiguous": int(amb.sum()),
-                         "label_differs_from_neighbours": int(differs.sum()), "label_differs_and_not_ambiguous": int((differs & ~amb).sum()),
-                         "unlabelled": int(unlabelled.sum()), "unlabelled_and_ambiguous": int((unlabelled & amb).sum()), "unlabelled_without_a_coded_neighbour": int((unlabelled & ~has).sum())}
+        both = pd.concat([by_n, by_c])
+        own = both[both["d"].to_numpy() == pd.Series(label_code).reindex(both["o"]).to_numpy()].groupby("o")["share"].max().reindex(np.arange(n)).fillna(0.0).to_numpy()
+        amb_n, amb_c = has & ((s1 - s2) < AMBIGUOUS_WITHIN), has & ((t1 - t2) < AMBIGUOUS_WITHIN)
+        differs = has & ~unlabelled & (d1 != label_code)                                         # always against the LABEL, at every collar
+        absent = has & ~unlabelled & (own == 0)
+        tried[collar] = {"with_a_coded_neighbour": int(has.sum()), "without": int((~has).sum()), "ambiguous_tally_by_name": int(amb_n.sum()), "ambiguous_tally_by_code": int(amb_c.sum()),
+                         "label_differs_from_the_neighbours_largest_district": int(differs.sum()), "label_differs_tally_by_code": int((has & ~unlabelled & (e1 != label_code)).sum()),
+                         "label_absent_from_the_collar": int(absent.sum()), "the_two_tallies_name_a_different_largest_district": int((has & (d1 != e1)).sum())}
         if collar == COLLAR_M:
-            res["neighbours_district_code"] = d1
-            res["neighbours_district"] = pd.Series(d1).map(name_of).to_numpy()
-            res["neighbours_share"] = np.round(s1, 4)
-            res["neighbours_second_district_code"] = d2
-            res["neighbours_second_share"] = np.where(has, np.round(s2, 4), np.nan)
-            res["neighbours_n_districts"] = k
-            res["ambiguous"] = amb.astype(int)
-            res["label_agrees_with_neighbours"] = pd.array(np.where(has, agree.astype(int), 0), dtype="Int64")
-            res.loc[~has | unlabelled, "label_agrees_with_neighbours"] = pd.NA
-            label_share = own.reindex(np.arange(len(out))).fillna(0.0).to_numpy()
-            res["label_district_share_in_collar"] = np.where(has & ~unlabelled, np.round(label_share, 4), np.nan)
-            nowhere = has & ~unlabelled & (label_share == 0)
-            res.loc[nowhere, "assigned_by"] = "neighbours: the label's district is nowhere round the unit"
-            res.loc[unlabelled | nowhere, "pc11_district_code"] = pd.Series(d1)[unlabelled | nowhere].to_numpy()
-            kept_though_differing = int((differs & ~nowhere).sum())
+            at = {"d1": d1, "s1": s1, "d2": d2, "s2": s2, "k": k, "e1": e1, "has": has, "own": own, "amb": amb_n, "absent": absent}
+    has, d1, absent = at["has"], at["d1"], at["absent"]
+
+    # ---- the rule ----------------------------------------------------------------------------------------------------------
+    two = absent & covered & (a1 != label_code) & (a1 == d1)
+    assigned = label_code.copy()
+    how = np.where(unlabelled, "", "label").astype(object)
+    assigned[two] = a1[two]; how[two] = "two checks against the label"
+    by_area = unlabelled & covered
+    assigned[by_area] = a1[by_area]; how[by_area] = "area majority: the polygon has no district name"
+    by_nb = unlabelled & ~covered & has
+    assigned[by_nb] = d1[by_nb]; how[by_nb] = "neighbours: the polygon has no district name"
+    if (how == "").any():
+        fails.append(f"{int((how == '').sum())} polygons carry no district name, are less than half covered by panchayat polygons and touch no coded village: no source gives them a district")
+    stop_if_failed("assigning the districts")
+
+    res = pd.DataFrame({"unit_id": out["unit_id"].to_numpy(), "unit_name": out["name_2001"].to_numpy(), "district_2001_label": label.to_numpy(),
+                        "subdistrict_2001_label": out["subdistrict_2001"].fillna("").str.strip().to_numpy(), "pc11_district_code": assigned})
     res["district"] = res["pc11_district_code"].map(name_of)
+    res["assigned_by"] = how
+    res["area_cover_share"] = np.round(np.minimum(cover, 1.0), 4)
+    res["area_majority_district_code"] = a1
+    res["area_majority_district"] = pd.Series(a1).map(name_of).to_numpy()
+    res["area_majority_share_of_unit"] = np.round(as1, 4)
+    res["area_second_district_code"] = a2
+    res["area_second_share_of_unit"] = np.where(ak > 0, np.round(as2, 4), np.nan)
+    res["area_majority_agrees_with_assigned"] = flag(a1 == assigned, covered)
+    res["ambiguous_by_area"] = flag(amb_area, covered)
+    res["neighbours_district_code"] = d1
+    res["neighbours_district"] = pd.Series(d1).map(name_of).to_numpy()
+    res["neighbours_share"] = np.round(at["s1"], 4)
+    res["neighbours_second_district_code"] = at["d2"]
+    res["neighbours_second_share"] = np.where(has, np.round(at["s2"], 4), np.nan)
+    res["neighbours_n_districts"] = at["k"]
+    res["neighbours_by_code_district_code"] = at["e1"]
+    res["neighbours_agree_with_assigned"] = flag(d1 == assigned, has)
+    res["label_district_share_in_collar"] = np.where(has & ~unlabelled, np.round(at["own"], 4), np.nan)
+    res["label_absent_from_collar"] = flag(absent, has & ~unlabelled)
+    res["ambiguous_by_collar"] = flag(at["amb"], has)
+    res["ambiguous"] = np.where(covered, amb_area, np.where(has, at["amb"], False)).astype(int)
+    res["ambiguous_basis"] = np.where(covered, "area of the unit", np.where(has, "collar", "not measurable"))
     res["area_ha"] = u["area_ha"].to_numpy()
     if res["pc11_district_code"].isna().any() or res["district"].isna().any():
         fails.append(f"{int(res['pc11_district_code'].isna().sum())} outside-village units got no district")
@@ -214,41 +325,67 @@ def main():
         fails.append("the table does not hold each outside-village unit once")
     stop_if_failed("assigning the districts")
 
-    summary = res.groupby(["pc11_district_code", "district"], as_index=False).agg(
+    km2 = lambda sel: round(float(res.loc[sel, "area_ha"].sum()) / 100, 2)
+    area_differs = covered & (a1 != assigned)
+    one_check = (area_differs | (absent & (how == "label")))
+    summary = res.assign(_differs=area_differs.astype(int), _absent=absent.astype(int), _unchecked=(~covered & ~has).astype(int)).groupby(["pc11_district_code", "district"], as_index=False).agg(
         outside_village_units=("unit_id", "size"), outside_village_km2=("area_ha", lambda s: round(s.sum() / 100, 2)), ambiguous_units=("ambiguous", "sum"),
-        label_differs_from_neighbours=("label_agrees_with_neighbours", lambda s: int((s == 0).sum())), no_coded_neighbour=("neighbours_n_districts", lambda s: int((s == 0).sum())),
-        assigned_by_neighbours=("assigned_by", lambda s: int((s != "label").sum())))
-    if int(summary["outside_village_units"].sum()) != len(res) or abs(summary["outside_village_km2"].sum() - res["area_ha"].sum() / 100) > 0.2:
-        fails.append("the per-district summary does not add up to the table")
+        area_majority_names_another_district=("_differs", "sum"), named_district_absent_from_collar=("_absent", "sum"), no_check_possible=("_unchecked", "sum"),
+        not_assigned_by_label=("assigned_by", lambda s: int((s != "label").sum())))
+    if int(summary["outside_village_units"].sum()) != int(rec["outside_village_polygons"]) or abs(float(summary["outside_village_km2"].sum()) - float(rec["outside_village_km2"])) > 0.2:
+        fails.append(f"the per-district summary holds {int(summary['outside_village_units'].sum()):,} units and {summary['outside_village_km2'].sum():,.2f} km2; {LAYER_RECORD.name} records {rec['outside_village_polygons']} and {rec['outside_village_km2']}")
         stop_if_failed("summarising")
     OUT.mkdir(exist_ok=True)
     res.to_csv(OUT / "outside_village_district.csv", index=False)
     summary.to_csv(OUT / "outside_village_district_summary.csv", index=False)
-    d = tried[COLLAR_M]
+    back = pd.read_csv(OUT / "outside_village_district.csv", dtype=str, keep_default_na=False)       # blanks are counted in the file as written
+    blank = {c: int((back[c] == "").sum()) for c in back.columns if (back[c] == "").any()}
+    counts = {"outside_village_units": int(len(res)), "outside_village_km2": km2(np.ones(n, bool)), "districts_with_such_units": int(summary["outside_village_units"].gt(0).sum()),
+              "assigned_by": {k_: {"units": int(n_), "km2": km2(res["assigned_by"] == k_)} for k_, n_ in res["assigned_by"].value_counts().items()},
+              "area_majority": {"cover_of_the_outside_village_land_pct": round(100 * float((ua * np.minimum(cover, 1)).sum() / ua.sum()), 1), "units_with_some_cover": int((cover > 0).sum()), "units_with_no_cover": int((cover == 0).sum()),
+                                "measurable_units_at_least_half_covered": {"units": int(covered.sum()), "km2": km2(covered)}, "not_measurable": {"units": int((~covered).sum()), "km2": km2(~covered)},
+                                "agrees_with_the_assigned_district": {"units": int((covered & ~area_differs).sum()), "km2": km2(covered & ~area_differs)},
+                                "names_another_district": {"units": int(area_differs.sum()), "km2": km2(area_differs)}, "names_another_district_than_the_label": int((covered & ~unlabelled & (a1 != label_code)).sum()),
+                                "ambiguous_by_area_two_districts_within_5_points_of_the_units_area": {"units": int(amb_area.sum()), "km2": km2(amb_area)}},
+              f"collar_{COLLAR_M:g}_m": {**tried[COLLAR_M], "label_absent_and_kept_one_check_only": int((absent & (how == "label")).sum()), "label_absent_and_overridden_two_checks": int(two.sum()),
+                                           "label_absent_and_the_area_majority_is_measurable": int((absent & covered).sum()), "of_those_the_area_majority_sides_with_the_label": int((absent & covered & (a1 == label_code)).sum())},
+              "by_collar_m": {f"{k_:g}": x for k_, x in tried.items()},
+              "flagged_not_moved_one_check_contradicts_the_assigned_district": {"units": int(one_check.sum()), "km2": km2(one_check)},
+              "no_check_possible_neither_covered_nor_with_a_coded_neighbour": {"units": int((~covered & ~has).sum()), "km2": km2(~covered & ~has)},
+              "ambiguous_the_one_flag": {"units": int(res["ambiguous"].sum()), "by_basis": {k_: int(v_) for k_, v_ in res.loc[res["ambiguous"] == 1, "ambiguous_basis"].value_counts().items()},
+                                         "units_by_basis": {k_: int(v_) for k_, v_ in res["ambiguous_basis"].value_counts().items()}}}
+    entry = lambda p: {"path": str(Path(p).resolve().relative_to(ROOT)), "bytes": Path(p).stat().st_size, "sha256": sha256(p)}
     with open(OUT / "outside_village_district.provenance.json", "w", encoding="utf-8") as fh:
         json.dump({"script": "scripts/01_assign_outside_district.py", "script_sha256": sha256(__file__), "run_utc": started,
-                   "inputs": [{"path": str(a.units), "bytes": Path(a.units).stat().st_size, "sha256": sha256(a.units)},
-                              {"path": str(VILLAGES.relative_to(ROOT)), "bytes": VILLAGES.stat().st_size, "sha256": sha256(VILLAGES)},
-                              {"path": str(DISTRICTS.relative_to(ROOT)), "bytes": DISTRICTS.stat().st_size, "sha256": sha256(DISTRICTS)}],
+                   "inputs": [{"path": str(a.units), "bytes": Path(a.units).stat().st_size, "sha256": sha256(a.units)}, entry(VILLAGES), entry(PANCHAYATS), entry(DISTRICTS), entry(LAYER_RECORD)],
                    "method": {"assigned_by": "the district name the DataMeet polygon carries (Census 2001), turned into a Census-2011 code through the coded polygons",
-                              "checked_by": f"the share, by Census-2011 district, of a {COLLAR_M:g} m collar round the unit that falls on coded villages",
-                              "ambiguous": f"the two largest shares within {AMBIGUOUS_WITHIN} of each other", "collar_crs": WORK_CRS,
-                              "note": "there is no district boundary file in 00_raw/; the DataMeet layer's own district names are the only district geometry among the inputs"},
-                   "checks_passed": {"units_are_the_uncoded_polygons_one_for_one": int(len(res)), "assigned_by": {k: int(n_) for k, n_ in res["assigned_by"].value_counts().items()}, "names_2001_to_codes_2011_one_to_one": int(len(by_name)),
-                                     "share_of_a_names_coded_polygons_with_its_code_min": round(float(purity.min()), 5), "every_unit_has_a_district": True},
-                   "counts": {"outside_village_units": int(len(res)), "label_kept_though_it_differs_from_the_neighbours": kept_though_differing, "districts_with_such_units": int(summary["outside_village_units"].gt(0).sum()), **{f"at_{COLLAR_M:g}_m": d},
-                              "by_collar_m": {f"{k:g}": x for k, x in tried.items()}},
-                   "tables": {"outside_village_district.csv": {"rows": int(len(res)), "columns": int(len(res.columns)), "blank_cells": {c: int(res[c].isna().sum()) for c in res.columns if res[c].isna().any()}},
+                              "overridden_when": "no coded village of the named district lies in the collar by either tally, AND the unit is at least half covered by panchayat polygons and its area majority is another district, AND that district is the neighbours' largest",
+                              "no_name": "the area majority where the unit is at least half covered; otherwise the neighbours' largest district by the tally by 2001 name",
+                              "area_majority": f"the share of the unit's own area on the panchayat polygons of each district ({PANCHAYATS.name}); measurable where at least {COVER_MIN} of the unit is covered",
+                              "neighbours": f"the share, by district, of a {COLLAR_M:g} m collar round the unit that falls on coded villages, tallied by their 2001 names (used) and by their 2011 codes (reported)",
+                              "ambiguous": f"the two largest districts within {AMBIGUOUS_WITHIN} of each other: of the unit's own area where the area majority is measurable, otherwise of the collar", "shares_measured_in": WORK_CRS,
+                              "note": "00_raw/ holds no district boundary file. It holds panchayat polygons with a district code, which cover about a third of this land; the method asked for (area majority) is applied where they allow"},
+                   "how_good_each_source_is_on_villages_whose_district_is_known": calib,
+                   "checks_passed": {"units_are_the_uncoded_polygons_one_for_one": int(len(res)), "count_and_area_equal_the_layers_own_record": True, "names_2001_to_codes_2011_one_to_one": int(len(by_name)),
+                                     "share_of_a_names_coded_polygons_with_its_code_min": round(float(purity.min()), 5), "every_unit_has_a_district": True, "largest_cover_of_a_unit_by_panchayat_polygons": round(float(cover.max()), 4)},
+                   "counts": counts,
+                   "tables": {"outside_village_district.csv": {"rows": int(len(res)), "columns": int(len(res.columns)), "blank_cells": blank},
                               "outside_village_district_summary.csv": {"rows": int(len(summary)), "columns": int(len(summary.columns))}},
                    "versions": {"python": sys.version.split()[0], "geopandas": gpd.__version__, "shapely": shapely.__version__, "pandas": pd.__version__}}, fh, indent=2)
-    how = {k: int(n_) for k, n_ in res["assigned_by"].value_counts().items()}
-    print(f"\noutside_village_district.csv: n = {len(res):,} units, every one with a district; assigned by: {how}; {int(summary['outside_village_units'].gt(0).sum())} districts have such units")
-    print(f"  of the {d['label_differs_from_neighbours']} units whose label differs from the neighbours' district, the label is kept in {kept_though_differing} (its district is present round the unit) and overridden in {how.get(chr(110) + 'eighbours: the label' + chr(39) + 's district is nowhere round the unit', 0)}")
-    print(f"  check by neighbours, {COLLAR_M:g} m collar: {d['with_a_coded_neighbour']:,} units have a coded neighbour, {d['without']:,} have none; "
-          f"AMBIGUOUS (two districts within {100 * AMBIGUOUS_WITHIN:g} points): {d['ambiguous']:,}; the label differs from the neighbours' district in {d['label_differs_from_neighbours']:,}, "
-          f"of which {d['label_differs_and_not_ambiguous']:,} are not ambiguous")
-    print("  the same at other collars:", {f"{k:g} m": x for k, x in tried.items()})
-    pd.set_option("display.width", 200)
+    am, cl = counts["area_majority"], counts[f"collar_{COLLAR_M:g}_m"]
+    print(f"\noutside_village_district.csv: n = {len(res):,} units, every one with a district; {counts['districts_with_such_units']} districts have such units. Assigned by:")
+    for k_, x in counts["assigned_by"].items():
+        print(f"    {k_}: {x['units']:,} units, {x['km2']:,.1f} km2")
+    print(f"  AREA MAJORITY (the method asked for) is measurable for {am['measurable_units_at_least_half_covered']['units']:,} units ({am['measurable_units_at_least_half_covered']['km2']:,.0f} km2) and not for "
+          f"{am['not_measurable']['units']:,} ({am['not_measurable']['km2']:,.0f} km2). Where measurable it agrees with the assigned district in {am['agrees_with_the_assigned_district']['units']:,} and names another in "
+          f"{am['names_another_district']['units']} ({am['names_another_district']['km2']:,.1f} km2). AMBIGUOUS BY AREA (two districts within {100 * AMBIGUOUS_WITHIN:g} points of the unit's area): {am['ambiguous_by_area_two_districts_within_5_points_of_the_units_area']['units']}")
+    print(f"  NEIGHBOURS, {COLLAR_M:g} m collar: {cl['with_a_coded_neighbour']:,} units have a coded neighbour, {cl['without']:,} have none; ambiguous by the tally by name {cl['ambiguous_tally_by_name']}, by code {cl['ambiguous_tally_by_code']}; "
+          f"the named district is absent from the collar in {cl['label_absent_from_the_collar']}: {cl['label_absent_and_overridden_two_checks']} overridden (the area majority agrees with the neighbours), {cl['label_absent_and_kept_one_check_only']} kept and flagged")
+    print(f"  flagged, not moved (one check contradicts the assigned district): {counts['flagged_not_moved_one_check_contradicts_the_assigned_district']['units']} units, {counts['flagged_not_moved_one_check_contradicts_the_assigned_district']['km2']:,.1f} km2; "
+          f"no check possible: {counts['no_check_possible_neither_covered_nor_with_a_coded_neighbour']['units']} units, {counts['no_check_possible_neither_covered_nor_with_a_coded_neighbour']['km2']:,.1f} km2")
+    print("  the collar at other widths:", json.dumps(counts["by_collar_m"]))
+    print(f"  blank cells: {blank}")
+    pd.set_option("display.width", 220)
     print(summary.to_string(index=False))
     print(f"run_utc {started}; outputs in {OUT.relative_to(ROOT)}/")
 

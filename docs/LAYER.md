@@ -1,6 +1,6 @@
 # The demo layer — `60_layer/`
 
-*Built by `scripts/06_build_layer.py` (run 2026-10-07T08:10:28Z) from the stage tables named below; page in
+*Built by `scripts/06_build_layer.py` (run 2026-10-07T08:28:39Z) from the stage tables named below; page in
 `scripts/layer_template.html`; checked by `scripts/verify_layer.py`. Every figure in this document is from
 `60_layer/layer.provenance.json`, a table it names, or the check record. n = 11,468 units throughout:
 3,492 outside-village units and 7,976 LGD panchayat units.*
@@ -13,11 +13,11 @@ Security. It needs no stage 4 and no NIRv, and it argues nothing: it shows what 
 | file | bytes | what |
 |---|---|---|
 | `index.html` | 177,426 | the map. Leaflet 1.9.4 (BSD 2-Clause) is inside it |
-| `data.js` | 18,317,371 | the unit shapes and every value and class the map shows. Keep it beside `index.html` |
+| `data.js` | 18,317,780 | the unit shapes and every value and class the map shows. Keep it beside `index.html` |
 | `layer_by_unit.csv` | — | the numbers the map shows, one row per unit, 73 columns. Not needed to view the map |
 | `layer.provenance.json` | — | inputs with hashes, the UTC run time, the simplification and its error, classes, checks |
 
-**To open: double-click `index.html`.** The two files together are 18,494,797 bytes (18.49 MB; the limit set was
+**To open: double-click `index.html`.** The two files together are 18,495,206 bytes (18.50 MB; the limit set was
 25 MB) and 5.42 MB zipped, so they can be e-mailed as one zip. The page makes **0 network
 requests**: no map tiles, no fonts, no library fetched. It will open the same way with no connection, and in two
 years. There is consequently no base map under the units — district outlines and names, drawn from the units
@@ -263,7 +263,7 @@ no rounding. Inputs of the run:
 |---|---|---|
 | `10_units/units.gpkg` | 48,369,664 | `ee86f0c3ac99c0c4…` |
 | `00_raw/cfr_fra/odisha_fra_mpr_district_2025-12-31.csv` | 6,289 | `a2e2cc9c7df1a9b1…` |
-| `10_units/outside_village_district.csv` | 352,976 | `81f71aa7006ed3c5…` |
+| `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c…` |
 | `20_degradation/degradation_by_unit.csv` | 3,628,329 | `072e281b53087823…` |
 | `20_degradation/corestack_by_unit_bands.csv` | 2,902,891 | `d59e23e87b62c37b…` |
 | `20_degradation/agreement_by_unit.csv` | 2,145,059 | `36f177e75b325055…` |
@@ -271,10 +271,10 @@ no rounding. Inputs of the run:
 | `40_allocation/allocation_by_unit.csv` | 1,072,899 | `3f81d2d3edefda9f…` |
 | `20_degradation/hansen_by_unit_level.csv` | 1,090 | `46d77ed69eac08ca…` |
 | `20_degradation/forest_floor_options.csv` | 1,636 | `f7bb4e1859aa7c6a…` |
-| `20_degradation/agreement.provenance.json` | 7,039 | `640bc1f63b58478e…` |
+| `20_degradation/agreement.provenance.json` | 7,039 | `c7557f683c0af31c…` |
 | `20_degradation/forest_floor_repeatability.csv` | 991 | `800c61adc7c22132…` |
 | `20_degradation/agreement_summary.csv` | 10,725 | `bbd59a6a06261b1e…` |
-| `20_degradation/agreement_intervals_by_district.csv` | 2,936 | `d3425a99e82471f8…` |
+| `20_degradation/agreement_intervals_by_district.csv` | 2,936 | `361c7ceba1bd5d4f…` |
 | `40_allocation/panchayat_of_record_check.csv` | 363 | `f36e1bd24b73ce67…` |
 | `10_units/units.provenance.json` | 1,706 | `7a7aa9077c79b68d…` |
 | `20_degradation/hansen.provenance.json` | 8,637 | `d6e816740e7dd41a…` |
@@ -367,7 +367,7 @@ The legend on the agreement and Scheduled Tribe layers, the 1 ha floor and the t
 
 **Then every unit, by script**, because sixteen is not 11,468: `scripts/verify_layer.py` rebuilds every displayed
 field of every unit from the stage tables — not from `layer_by_unit.csv` — and every class at both floors, and
-compares them with what `data.js` holds: **78 of 78 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays**. On its first run it failed 6 of 77 checks, and they were real
+compares them with what `data.js` holds: **79 of 79 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays**. On its first run it failed 6 of 77 checks, and they were real
 (CoRE Stack shares built from two tables rounded differently, so six classes summed to 99.97 per cent; units classed
 on an unrounded value that printed on the other side of a class boundary). Both were fixed in the builder.
 
@@ -377,14 +377,18 @@ Chrome loaded `file://…/60_layer/index.html` with a unit and a layer in the ad
 unit's panel and that layer's legend, with no script error.
 
 **The build that was clicked, and the builds since.** The sixteen units were clicked on the build of
-2026-10-06T20:43:03Z. The layer has been rebuilt twice since, after the review pass of 7 October: once when
-`degradation_by_unit.csv` gained one empty NIRv column, and once to replace the interval quoted in the *About* text
-with the one from resampling whole districts (`docs/DEGRADATION.md` §4b) and to record every file the builder reads.
-Neither touched a per-unit value: the tables behind every displayed field are byte for byte the same, and
-`verify_layer.py` passed after each (78 of 78 checks passed on the build of 2026-10-07T08:10:28Z). After the last rebuild the map was
-opened from disk once more in headless Chrome with a unit in the address: the unit's panel, its forest area and the
-agreement legend were on the rendered page. The changed sentence was confirmed in `data.js`; the *About* panel was
-not opened on screen again.
+2026-10-06T20:43:03Z. The layer has been rebuilt three times since, after the review pass of 7 October: when
+`degradation_by_unit.csv` gained one empty NIRv column; to replace the interval quoted in the *About* text with the one
+from resampling whole districts (`docs/DEGRADATION.md` §4b) and to record every file the builder reads; and when the
+district of the outside-village units was redone (`docs/UNITS.md`). The first two touched no per-unit value. **The
+third changed one displayed field, the district line, for outside-village units**: 21 of them carry a different
+district, and 52 a different line in all (the way the district was assigned, or the ambiguity flag). 2 of the
+sixteen clicked units are among those (`OUTSIDE_1229`, `OUTSIDE_3062`); their new district lines, and that of `OUTSIDE_1200`,
+the unit the review singled out, were read off the page again, from disk, in headless Chrome, and equal
+`outside_village_district.csv` (3 of 3 lines equal: OUTSIDE_1229, OUTSIDE_3062, OUTSIDE_1200). Every other field of every unit rests on
+tables that are byte for byte the same, and `verify_layer.py` passed after each rebuild (79 of 79 checks passed on the
+build of 2026-10-07T08:28:39Z); it now also checks that each outside-village unit's line says the way *its* district was
+assigned. The changed sentence of the *About* text was confirmed in `data.js`; the panel was not opened on screen again.
 
 **Not checked:** the type and district filters and the search box, beyond their loading; any browser other than Chrome; a phone or a small screen; printing; a machine with less memory
 (the data file is 18 MB of script); and whether the Foundation's staff read the class names as intended.

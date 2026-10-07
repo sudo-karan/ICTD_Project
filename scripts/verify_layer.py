@@ -81,6 +81,13 @@ district = pd.Series(code).map(dn).to_numpy()
 check("district: the name shown begins with the district of the unit's Census code, or of outside_village_district.csv", all(str(F[i, 3]).split(" (")[0] == district[i] for i in range(n)),
       f"{len(set(district))} districts; {int(sum('(by ' in str(x) for x in F[:, 3])):,} carry how they were assigned")
 check("district: an outside-village unit, and only one, says how its district was assigned", all(("(by " in str(F[i, 3])) == bool(out[i]) for i in range(n)))
+words = {"label": "name on the DataMeet polygon)", "two checks against the label": "which both contradict the name on the polygon",
+         "area majority: the polygon has no district name": "panchayat polygons under it (the polygon carries no district name",
+         "neighbours: the polygon has no district name": "its neighbours (the polygon carries no district name"}
+by = od["assigned_by"].reindex(ids)
+check("district: each outside-village unit says the way ITS district was assigned, as outside_village_district.csv has it",
+      set(by[out].dropna()) <= set(words) and all(sum(w in str(F[i, 3]) or (k == "label" and str(F[i, 3]).split(",")[0].endswith("name on the DataMeet polygon")) for k, w in words.items() if k == by.iloc[i]) == 1
+                                                 and sum(w.rstrip(")") in str(F[i, 3]) for w in words.values()) == 1 for i in range(n) if out[i]), str(by[out].value_counts().to_dict()))
 amb = od["ambiguous"].reindex(ids).fillna(0).to_numpy()
 check("district: the units flagged ambiguous are those of outside_village_district.csv", all(("ambiguous" in str(F[i, 3])) == bool(amb[i]) for i in range(n)), f"{int(amb.sum())} ambiguous")
 same(4, fmt(g["area_ha"], " ha"), "area")

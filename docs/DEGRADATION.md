@@ -254,7 +254,7 @@ number of pixels apart), so nothing is resampled; they both have a value on 17.5
 
 ### 4b. Do Hansen and CoRE Stack point at the same units? (task D)
 
-**State: built for all 11,468 units (run 2026-10-07T07:55:00Z), from the two sources' own per-unit tables; no Earth Engine. Its
+**State: built for all 11,468 units (run 2026-10-07T08:26:04Z), from the two sources' own per-unit tables; no Earth Engine. Its
 arithmetic was then rebuilt by a script that imports nothing from the builder (`scripts/verify_agreement.py`:
 55 of 55 checks passed; its docstring lists what it re-derives and what it only checks — the bootstrap intervals are
 checked, not rebuilt).** Tables: `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`, and three
@@ -310,9 +310,9 @@ assume*, below.
 
 | | units | insufficient forest | assessed | flagged by Hansen | flagged by CoRE Stack | **by both** | expected if unrelated | observed / expected | odds ratio | Hansen only | CoRE Stack only | neither |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| all units | 11,468 | 7,757 | 3,711 | 742 | 742 | **255** | 148.4 | 1.72 (1.34–2.34) | 2.67 (1.70–4.39) | 487 | 487 | 2,482 |
+| all units | 11,468 | 7,757 | 3,711 | 742 | 742 | **255** | 148.4 | 1.72 (1.34–2.33) | 2.67 (1.70–4.37) | 487 | 487 | 2,482 |
 | LGD panchayat units | 7,976 | 5,472 | 2,504 | 456 | 391 | **129** | 71.2 | 1.81 (1.24–2.76) | 2.69 (1.40–5.48) | 327 | 262 | 1,786 |
-| outside-village units | 3,492 | 2,285 | 1,207 | 286 | 351 | **126** | 83.2 | 1.51 (1.29–2.05) | 2.44 (1.78–4.19) | 160 | 225 | 696 |
+| outside-village units | 3,492 | 2,285 | 1,207 | 286 | 351 | **126** | 83.2 | 1.51 (1.29–2.05) | 2.44 (1.78–4.22) | 160 | 225 | 696 |
 
 Rank correlation (Spearman) across assessed units between the Hansen rate 2017–2023 and each CoRE Stack rate, with
 the same intervals. Class 1, *improvement*, is the placebo: it comes from the same classifiers as class −1 and should
@@ -322,18 +322,18 @@ not go with clearance.
 |---|---|---|---|---|---|
 | all units | 0.36 (0.22–0.47) | 0.25 (0.10–0.39) | 0.36 | 0.18 (0.07–0.26) | 0.03 (−0.12 to 0.14) |
 | LGD panchayat units | 0.37 (0.18–0.51) | 0.24 (0.08–0.40) | 0.36 | 0.15 (0.03–0.26) | 0.03 (−0.12 to 0.15) |
-| outside-village units | 0.32 (0.24–0.41) | 0.23 (0.13–0.36) | 0.32 | 0.32 (0.21–0.41) | −0.00 (−0.15 to 0.11) |
+| outside-village units | 0.32 (0.23–0.42) | 0.23 (0.13–0.36) | 0.32 | 0.32 (0.21–0.41) | −0.00 (−0.15 to 0.11) |
 
 **What the intervals assume.** The intervals in `agreement_summary.csv` resample units one at a time, as if each unit
 were an independent draw. They are not — neighbouring units share forest, terrain and administration — and what that
-assumption hides shows when whole districts are resampled instead: every interval is 2.7 to 4.7 times wider (all units):
+assumption hides shows when whole districts are resampled instead: every interval is 2.7 to 4.8 times wider (all units):
 
 | | estimate | 95 % interval, units resampled singly | **whole districts resampled** | times wider |
 |---|---|---|---|---|
-| odds ratio | 2.67 | 2.20–3.19 | **1.70–4.39** | 2.7 |
-| observed / expected | 1.72 | 1.57–1.87 | **1.34–2.34** | 3.3 |
-| rank correlation with class −1 | 0.36 | 0.34–0.39 | **0.22–0.47** | 4.5 |
-| with class −1 minus class 1 | 0.25 | 0.21–0.27 | **0.10–0.39** | 4.7 |
+| odds ratio | 2.67 | 2.20–3.19 | **1.70–4.37** | 2.7 |
+| observed / expected | 1.72 | 1.57–1.87 | **1.34–2.33** | 3.3 |
+| rank correlation with class −1 | 0.36 | 0.34–0.39 | **0.22–0.47** | 4.6 |
+| with class −1 minus class 1 | 0.25 | 0.21–0.27 | **0.10–0.39** | 4.8 |
 | with class −2 | 0.18 | 0.15–0.21 | **0.07–0.26** | 3.0 |
 | with class 1 (the placebo) | 0.03 | −0.00 to 0.06 | **−0.12 to 0.14** | 4.1 |
 
@@ -342,13 +342,13 @@ are a lower bound on the uncertainty. With 28 clusters they are rough themselves
 bound stays above 1 in both kinds of unit. In every resample the flags are those of the full sample.
 
 Is the agreement only that both measures are high in the same districts? No. The odds ratio **within districts**
-(Mantel–Haenszel, pooled over the districts) is 2.37 for all units, 2.89 in the LGD panchayat units and 2.16 in the
+(Mantel–Haenszel, pooled over the districts) is 2.33 for all units, 2.89 in the LGD panchayat units and 2.10 in the
 outside-village units, against 2.67 overall: the agreement holds unit by unit inside a district.
 
 **What this shows.**
 
 1. **The two measures agree more than chance, and far from fully.** 255 units are in the top fifth on both, against
-   148 expected of unrelated flags: 1.72 times as many, odds ratio 2.67 (1.70–4.39). But 487 units are flagged by
+   148 expected of unrelated flags: 1.72 times as many, odds ratio 2.67 (1.70–4.37). But 487 units are flagged by
    Hansen alone and 487 by CoRE Stack alone: of the units either measure puts in its worst fifth, 34 per cent are in
    the other's. Where both flag a unit the claim that it degraded is as strong as these two sources can make it. Where
    one does, the table says which, and neither is preferred.
@@ -1030,7 +1030,7 @@ What was applied, and where:
 | the assembly, `degradation_by_unit.csv` (task 1 of 7 October) | **one careful pass**: the script's own gates — every unit once, the yearly columns adding to the total, the > 30 band equal to the Hansen table, and 66 sums against the three sources' own summary tables — and an independent reviewer who rebuilt the columns from the sources (*The careful pass of 7 October*, below) |
 | agreement table (§4b, task D) | **its arithmetic checked directly**: `scripts/verify_agreement.py` shares no code with the builder and rebuilds, from the two sources' per-unit tables, each unit's reference land, rates, flags and class and every count, expected count, odds ratio and rank correlation of the summary — 55 of 55 checks passed; n = 11,468 units, 3,711 assessed. Then **one careful pass** by an independent reviewer (below) |
 | housekeeping: a district for each outside-village unit, the git repository (task 5) | **one careful pass**: the script's gates and an independent reviewer (below) |
-| the demo layer, `60_layer/` (task 6; `docs/LAYER.md`) | **by hand, in a browser**: the map was opened, 16 units were clicked — forest from none to the largest, both kinds of unit — and all 656 values displayed for them were read off the page and compared with the stage tables. Then, because sixteen is not 11,468, `scripts/verify_layer.py` rebuilt every displayed field of every unit from the stage tables: 78 of 78 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays |
+| the demo layer, `60_layer/` (task 6; `docs/LAYER.md`) | **by hand, in a browser**: the map was opened, 16 units were clicked — forest from none to the largest, both kinds of unit — and all 656 values displayed for them were read off the page and compared with the stage tables. Then, because sixteen is not 11,468, `scripts/verify_layer.py` rebuilt every displayed field of every unit from the stage tables: 79 of 79 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays |
 | minimum forest area (§4c, task E) | one careful pass; it is arithmetic on the replicated Hansen table |
 | stage 0 rebuild, manifest rows, README and docs edits | one careful pass, with byte-level checks where a check exists |
 
@@ -1264,7 +1264,7 @@ again; the findings of the first two were reproduced here instead of by second a
 - *The agreement table.* The reviewer recomputed the summary and definitions tables with a percentile and a rank
   correlation written by hand, and every unit's class in the three windows (its count: 702 and 180 cells, 0 differing).
   **No number failed to reproduce; four findings changed what §4b says.** (1) The intervals resampled units singly, as
-  if independent. Resampling whole districts makes them 2.7 to 4.7 times wider; those are now the intervals quoted, with
+  if independent. Resampling whole districts makes them 2.7 to 4.8 times wider; those are now the intervals quoted, with
   the odds ratio within districts beside them (`agreement_intervals_by_district.csv`). (2) "The placebo behaves" was
   true pooled and in one of CoRE Stack's two zone models and false in the other; §4b says so now, from
   `agreement_by_zone.csv`. (3) The evidence cited for the 50 ha floor was measured on the `treecover2000` > 30 mask,
@@ -1281,7 +1281,29 @@ again; the findings of the first two were reproduced here instead of by second a
   and repeatability tables exactly, the district intervals to within the difference between two random streams.
   `agreement_by_unit.csv` and `agreement_summary.csv` are byte for byte what they were before the pass, so nothing
   downstream of them moved.
-- *The housekeeping* (the districts of the outside-village units, the git repository). **This reviewer had not reported when this was written.**
+- *The housekeeping: a district for each outside-village unit, and the git repository.* The reviewer redid the collar
+  for all 3,492 units with code of its own and matched the delivered table in every one; the mapping of names to
+  codes, the counts and the summary reproduced. **And it found the premise false.** The script, its record, the README
+  and `docs/UNITS.md` all said the DataMeet layer was the only district geometry among the inputs. It is not:
+  `00_raw/04_boundaries/` holds panchayat polygons with a district code, which stage 3 already reads. They cover
+  35.1 per cent of the outside-village land, so the method that was asked for — the majority of a unit's own area — can be
+  applied to 2,170 units and was applied to none. Three of its four findings of weight went to a second agent told to
+  refute them, and none was refuted; all four were reproduced here. The other three: a unit placed in Kendrapara, 42 km from the nearest village of
+  that district (the reviewer's measurement), because a unit moved off its name took its district from the tally by
+  2011 code, which the layer's miscoded villages contaminate; a sensitivity row that compared the 250 m collar with
+  the districts already assigned at 100 m instead of with the names (60 where it should have read 92); and an override
+  that rested on the claim that a name absent from the collar "cannot be right", which the panchayat polygons
+  contradict for 3 of the 16 overridden units they cover. **The script was rewritten** (`docs/UNITS.md`): the name is
+  kept, because on villages whose district is known it is right for 99.92 per cent against 97.88 for the area
+  majority; the area majority is computed wherever it can be and reported beside it; a name is overridden only where
+  both checks contradict it (13 units, not 32); ambiguity is the quantity asked for where that can be measured (3 units).
+  21 units changed district. The agreement table's district intervals and the layer were rebuilt on the new table.
+  Lesser things, fixed: blank cells are counted in the file as written; the count and area of these units are held to
+  the layer's own record, where the old gate compared a table with itself. *Git:* 64 files tracked; the reviewer found
+  no credential in the tree or in the history, and nothing tracked under the raw-data folders, the stage folders or the
+  scratch folder. Left for the project owner: 1 tracked file over 1 MB (`00_raw/05_forest_reference/gfw_IND.xlsx`), which the `.gitignore`'s own
+  comment would keep out; and every commit carries the machine's git identity, a work address, which is worth a look
+  before anything is pushed.
 
 The reviewers' own scripts are in `.session_scratch_2026-10-05/careful_pass/`, with the sandbox tests of the assembler
 and of the verifier.

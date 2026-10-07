@@ -416,8 +416,11 @@ def main():
     # ---- what the panel says for a unit: every string made here ---------------------------------------------------------------------
     nd, nc = "not defined: no such land in this unit", "no census data for this land"
     type_label = np.where(outside, "Outside-village unit: land outside any revenue village", "LGD panchayat unit")
-    how = {"label": "the name on the DataMeet polygon", "neighbours: the polygon has no district name": "its neighbours (the polygon carries no district name)",
-           "neighbours: the label's district is nowhere round the unit": "its neighbours (the polygon's own label names a district that is nowhere round it)"}
+    how = {"label": "the name on the DataMeet polygon", "two checks against the label": "the panchayat polygons under it and its neighbours, which both contradict the name on the polygon",
+           "area majority: the polygon has no district name": "the panchayat polygons under it (the polygon carries no district name)",
+           "neighbours: the polygon has no district name": "its neighbours (the polygon carries no district name)"}
+    if not set(T.loc[outside, "district_assigned_by"]) <= set(how):
+        fails.append(f"outside_village_district.csv has a way of assigning a district that the map has no words for: {sorted(set(T.loc[outside, 'district_assigned_by']) - set(how))}")
     flag = np.where(T["forest_ha"] < 1, "Under 1 ha of forest: this unit cannot be assessed for forest loss.",
                     np.where(T["forest_ha"] < 50, "Under 50 ha of forest: a loss rate on this little forest is mostly noise.", ""))
     F = []
@@ -425,7 +428,7 @@ def main():
         o = bool(r.outside_village)
         F.append([
             r.unit_name or "(no name on the polygon)", r.unit_id, type_label[i],
-            r.district + (" (by " + how[r.district_assigned_by] + (", ambiguous: two districts lie round it almost equally" if r.district_ambiguous else "") + ")" if o else ""),
+            r.district + (" (by " + how[r.district_assigned_by] + (", ambiguous: two districts within 5 points of each other" if r.district_ambiguous else "") + ")" if o else ""),
             ha(r.area_ha), ha(r.forest_ha), pct(r.forest_pct_of_area), ha(r.land_tc_gt10_ha),
             ha(r.hansen_loss_ha), pct(r.hansen_loss_pct_of_forest) or nd, ha(r.hansen_loss_ha_2017_2023),
             ha(r.land_ha_tc_gt10le30), ha(r.hansen_loss_ha_tc_gt10le30), pct(r.hansen_loss_pct_of_land_tc_gt10le30) or nd, ha(r.land_ha_tc_le10), ha(r.hansen_loss_ha_tc_le10), ha(r.hansen_loss_ha_tc_eq0),

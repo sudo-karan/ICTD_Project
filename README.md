@@ -132,7 +132,7 @@ methods section of the paper writable.
 | `aggregate_nrega_assets.py` | district GeoJSON → MIS panchayat code × FY × category (the 10-digit code in `Work Code`; **not** the analysis unit). Run 5 Oct 2026: reproduces the verified totals; self-checks two districts. |
 | `build_odisha_villages_datameet.py` | rebuilds the village polygon layer. Run; reproduces the delivered file exactly. |
 | `01_build_units.py` | stage 0. Run in all four modes against the real 52,531-polygon layer and the real LGD mapping, 5 Oct 2026; writes a provenance record beside each layer. |
-| `01_assign_outside_district.py` | stage 0, an addition. A district for each of the 3,492 outside-village units. There is no district boundary file in `00_raw/`, so it is not a spatial majority against one: each unit takes the district its DataMeet polygon names, checked against the coded villages within 100 m. Run 2026-10-06T19:19:40Z. For descriptive tables and the layer only (`docs/UNITS.md`). |
+| `01_assign_outside_district.py` | stage 0, an addition. A district for each of the 3,492 outside-village units: the district its DataMeet polygon names, checked two ways — against the area majority on the panchayat polygons of `00_raw/04_boundaries/` (the method asked for; they cover 35.1 per cent of this land) and against the coded villages within 100 m — and overridden only where both contradict it. Run 2026-10-07T08:21:28Z. For descriptive tables and the layer (`docs/UNITS.md`). |
 | `02_upload_units_asset.py` | stage 1, step a. Puts a unit layer into Earth Engine as one table asset, unsimplified, in parts under Earth Engine's 10,485,760-byte request limit, with edges sent as geodesics; then reads every unit's geometry back and measures it against the layer. Run 5 Oct 2026; the asset was re-exported without its area column and re-checked on 6 Oct 2026. |
 | `_ee_units.py` | not a step and writes nothing: the zonal-statistics machinery the stage-1 builders share, so that all of them sum pixel areas over the units, and gate them, in the same way. |
 | `02_build_hansen.py` | stage 1. Forest (`treecover2000` > 30) and Hansen tree-cover loss per unit and year, with the same at > 10, > 50 and ≥ 30, and loss split by year-2000 canopy band; reconciles state totals to Global Forest Watch's published figures. Run 5 Oct 2026 (UTC) on the rebuilt layer; all gates passed. Independently replicated twice without Earth Engine (`docs/DEGRADATION.md` §8). It replaces `02_build_degradation.py`, which built the mask as ≥ 30. |
@@ -142,7 +142,7 @@ methods section of the paper writable.
 | `02_build_nirv.py` | stage 1, the NIRv column. NIRv per unit from the two stored layers, with two yearly values side by side: date-standardised (the reported columns) and the first design's median (`_unadjusted`). Before anything is summed it re-derives the stored values at 4,000 random pixels and stops if they disagree; it also stops unless the blocks and the tiles cover the same land in every unit and season. Then trend and exact test per pixel, a measured false-alarm rate, a check that the value no longer follows the date, and how much the result hangs on the fitted rate. **Not run for the state.** Tested band by band against a local recomputation and run whole on a few real units. |
 | `check_nirv_blocks.py` | stage 1, the NIRv column; writes nothing but a log. The 13 blocks of yearly values were queued before the tiles they read were finished. This checks, per block, that its export started after the last successful export of every tile under it; that the scene list it was queued with gives every scene the same day as the list on disk; and (`--probe`) that on a box of one block the cells with a stored pass are exactly the cells the tiles hold an observation for. Exit 0 pass, 1 fail, 3 not decidable yet. |
 | `run_nirv_chain.py` | stage 1, the NIRv column: the driver. One process that reads Earth Engine's own task records, waits for the tiles and the blocks, runs the check, `02_build_nirv.py` and `02_assemble_degradation.py` in order, each only if the one before passed, and cancels a task that uses far more compute than was measured for its kind. It resubmits nothing that failed and stops, saying why, in `logs/nirv_chain.log`. `--self-test` runs its decisions on made-up queues. **Running** since 6 Oct 2026 19:39 UTC. |
-| `02_build_agreement.py` | stage 1. Hansen beside CoRE Stack, unit by unit, from the two sources' own tables (no Earth Engine): each unit's rate on one reference land (`treecover2000` > 10), a flag for the worst fifth on each measure, and the class *both / Hansen only / CoRE Stack only / neither / insufficient forest*. Headline window 2017–2023; 2019–2022 and Hansen's full span in rows of their own, never pooled. Run 2026-10-07T07:55:00Z. The three-measure version of 6 Oct is in the repository's first commit only. |
+| `02_build_agreement.py` | stage 1. Hansen beside CoRE Stack, unit by unit, from the two sources' own tables (no Earth Engine): each unit's rate on one reference land (`treecover2000` > 10), a flag for the worst fifth on each measure, and the class *both / Hansen only / CoRE Stack only / neither / insufficient forest*. Headline window 2017–2023; 2019–2022 and Hansen's full span in rows of their own, never pooled. Run 2026-10-07T08:26:04Z. The three-measure version of 6 Oct is in the repository's first commit only. |
 | `verify_agreement.py` | stage 1 check; writes nothing. Rebuilds the agreement tables' arithmetic from the sources, importing nothing from the builder: 55 of 55 checks passed; n = 11,468 units, 3,711 assessed. Its docstring lists what it re-derives and what it only checks (the bootstrap intervals). |
 | `02_assemble_degradation.py` | stage 1, last. Copies the sources' columns into `degradation_by_unit.csv`, one row per unit, and gates 66 sums against the sources' own summary tables. Hansen and CoRE Stack are required; NIRv is optional — while it is not built its columns are blank and `nirv_status` is `pending`. Run 2026-10-06T21:26:10Z: 11,468 rows × 63 columns, NIRv pending. |
 | `02_propose_forest_floor.py` | stage 1, a recommendation only: how many units, and how much forest and loss, survive a minimum forest area. Changes no stage-1 output. Run 5 Oct 2026 (UTC). |
@@ -175,11 +175,14 @@ mapping has 8,152 ids for Odisha against 6,645 distinct name-and-district pairs 
 `lgd_panchayat` everywhere. `docs/UNITS.md` has the counts.
 
 **A district for the outside-village units** (`10_units/outside_village_district.csv`, 7 Oct 2026). They have no
-census code, so `pc11_district_code` is blank for them in `units.gpkg`, and there is no district boundary file in
-`00_raw/` to lay them on. Each is one DataMeet polygon, and takes the district that polygon names (3,441 units),
-or its coded neighbours' where it names none (19) or names one that is nowhere round it (32). 5 are
-ambiguous by the neighbour test and 354 have no coded neighbour within 100 m. **For descriptive tables and the layer
-only: these units stay out of any regression.**
+census code, so `pc11_district_code` is blank for them in `units.gpkg`. `00_raw/` has no file of district boundaries;
+it has panchayat polygons with a district code (`00_raw/04_boundaries/`), which cover 35.1 per cent of this land. So each
+unit takes the district its DataMeet polygon names (3,460 units), which is right for 99.92 per cent of the villages it
+can be scored on, and the area majority against the panchayat polygons — the method asked for — is the check where
+it can be taken: 2,170 units, 21 per cent of the land. It names another district in 63 of them (flagged, not
+moved); 3 are ambiguous by area (two districts within 5 points). 13 units are moved off their name because that check
+and their neighbours both contradict it; 19 polygons carry no name. **For descriptive tables and the layer:
+these units stay out of any regression.**
 
 **The base layer covers 154,929.33 km², ellipsoidal, WGS84** (ruling of 6 Oct 2026). That is the area of the
 polygons on the WGS84 ellipsoid, it is what `area_ha` holds, and the figure is frozen: quote it from here or
@@ -247,12 +250,12 @@ correction for the date of each image. **NIRv is a reported column, not a measur
   its rate is in the worst fifth of the assessed units. **Headline window 2017–2023** — the span of the CoRE Stack
   product, and the years in which plantation went from 24.2 per cent of Odisha's scheme expenditure (2016-17) to
   3.3 (2018-19): 255 units are flagged by both, against 148 expected of unrelated flags (odds ratio 2.67,
-  95 % interval 1.70–4.39); 487 by Hansen alone, 487 by CoRE Stack alone, 2,482 by neither. Rank
+  95 % interval 1.70–4.37); 487 by Hansen alone, 487 by CoRE Stack alone, 2,482 by neither. Rank
   correlation of the two rates 0.36 (0.22–0.47). They agree more than chance and far from fully; where one flags a unit and the
   other does not, say which. Three things to carry with the figure. **(1) Quote the intervals from
   `agreement_intervals_by_district.csv`**, which resamples whole districts, as above; the ones in the summary table
   treat units as independent and are 2.7 times too narrow for the odds ratio. Within districts the odds ratio is
-  2.37: the agreement is not only that both are high in the same districts. **(2) The placebo is clean in one
+  2.33: the agreement is not only that both are high in the same districts. **(2) The placebo is clean in one
   of CoRE Stack's two zone models and not in the other** (`agreement_by_zone.csv`): the Hansen rate's correlation with
   the *improvement* class is +0.03 pooled and +0.06 in the Eastern Plateau and Hills model (2,921 units), but
   +0.29 in the East Coast Plains and Hills model (630 units; with degradation there, 0.53). **(3) The 50 ha floor is the
@@ -412,7 +415,7 @@ network request, and has no map tiles behind it**: Leaflet 1.9.4 is inside the H
 drawn; outside-village units are hatched. `docs/LAYER.md` is the full account. What must not be lost:
 
 - **Every number shown is a cell of a stage table**, formatted in Python. The page computes nothing. `scripts/verify_layer.py`
-  rebuilds every displayed field of every unit from the stage tables (78 of 78 checks passed), and 16 units were
+  rebuilds every displayed field of every unit from the stage tables (79 of 79 checks passed), and 16 units were
   checked by hand in a browser.
 - **Honest colour.** A unit with too little forest for a rate to mean anything is drawn in a flat grey class,
   *insufficient forest to assess*, not on the colour scale; the floor is 50 ha by default, with 1 ha as the other
