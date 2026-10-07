@@ -12,11 +12,11 @@ should be on the screen from the tables the figures come from:
                    corestack_by_unit_bands.csv, agreement_by_unit.csv
     30_need/need_by_unit.csv        40_allocation/allocation_by_unit.csv
 It goes behind degradation_by_unit.csv to the tables that was assembled from. It also rebuilds every class of
-every layer at both minimum-forest settings, recounts the legend, checks that each unit's drawn shape lies where
+every layer at each of the three minimum-forest settings, recounts the legend, checks that each unit's drawn shape lies where
 the unit is, and that the two files ask for nothing from the network and carry no SHRUG-derived figure.
 This is the machine's half of the layer's verification; the other half is opening the map and clicking.
 """
-import json, re, sys
+import hashlib, json, re, sys
 from pathlib import Path
 
 import geopandas as gpd
@@ -118,26 +118,48 @@ for j, k in enumerate(klass):
 near(24, (100 * (area["degradation"] - area["improvement"]) / valued).where(valued > 0), 0.0101, "Degradation minus Improvement", "not defined")
 same(25, fmt(c["corestack_degradation_ha"], " ha"), "Degradation on all land the product covers")
 same(26, fmt(c["corestack_tree_cover_start_ha"], " ha"), "the product's tree cover at the start")
-label = {"both": "Both measures flag this unit", "hansen_only": "Hansen only (clearance)", "corestack_only": "CoRE Stack only (degradation)", "neither": "Neither", "insufficient_forest": "Insufficient forest to assess"}
-same(27, ag["agreement_class"].map(label).to_numpy(), "agreement class")
+label = {"both": "Both measures flag this unit", "hansen_only": "Hansen only (clearance)", "corestack_only": "CoRE Stack only (degradation)", "neither": "Neither",
+         "zone_model_excluded": "East Coast zone model: left out of the headline comparison", "insufficient_forest": "Insufficient forest to assess"}
+same(27, ag["agreement_class"].map(label).to_numpy(), "agreement class, the headline comparison")
+same(28, ag["agreement_class_all_assessed"].map(label).to_numpy(), "agreement class with no zone model left out")
+# the zone model is taken here from the CoRE Stack table itself, not from the agreement table's own column
+ze, zc = cb["value_ha_zone_EPAHR"].to_numpy(float), cb["value_ha_zone_ECPHR"].to_numpy(float)
+zone_words = np.where(valued.to_numpy() <= 0, "no land with a CoRE Stack class", np.where((ze > 0) & (zc == 0), "Eastern Plateau and Hills",
+                      np.where((zc > 0) & (ze == 0), "East Coast Plains and Hills - the placebo test fails in this model: read its Degradation class with caution", "both models: the unit straddles the two")))
+same(29, zone_words, "CoRE Stack zone model")
+check("a unit drawn as 'East Coast zone model' has at least 100 ha on both grids and all its valued land under that model, and no other unit is drawn so",
+      ((ag["agreement_class"] == "zone_model_excluded").to_numpy() == ((np.minimum(hb["area_ha_gt10le30"] + hb["area_ha_gt30"], valued).to_numpy() >= 100) & (zc > 0) & (ze == 0))).all(),
+      f"{int((ag['agreement_class'] == 'zone_model_excluded').sum()):,} units")
 loss1723 = sum(hb[f"loss_ha_{b}_{y}"] for b in ("gt10le30", "gt30") for y in range(2017, 2024))
-near(28, (100 * loss1723 / land10).where(land10 > 0), 0.0051, "Hansen loss 2017-2023 as a share of the reference land", "not defined")
-near(29, (100 * area["degradation"] / valued).where(valued > 0), 0.0101, "CoRE Stack Degradation rate in the agreement panel", "not defined")
-near(30, land10, 0.0051, "reference land", "zzz")
-same(31, np.array([f"{int(x):,}" for x in al["n_works"]], dtype=object), "MGNREGA works")
-for j, col in ((32, "expenditure_total"), (33, "expenditure_plantation_category"), (34, "expenditure_forest_named_worktype"), (35, "expenditure_water")):
+near(30, (100 * loss1723 / land10).where(land10 > 0), 0.0051, "Hansen loss 2017-2023 as a share of the reference land", "not defined")
+near(31, (100 * area["degradation"] / valued).where(valued > 0), 0.0101, "CoRE Stack Degradation rate in the agreement panel", "not defined")
+near(32, land10, 0.0051, "reference land", "zzz")
+check("the land with canopy above 10 % prints the same on its two lines, in every unit", (F[:, 7] == F[:, 32]).all(), f"{int((F[:, 7] != F[:, 32]).sum())} units differ")
+twice = np.array([(re.search(r"\(([\-0-9.,]+ %)\)", str(a)).group(1) if "(" in str(a) else "not defined: no such land in this unit") == str(b) for a, b in zip(F[:, 19], F[:, 31])])
+check("CoRE Stack's Degradation share prints the same on its two lines, in every unit", twice.all(), f"{int((~twice).sum())} units differ")
+same(33, np.array([f"{int(x):,}" for x in al["n_works"]], dtype=object), "MGNREGA works")
+for j, col in ((34, "expenditure_total"), (35, "expenditure_plantation_category"), (36, "expenditure_forest_named_worktype"), (37, "expenditure_water")):
     same(j, np.array(["not recorded" if pd.isna(x) else f"Rs {x / 1e5:,.2f} lakh" for x in al[col]], dtype=object), col)
 nc = "no census data for this land"
-same(36, np.where(out, nc, [("" if pd.isna(x) else f"{int(round(x)):,}") for x in nd["population"]]), "population")
-same(37, np.where(out, nc, [("" if pd.isna(x) else f"{int(round(x)):,}") for x in nd["households"]]), "households")
-same(38, np.where(out, nc, ["not defined: no resident population" if pd.isna(x) else f"{100 * x:,.2f} %" for x in nd["st_share"]]), "Scheduled Tribe share")
-same(39, np.where(out, nc, ["not defined: no resident population" if pd.isna(x) else f"{100 * x:,.2f} %" for x in nd["sc_share"]]), "Scheduled Caste share")
-same(40, np.where(out, nc, ["no index for this unit's villages" if pd.isna(x) else f"{x:,.2f}" for x in nd["adi_2011"]]), "Aggregate Development Index 2011")
-check("every outside_village unit says 'no census data for this land' in all five census lines, and no other unit does", all(((F[:, j] == nc) == out).all() for j in range(36, 41)), f"{int(out.sum()):,} units")
-check("no blank cell is shown to the reader", not (F[:, :41] == "").any(), f"{int((F[:, :41] == '').sum())} blank among {F[:, :41].size:,} cells")
+same(38, np.where(out, nc, [("" if pd.isna(x) else f"{int(round(x)):,}") for x in nd["population"]]), "population")
+same(39, np.where(out, nc, [("" if pd.isna(x) else f"{int(round(x)):,}") for x in nd["households"]]), "households")
+same(40, np.where(out, nc, ["not defined: no resident population" if pd.isna(x) else f"{100 * x:,.2f} %" for x in nd["st_share"]]), "Scheduled Tribe share")
+same(41, np.where(out, nc, ["not defined: no resident population" if pd.isna(x) else f"{100 * x:,.2f} %" for x in nd["sc_share"]]), "Scheduled Caste share")
+same(42, np.where(out, nc, ["no index for this unit's villages" if pd.isna(x) else f"{x:,.2f}" for x in nd["adi_2011"]]), "Aggregate Development Index 2011")
+check("every outside_village unit says 'no census data for this land' in all five census lines, and no other unit does", all(((F[:, j] == nc) == out).all() for j in range(38, 43)), f"{int(out.sum()):,} units")
+check("no blank cell is shown to the reader", not (F[:, :43] == "").any(), f"{int((F[:, :43] == '').sum())} blank among {F[:, :43].size:,} cells")
 fh = h["forest_ha"].to_numpy()
-check("the warning on small forests is on the units under 1 ha and under 50 ha of forest, and no other", all(("Under 1 ha" in F[i, 41]) == (fh[i] < 1) and ("Under 50 ha" in F[i, 41]) == (1 <= fh[i] < 50) for i in range(n)),
-      f"{int((fh < 1).sum()):,} under 1 ha, {int(((fh >= 1) & (fh < 50)).sum()):,} from 1 to 50 ha")
+check("the warning on small forests is on the units under 1 ha and under 100 ha of forest, and no other", F.shape[1] == 44 and all(("Under 1 ha" in F[i, 43]) == (fh[i] < 1) and ("Under 100 ha" in F[i, 43]) == (1 <= fh[i] < 100) for i in range(n)),
+      f"{int((fh < 1).sum()):,} under 1 ha, {int(((fh >= 1) & (fh < 100)).sum()):,} from 1 to 100 ha")
+check("the minimum-forest settings are 100 ha (the default), 50 ha and 1 ha", [f["id"] for f in D["floors"]] == ["100", "50", "1"] and D["default_floor"] == "100", str([f["label"] for f in D["floors"]]))
+REC = json.loads((ROOT / "60_layer" / "layer.provenance.json").read_text(encoding="utf-8"))
+check("the layer's run record names the same floors and the same default as the page", [str(k) for k in REC["floors_ha"]] == [f["id"] for f in D["floors"]] and float(REC["default_floor_ha"]) == float(D["default_floor"]),
+      f"record: floors {list(REC['floors_ha'])}, default {REC['default_floor_ha']}; page: default {D['default_floor']}")
+check("the layer's run record is of the build that is on disk (sizes and sha256 of both files)",
+      all(REC["outputs"][f] == (ROOT / "60_layer" / f).stat().st_size and REC["outputs"]["sha256"][f] == hashlib.sha256((ROOT / "60_layer" / f).read_bytes()).hexdigest() for f in ("index.html", "data.js")),
+      f"record run {REC['run_utc']}")
+check("the 'Built' line names the day of this build and the latest stage table it read", D["built"].startswith(f"Built {REC['run_utc'][:10]} ") and
+      max(json.loads((ROOT / i["path"]).read_text(encoding="utf-8"))["run_utc"] for i in REC["inputs"] if i["path"].endswith(".provenance.json"))[:10] in D["built"], D["built"])
 
 # ---- every class of every layer, both minimum-forest settings -----------------------------------------------------------------
 L = {x["id"]: x for x in D["layers"]}
@@ -161,7 +183,7 @@ loss_labels = ["Up to 1 %", "1 to 2.5 %", "2.5 to 5 %", "5 to 10 %", "10 to 20 %
 fp = (100 * h["forest_ha"] / g["area_ha"]).to_numpy()
 exp = np.where(fh <= 0, "No forest by this measure", bins(fp, [1, 10, 30, 60], ["Up to 1 %", "1 to 10 %", "10 to 30 %", "30 to 60 %", "More than 60 %"]))
 check("classes of 'Area under forests'", (shown("forest_area", "all") == exp).all(), str(pd.Series(exp).value_counts().to_dict()))
-for floor in ("50", "1"):
+for floor in ("100", "50", "1"):
     f = float(floor)
     lp = np.nan_to_num((100 * h["hansen_loss_ha"] / h["forest_ha"]).to_numpy())
     exp = np.where(fh < f, GREY, np.where(r2(lp) <= 0, "No loss recorded", bins(lp, [1, 2.5, 5, 10, 20], loss_labels)))

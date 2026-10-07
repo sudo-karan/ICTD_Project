@@ -31,11 +31,13 @@ select, input[type=text] { width: 100%; box-sizing: border-box; padding: 4px 6px
 button { font: inherit; padding: 4px 10px; border: 1px solid #888; border-radius: 3px; background: #fff; cursor: pointer; margin: 2px 4px 2px 0; }
 button:hover { background: #eee; }
 #legend { position: absolute; right: 10px; bottom: 14px; z-index: 800; background: rgba(255,255,255,.96); border: 1px solid #999; border-radius: 4px; padding: 8px 10px; max-width: 330px; font-size: 12.5px; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+#legend { max-height: calc(100% - 40px); overflow-y: auto; box-sizing: border-box; }
+#legend .lh { display: flex; justify-content: space-between; align-items: flex-start; }
 #legend .t { font-weight: 600; margin-bottom: 4px; }
+#legend button { font-size: 11.5px; padding: 0 7px; margin: 0 0 0 8px; flex: none; }
 .sw { display: inline-block; width: 18px; height: 12px; border: 1px solid #555; vertical-align: -2px; margin-right: 6px; box-sizing: border-box; }
 .sw.hatch { background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.55) 0, rgba(0,0,0,.55) 1px, transparent 1px, transparent 5px); }
-.lr { white-space: nowrap; }
-.lr.wrap { white-space: normal; }
+.lr { padding-left: 25px; text-indent: -25px; }          /* a long class name wraps under its own text, not under its colour */
 .lr .n { color: #555; }
 .flatsep { border-top: 1px solid #ccc; margin: 5px 0 3px; }
 table.kv { border-collapse: collapse; width: 100%; }
@@ -43,6 +45,9 @@ table.kv td { padding: 2px 0; vertical-align: top; border-bottom: 1px solid #eee
 table.kv td.v { text-align: right; padding-left: 10px; font-variant-numeric: tabular-nums; }
 table.kv td.num { white-space: nowrap; }
 .note { color: #555; font-size: 12px; margin: 3px 0 0; }
+/* a narrow window: the two side panels give way so that the map keeps most of the width; under about 700 px the page is cramped */
+@media (max-width: 1150px) { #side { width: 250px; } #info { width: 300px; } }
+@media (max-width: 900px) { #side { width: 210px; padding: 8px 10px; } #info { width: 240px; padding: 8px 10px; } #legend { max-width: 240px; font-size: 11.5px; } }
 .flag { background: #fff6d6; border: 1px solid #e0c060; border-radius: 3px; padding: 4px 6px; font-size: 12.5px; margin: 6px 0; }
 .bar { display: flex; height: 16px; border: 1px solid #555; margin: 4px 0 2px; }
 .bar span { display: block; height: 100%; }
@@ -95,7 +100,7 @@ table.kv td.num { white-space: nowrap; }
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
   var N = D.id.length, CODES = D.codes;
-  var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1 };
+  var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1, legend: true };
   var layerById = {};
   D.layers.forEach(function (l) { layerById[l.id] = l; });
 
@@ -116,6 +121,7 @@ table.kv td.num { white-space: nowrap; }
   });
   var map = L.map("map", { renderer: new Hatch({ padding: 0.4 }), zoomSnap: 0.25, minZoom: 6, maxZoom: 15, attributionControl: false, zoomControl: true });
   L.control.scale({ imperial: false }).addTo(map);
+  window.ICTD_MAP = map;                   // for checking the page: lets a test ask where on the screen a place is drawn. Nothing on the page uses it
   map.fitBounds(D.bounds);                 // the view is set BEFORE any shape is added: a shape added to a map with no view yet meets a renderer that is not ready
   function ring(a) {                       // a ring is stored as whole numbers: first point, then steps, in 0.00001 degrees
     var x = a[0], y = a[1], out = [[y / 1e5, x / 1e5]], i;
@@ -172,13 +178,14 @@ table.kv td.num { white-space: nowrap; }
   }
   function showLegend() {
     var l = layerById[state.layer], counts = l.floored ? l.counts[state.floor] : l.counts.all, h, k, c, sep = false;
-    h = '<div class="t">' + esc(l.legend_title) + "</div>";
+    h = '<div class="lh"><div class="t">' + esc(l.legend_title) + '</div><button id="b_legend" title="Hide or show the legend, to see the map under it">' + (state.legend ? "Hide" : "Show") + "</button></div>";
+    if (!state.legend) { $("legend").innerHTML = h; return; }
     for (k = 0; k < l.classes.length; k++) {
       c = l.classes[k];
       if (c.flat && !sep) { h += '<div class="flatsep"></div>'; sep = true; }
       h += '<div class="lr"><span class="sw" style="background:' + c.color + '"></span>' + esc(c.label) + ' <span class="n">(' + esc(counts[k]) + ")</span></div>";
     }
-    h += '<div class="flatsep"></div><div class="lr wrap"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
+    h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
     h += '<p class="note">' + esc(l.this_shows) + "</p>";
     if (l.floored) { h += '<p class="note">' + esc(l.floor_note[state.floor]) + "</p>"; }
     $("legend").innerHTML = h;
@@ -211,7 +218,7 @@ table.kv td.num { white-space: nowrap; }
     if (hi) { map.removeLayer(hi); hi = null; }
     if (k >= 0) {
       hi = L.polygon(shape(D.g[k]), { fill: false, color: "#000", weight: 3, interactive: false }).addTo(map);
-      if (fly) { map.fitBounds(hi.getBounds(), { maxZoom: 12, padding: [60, 60] }); }
+      if (fly) { map.fitBounds(hi.getBounds(), { maxZoom: 12, padding: [60, 60], animate: false }); }
     }
     showInfo();
     writeHash();
@@ -235,8 +242,24 @@ table.kv td.num { white-space: nowrap; }
       if (want && !has) { group.addLayer(polys[k]); } else if (!want && has) { group.removeLayer(polys[k]); }
     }
   }
+  function setTypes(lgd, out) {
+    state.lgd = lgd; state.out = out;
+    $("c_lgd").checked = lgd; $("c_out").checked = out;
+    setShown(); writeHash();
+  }
+  // Moves made by a control are not animated: the map library ignores a move asked for while an animated one is still running.
+  function gotoDistrict(k) { $("district").value = String(k); map.fitBounds(D.districts[k].bbox, { animate: false }); }
+  function search(text) {
+    var q = String(text).trim().toLowerCase(), hits = [], k;
+    if (!q) { return; }
+    for (k = 0; k < N; k++) { if (D.id[k].toLowerCase() === q) { hits = [k]; break; } }
+    if (!hits.length) { for (k = 0; k < N; k++) { if (D.f[k][0].toLowerCase().indexOf(q) >= 0) { hits.push(k); } } }
+    $("searchmsg").textContent = hits.length ? (hits.length > 1 ? D.search_many.replace("{n}", String(hits.length).replace(/\B(?=(\d{3})+(?!\d))/g, ",")) : "") : D.search_none;
+    if (hits.length) { select(hits[0], true); }
+  }
   function writeHash() {
-    var h = "layer=" + state.layer + "&floor=" + state.floor + (state.sel >= 0 ? "&unit=" + encodeURIComponent(D.id[state.sel]) : "");
+    var show = state.lgd && state.out ? "" : "&show=" + (state.lgd ? "lgd" : state.out ? "out" : "none");
+    var h = "layer=" + state.layer + "&floor=" + state.floor + show + (state.sel >= 0 ? "&unit=" + encodeURIComponent(D.id[state.sel]) : "");
     if (window.history && history.replaceState) { history.replaceState(null, "", "#" + h); } else { location.hash = h; }
   }
   function readHash() {
@@ -248,32 +271,37 @@ table.kv td.num { white-space: nowrap; }
     var t = e.target;
     if (t.name === "layer") { setLayer(t.value); }
     else if (t.name === "floor") { setFloor(t.value); }
-    else if (t.id === "c_lgd") { state.lgd = t.checked; setShown(); }
-    else if (t.id === "c_out") { state.out = t.checked; setShown(); }
-    else if (t.id === "district" && t.value !== "") { map.fitBounds(D.districts[+t.value].bbox); }
+    else if (t.id === "c_lgd") { setTypes(t.checked, state.out); }
+    else if (t.id === "c_out") { setTypes(state.lgd, t.checked); }
+    else if (t.id === "district" && t.value !== "") { gotoDistrict(+t.value); }
   });
   $("search").addEventListener("keydown", function (e) {
-    if (e.keyCode !== 13) { return; }
-    var q = this.value.trim().toLowerCase(), hits = [], k;
-    if (!q) { return; }
-    for (k = 0; k < N; k++) { if (D.id[k].toLowerCase() === q) { hits = [k]; break; } }
-    if (!hits.length) { for (k = 0; k < N; k++) { if (D.f[k][0].toLowerCase().indexOf(q) >= 0) { hits.push(k); } } }
-    $("searchmsg").textContent = hits.length ? (hits.length > 1 ? D.search_many.replace("{n}", hits.length) : "") : D.search_none;
-    if (hits.length) { select(hits[0], true); }
+    if (e.keyCode === 13 || e.key === "Enter") { search(this.value); }
   });
   function modal(html) { $("modalbody").innerHTML = html; $("modal").style.display = "block"; }
   $("b_about").onclick = function () { modal(D.about_html); };
   $("b_sources").onclick = function () { modal(D.sources_html); };
   $("b_close").onclick = function () { $("modal").style.display = "none"; };
+  $("legend").addEventListener("click", function (e) { if (e.target.id === "b_legend") { state.legend = !state.legend; showLegend(); } });
   $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
 
   // ---- start: the layer, floor and unit can be given in the address after #, and followed when the address changes -----
+  // Also: show=lgd|out|both|none (which kinds of unit are drawn), district=<name>, q=<what to search for>, open=about|sources.
   function fromAddress(first) {
-    var h0 = readHash(), k;
+    var h0 = readHash(), k, want;
+    if (h0.show) {
+      want = { lgd: [true, false], out: [false, true], both: [true, true], none: [false, false] }[h0.show];
+      if (want && (want[0] !== state.lgd || want[1] !== state.out)) { setTypes(want[0], want[1]); }
+    }
     if (first || (h0.floor && h0.floor !== state.floor)) { setFloor(D.floors.some(function (f) { return f.id === h0.floor; }) ? h0.floor : D.default_floor); }
     if (first || (h0.layer && h0.layer !== state.layer)) { setLayer(h0.layer && layerById[h0.layer] && !layerById[h0.layer].pending ? h0.layer : D.default_layer); }
     k = h0.unit ? D.id.indexOf(h0.unit) : -1;
     if (k >= 0 && k !== state.sel) { select(k, true); } else if (first) { showInfo(); }
+    if (h0.district) {
+      for (k = 0; k < D.districts.length; k++) { if (D.districts[k].name.toLowerCase() === h0.district.toLowerCase()) { gotoDistrict(k); break; } }
+    }
+    if (h0.q) { $("search").value = h0.q; search(h0.q); }
+    if (h0.open === "about") { modal(D.about_html); } else if (h0.open === "sources") { modal(D.sources_html); }
   }
   fromAddress(true);
   window.addEventListener("hashchange", function () { fromAddress(false); });

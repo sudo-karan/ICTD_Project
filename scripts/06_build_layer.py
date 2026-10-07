@@ -33,9 +33,13 @@ HONEST COLOUR.
   - A rate on a few hectares of forest is noise (forest_floor_repeatability.csv gives, by forest area, the rank
     correlation of a unit's Hansen loss rate between odd and even years; the page quotes it from that table).
     So on every layer that is a rate on forest land, a unit below a minimum of that land is drawn in one flat
-    colour, "insufficient forest to assess" - never on the colour scale. The page offers two minimums: 50 ha (the
-    floor proposed for stage 4; the default) and 1 ha (every unit with measurable forest). The agreement class has
-    its own floor, fixed where 02_build_agreement.py set it.
+    colour, "insufficient forest to assess" - never on the colour scale. The page offers three minimums: 100 ha (the
+    floor the project owner ruled on 7 Oct 2026; the default), 50 ha (the earlier proposal: a sensitivity) and 1 ha
+    (every unit with measurable forest). The agreement class has its own floor, 100 ha, fixed where
+    02_build_agreement.py set it.
+  - The agreement layer draws the HEADLINE comparison of 02_build_agreement.py, which leaves out the units wholly
+    under CoRE Stack's East Coast zone model, where the placebo test fails. Those units are a class of their own,
+    flat, never one of the four agreement classes; the panel gives their class with nothing left out beside it.
   - The outside_village units have no census rows. On the two census layers they are "no census data for this
     land" - a class of its own, never blank and never zero.
   - Every class is listed in the legend with the number of units in it.
@@ -50,7 +54,8 @@ THE LAYERS (id: what is drawn; the land it must have to be assessed)
                             band Hansen's mask leaves out; needs land in that band
   corestack_degradation     CoRE Stack class -1 as a share of the land with a class, on treecover2000 > 10; needs that land
   corestack_net             class -1 minus class 1, the same share; needs that land
-  agreement                 the two-measure agreement class of agreement_by_unit.csv (its own floor)
+  agreement                 the two-measure agreement class of agreement_by_unit.csv: the headline population's, at
+                            its own floor
   allocation                expenditure on all MGNREGA works geotagged inside the unit, rupees lakh
   forest_named_expenditure  the same for works whose work type names forest or forestry
   st_share, adi_2011        Census 2011
@@ -80,13 +85,20 @@ LEAFLET_SHA256 = "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e564
 WORK_CRS = "EPSG:32645"
 SIMPLIFY_M = 30.0
 MAX_BYTES = 25_000_000
-FLOORS = {"50": 50.0, "1": 1.0}                    # hectares; the first is the default
+STAGE_RECORDS = ("10_units/units.provenance.json", "10_units/outside_village_district.provenance.json", "20_degradation/hansen.provenance.json", "20_degradation/corestack.provenance.json",
+                 "20_degradation/agreement.provenance.json", "20_degradation/forest_floor.provenance.json", "30_need/need.provenance.json", "40_allocation/allocation.provenance.json")
+FLOORS = {"100": 100.0, "50": 50.0, "1": 1.0}      # hectares; the first is the default: the floor ruled on 7 Oct 2026
+FLOOR_LABEL = {"100": " (default: the floor ruled for the analysis)", "50": " (the earlier proposal: shown as a sensitivity)", "1": " (every unit with measurable forest)"}
+ZONE_EXCLUDED = "#bcd3d6"
+ZONE_WORDS = {"EPAHR only": "Eastern Plateau and Hills", "ECPHR only": "East Coast Plains and Hills - the placebo test fails in this model: read its Degradation class with caution",
+              "both models": "both models: the unit straddles the two"}
 CODES = "0123456789abcdefghij"
 GREY, NO_CENSUS, NO_FIGURE = "#cfcfcf", "#9fa8b3", "#e6e0d4"
 CORE_CLASSES = [("Deforestation (tree cover lost)", "#ff0000", "loss"), ("Degradation", "#ffa500", "degradation"), ("Partially Degraded", "#dee64c", "partial_degradation"),
                 ("No Change", "#ffffff", "no_change"), ("Improvement", "#8aff8a", "improvement"), ("Afforestation (tree cover gained)", "#007500", "gain")]
 AGREEMENT = {"both": ("Both measures flag this unit", "#6a1b7a"), "hansen_only": ("Hansen only (clearance)", "#e31a1c"), "corestack_only": ("CoRE Stack only (degradation)", "#ffa500"),
-             "neither": ("Neither", "#f3efe0"), "insufficient_forest": ("Insufficient forest to assess", GREY)}
+             "neither": ("Neither", "#f3efe0"), "zone_model_excluded": ("East Coast zone model: left out of the headline comparison", ZONE_EXCLUDED),
+             "insufficient_forest": ("Insufficient forest to assess", GREY)}
 SHRUG_COLUMNS = ("poverty_rate", "poverty_rate_ppp2", "poverty_rate_population_covered_share", "poverty_rate_population_rated", "poverty_rate_shared_shrid_population_share")
 fails = []
 
@@ -234,9 +246,21 @@ def main():
     T["corestack_degradation_ha_all_land"] = deg["corestack_degradation_ha"].to_numpy()
     T["corestack_tree_cover_start_ha_all_land"] = deg["corestack_tree_cover_start_ha"].to_numpy()
     T["agreement_class"] = agr["agreement_class"].to_numpy()
-    T["agreement_reference_ha"] = agr["reference_ha"].to_numpy()
-    T["agreement_hansen_rate_2017_2023_pct"] = 100.0 * agr["hansen_rate_common_2017_2023"].to_numpy()
-    T["agreement_corestack_degradation_rate_pct"] = 100.0 * agr["corestack_rate_degradation"].to_numpy()
+    T["agreement_class_all_assessed"] = agr["agreement_class_all_assessed"].to_numpy()
+    T["corestack_zone_model"] = agr["corestack_zone_model"].to_numpy()
+    if not set(T["agreement_class"]) <= set(AGREEMENT) or not set(T["agreement_class_all_assessed"]) <= set(AGREEMENT) or not set(T["corestack_zone_model"].dropna()) <= set(ZONE_WORDS):
+        fails.append("agreement_by_unit.csv has an agreement class or a zone model that the map has no words for")
+    # The agreement panel repeats two figures the panel has already printed - the land with canopy above 10 %, and CoRE Stack's
+    # Degradation share. They are taken from the SAME cells as the first printing, after checking that the agreement table agrees,
+    # so that a figure cannot print one hundredth apart on two lines (it did, in 12 and 32 units, until 7 Oct 2026).
+    if np.abs(T["land_tc_gt10_ha"].to_numpy(float) - agr["reference_ha"].to_numpy(float)).max() > 1e-4:
+        fails.append("the land with canopy above 10 % differs from agreement_by_unit.csv's reference_ha")
+    T["agreement_reference_ha"] = T["land_tc_gt10_ha"].to_numpy()
+    T["agreement_hansen_rate_2017_2023_pct"] = div(agr["hansen_loss_ha_common_2017_2023"].to_numpy(float), T["land_tc_gt10_ha"].to_numpy(float))
+    gap = float(np.nanmax(np.abs(T["agreement_hansen_rate_2017_2023_pct"].to_numpy(float) - 100.0 * agr["hansen_rate_common_2017_2023"].to_numpy(float))))
+    if gap > 1e-3:
+        fails.append(f"Hansen loss 2017-2023 over the land with canopy above 10 % differs from agreement_by_unit.csv's rate by up to {gap:.5f} points")
+    T["agreement_corestack_degradation_rate_pct"] = T["corestack_degradation_pct"].to_numpy()
     for c in ("n_works", "expenditure_total", "expenditure_plantation_category", "expenditure_forest_named_worktype", "expenditure_water"):
         T[c] = alloc[c].to_numpy()
     for c in ("expenditure_total", "expenditure_plantation_category", "expenditure_forest_named_worktype", "expenditure_water"):
@@ -314,10 +338,12 @@ def main():
          "this_shows": "This shows where degradation outweighs improvement. Because both classes carry the same classifier noise, the net is the safer reading: near zero means no net signal.",
          "classes": scale(div_colors, ["Net improvement, more than 10 points", "Net improvement, 2 to 10 points", "Within 2 points: no net change", "Net degradation, 2 to 10 points", "Net degradation, 10 to 20 points", "Net degradation, more than 20 points"])},
         classify(np.nan_to_num(v), [-10, -2, 2, 10, 20]), "reference")
-    order = ["both", "hansen_only", "corestack_only", "neither", "insufficient_forest"]
+    order = ["both", "hansen_only", "corestack_only", "neither", "zone_model_excluded", "insufficient_forest"]
     add({"id": "agreement", "group": "Forests", "title": "Do the two measures agree? (2017-2023)", "legend_title": "Hansen loss 2017-2023 beside CoRE Stack Degradation 2017-2023: which measure puts the unit in its top fifth",
-         "this_shows": "This shows, for units with at least 50 ha of land with canopy above 10 % in 2000, whether each measure ranks the unit in the top fifth of such units. Where both do, the claim that the unit degraded is as strong as these two sources can make it. Where one does, neither is preferred. This layer has its own floor: the control on the left does not change it.",
-         "classes": [({"label": AGREEMENT[k][0], "color": AGREEMENT[k][1], "flat": 1} if k == "insufficient_forest" else {"label": AGREEMENT[k][0], "color": AGREEMENT[k][1]}) for k in order]},
+         "this_shows": "This shows, for units with at least {floor_agreement:g} ha of land with canopy above 10 % in 2000, whether each measure ranks the unit in the top fifth of such units. Where both do, the claim that the unit degraded is as strong as these two sources "
+                       "can make it. Where one does, neither is preferred. It is about units, not hectares: the two have not been overlaid pixel by pixel. Units wholly under CoRE Stack's East Coast zone model are left out of this comparison and drawn as a class of "
+                       "their own, because CoRE Stack's own check fails there (see 'What this is'); their panel gives the class they would have with nothing left out.",
+         "classes": [({"label": AGREEMENT[k][0], "color": AGREEMENT[k][1], "flat": 1} if k in ("insufficient_forest", "zone_model_excluded") else {"label": AGREEMENT[k][0], "color": AGREEMENT[k][1]}) for k in order]},
         T["agreement_class"].map({k: i for i, k in enumerate(order)}).to_numpy())
     blues = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"]
     works, spent = T["n_works"].to_numpy(float), T["expenditure_total_lakh"].to_numpy(float)
@@ -356,10 +382,13 @@ def main():
     by = {L["id"]: L for L in layers}
     grey = lambda lid, f: int((by[lid]["_arrays"][f] == len(by[lid]["classes"]) - 1).sum())
     checks = {"units_under_1_ha_of_forest": [grey("hansen_loss", "1"), int(hl.loc["all units", "units_with_under_1_ha_of_forest_including_none"])],
+              "units_under_100_ha_of_forest": [grey("hansen_loss", "100"), n - int(ff.loc[100.0, "units_kept"])],
               "units_under_50_ha_of_forest": [grey("hansen_loss", "50"), n - int(ff.loc[50.0, "units_kept"])],
               "units_with_no_forest": [int((by["forest_area"]["_arrays"]["all"] == 0).sum()), int(hl.loc["all units", "units_with_no_forest"])]}
     for k, i in {k: i for i, k in enumerate(order)}.items():
         checks[f"agreement_{k}"] = [int((by["agreement"]["_arrays"]["all"] == i).sum()), int(ap_["counts"]["by_level"]["all units"].get(k, 0))]
+    if float(ap_["definitions"]["floor"]["minimum_reference_ha"]) != FLOORS["100"] or str(ff.loc[100.0, "role"]) != "RULED":
+        fails.append("the agreement table's floor, or the floor marked RULED in forest_floor_options.csv, is not the map's default of 100 ha")
     checks["no_census_data_units_st_share"] = [int((by["st_share"]["_arrays"]["all"] == 4).sum()), int(outside.sum())]
     checks["no_census_data_units_adi"] = [int((by["adi_2011"]["_arrays"]["all"] == 5).sum()), int(outside.sum())]
     for k, (mine, theirs) in checks.items():
@@ -422,7 +451,7 @@ def main():
     if not set(T.loc[outside, "district_assigned_by"]) <= set(how):
         fails.append(f"outside_village_district.csv has a way of assigning a district that the map has no words for: {sorted(set(T.loc[outside, 'district_assigned_by']) - set(how))}")
     flag = np.where(T["forest_ha"] < 1, "Under 1 ha of forest: this unit cannot be assessed for forest loss.",
-                    np.where(T["forest_ha"] < 50, "Under 50 ha of forest: a loss rate on this little forest is mostly noise.", ""))
+                    np.where(T["forest_ha"] < 100, "Under 100 ha of forest: below the floor ruled for the analysis, where a loss rate does not repeat from one set of years to the next.", ""))
     F = []
     for i, r in enumerate(T.itertuples(index=False)):
         o = bool(r.outside_village)
@@ -435,7 +464,8 @@ def main():
             ha(r.corestack_valued_ha_tc_gt10),
             *[(ha(getattr(r, f"corestack_{k}_ha_tc_gt10")) + ("  (" + pct(getattr(r, f"corestack_{k}_pct")) + ")" if pct(getattr(r, f"corestack_{k}_pct")) else "")) for _, _, k in CORE_CLASSES],
             (num(r.corestack_net_pct, 2, " points") if not pd.isna(r.corestack_net_pct) else nd), ha(r.corestack_degradation_ha_all_land), ha(r.corestack_tree_cover_start_ha_all_land),
-            AGREEMENT[r.agreement_class][0], pct(r.agreement_hansen_rate_2017_2023_pct) or nd, pct(r.agreement_corestack_degradation_rate_pct) or nd, ha(r.agreement_reference_ha),
+            AGREEMENT[r.agreement_class][0], AGREEMENT[r.agreement_class_all_assessed][0], (ZONE_WORDS[r.corestack_zone_model] if isinstance(r.corestack_zone_model, str) else "no land with a CoRE Stack class"),
+            pct(r.agreement_hansen_rate_2017_2023_pct) or nd, pct(r.agreement_corestack_degradation_rate_pct) or nd, ha(r.agreement_reference_ha),
             whole(r.n_works), lakh(r.expenditure_total_lakh) or "not recorded", lakh(r.expenditure_plantation_category_lakh) or "not recorded", lakh(r.expenditure_forest_named_worktype_lakh) or "not recorded",
             lakh(r.expenditure_water_lakh) or "not recorded",
             nc if o else whole(r.population), nc if o else whole(r.households), nc if o else (pct(r.st_share_pct) or "not defined: no resident population"),
@@ -458,18 +488,20 @@ def main():
          "note": "Source: CoRE Stack, overall_change_2017_2023 (25 m), read from the raw Earth Engine asset: classes named and coloured as CoRE Stack does. CoRE Stack's own dashboard takes Deforestation and Afforestation from its land-use maps "
                  "instead, so its figures for those two classes will differ. Only Deforestation was validated by its producers."},
         {"heading": "Do the two measures agree? (2017-2023)",
-         "rows": [["Agreement class", c0 + 9], ["Hansen loss 2017-2023, share of the land below", c0 + 10], ["CoRE Stack Degradation, share of the land with a class", c0 + 11], ["Land with canopy above 10 % in 2000", c0 + 12]],
-         "note": "A unit is assessed if it has at least 50 ha of this land by both sources' grids, and flagged by a measure if its rate is in the top fifth of assessed units. The flag is relative, not an absolute amount of damage."},
+         "rows": [["Agreement class (the headline comparison)", c0 + 9], ["... with no zone model left out", c0 + 10], ["CoRE Stack zone model of this unit's land", c0 + 11],
+                  ["Hansen loss 2017-2023, share of the land below", c0 + 12], ["CoRE Stack Degradation, share of the land with a class", c0 + 13], ["Land with canopy above 10 % in 2000", c0 + 14]],
+         "note": "A unit is compared if it has at least 100 ha of this land by both sources' grids, and flagged by a measure if its rate is in the top fifth of the units compared. The flag is relative, not an absolute amount of damage. "
+                 "The headline comparison leaves out units wholly under CoRE Stack's East Coast zone model, where its own check fails; the second line is the class with every unit kept. This is about units: the two measures have not been overlaid pixel by pixel."},
         {"heading": "MGNREGA works geotagged inside this unit",
-         "rows": [["Works", c0 + 13], ["Expenditure, all works", c0 + 14], ["... Plantation category (includes orchards)", c0 + 15], ["... work type names forest or forestry", c0 + 16], ["... water works", c0 + 17]],
+         "rows": [["Works", c0 + 15], ["Expenditure, all works", c0 + 16], ["... Plantation category (includes orchards)", c0 + 17], ["... work type names forest or forestry", c0 + 18], ["... water works", c0 + 19]],
          "note": "Source: MGNREGA geotagged assets (Bhuvan, as published by CoRE Stack), works started 2006-07 to 2017-18 in the main. What was geotagged inside this polygon - not what the panchayat of record received. "
                  "The three lines below the total are flags that overlap: do not add them."},
         {"heading": "Social: Census 2011",
-         "rows": [["Population", c0 + 18], ["Households", c0 + 19], ["Scheduled Tribe share", c0 + 20], ["Scheduled Caste share", c0 + 21], ["Aggregate Development Index 2011 (5 to 15)", c0 + 22]],
+         "rows": [["Population", c0 + 20], ["Households", c0 + 21], ["Scheduled Tribe share", c0 + 22], ["Scheduled Caste share", c0 + 23], ["Aggregate Development Index 2011 (5 to 15)", c0 + 24]],
          "note": "Source: Census 2011 village rows summed over the unit's villages; index by the ICTD group, IIT Delhi. Outside-village units are land outside any revenue village: the census has no rows for them."},
-        {"heading": "NIRv trend (Landsat 8, 2013-2025)", "note": "Pending: not yet computed for the state. It will be a reported column, not a measure of degradation - its trend moves with the correction applied for the date of each image."},
+        {"heading": "NIRv trend (Landsat 8, 2013-2025)", "note": "Pending: not computed for the state. It is a reported column, not a measure of degradation - its trend moves with the correction applied for the date of each image."},
     ]
-    if any(max(r[1] for r in s.get("rows", [["", 0]])) >= FIELD_COUNT for s in panel) or c0 + 23 != FIELD_COUNT - 1:
+    if any(max(r[1] for r in s.get("rows", [["", 0]])) >= FIELD_COUNT for s in panel) or c0 + 25 != FIELD_COUNT - 1:
         fails.append("the panel points at a field that is not there")
     widths = np.nan_to_num(np.column_stack([T[f"corestack_{k}_pct"].to_numpy(float) for _, _, k in CORE_CLASSES]))
     bars = [[round(float(x), 2) for x in row] if row.sum() > 0 else 0 for row in widths]
@@ -481,19 +513,22 @@ def main():
     ov = hl.loc["outside_village"]
     rep = pd.read_csv(also("20_degradation/forest_floor_repeatability.csv", "a figure in the texts")).set_index("forest_ha_from")["odd_years_vs_even_years_spearman"]
     summ = pd.read_csv(also("20_degradation/agreement_summary.csv", "figures in the texts"))
-    head = summ[(summ.delivered == 1) & (summ.units == "all units")].iloc[0]
-    # the interval quoted is the one from resampling whole districts: the summary's own treats units as independent and is too narrow
-    bd = pd.read_csv(also("20_degradation/agreement_intervals_by_district.csv", "a figure in the texts"))
-    bd = bd[(bd.units == "all units") & (bd.statistic == "odds_ratio")].iloc[0]
-    if abs(float(bd["estimate"]) - float(head["odds_ratio"])) > 1e-9:
-        fails.append("the odds ratio in agreement_intervals_by_district.csv is not the summary's")
+    at_floor = summ[(summ.window == "common_2017_2023") & (summ.minimum_reference_ha == FLOORS["100"])]
+    head = at_floor[(at_floor.delivered == 1) & (at_floor.units == "all units")].iloc[0]                      # the headline population
+    head_lgd = at_floor[(at_floor.delivered == 1) & (at_floor.units == "lgd_panchayat")].iloc[0]
+    every = at_floor[(at_floor.population == "all_assessed") & (at_floor.units == "all units")].iloc[0]       # nothing left out
+    if head.population != ap_["definitions"]["headline_population"] or int(head.n_assessed) + int(head.n_excluded_by_zone_model) != int(every.n_assessed):
+        fails.append("the delivered rows of agreement_summary.csv are not the headline population the record names, or the two populations do not add up")
+    zones = pd.read_csv(also("20_degradation/agreement_by_zone.csv", "figures in the texts")).set_index("zone_model_of_the_units_valued_land")
+    rep10 = pd.read_csv(also("20_degradation/agreement_floor_repeatability.csv", "figures in the texts"))
+    rep10 = rep10[rep10.hansen_loss_years == "2001-2025"].set_index("reference_ha_from")["odd_years_vs_even_years_spearman"]
     por = pd.read_csv(also("40_allocation/panchayat_of_record_check.csv", "a figure in the texts")).set_index("scope").loc["all units"]
     uc = json.load(open(also("10_units/units.provenance.json", "counts in the texts")))["counts"]
     spent_all = float(alloc["expenditure_total"].sum())
     fig = {"out_area": float(ov["share_of_all_area_pct"]), "out_forest": float(ov["share_of_all_forest_pct"]), "out_loss": float(ov["share_of_all_loss_pct"]),
-           "rep_1": float(rep.loc[1.0]), "rep_5": float(rep.loc[5.0]), "rep_50": float(rep.loc[50.0]), "kept_50": float(ff.loc[50.0, "forest_kept_pct"]),
-           "outside_mask": float(hl.loc["all units", "loss_outside_the_mask_pct_of_any_cover"]), "expected_both": float(head["both_expected_if_unrelated"]),
-           "odds": float(head["odds_ratio"]), "odds_lo": float(bd["lo95_whole_districts_resampled"]), "odds_hi": float(bd["hi95_whole_districts_resampled"]),
+           "rep_1": float(rep.loc[1.0]), "rep_5": float(rep.loc[5.0]), "rep10_50": float(rep10.loc[50]), "rep10_100": float(rep10.loc[100]), "kept_100": float(ff.loc[100.0, "forest_kept_pct"]),
+           "floor_agreement": float(ap_["definitions"]["floor"]["minimum_reference_ha"]),
+           "outside_mask": float(hl.loc["all units", "loss_outside_the_mask_pct_of_any_cover"]),
            "in_own_unit": 100 * float(por["share_in_modal_polygon"]), "forest_named": 100 * float(alloc["expenditure_forest_named_worktype"].sum()) / spent_all,
            "plantation": 100 * float(alloc["expenditure_plantation_category"].sum()) / spent_all}
     for L in layers:
@@ -506,26 +541,35 @@ whether those two agree, MGNREGA expenditure on the works geotagged inside the u
 forest conservation and restoration, tracking of carbon credits, etc. by suitably bringing together new datasets and methods for these new domains of ecological sustainability.&rdquo; This is a first step toward such a tool for forest:
 datasets (tree canopy, its loss, tree-cover change), indicators per unit, and one view of them. It is a demonstration for discussion, to be checked against what people who know these places observe - not a verdict on any place.</p>
 <p><b>The unit.</b> Commons Connect computes its landscape-level indicators per micro-watershed, and the consultation catalogue lists its forest variables per forest beat. This map uses administrative polygons instead, because MGNREGA funds and the census are
-administrative: an LGD panchayat unit is the villages mapped to one LGD panchayat id (not always a whole gram panchayat). <b>Outside-village units</b> (hatched) are the land outside any revenue village - mostly reserved forest. They are {fig['out_area']:.0f} % of the area and hold {fig['out_forest']:.0f} % of
+administrative: an LGD panchayat unit is the villages mapped to one LGD panchayat id (not always a whole gram panchayat). <b>Outside-village units</b> (hatched) are the land outside any revenue village; what that land is in law is not in the data used here. They are {fig['out_area']:.0f} % of the area and hold {fig['out_forest']:.0f} % of
 the forest and {fig['out_loss']:.0f} % of its loss, and they have no census rows. The few blank patches inside the state are {uc['villages_with_no_lgd_panchayat']} villages
 ({uc['villages_with_no_lgd_panchayat_km2']:,.0f} km<sup>2</sup>) that have a census code but no row in the village-to-panchayat mapping: they belong to no unit. The district of an outside-village unit is the district named on its boundary polygon,
 checked against the villages round it; the panel says so where it was assigned another way or is ambiguous.</p>
-<p><b>Honest colour.</b> More than half of the units ({checks['units_under_1_ha_of_forest'][0]:,} of {n:,}) have under one hectare of forest, and a rate on a few hectares is noise: between odd and even years the rank correlation of a unit's loss rate is {fig['rep_1']:.2f} for units
-with 1 to 2 ha of forest, {fig['rep_5']:.2f} at 5 to 10 ha and {fig['rep_50']:.2f} at 50 to 100 ha. So on the forest layers a unit with too little of the land a layer rests on is grey - <i>insufficient forest to assess</i> - and never on the colour scale. You can set the minimum to 50 ha (the default; {checks['units_under_50_ha_of_forest'][0]:,} units grey on the
-Hansen layer, and the coloured units still hold {fig['kept_50']:.1f} % of the forest) or to 1 ha. On the census layers the outside-village units are <i>no census data for this land</i>, never zero.</p>
+<p><b>Honest colour.</b> More than half of the units ({checks['units_under_1_ha_of_forest'][0]:,} of {n:,}) have under one hectare of forest, and a rate on a little forest is noise: between odd and even years the rank correlation of a unit's loss rate is {fig['rep_1']:.2f} for units
+with 1 to 2 ha of forest and {fig['rep_5']:.2f} at 5 to 10 ha. On the land the two measures are compared on it is still only {fig['rep10_50']:.2f} at 50 to 100 ha, and {fig['rep10_100']:.2f} at 100 to 250 ha. So on the forest layers a unit with too little of the land a layer rests on is
+grey - <i>insufficient forest to assess</i> - and never on the colour scale. The minimum is 100 ha, the floor ruled for the analysis ({checks['units_under_100_ha_of_forest'][0]:,} units grey on the Hansen layer; the coloured units still hold {fig['kept_100']:.1f} % of the forest).
+You can set it to 50 ha or to 1 ha to see what the stricter floor hides. On the census layers the outside-village units are <i>no census data for this land</i>, never zero.</p>
 <p><b>What each forest measure can and cannot see.</b></p>
 <ul>
 <li><b>Hansen tree cover loss</b> dates the outright removal of canopy that was fairly closed in 2000. It is validated and it is a floor: it cannot see thinning, and it cannot see change on land that was already open in 2000.</li>
 <li><b>CoRE Stack tree cover change 2017-2023</b> classes each 25 m pixel inside its own tree mask by whether canopy density or tree height moved a class between two three-year periods. Its Degradation and Improvement classes come from classifiers
 its producers report as right about two times in three, and only Deforestation was validated by them: read Degradation beside Improvement. The two agro-climatic zone models differ, so part of what the map shows follows the zone boundary.</li>
-<li><b>Agreement.</b> Among the {int(ap_['counts']['assessed']):,} units with at least 50 ha of land with canopy above 10 % in 2000, {checks['agreement_both'][0]:,} are in the top fifth on both measures; two unrelated measures would share about {fig['expected_both']:.0f}
-(odds ratio {fig['odds']:.2f}; 95 % interval {fig['odds_lo']:.2f} to {fig['odds_hi']:.2f}, from resampling whole districts). The two do not measure
-the same thing and are not expected to mark the same pixels; the question is whether they point at the same units.</li>
+<li><b>Do the two agree?</b> A unit is compared only if it has at least {fig['floor_agreement']:g} ha of land with canopy above 10 % in 2000 by both sources' grids. The answer is given two ways, side by side:
+<table>
+<tr><th></th><th>units compared</th><th>in the top fifth on both</th><th>two unrelated measures would share</th><th>odds ratio (95 % interval)</th></tr>
+<tr><td><b>The headline:</b> units wholly under CoRE Stack's East Coast zone model left out</td><td>{int(head.n_assessed):,}</td><td>{int(head.both):,}</td><td>about {head.both_expected_if_unrelated:.0f}</td><td>{head.odds_ratio:.2f} ({head.odds_ratio_lo95:.2f} to {head.odds_ratio_hi95:.2f})</td></tr>
+<tr><td>Every unit kept</td><td>{int(every.n_assessed):,}</td><td>{int(every.both):,}</td><td>about {every.both_expected_if_unrelated:.0f}</td><td>{every.odds_ratio:.2f} ({every.odds_ratio_lo95:.2f} to {every.odds_ratio_hi95:.2f})</td></tr>
+</table>
+The first is the headline because CoRE Stack's Improvement class is the check on its Degradation class: clearance should not go with improvement. In the {int(zones.loc['ECPHR only', 'n_assessed']):,} compared units under the East Coast model it does - a rank correlation of
+{zones.loc['ECPHR only', 'spearman_hansen_vs_corestack_improvement']:.2f}, against {zones.loc['EPAHR only', 'spearman_hansen_vs_corestack_improvement']:.2f} under the other model - so agreement there cannot be read as agreement about degradation. Those are also the units where the two agree most, so leaving them out
+<i>lowers</i> the figure; they are drawn as a class of their own on the agreement layer. The agreement that remains is modest, and in the LGD panchayat units taken alone it is not established: their odds ratio is {head_lgd.odds_ratio:.2f} with an interval of
+{head_lgd.odds_ratio_lo95:.2f} to {head_lgd.odds_ratio_hi95:.2f}, which includes 1. Intervals come from resampling whole districts. The two measures do not measure the same thing and are not expected to mark the same pixels.</li>
+<li><b>Units, not hectares.</b> The two measures agree about <i>which units</i> are degrading, not yet about <i>which hectares</i>. A pixel-by-pixel overlap of the two has not been run: it needs one more Earth Engine job.</li>
 <li><b>NIRv</b> (a greenness trend from Landsat 8) is pending and will be a reported column only.</li>
 </ul>
 <p><b>MGNREGA.</b> Expenditure is that of the works whose recorded location falls inside a unit, from the geotagged asset record, which effectively ends with works started in 2017-18. It is not what a panchayat received: only {fig['in_own_unit']:.0f} works in 100 fall in the unit
 that holds most of their own panchayat's works. Works typed as forest or forestry are {fig['forest_named']:.1f} % of all expenditure on the works in these units. What happened to plantation spending after 2017-18 is in the scheme's district reports (MIS report R6.20), not in this unit-level record.</p>
-<p><b>The shapes are simplified</b> so that the file can be e-mailed: {ae['vertices_before']:,} boundary points to {ae['vertices_after']:,}, with a tolerance of {ae['tolerance_m']:g} m and shared boundaries kept shared. The whole area changes by {ae['total_area_change_pct']:+.4f} %;
+<p><b>The shapes are simplified</b> so that the file can be e-mailed: {ae['vertices_before']:,} boundary points to {ae['vertices_after']:,}, with a tolerance of {ae['tolerance_m']:g} m and shared boundaries kept shared. The whole area changes by {ae['total_area_change_pct']:+.5f} %;
 a unit's drawn area by {ae['per_unit_abs_change_pct']['median']} % at the median and under {ae['per_unit_abs_change_pct']['p95']} % for 95 units in 100; {ae['units_changed_by_more_than_5_pct']} very small units (none larger than {ae['largest_such_unit_ha']} ha) change by more than 5 %.
 Every area printed in a panel is the unit's true area, not that of the simplified shape. There is no background map: nothing is fetched from the internet.</p>
 <p><b>To check a figure.</b> Every number shown is a cell of <code>layer_by_unit.csv</code>, which is built from the stage tables <code>degradation_by_unit.csv</code>, <code>agreement_by_unit.csv</code>, <code>need_by_unit.csv</code> and <code>allocation_by_unit.csv</code>.</p>
@@ -548,10 +592,10 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
 """
     payload = {
         "title": "Forest condition, MGNREGA allocation and social need - Odisha", "subtitle": f"{n:,} units. Pre-computed and offline: a demonstration for discussion.",
-        "built": f"Built {started[:10]} from stage outputs of {max(json.load(open(also('20_degradation/' + p, 'the date in the texts')))['run_utc'] for p in ('hansen.provenance.json', 'corestack.provenance.json'))[:10]} and earlier.",
+        "built": f"Built {started[:10]} from stage outputs of {max(json.load(open(also(p, 'the date in the texts')))['run_utc'] for p in STAGE_RECORDS)[:10]} and earlier.",
         "unit_types": {"lgd": f"LGD panchayat units ({n_lgd:,})", "out": f"Outside-village units ({n_out:,})", "out_legend": "Hatched: outside-village unit (land outside any revenue village)"},
-        "codes": CODES, "default_layer": "hansen_loss", "default_floor": "50",
-        "floors": [{"id": f, "label": f"{v:g} ha" + (" (default: the floor proposed for the analysis)" if f == "50" else " (every unit with measurable forest)")} for f, v in FLOORS.items()],
+        "codes": CODES, "default_layer": "hansen_loss", "default_floor": next(iter(FLOORS)),
+        "floors": [{"id": f, "label": f"{v:g} ha" + FLOOR_LABEL[f]} for f, v in FLOORS.items()],
         "layers": [x for L in layers for x in ([{k: v for k, v in L.items() if not k.startswith("_")}]
                                                + ([{"id": "nirv", "group": "Forests", "title": "NIRv trend (Landsat 8, 2013-2025)", "pending": "pending, not yet computed"}] if L["id"] == "agreement" else []))],
         "core_classes": [{"name": name, "color": color} for name, color, _ in CORE_CLASSES],
@@ -597,8 +641,8 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
     with open(OUT / "layer.provenance.json", "w", encoding="utf-8") as fh:
         json.dump({"script": "scripts/06_build_layer.py", "script_sha256": sha256(__file__), "template_sha256": sha256(TEMPLATE), "run_utc": started, "inputs": inputs,
                    "embedded": {"leaflet": "1.9.4", "leaflet_js_sha256": LEAFLET_SHA256, "licence": "BSD 2-Clause"},
-                   "outputs": {"index.html": sizes["index.html"], "data.js": sizes["data.js"], "both_bytes": sum(sizes.values()), "both_zipped_bytes": zipped, "limit_bytes": MAX_BYTES, "network_requests": 0},
-                   "geometry": area_error, "floors_ha": FLOORS, "default_floor_ha": 50,
+                   "outputs": {"index.html": sizes["index.html"], "data.js": sizes["data.js"], "sha256": {"index.html": sha256(OUT / "index.html"), "data.js": sha256(OUT / "data.js")}, "both_bytes": sum(sizes.values()), "both_zipped_bytes": zipped, "limit_bytes": MAX_BYTES, "network_requests": 0},
+                   "geometry": area_error, "floors_ha": FLOORS, "default_floor_ha": FLOORS[next(iter(FLOORS))],
                    "layers": [{"id": L["id"], "title": L["title"], "classes": [c["label"] for c in L["classes"]], "units_per_class": {f: [int((x == i).sum()) for i in range(len(L["classes"]))] for f, x in L["_arrays"].items()}} for L in layers],
                    "omitted_on_purpose": {"columns": list(SHRUG_COLUMNS), "why": "SHRUG is CC BY-NC-SA 4.0; a shared file carrying its estimates could become a derived work under that licence. They remain in 30_need/need_by_unit.csv"},
                    "checks_passed": {"class_counts_equal_the_stage_tables_own": {k: v[0] for k, v in checks.items()}, "totals_equal_the_stage_tables_own": {k: round(v[0], 3) for k, v in totals.items()},
