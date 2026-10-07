@@ -1,6 +1,6 @@
 # The demo layer — `60_layer/`
 
-*Built by `scripts/06_build_layer.py` (run 2026-10-07T08:28:39Z) from the stage tables named below; page in
+*Built by `scripts/06_build_layer.py` (run 2026-10-07T12:05:18Z) from the stage tables named below; page in
 `scripts/layer_template.html`; checked by `scripts/verify_layer.py`. Every figure in this document is from
 `60_layer/layer.provenance.json`, a table it names, or the check record. n = 11,468 units throughout:
 3,492 outside-village units and 7,976 LGD panchayat units.*
@@ -12,18 +12,21 @@ Security. It needs no stage 4 and no NIRv, and it argues nothing: it shows what 
 
 | file | bytes | what |
 |---|---|---|
-| `index.html` | 177,426 | the map. Leaflet 1.9.4 (BSD 2-Clause) is inside it |
-| `data.js` | 18,317,780 | the unit shapes and every value and class the map shows. Keep it beside `index.html` |
-| `layer_by_unit.csv` | — | the numbers the map shows, one row per unit, 73 columns. Not needed to view the map |
+| `index.html` | 179,973 | the map. Leaflet 1.9.4 (BSD 2-Clause) is inside it |
+| `data.js` | 19,603,106 | the unit shapes and every value and class the map shows. Keep it beside `index.html` |
+| `layer_by_unit.csv` | — | the numbers the map shows, one row per unit, 79 columns. Not needed to view the map |
 | `layer.provenance.json` | — | inputs with hashes, the UTC run time, the simplification and its error, classes, checks |
 
-**To open: double-click `index.html`.** The two files together are 18,495,206 bytes (18.50 MB; the limit set was
-25 MB) and 5.42 MB zipped, so they can be e-mailed as one zip. The page makes **0 network
+**To open: double-click `index.html`.** The two files together are 19,783,079 bytes (19.78 MB; the limit set was
+25 MB) and 5.46 MB zipped, so they can be e-mailed as one zip. The page makes **0 network
 requests**: no map tiles, no fonts, no library fetched. It will open the same way with no connection, and in two
 years. There is consequently no base map under the units — district outlines and names, drawn from the units
 themselves, are the only orientation.
 
-An address can point at a view: `index.html#layer=agreement&floor=50&unit=OUTSIDE_183` (layer ids are in §2).
+An address can point at a view, for sending someone to a place: `index.html#layer=agreement&unit=OUTSIDE_183`. The
+parts, all optional: `layer=` (ids in §2), `floor=100|50|1`, `unit=` an id, `show=lgd|out|both|none`, `district=` a
+district's name, `q=` text for the search box, `open=about|sources`. A part the page does not understand is ignored and
+the default is used.
 
 ## 2. What it shows
 
@@ -34,14 +37,14 @@ An address can point at a view: `index.html#layer=agreement&floor=50&unit=OUTSID
 | Loss on open canopy, outside the forest mask (Hansen) | `hansen_loss_ha_tc_gt10le30` / `land_ha_tc_gt10le30` | `degradation_by_unit.csv` | land with 10 < `treecover2000` ≤ 30 |
 | Forest health and degradation (CoRE Stack tree cover change 2017-2023) | class −1 / land with a class, on `treecover2000` > 10 | `corestack_by_unit_bands.csv` | the smaller of that land on the two grids |
 | Degradation net of improvement (CoRE Stack 2017-2023) | (class −1 − class 1) / land with a class, on `treecover2000` > 10 | `corestack_by_unit_bands.csv` | the same |
-| Do the two measures agree? (2017-2023) | `agreement_class` (headline window 2017–2023) | `agreement_by_unit.csv` | its own: 50 ha of reference land on both grids, fixed |
+| Do the two measures agree? (2017-2023) | `agreement_class` (headline window 2017–2023) | `agreement_by_unit.csv` | its own: 100 ha of reference land on both grids, fixed |
 | Past allocation: expenditure on all works | `expenditure_total`, in ₹ lakh | `allocation_by_unit.csv` | — |
 | Forest-named expenditure | `expenditure_forest_named_worktype`, in ₹ lakh | `allocation_by_unit.csv` | — |
 | Scheduled Tribe share of population | `st_share` | `need_by_unit.csv` | — |
 | Aggregate Development Index 2011 | `adi_2011` | `need_by_unit.csv` | — |
 | NIRv trend | nothing: listed as *pending* | — | — |
 
-Clicking a unit opens a panel with 42 fields: its name, type and district; area; forest and loss; loss by canopy
+Clicking a unit opens a panel with 44 fields: its name, type and district; area; forest and loss; loss by canopy
 band; the six CoRE Stack classes as areas and shares; the agreement class and the two rates behind it; works and
 expenditure; and the Census 2011 figures. Units can be filtered by type and district and found by name or id.
 
@@ -63,66 +66,67 @@ The same counts are in the map's legend. Every table adds up to 11,468.
 
 **Tree cover loss 2001-2025 (Hansen)**
 
-| class | units, floor 50 ha | units, floor 1 ha |
-|---|---|---|
-| No loss recorded | 263 | 1,632 |
-| Up to 1 % | 912 | 1,131 |
-| 1 to 2.5 % | 340 | 539 |
-| 2.5 to 5 % | 281 | 461 |
-| 5 to 10 % | 350 | 544 |
-| 10 to 20 % | 342 | 526 |
-| More than 20 % | 147 | 370 |
-| Insufficient forest to assess | 8,833 | 6,265 |
-| **all units** | **11,468** | **11,468** |
+| class | units, floor 100 ha | units, floor 50 ha | units, floor 1 ha |
+|---|---|---|---|
+| No loss recorded | 142 | 263 | 1,632 |
+| Up to 1 % | 755 | 912 | 1,131 |
+| 1 to 2.5 % | 269 | 340 | 539 |
+| 2.5 to 5 % | 222 | 281 | 461 |
+| 5 to 10 % | 284 | 350 | 544 |
+| 10 to 20 % | 277 | 342 | 526 |
+| More than 20 % | 118 | 147 | 370 |
+| Insufficient forest to assess | 9,401 | 8,833 | 6,265 |
+| **all units** | **11,468** | **11,468** | **11,468** |
 
 **Loss on open canopy, outside the forest mask (Hansen)**
 
-| class | units, floor 50 ha | units, floor 1 ha |
-|---|---|---|
-| No loss recorded | 728 | 5,176 |
-| Up to 1 % | 1,140 | 1,490 |
-| 1 to 2.5 % | 351 | 627 |
-| 2.5 to 5 % | 257 | 488 |
-| 5 to 10 % | 263 | 477 |
-| 10 to 20 % | 160 | 316 |
-| More than 20 % | 79 | 187 |
-| Insufficient forest to assess | 8,490 | 2,707 |
-| **all units** | **11,468** | **11,468** |
+| class | units, floor 100 ha | units, floor 50 ha | units, floor 1 ha |
+|---|---|---|---|
+| No loss recorded | 391 | 728 | 5,176 |
+| Up to 1 % | 895 | 1,140 | 1,490 |
+| 1 to 2.5 % | 267 | 351 | 627 |
+| 2.5 to 5 % | 185 | 257 | 488 |
+| 5 to 10 % | 220 | 263 | 477 |
+| 10 to 20 % | 120 | 160 | 316 |
+| More than 20 % | 54 | 79 | 187 |
+| Insufficient forest to assess | 9,336 | 8,490 | 2,707 |
+| **all units** | **11,468** | **11,468** | **11,468** |
 
 **Forest health and degradation (CoRE Stack tree cover change 2017-2023)**
 
-| class | units, floor 50 ha | units, floor 1 ha |
-|---|---|---|
-| Up to 5 % | 881 | 3,970 |
-| 5 to 15 % | 1,274 | 2,446 |
-| 15 to 25 % | 869 | 1,223 |
-| 25 to 35 % | 456 | 565 |
-| More than 35 % | 231 | 320 |
-| Insufficient forest to assess | 7,757 | 2,944 |
-| **all units** | **11,468** | **11,468** |
+| class | units, floor 100 ha | units, floor 50 ha | units, floor 1 ha |
+|---|---|---|---|
+| Up to 5 % | 529 | 881 | 3,970 |
+| 5 to 15 % | 1,010 | 1,274 | 2,446 |
+| 15 to 25 % | 749 | 869 | 1,223 |
+| 25 to 35 % | 407 | 456 | 565 |
+| More than 35 % | 196 | 231 | 320 |
+| Insufficient forest to assess | 8,577 | 7,757 | 2,944 |
+| **all units** | **11,468** | **11,468** | **11,468** |
 
 **Degradation net of improvement (CoRE Stack 2017-2023)**
 
-| class | units, floor 50 ha | units, floor 1 ha |
-|---|---|---|
-| Net improvement, more than 10 points | 913 | 2,229 |
-| Net improvement, 2 to 10 points | 749 | 1,903 |
-| Within 2 points: no net change | 518 | 2,000 |
-| Net degradation, 2 to 10 points | 740 | 1,300 |
-| Net degradation, 10 to 20 points | 416 | 585 |
-| Net degradation, more than 20 points | 375 | 507 |
-| Insufficient forest to assess | 7,757 | 2,944 |
-| **all units** | **11,468** | **11,468** |
+| class | units, floor 100 ha | units, floor 50 ha | units, floor 1 ha |
+|---|---|---|---|
+| Net improvement, more than 10 points | 650 | 913 | 2,229 |
+| Net improvement, 2 to 10 points | 559 | 749 | 1,903 |
+| Within 2 points: no net change | 378 | 518 | 2,000 |
+| Net degradation, 2 to 10 points | 625 | 740 | 1,300 |
+| Net degradation, 10 to 20 points | 358 | 416 | 585 |
+| Net degradation, more than 20 points | 321 | 375 | 507 |
+| Insufficient forest to assess | 8,577 | 7,757 | 2,944 |
+| **all units** | **11,468** | **11,468** | **11,468** |
 
 **Do the two measures agree? (2017-2023)**
 
 | class | units |
 |---|---|
-| Both measures flag this unit | 255 |
-| Hansen only (clearance) | 487 |
-| CoRE Stack only (degradation) | 487 |
-| Neither | 2,482 |
-| Insufficient forest to assess | 7,757 |
+| Both measures flag this unit | 137 |
+| Hansen only (clearance) | 348 |
+| CoRE Stack only (degradation) | 348 |
+| Neither | 1,590 |
+| East Coast zone model: left out of the headline comparison | 468 |
+| Insufficient forest to assess | 8,577 |
 | **all units** | **11,468** |
 
 **Past allocation: expenditure on all works**
@@ -191,6 +195,7 @@ Blank cells of `layer_by_unit.csv` — a blank is shown on the map in words, nev
 | `corestack_improvement_pct` | 808 |
 | `corestack_gain_pct` | 808 |
 | `corestack_net_pct` | 808 |
+| `corestack_zone_model` | 808 |
 | `agreement_hansen_rate_2017_2023_pct` | 702 |
 | `agreement_corestack_degradation_rate_pct` | 808 |
 | `expenditure_total` | 9 |
@@ -216,13 +221,15 @@ unit has none of that land. Expenditure is blank where works are geotagged in th
 
 1. **Too little forest is a class, not a colour on the scale.** A loss rate on a few hectares is noise. In
    `20_degradation/forest_floor_repeatability.csv` the rank correlation of a unit's Hansen loss rate between odd and
-   even years is 0.34 for units with 1 to 2 ha of forest, 0.77 with 25 to 50 ha, 0.81 with 50 to 100 ha and 0.94
-   with 500 to 1,000 ha. So on
+   even years is 0.34 for units with 1 to 2 ha of forest, 0.77 with 25 to 50 ha, 0.81 with 50 to 100 ha, 0.89 with
+   100 to 250 ha and 0.94 with 500 to 1,000 ha. So on
    every layer that is a rate on forest land a unit below a minimum of that land is drawn flat grey, **"insufficient
-   forest to assess"**. The map offers two minimums: **50 ha, the default** — the floor proposed for stage 4, which
-   the project owner has not ruled on — and **1 ha**, every unit with measurable forest. At 50 ha, 8,833 units
-   are in that class on the Hansen layer; at 1 ha, 6,265. The agreement layer has its own floor, fixed at 50 ha of
-   reference land on both grids (7,757 units insufficient).
+   forest to assess"**. The map offers three minimums: **100 ha, the default — the floor the project owner ruled on
+   7 October 2026** — and 50 ha and 1 ha, to see what the stricter floor hides. On the Hansen layer 9,401 units are
+   grey at 100 ha, 8,833 at 50 ha and 6,265 at 1 ha. The agreement layer has its own floor, fixed at
+   100 ha of reference land on both grids (8,577 units insufficient), and a class of its own for the
+   468 units left out of the headline comparison because their land lies wholly under CoRE Stack's East Coast
+   zone model (`docs/RESULTS.md` §5.2; `docs/DEGRADATION.md` §4b).
 2. **Outside-village units have no census rows.** On the two census layers all 3,492 read **"no census data for this
    land"**, hatched and in a colour that is not on the scale — never blank and never zero.
 3. **Outside-village units are hatched on every layer**, so the two kinds of unit can always be told apart.
@@ -266,22 +273,27 @@ no rounding. Inputs of the run:
 | `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c…` |
 | `20_degradation/degradation_by_unit.csv` | 3,628,329 | `072e281b53087823…` |
 | `20_degradation/corestack_by_unit_bands.csv` | 2,902,891 | `d59e23e87b62c37b…` |
-| `20_degradation/agreement_by_unit.csv` | 2,145,059 | `36f177e75b325055…` |
+| `20_degradation/agreement_by_unit.csv` | 2,551,239 | `c8a7dc67a24b25fa…` |
 | `30_need/need_by_unit.csv` | 1,212,483 | `0fc54bd7eb2a6d84…` |
 | `40_allocation/allocation_by_unit.csv` | 1,072,899 | `3f81d2d3edefda9f…` |
 | `20_degradation/hansen_by_unit_level.csv` | 1,090 | `46d77ed69eac08ca…` |
-| `20_degradation/forest_floor_options.csv` | 1,636 | `f7bb4e1859aa7c6a…` |
-| `20_degradation/agreement.provenance.json` | 7,039 | `c7557f683c0af31c…` |
+| `20_degradation/forest_floor_options.csv` | 1,671 | `10fd206612c3c538…` |
+| `20_degradation/agreement.provenance.json` | 10,756 | `0c0182e3a357255c…` |
 | `20_degradation/forest_floor_repeatability.csv` | 991 | `800c61adc7c22132…` |
-| `20_degradation/agreement_summary.csv` | 10,725 | `bbd59a6a06261b1e…` |
-| `20_degradation/agreement_intervals_by_district.csv` | 2,936 | `361c7ceba1bd5d4f…` |
+| `20_degradation/agreement_summary.csv` | 32,470 | `6e0fb5e26102e318…` |
+| `20_degradation/agreement_by_zone.csv` | 1,995 | `df07ed89f94db597…` |
+| `20_degradation/agreement_floor_repeatability.csv` | 1,277 | `656d67107fd39010…` |
 | `40_allocation/panchayat_of_record_check.csv` | 363 | `f36e1bd24b73ce67…` |
 | `10_units/units.provenance.json` | 1,706 | `7a7aa9077c79b68d…` |
+| `10_units/outside_village_district.provenance.json` | 7,734 | `e5e02aa04ca51004…` |
 | `20_degradation/hansen.provenance.json` | 8,637 | `d6e816740e7dd41a…` |
 | `20_degradation/corestack.provenance.json` | 12,320 | `8f03282fa339d4a3…` |
+| `20_degradation/forest_floor.provenance.json` | 1,891 | `3691b99a971dda8c…` |
+| `30_need/need.provenance.json` | 15,023 | `8024375c3a69546b…` |
+| `40_allocation/allocation.provenance.json` | 15,953 | `bf1e7052fa4ba2c7…` |
 
 The builder stops unless: the class counts above equal the stage tables' own counts (units with no forest, under
-1 ha and under 50 ha; the five agreement classes; the units with no census rows); forest and loss total what the
+1 ha, under 50 ha and under 100 ha; the six agreement classes; the units with no census rows); forest and loss total what the
 Hansen table totals (26,630.4 and 1,552.6 km²); every unit has a shape and a district; the simplified
 shapes are still a valid coverage; no SHRUG-derived column is present; nothing in the page or the data refers to
 the network; and the two files are under the size limit.
@@ -304,8 +316,8 @@ Where it departs, and why:
   (`docs/DEGRADATION.md` §4a). Degradation, Partially Degraded, No Change and Improvement are the same thing.
 - The unit is the **LGD panchayat unit or a tract of land outside every village**, not a micro-watershed or a
   tehsil; and a unit polygon is not the panchayat of record for the works inside it (README §5.8).
-- Past allocation is the geotagged asset record, 97.8 per cent of which predates FY2017-18 (README, stage 4).
-  It is what was built where, not what is being spent now.
+- Past allocation is the geotagged asset record, which effectively ends with works started in FY2017-18
+  (`docs/RESULTS.md` §8). It is what was built where, not what is being spent now.
 
 ## 7. Licences, and what was left out
 
@@ -337,61 +349,283 @@ in `30_need/need_by_unit.csv` and in the analysis. The builder fails if one of t
 
 ## 8. How it was verified
 
-A map that renders is not a map that is correct, so this was checked by looking, not by re-running.
+A map that renders is not a map that is correct. It was checked three ways: every unit by script; every control in two
+browser engines; and, in the Safari application itself, every state that can be reached through the address.
 
-**By hand, in a browser.** The built map was opened in Chrome, 16 units were clicked, and every value the panel
-displayed was read off the page and compared with the stage tables — 656 of 656 values equal. The units were
-chosen to span forest from none to the largest, both kinds of unit, and the awkward cases:
+**Every unit, by script.** `scripts/verify_layer.py` rebuilds every displayed field of every unit from the stage tables
+— not from `layer_by_unit.csv` — and every class at every floor, and compares them with what `data.js` holds:
+**92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays**. It also checks that the layer's run record describes the two files on disk (sizes, sha256, the default
+floor).
 
-| | chosen as | unit | type | forest, ha | values equal |
-|---|---|---|---|---|---|
-| A | free click, Mayurbhanj | `132731` | lgd panchayat | 50,768.70 | 41 of 41 |
-| B | free click, Kendujhar | `OUTSIDE_183` | outside village | 10,235.40 | 41 of 41 |
-| C | free click, Kendrapara | `133949` | lgd panchayat | 0.00 | 41 of 41 |
-| D | free click, Kandhamal | `137247` | lgd panchayat | 977.51 | 41 of 41 |
-| E | free click, Malkangiri | `OUTSIDE_3185` | outside village | 29,576.74 | 41 of 41 |
-| F | lgd, no forest | `137771` | lgd panchayat | 0.00 | 41 of 41 |
-| G | lgd, 1 to 50 ha of forest | `131999` | lgd panchayat | 32.95 | 41 of 41 |
-| H | lgd, both measures flag | `138534` | lgd panchayat | 1,294.74 | 41 of 41 |
-| I | lgd, works but no expenditure, no population | `132539` | lgd panchayat | 0.00 | 41 of 41 |
-| J | aimed at 133172, the click landed on its neighbour | `133170` | lgd panchayat | 0.07 | 41 of 41 |
-| K | lgd in Anugul with the most forest | `135472` | lgd panchayat | 9,702.92 | 41 of 41 |
-| L | outside, large forest | `OUTSIDE_1855` | outside village | 5,985.32 | 41 of 41 |
-| M | aimed at OUTSIDE_387, the click landed on its neighbour | `131760` | lgd panchayat | 616.16 | 41 of 41 |
-| N | outside, district ambiguous | `OUTSIDE_1229` | outside village | 0.65 | 41 of 41 |
-| O | outside, no name, district by neighbours, no forest | `OUTSIDE_3062` | outside village | 0.00 | 41 of 41 |
-| P | outside, under 1 ha of forest | `OUTSIDE_3327` | outside village | 0.15 | 41 of 41 |
+**Every control, in a browser, on this build.** `scripts/exercise_layer.py` opens `60_layer/index.html` from disk, works
+each interactive element, and after each action reads what the page then shows. It then clicks a sample of units on
+the map and compares every value the panel displays with the stage tables, rebuilt without any of the builder's code.
+Both runs below are on the build of 2026-10-07T12:05:18Z (`index.html` sha256 `13bddb2fb2db2521…`, `data.js` `a6ddd3445642a78c…`);
+this document is not written unless they are.
 
-Two of the clicks landed on a neighbour of the unit aimed at; the unit that opened is the one that was checked.
-The legend on the agreement and Scheduled Tribe layers, the 1 ha floor and the two text panels were looked at on screen.
+| | Chrome | WebKit |
+|---|---|---|
+| browser | Chrome/154.0.8037.99 | WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) |
+| how the events were made | real mouse and keyboard events sent through Chrome's DevTools protocol to a separate, headless Chrome | events dispatched inside the page (a control's own click(); mouse, wheel and key events built in script), in a WKWebView that lies off the screen |
+| run | 2026-10-07T12:15:32Z | 2026-10-07T12:10:32Z |
+| actions that did what they should | 53 of 53 | 53 of 53 |
+| units clicked on the map | 29 | 29 |
+| displayed values equal to the stage tables | 1,276 of 1,276 | 1,276 of 1,276 |
+| script errors raised by the page | none | none |
+| log | `60_layer/exercise_chrome.json` | `60_layer/exercise_webkit.json` |
 
-**Then every unit, by script**, because sixteen is not 11,468: `scripts/verify_layer.py` rebuilds every displayed
-field of every unit from the stage tables — not from `layer_by_unit.csv` — and every class at both floors, and
-compares them with what `data.js` holds: **79 of 79 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays**. On its first run it failed 6 of 77 checks, and they were real
-(CoRE Stack shares built from two tables rounded differently, so six classes summed to 99.97 per cent; units classed
-on an unrounded value that printed on the other side of a class boundary). Both were fixed in the builder.
+### 8.1 What was clicked, and what happened — Chrome
 
-**Opened from disk.** The browser automation used for the clicking cannot open a `file://` address, so the clicking
-was done on the same two files served from this machine, and the double-click case was verified separately: headless
-Chrome loaded `file://…/60_layer/index.html` with a unit and a layer in the address, and the rendered page held that
-unit's panel and that layer's legend, with no script error.
+| | control | what was done | what the page then showed |
+|---|---|---|---|
+| 1 | page | opened file://<repository>/60_layer/index.html in Chrome/154.0.8037.99 | ready in 3.8 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
+| 3 | layer switcher | clicked the radio button 'Area under forests' at (26, 260) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
+| 4 | layer switcher | clicked the radio button 'Tree cover loss 2001-2025 (Hansen)' at (26, 288) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=hansen_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
+| 5 | layer switcher | clicked the radio button 'Loss on open canopy, outside the forest mask (Hansen)' at (26, 315) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=canopy_band_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
+| 6 | layer switcher | clicked the radio button 'Forest health and degradation (CoRE Stack tree cover change 2017-2023)' at (26, 363) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=corestack_degradation&floor=100'; unit 132731 (class 'More than 35 %') is drawn #a63603, the class colour #a63603 |
+| 7 | layer switcher | clicked the radio button 'Degradation net of improvement (CoRE Stack 2017-2023)' at (26, 429) | it became the checked layer; the legend's title and its 7 classes with their counts became this layer's; the address reads '#layer=corestack_net&floor=100'; unit 132731 (class 'Net degradation, more than 20 points') is drawn #7f3b08, the class colour #7f3b08 |
+| 8 | layer switcher | clicked the radio button 'Do the two measures agree? (2017-2023)' at (26, 477) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=agreement&floor=100'; unit 132731 (class 'CoRE Stack only (degradation)') is drawn #ffa500, the class colour #ffa500 |
+| 9 | layer switcher | clicked the radio button 'Past allocation: expenditure on all works' at (26, 615) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=allocation&floor=100'; unit 132731 (class 'More than Rs 400 lakh') is drawn #3182bd, the class colour #3182bd |
+| 10 | layer switcher | clicked the radio button 'Forest-named expenditure' at (26, 662) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_named_expenditure&floor=100'; unit 132731 (class 'More than Rs 20 lakh') is drawn #1a7f6b, the class colour #1a7f6b |
+| 11 | layer switcher | clicked the radio button 'Scheduled Tribe share of population' at (26, 718) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=st_share&floor=100'; unit 132731 (class 'More than 50 %') is drawn #b9722c, the class colour #b9722c |
+| 12 | layer switcher | clicked the radio button 'Aggregate Development Index 2011' at (26, 746) | it became the checked layer; the legend's title and its 7 classes with their counts became this layer's; the address reads '#layer=adi_2011&floor=100'; unit 132731 (class 'Up to 6') is drawn #f2f0f7, the class colour #f2f0f7 |
+| 13 | layer switcher | clicked the entry 'NIRv trend ... pending' at (142, 534) | nothing changed: it is text, not a control |
+| 14 | layer switcher | with the keyboard: Arrow Down on the focused radio button | the next layer, 'canopy_band_loss', became the layer and the legend followed |
+| 15 | minimum forest | clicked '50 ha' at (26, 857) with the Hansen loss layer on | legend: 'Insufficient forest to assess (8,833 units)' (hansen_by_unit.csv has 8,833 units under 50 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #fed976 = '1 to 2.5 %' (#fed976); address '#layer=hansen_loss&floor=50' |
+| 16 | minimum forest | clicked '1 ha' at (26, 856) with the Hansen loss layer on | legend: 'Insufficient forest to assess (6,265 units)' (hansen_by_unit.csv has 6,265 units under 1 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #fed976 = '1 to 2.5 %' (#fed976); address '#layer=hansen_loss&floor=1' |
+| 17 | minimum forest | clicked '100 ha' at (26, 762) with the Hansen loss layer on | legend: 'Insufficient forest to assess (9,401 units)' (hansen_by_unit.csv has 9,401 units under 100 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #cfcfcf = 'Insufficient forest to assess' (#cfcfcf); address '#layer=hansen_loss&floor=100' |
+| 18 | minimum forest | with the agreement layer on, clicked '1 ha' | the agreement legend did not change: that layer has its own floor |
+| 19 | units shown | unticked 'LGD panchayat units' at (24, 856) | 0 LGD panchayat and 3,492 outside-village units are drawn; address '#layer=agreement&floor=100&show=out' |
+| 20 | units shown | unticked 'Outside-village units' at (24, 857) | 0 LGD panchayat and 0 outside-village units are drawn; address '#layer=agreement&floor=100&show=none' |
+| 21 | units shown | ticked 'LGD panchayat units' again at (24, 829) | 7,976 LGD panchayat and 0 outside-village units are drawn; address '#layer=agreement&floor=100&show=lgd' |
+| 22 | units shown | ticked 'Outside-village units' again at (24, 857) | 7,976 LGD panchayat and 3,492 outside-village units are drawn; address '#layer=agreement&floor=100' |
+| 23 | go to a district | did not click the district list | a native pop-up menu cannot be operated in a headless window (opening it there swallowed all later input); the choices below set the list and send its change event |
+| 24 | go to a district | chose each of the 30 districts in the list in turn | the map moved so that the whole district was in view for 30 of 30 |
+| 25 | go to a district | chose the first line of the list, 'District...' | nothing moved and nothing broke |
+| 26 | search | put the id 'OUTSIDE_1097' in the box at (142, 848) and pressed Enter | the panel opened unit OUTSIDE_1097, the map flew to it and outlined it (1 outline), no message; address '#layer=agreement&floor=100&unit=OUTSIDE_1097' |
+| 27 | search | typed the id in lower case, 'outside_1097' | the same unit, OUTSIDE_1097 |
+| 28 | search | typed part of a name, 'PUR' (in capitals), pressed Enter | message: '1,659 units match; showing the first. Add more of the name, or use the id.'; the unit opened is 131199 ('bhubaneswarpur'); units_attributes.csv has 1,659 names containing 'pur' |
+| 29 | search | typed a name only one unit has, 'bhengrajpur' | unit 131205 opened, no message |
+| 30 | search | typed 'zzzz no such place', pressed Enter | message: 'No unit with that name or id.'; the unit shown stayed 131205 |
+| 31 | search | emptied the box and pressed Enter | nothing changed |
+| 32 | text panels | clicked the button 'What this is, and how to read it' at (122, 15) | the panel opened (6,487 characters) and holds ['Units, not hectares', 'The headline:', 'Every unit kept', 'Honest colour'] |
+| 33 | text panels | turned the mouse wheel over the panel | it scrolled (600 px) |
+| 34 | text panels | clicked 'Close' at (1060, 49) | the panel closed |
+| 35 | text panels | clicked the button 'Sources and licences' at (92, 48) | the panel opened (2,123 characters) and holds ['ODbL 1.0', 'CC BY-NC-SA 4.0', 'Leaflet 1.9.4'] |
+| 36 | text panels | turned the mouse wheel over the panel | it scrolled (90 px) |
+| 37 | text panels | clicked the dimmed page beside the panel, at (40, 500) | the panel closed |
+| 38 | legend | read the legend of the agreement layer, the one with the longest class name | it is 330 x 455 px on a map of 840 x 863 px, lists 7 rows, and nothing in it runs past its edge |
+| 39 | legend | clicked its 'Hide' button at (1099, 412) | the legend shrank to its title (330 x 75 px, 0 rows) and the button now reads 'Show' |
+| 40 | legend | changed the layer while the legend was hidden | it stayed hidden and its title became the new layer's ('Scheduled Tribe share of population, Cen...') |
+| 41 | legend | clicked 'Show' at (1096, 810) | the legend came back with 7 rows |
+| 42 | map | clicked '+' at (327, 28) | zoom went from 7.5 to 8.5 |
+| 43 | map | clicked '-' at (327, 58) | zoom went back to 7.5 |
+| 44 | map | turned the mouse wheel (upwards) over the middle of the map | zoom went from 7.5 to 9 |
+| 45 | map | dragged the map 180 px left and 120 px up | its centre moved from 20.211 N 84.440 E to 19.900 N 84.935 E, and the unit that was open stayed open |
+| 46 | map | double-clicked the middle of the map | zoom went from 9 to 10 |
+| 47 | address | closed the page, then opened the file afresh with '#layer=agreement&floor=50&show=out&unit=...&district=Koraput&open=sources' | layer agreement, floor 50, 0 LGD and 3,492 outside-village units drawn, unit OUTSIDE_1097 open, district list on 'Koraput', the Sources panel open |
+| 48 | address | changed the address in place to '#layer=st_share&floor=100&show=both&q=<a unit's name>' | the page followed: layer st_share, floor 100, all 11,468 units drawn, unit 131205 open |
+| 49 | address | changed the address in place to a layer that is pending, a floor that does not exist and a unit that does not exist | layer and floor went to their defaults (hansen_loss, 100 ha); the unit already open, 131205, stayed open; no error |
+| 50 | address | closed the page, then opened the file afresh with nonsense in every part of the address | the page opened on its defaults: layer hansen_loss, floor 100 ha, all 11,468 units drawn, no unit open, no panel, no error |
+| 51 | window size | made the window 1100 x 700 | side panel 250 px, map 550 px, unit panel 300 px wide; the page is 1100 px wide, with no sideways scrolling; the legend is 330 x 374 px inside a map 700 px high and can be hidden |
+| 52 | window size | made the window 820 x 600 | side panel 210 px, map 370 px, unit panel 240 px wide; the page is 820 px wide, with no sideways scrolling; the legend is 240 x 439 px inside a map 600 px high and can be hidden |
+| 53 | unit panel | turned the mouse wheel over the unit panel | it scrolled (500 px); it has 7 headed sections and a bar of 6 class segments |
 
-**The build that was clicked, and the builds since.** The sixteen units were clicked on the build of
-2026-10-06T20:43:03Z. The layer has been rebuilt three times since, after the review pass of 7 October: when
-`degradation_by_unit.csv` gained one empty NIRv column; to replace the interval quoted in the *About* text with the one
-from resampling whole districts (`docs/DEGRADATION.md` §4b) and to record every file the builder reads; and when the
-district of the outside-village units was redone (`docs/UNITS.md`). The first two touched no per-unit value. **The
-third changed one displayed field, the district line, for outside-village units**: 21 of them carry a different
-district, and 52 a different line in all (the way the district was assigned, or the ambiguity flag). 2 of the
-sixteen clicked units are among those (`OUTSIDE_1229`, `OUTSIDE_3062`); their new district lines, and that of `OUTSIDE_1200`,
-the unit the review singled out, were read off the page again, from disk, in headless Chrome, and equal
-`outside_village_district.csv` (3 of 3 lines equal: OUTSIDE_1229, OUTSIDE_3062, OUTSIDE_1200). Every other field of every unit rests on
-tables that are byte for byte the same, and `verify_layer.py` passed after each rebuild (79 of 79 checks passed on the
-build of 2026-10-07T08:28:39Z); it now also checks that each outside-village unit's line says the way *its* district was
-assigned. The changed sentence of the *About* text was confirmed in `data.js`; the panel was not opened on screen again.
+### 8.2 The same, in WebKit
 
-**Not checked:** the type and district filters and the search box, beyond their loading; any browser other than Chrome; a phone or a small screen; printing; a machine with less memory
-(the data file is 18 MB of script); and whether the Foundation's staff read the class names as intended.
+| | control | what was done | what the page then showed |
+|---|---|---|---|
+| 1 | page | opened file://<repository>/60_layer/index.html in WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | ready in 2.0 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
+| 3 | layer switcher | sent a click to the radio button 'Area under forests' at (22, 258) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
+| 4 | layer switcher | sent a click to the radio button 'Tree cover loss 2001-2025 (Hansen)' at (22, 284) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=hansen_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
+| 5 | layer switcher | sent a click to the radio button 'Loss on open canopy, outside the forest mask (Hansen)' at (22, 329) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=canopy_band_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
+| 6 | layer switcher | sent a click to the radio button 'Forest health and degradation (CoRE Stack tree cover change 2017-2023)' at (22, 374) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=corestack_degradation&floor=100'; unit 132731 (class 'More than 35 %') is drawn #a63603, the class colour #a63603 |
+| 7 | layer switcher | sent a click to the radio button 'Degradation net of improvement (CoRE Stack 2017-2023)' at (22, 438) | it became the checked layer; the legend's title and its 7 classes with their counts became this layer's; the address reads '#layer=corestack_net&floor=100'; unit 132731 (class 'Net degradation, more than 20 points') is drawn #7f3b08, the class colour #7f3b08 |
+| 8 | layer switcher | sent a click to the radio button 'Do the two measures agree? (2017-2023)' at (22, 483) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=agreement&floor=100'; unit 132731 (class 'CoRE Stack only (degradation)') is drawn #ffa500, the class colour #ffa500 |
+| 9 | layer switcher | sent a click to the radio button 'Past allocation: expenditure on all works' at (22, 616) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=allocation&floor=100'; unit 132731 (class 'More than Rs 400 lakh') is drawn #3182bd, the class colour #3182bd |
+| 10 | layer switcher | sent a click to the radio button 'Forest-named expenditure' at (22, 661) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_named_expenditure&floor=100'; unit 132731 (class 'More than Rs 20 lakh') is drawn #1a7f6b, the class colour #1a7f6b |
+| 11 | layer switcher | sent a click to the radio button 'Scheduled Tribe share of population' at (22, 715) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=st_share&floor=100'; unit 132731 (class 'More than 50 %') is drawn #b9722c, the class colour #b9722c |
+| 12 | layer switcher | sent a click to the radio button 'Aggregate Development Index 2011' at (22, 760) | it became the checked layer; the legend's title and its 7 classes with their counts became this layer's; the address reads '#layer=adi_2011&floor=100'; unit 132731 (class 'Up to 6') is drawn #f2f0f7, the class colour #f2f0f7 |
+| 13 | layer switcher | sent a click to the entry 'NIRv trend ... pending' at (141, 536) | nothing changed: it is text, not a control |
+| 14 | layer switcher | did not try the keyboard | a key's built-in action does not run for an event made in script: not exercised in this browser |
+| 15 | minimum forest | sent a click to '50 ha' at (22, 944) with the Hansen loss layer on | legend: 'Insufficient forest to assess (8,833 units)' (hansen_by_unit.csv has 8,833 units under 50 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #fed976 = '1 to 2.5 %' (#fed976); address '#layer=hansen_loss&floor=50' |
+| 16 | minimum forest | sent a click to '1 ha' at (22, 944) with the Hansen loss layer on | legend: 'Insufficient forest to assess (6,265 units)' (hansen_by_unit.csv has 6,265 units under 1 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #fed976 = '1 to 2.5 %' (#fed976); address '#layer=hansen_loss&floor=1' |
+| 17 | minimum forest | sent a click to '100 ha' at (22, 854) with the Hansen loss layer on | legend: 'Insufficient forest to assess (9,401 units)' (hansen_by_unit.csv has 9,401 units under 100 ha of forest); unit 131597, with 81.8 ha of forest, is drawn #cfcfcf = 'Insufficient forest to assess' (#cfcfcf); address '#layer=hansen_loss&floor=100' |
+| 18 | minimum forest | with the agreement layer on, sent a click to '1 ha' | the agreement legend did not change: that layer has its own floor |
+| 19 | units shown | unticked 'LGD panchayat units' at (22, 944) | 0 LGD panchayat and 3,492 outside-village units are drawn; address '#layer=agreement&floor=100&show=out' |
+| 20 | units shown | unticked 'Outside-village units' at (22, 944) | 0 LGD panchayat and 0 outside-village units are drawn; address '#layer=agreement&floor=100&show=none' |
+| 21 | units shown | ticked 'LGD panchayat units' again at (22, 918) | 7,976 LGD panchayat and 0 outside-village units are drawn; address '#layer=agreement&floor=100&show=lgd' |
+| 22 | units shown | ticked 'Outside-village units' again at (22, 944) | 7,976 LGD panchayat and 3,492 outside-village units are drawn; address '#layer=agreement&floor=100' |
+| 23 | go to a district | did not click the district list | a native pop-up menu cannot be operated in a headless window (opening it there swallowed all later input); the choices below set the list and send its change event |
+| 24 | go to a district | chose each of the 30 districts in the list in turn | the map moved so that the whole district was in view for 30 of 30 |
+| 25 | go to a district | chose the first line of the list, 'District...' | nothing moved and nothing broke |
+| 26 | search | put the id 'OUTSIDE_1097' in the box at (141, 935) and pressed Enter | the panel opened unit OUTSIDE_1097, the map flew to it and outlined it (1 outline), no message; address '#layer=agreement&floor=100&unit=OUTSIDE_1097' |
+| 27 | search | typed the id in lower case, 'outside_1097' | the same unit, OUTSIDE_1097 |
+| 28 | search | typed part of a name, 'PUR' (in capitals), pressed Enter | message: '1,659 units match; showing the first. Add more of the name, or use the id.'; the unit opened is 131199 ('bhubaneswarpur'); units_attributes.csv has 1,659 names containing 'pur' |
+| 29 | search | typed a name only one unit has, 'bhengrajpur' | unit 131205 opened, no message |
+| 30 | search | typed 'zzzz no such place', pressed Enter | message: 'No unit with that name or id.'; the unit shown stayed 131205 |
+| 31 | search | emptied the box and pressed Enter | nothing changed |
+| 32 | text panels | sent a click to the button 'What this is, and how to read it' at (125, 14) | the panel opened (6,487 characters) and holds ['Units, not hectares', 'The headline:', 'Every unit kept', 'Honest colour'] |
+| 33 | text panels | scrolled the panel by its own scroll position (script cannot scroll WebKit with a wheel event) | it scrolled (600 px) |
+| 34 | text panels | sent a click to 'Close' at (1058, 52) | the panel closed |
+| 35 | text panels | sent a click to the button 'Sources and licences' at (94, 48) | the panel opened (2,123 characters) and holds ['ODbL 1.0', 'CC BY-NC-SA 4.0', 'Leaflet 1.9.4'] |
+| 36 | text panels | scrolled the panel by its own scroll position (script cannot scroll WebKit with a wheel event) | it scrolled (54 px) |
+| 37 | text panels | sent a click to the dimmed page beside the panel, at (40, 500) | the panel closed |
+| 38 | legend | read the legend of the agreement layer, the one with the longest class name | it is 330 x 439 px on a map of 840 x 950 px, lists 7 rows, and nothing in it runs past its edge |
+| 39 | legend | sent a click to its 'Hide' button at (1098, 515) | the legend shrank to its title (330 x 73 px, 0 rows) and the button now reads 'Show' |
+| 40 | legend | changed the layer while the legend was hidden | it stayed hidden and its title became the new layer's ('Scheduled Tribe share of population, Cen...') |
+| 41 | legend | sent a click to 'Show' at (1096, 898) | the legend came back with 7 rows |
+| 42 | map | sent a click to '+' at (327, 28) | zoom went from 7.5 to 8.5 |
+| 43 | map | sent a click to '-' at (327, 58) | zoom went back to 7.5 |
+| 44 | map | sent a wheel event (upwards) over the middle of the map | zoom went from 7.5 to 8.25 |
+| 45 | map | dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) | its centre moved from 20.205 N 84.440 E to 19.685 N 85.270 E, and the unit that was open stayed open |
+| 46 | map | double-clicked the middle of the map | zoom went from 8.25 to 9.25 |
+| 47 | address | closed the page, then opened the file afresh with '#layer=agreement&floor=50&show=out&unit=...&district=Koraput&open=sources' | layer agreement, floor 50, 0 LGD and 3,492 outside-village units drawn, unit OUTSIDE_1097 open, district list on 'Koraput', the Sources panel open |
+| 48 | address | changed the address in place to '#layer=st_share&floor=100&show=both&q=<a unit's name>' | the page followed: layer st_share, floor 100, all 11,468 units drawn, unit 131205 open |
+| 49 | address | changed the address in place to a layer that is pending, a floor that does not exist and a unit that does not exist | layer and floor went to their defaults (hansen_loss, 100 ha); the unit already open, 131205, stayed open; no error |
+| 50 | address | closed the page, then opened the file afresh with nonsense in every part of the address | the page opened on its defaults: layer hansen_loss, floor 100 ha, all 11,468 units drawn, no unit open, no panel, no error |
+| 51 | window size | made the window 1100 x 700 | side panel 250 px, map 550 px, unit panel 300 px wide; the page is 1100 px wide, with no sideways scrolling; the legend is 330 x 362 px inside a map 700 px high and can be hidden |
+| 52 | window size | made the window 820 x 600 | side panel 210 px, map 370 px, unit panel 240 px wide; the page is 820 px wide, with no sideways scrolling; the legend is 240 x 430 px inside a map 600 px high and can be hidden |
+| 53 | unit panel | scrolled the unit panel by its own scroll position | it scrolled (500 px); it has 7 headed sections and a bar of 6 class segments |
+
+### 8.3 Safari, the application: opened from disk and driven by its address
+
+`scripts/exercise_layer_safari.py` asks Safari itself (Safari 27.0 (the application)) to open `60_layer/index.html` from disk in a
+new window, then changes the window's address — the parts listed in §1 — and after each change reads back the
+window's title and the text the page shows. **Nothing is clicked**: running script in a page of Safari from outside
+needs a Safari setting that is the owner's to change. So this shows that the page loads, runs and shows the right text
+in Safari, for every layer, every minimum, the same 29 units, the search and the two text panels. Run 2026-10-07T12:22:56Z:
+**48 of 48 addresses showed what they should, and 1,265 of 1,265 values the units' panels should show
+were in the page's text, in the panel's order** (a value that is blank for a unit is not counted). Log:
+`60_layer/exercise_safari.json`.
+
+| | reached | what was done | what the page then showed |
+|---|---|---|---|
+| 1 | page | opened file://<repository>/60_layer/index.html?exercise=20261007T122117Z in the Safari application, version 27.0, with no layer, floor or unit in the address | after 3 s the window's title is 'Forest condition, MGNREGA allocation and social need - Odisha', the page shows 2,235 characters of text, and the legend is the default layer's (hansen_loss) at 100 ha with its 8 classes and their counts |
+| 2 | layer, by address | set the address to '#layer=forest_area&floor=100' | the legend's title and 6 of its 6 class rows, with their counts, are those of the layer's own record |
+| 3 | layer, by address | set the address to '#layer=hansen_loss&floor=100' | the legend's title and 8 of its 8 class rows, with their counts, are those of the layer's own record |
+| 4 | layer, by address | set the address to '#layer=canopy_band_loss&floor=100' | the legend's title and 8 of its 8 class rows, with their counts, are those of the layer's own record |
+| 5 | layer, by address | set the address to '#layer=corestack_degradation&floor=100' | the legend's title and 6 of its 6 class rows, with their counts, are those of the layer's own record |
+| 6 | layer, by address | set the address to '#layer=corestack_net&floor=100' | the legend's title and 7 of its 7 class rows, with their counts, are those of the layer's own record |
+| 7 | layer, by address | set the address to '#layer=agreement&floor=100' | the legend's title and 6 of its 6 class rows, with their counts, are those of the layer's own record |
+| 8 | layer, by address | set the address to '#layer=allocation&floor=100' | the legend's title and 8 of its 8 class rows, with their counts, are those of the layer's own record |
+| 9 | layer, by address | set the address to '#layer=forest_named_expenditure&floor=100' | the legend's title and 6 of its 6 class rows, with their counts, are those of the layer's own record |
+| 10 | layer, by address | set the address to '#layer=st_share&floor=100' | the legend's title and 6 of its 6 class rows, with their counts, are those of the layer's own record |
+| 11 | layer, by address | set the address to '#layer=adi_2011&floor=100' | the legend's title and 7 of its 7 class rows, with their counts, are those of the layer's own record |
+| 12 | minimum forest, by address | set the address to '#layer=hansen_loss&floor=100' | the legend reads 'Insufficient forest to assess (9,401 units)' |
+| 13 | minimum forest, by address | set the address to '#layer=hansen_loss&floor=50' | the legend reads 'Insufficient forest to assess (8,833 units)' |
+| 14 | minimum forest, by address | set the address to '#layer=hansen_loss&floor=1' | the legend reads 'Insufficient forest to assess (6,265 units)' |
+| 15 | unit, by address | set the address to '#layer=agreement&floor=100&unit=135949' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 16 | unit, by address | set the address to '#layer=agreement&floor=100&unit=133178' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 17 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_948' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 18 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_2177' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 19 | unit, by address | set the address to '#layer=agreement&floor=100&unit=138213' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 20 | unit, by address | set the address to '#layer=agreement&floor=100&unit=135599' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 21 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_3051' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 22 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1988' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 23 | unit, by address | set the address to '#layer=agreement&floor=100&unit=136359' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 24 | unit, by address | set the address to '#layer=agreement&floor=100&unit=132792' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 25 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_2546' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 26 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_446' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 27 | unit, by address | set the address to '#layer=agreement&floor=100&unit=138925' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 28 | unit, by address | set the address to '#layer=agreement&floor=100&unit=131785' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 29 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1650' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 30 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1523' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 31 | unit, by address | set the address to '#layer=agreement&floor=100&unit=136951' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 32 | unit, by address | set the address to '#layer=agreement&floor=100&unit=137175' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 33 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_232' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 34 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_915' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 35 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1619' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 36 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_2469' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 37 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_413' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 38 | unit, by address | set the address to '#layer=agreement&floor=100&unit=137851' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 39 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_3190' | 43 of 43 values the panel should show are in the page's text, in the panel's order |
+| 40 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1704' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 41 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1039' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 42 | unit, by address | set the address to '#layer=agreement&floor=100&unit=OUTSIDE_1034' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 43 | unit, by address | set the address to '#layer=agreement&floor=100&unit=138817' | 44 of 44 values the panel should show are in the page's text, in the panel's order |
+| 44 | search, by address | with unit 135949 open, set the address to '#layer=agreement&q=outside_948' (the id in lower case) | the panel shows unit OUTSIDE_948 |
+| 45 | search, by address | set the address to a search for 'zzzz no such place' | the message 'No unit with that name or id.' is shown |
+| 46 | text panels, by address | set the address to '#layer=agreement&open=about' | the page's text now holds ['Units, not hectares', 'The headline:', 'Every unit kept']; before it was opened it did not hold the first panel's words |
+| 47 | text panels, by address | set the address to '#layer=agreement&open=sources' | the page's text now holds ['ODbL 1.0', 'CC BY-NC-SA 4.0'] |
+| 48 | address | set the address to a layer, a floor and a unit that do not exist | the page went to its defaults: the legend is that of hansen_loss at 100 ha |
+
+### 8.4 The units clicked on the map
+
+A seeded sample, the same in both engines, drawn to span both kinds of unit, forest from none to the largest, every
+agreement class and every way a district was assigned. The sixteen units of the first hand check (6 October) were left
+out, so that this is a fresh sample. Every one of the 44 fields of the panel is compared.
+
+| unit that opened | type | chosen as | forest, ha | agreement class | values equal, Chrome | WebKit |
+|---|---|---|---|---|---|---|
+| `135949` | lgd panchayat | lgd panchayat, no forest | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `133178` | lgd panchayat | lgd panchayat, no forest | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_948` | outside village | outside village, no forest | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_2177` | outside village | outside village, no forest | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `138213` | lgd panchayat | lgd panchayat, under 1 ha of forest | 0.6 | insufficient forest | 44 of 44 | 44 of 44 |
+| `135599` | lgd panchayat | lgd panchayat, under 1 ha of forest | 0.1 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_3051` | outside village | outside village, under 1 ha of forest | 0.1 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1988` | outside village | outside village, under 1 ha of forest | 0.4 | insufficient forest | 44 of 44 | 44 of 44 |
+| `136359` | lgd panchayat | lgd panchayat, 1 to 100 ha | 16.1 | insufficient forest | 44 of 44 | 44 of 44 |
+| `132792` | lgd panchayat | lgd panchayat, 1 to 100 ha | 1.1 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_2546` | outside village | outside village, 1 to 100 ha | 2.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_446` | outside village | outside village, 1 to 100 ha | 1.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `138925` | lgd panchayat | lgd panchayat, 100 to 1,000 ha | 682.5 | hansen only | 44 of 44 | 44 of 44 |
+| `131785` | lgd panchayat | lgd panchayat, 100 to 1,000 ha | 139.4 | neither | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1650` | outside village | outside village, 100 to 1,000 ha | 497.4 | zone model excluded | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1523` | outside village | outside village, 100 to 1,000 ha | 237.2 | both | 44 of 44 | 44 of 44 |
+| `136951` | lgd panchayat | lgd panchayat, over 1,000 ha | 2,648.4 | both | 44 of 44 | 44 of 44 |
+| `137175` | lgd panchayat | lgd panchayat, over 1,000 ha | 1,293.2 | neither | 44 of 44 | 44 of 44 |
+| `OUTSIDE_232` | outside village | outside village, over 1,000 ha | 1,692.8 | corestack only | 44 of 44 | 44 of 44 |
+| `OUTSIDE_915` | outside village | outside village, over 1,000 ha | 1,786.0 | neither | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1619` | outside village | agreement class 'both' | 97.5 | both | 44 of 44 | 44 of 44 |
+| `OUTSIDE_2469` | outside village | agreement class 'hansen_only' | 132.3 | hansen only | 44 of 44 | 44 of 44 |
+| `OUTSIDE_413` | outside village | agreement class 'corestack_only' | 2,313.7 | corestack only | 44 of 44 | 44 of 44 |
+| `137851` | lgd panchayat | agreement class 'neither' | 51.5 | neither | 44 of 44 | 44 of 44 |
+| `OUTSIDE_3190` | outside village | agreement class 'zone_model_excluded' | 102.4 | zone model excluded | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1704` | outside village | outside village, district moved off the polygon's name | 75.8 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1039` | outside village | outside village, polygon with no name | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `OUTSIDE_1034` | outside village | outside village, district ambiguous | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+| `138817` | lgd panchayat | lgd panchayat, no development index | 0.0 | insufficient forest | 44 of 44 | 44 of 44 |
+
+### 8.5 What the check found, and what was changed
+
+The first runs of this check, on the builds before this one, found faults that the per-unit script could not have
+found, because they were in how the page behaves and not in what it holds. All were fixed, and the runs above are
+after the fixes:
+
+- **One quantity, printed two ways.** The land with canopy above 10 per cent, and CoRE Stack's Degradation share, each
+  appear on two lines of the panel; in some units the two lines differed in the last digit, because they were taken
+  from two tables rounded differently. Each now takes one cell, and `verify_layer.py` requires the two lines to read
+  the same.
+- **Narrow windows.** In a narrow window the side panels kept their width and squeezed the map to a strip; the rule
+  meant to prevent it was placed where it had no effect. The panels now narrow with the window.
+- **The legend.** The longest class name ran past the legend's edge, and in a short window the legend covered the map.
+  Rows now wrap, the legend scrolls within the map, and it has a Hide / Show button.
+- **The district list.** A district chosen while the map was still moving to the previous one was ignored. Moves to a
+  district or a unit are no longer animated.
+- **Small things.** The count of search matches had no thousands separator; the *About* text printed a change of
+  "−0.0000 %".
+- **The run record.** It gave a default minimum other than the page's 100 ha, and the "Built" line named an
+  older stage date than the newest table read. The builder was corrected and the verifier now compares the record with
+  the page.
+
+### 8.6 What this does not show
+
+- **Nothing was clicked in the Safari application.** There the page was opened and taken through its address (§8.3);
+  the clicks were made in WebKit, its engine, and in Chrome. Clicking in Safari itself needs its "Allow remote
+  automation" or "Allow JavaScript from Apple Events" setting, which is the owner's to change. Not reachable through
+  the address, and so not seen in Safari itself: the two kinds-of-unit boxes, the district list, and the drawn map.
+  In WebKit the events are made in script, so what a key press does by default (an arrow key moving the choice of
+  layer) is exercised in Chrome only.
+- **The district list was set through its change event** in both engines: its native pop-up cannot be clicked in a
+  window that is not on a screen. Choosing a district, and what the map then does, is exercised; the pop-up itself is
+  not.
+- **Firefox**: not installed on the machine the check ran on, so the layer has not been opened in it.
+- A phone or a touch screen; printing; a machine with little memory (the data file is 20 MB of script); and
+  whether the Foundation's staff read the class names as intended.
 
 ## 9. Before it is shown
 
@@ -406,8 +640,14 @@ assigned. The changed sentence of the *About* text was confirmed in `data.js`; t
 ```
 .venv/bin/python scripts/06_build_layer.py --units 10_units/units.gpkg
 .venv/bin/python scripts/verify_layer.py
+.venv/bin/python scripts/exercise_layer.py chrome      # needs Google Chrome
+.venv/bin/python scripts/exercise_layer.py webkit      # needs macOS and swiftc
+.venv/bin/python scripts/exercise_layer_safari.py      # needs macOS, Safari, and leave for the terminal to control it
 ```
 
-`60_layer/` is git-ignored: it is rebuilt from the stage tables, and `data.js` is 18 MB. When NIRv lands as a
+A rebuild makes the three `exercise_*.json` logs stale: they name the build they were made on, and both this document
+and `docs/RESULTS.md` refuse to be written from a log of another build.
+
+`60_layer/` is git-ignored: it is rebuilt from the stage tables, and `data.js` is 20 MB. When NIRv lands as a
 column of `degradation_by_unit.csv` the layer is not changed by it; NIRv is a reported column, not a measure, and
 stays listed as it is unless the owner asks for it to be drawn.

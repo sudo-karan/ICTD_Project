@@ -214,10 +214,14 @@ What to hold against it:
 - The five districts with the most such land: Kandhamal 3,595 km² in 152 units, Kalahandi 2,954 km² in 193 units, Ganjam 2,915 km² in 558 units, Koraput 2,914 km² in 253 units, Sundargarh 2,588 km² in 143 units.
 
 **Use.** For descriptive tables and for the demo layer (`docs/LAYER.md`). `units.gpkg` is unchanged, and these units
-stay out of any regression: they have no census rows whatever district they are in. One use beyond description was
-added on 7 October and is for the project owner to accept or refuse: `02_build_agreement.py` resamples whole
-districts to get honest intervals (`docs/DEGRADATION.md` §4b), and takes the district of an assessed outside-village
-unit from this table. No estimate depends on it; the width of the intervals does.
+stay out of any regression: they have no census rows whatever district they are in. One use goes beyond
+description, by ruling of the project owner on 7 October 2026: `02_build_agreement.py` resamples whole districts to get
+its primary intervals, and takes the district of an assessed outside-village unit from this table; the design that
+groups only the LGD panchayat units by district is printed beside it (`docs/RESULTS.md` §5.4, `docs/DEGRADATION.md`
+§4b). No estimate depends on the assignment; the width of the intervals does. Of the 774 outside-village units in
+the headline comparison, 25 carry a district that no check can confirm, 0 were moved off their polygon's name
+and 0 are ambiguous. For those units taken alone the interval from resampling districts is 1.34 times
+as wide as the one from resampling them singly (`20_degradation/agreement_intervals.csv`).
 
 ## Withdrawn
 
