@@ -167,6 +167,13 @@ def main():
         inputs.append({"path": path, "bytes": p.stat().st_size, "sha256": sha256(p)})
         return pd.read_csv(p, dtype={"unit_id": str, "pc11_district_code": str}, **kw)
 
+    def also(path, role):
+        """A file read for a count to check against or a figure in the texts: recorded among the inputs like the tables."""
+        p = ROOT / path
+        if not any(i["path"] == path for i in inputs):
+            inputs.append({"path": path, "bytes": p.stat().st_size, "sha256": sha256(p), "role": role})
+        return p
+
     g = gpd.read_file(a.units, layer="units")
     inputs.append({"path": str(a.units), "bytes": Path(a.units).stat().st_size, "sha256": sha256(a.units)})
     g["unit_id"] = g["unit_id"].astype(str)
@@ -343,9 +350,9 @@ def main():
             T[f"class_{L['id']}" + ("" if f == "all" else f"_floor_{f}_ha")] = [L["classes"][i]["label"] for i in x]
 
     # ---- the classes against the stage tables' own counts -----------------------------------------------------------------------
-    hl = pd.read_csv(ROOT / "20_degradation/hansen_by_unit_level.csv").set_index("unit_level")
-    ff = pd.read_csv(ROOT / "20_degradation/forest_floor_options.csv").set_index("floor_ha")
-    ap_ = json.load(open(ROOT / "20_degradation/agreement.provenance.json"))
+    hl = pd.read_csv(also("20_degradation/hansen_by_unit_level.csv", "its own counts and totals, checked against")).set_index("unit_level")
+    ff = pd.read_csv(also("20_degradation/forest_floor_options.csv", "its own counts, checked against")).set_index("floor_ha")
+    ap_ = json.load(open(also("20_degradation/agreement.provenance.json", "its own counts, checked against")))
     by = {L["id"]: L for L in layers}
     grey = lambda lid, f: int((by[lid]["_arrays"][f] == len(by[lid]["classes"]) - 1).sum())
     checks = {"units_under_1_ha_of_forest": [grey("hansen_loss", "1"), int(hl.loc["all units", "units_with_under_1_ha_of_forest_including_none"])],
@@ -469,16 +476,21 @@ def main():
     n_out, n_lgd = int(outside.sum()), int((~outside).sum())
     ae = area_error
     ov = hl.loc["outside_village"]
-    rep = pd.read_csv(ROOT / "20_degradation/forest_floor_repeatability.csv").set_index("forest_ha_from")["odd_years_vs_even_years_spearman"]
-    summ = pd.read_csv(ROOT / "20_degradation/agreement_summary.csv")
+    rep = pd.read_csv(also("20_degradation/forest_floor_repeatability.csv", "a figure in the texts")).set_index("forest_ha_from")["odd_years_vs_even_years_spearman"]
+    summ = pd.read_csv(also("20_degradation/agreement_summary.csv", "figures in the texts"))
     head = summ[(summ.delivered == 1) & (summ.units == "all units")].iloc[0]
-    por = pd.read_csv(ROOT / "40_allocation/panchayat_of_record_check.csv").set_index("scope").loc["all units"]
-    uc = json.load(open(ROOT / "10_units/units.provenance.json"))["counts"]
+    # the interval quoted is the one from resampling whole districts: the summary's own treats units as independent and is too narrow
+    bd = pd.read_csv(also("20_degradation/agreement_intervals_by_district.csv", "a figure in the texts"))
+    bd = bd[(bd.units == "all units") & (bd.statistic == "odds_ratio")].iloc[0]
+    if abs(float(bd["estimate"]) - float(head["odds_ratio"])) > 1e-9:
+        fails.append("the odds ratio in agreement_intervals_by_district.csv is not the summary's")
+    por = pd.read_csv(also("40_allocation/panchayat_of_record_check.csv", "a figure in the texts")).set_index("scope").loc["all units"]
+    uc = json.load(open(also("10_units/units.provenance.json", "counts in the texts")))["counts"]
     spent_all = float(alloc["expenditure_total"].sum())
     fig = {"out_area": float(ov["share_of_all_area_pct"]), "out_forest": float(ov["share_of_all_forest_pct"]), "out_loss": float(ov["share_of_all_loss_pct"]),
            "rep_1": float(rep.loc[1.0]), "rep_5": float(rep.loc[5.0]), "rep_50": float(rep.loc[50.0]), "kept_50": float(ff.loc[50.0, "forest_kept_pct"]),
            "outside_mask": float(hl.loc["all units", "loss_outside_the_mask_pct_of_any_cover"]), "expected_both": float(head["both_expected_if_unrelated"]),
-           "odds": float(head["odds_ratio"]), "odds_lo": float(head["odds_ratio_lo95"]), "odds_hi": float(head["odds_ratio_hi95"]),
+           "odds": float(head["odds_ratio"]), "odds_lo": float(bd["lo95_whole_districts_resampled"]), "odds_hi": float(bd["hi95_whole_districts_resampled"]),
            "in_own_unit": 100 * float(por["share_in_modal_polygon"]), "forest_named": 100 * float(alloc["expenditure_forest_named_worktype"].sum()) / spent_all,
            "plantation": 100 * float(alloc["expenditure_plantation_category"].sum()) / spent_all}
     for L in layers:
@@ -504,7 +516,7 @@ Hansen layer, and the coloured units still hold {fig['kept_50']:.1f} % of the fo
 <li><b>CoRE Stack tree cover change 2017-2023</b> classes each 25 m pixel inside its own tree mask by whether canopy density or tree height moved a class between two three-year periods. Its Degradation and Improvement classes come from classifiers
 its producers report as right about two times in three, and only Deforestation was validated by them: read Degradation beside Improvement. The two agro-climatic zone models differ, so part of what the map shows follows the zone boundary.</li>
 <li><b>Agreement.</b> Among the {int(ap_['counts']['assessed']):,} units with at least 50 ha of land with canopy above 10 % in 2000, {checks['agreement_both'][0]:,} are in the top fifth on both measures; two unrelated measures would share about {fig['expected_both']:.0f}
-(odds ratio {fig['odds']:.2f}, 95 % interval {fig['odds_lo']:.2f} to {fig['odds_hi']:.2f}). The two do not measure
+(odds ratio {fig['odds']:.2f}; 95 % interval {fig['odds_lo']:.2f} to {fig['odds_hi']:.2f}, from resampling whole districts). The two do not measure
 the same thing and are not expected to mark the same pixels; the question is whether they point at the same units.</li>
 <li><b>NIRv</b> (a greenness trend from Landsat 8) is pending and will be a reported column only.</li>
 </ul>
@@ -533,7 +545,7 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
 """
     payload = {
         "title": "Forest condition, MGNREGA allocation and social need - Odisha", "subtitle": f"{n:,} units. Pre-computed and offline: a demonstration for discussion.",
-        "built": f"Built {started[:10]} from stage outputs of {max(json.load(open(ROOT / '20_degradation' / p))['run_utc'] for p in ('hansen.provenance.json', 'corestack.provenance.json'))[:10]} and earlier.",
+        "built": f"Built {started[:10]} from stage outputs of {max(json.load(open(also('20_degradation/' + p, 'the date in the texts')))['run_utc'] for p in ('hansen.provenance.json', 'corestack.provenance.json'))[:10]} and earlier.",
         "unit_types": {"lgd": f"LGD panchayat units ({n_lgd:,})", "out": f"Outside-village units ({n_out:,})", "out_legend": "Hatched: outside-village unit (land outside any revenue village)"},
         "codes": CODES, "default_layer": "hansen_loss", "default_floor": "50",
         "floors": [{"id": f, "label": f"{v:g} ha" + (" (default: the floor proposed for the analysis)" if f == "50" else " (every unit with measurable forest)")} for f, v in FLOORS.items()],

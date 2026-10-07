@@ -142,9 +142,9 @@ methods section of the paper writable.
 | `02_build_nirv.py` | stage 1, the NIRv column. NIRv per unit from the two stored layers, with two yearly values side by side: date-standardised (the reported columns) and the first design's median (`_unadjusted`). Before anything is summed it re-derives the stored values at 4,000 random pixels and stops if they disagree; it also stops unless the blocks and the tiles cover the same land in every unit and season. Then trend and exact test per pixel, a measured false-alarm rate, a check that the value no longer follows the date, and how much the result hangs on the fitted rate. **Not run for the state.** Tested band by band against a local recomputation and run whole on a few real units. |
 | `check_nirv_blocks.py` | stage 1, the NIRv column; writes nothing but a log. The 13 blocks of yearly values were queued before the tiles they read were finished. This checks, per block, that its export started after the last successful export of every tile under it; that the scene list it was queued with gives every scene the same day as the list on disk; and (`--probe`) that on a box of one block the cells with a stored pass are exactly the cells the tiles hold an observation for. Exit 0 pass, 1 fail, 3 not decidable yet. |
 | `run_nirv_chain.py` | stage 1, the NIRv column: the driver. One process that reads Earth Engine's own task records, waits for the tiles and the blocks, runs the check, `02_build_nirv.py` and `02_assemble_degradation.py` in order, each only if the one before passed, and cancels a task that uses far more compute than was measured for its kind. It resubmits nothing that failed and stops, saying why, in `logs/nirv_chain.log`. `--self-test` runs its decisions on made-up queues. **Running** since 6 Oct 2026 19:39 UTC. |
-| `02_build_agreement.py` | stage 1. Hansen beside CoRE Stack, unit by unit, from the two sources' own tables (no Earth Engine): each unit's rate on one reference land (`treecover2000` > 10), a flag for the worst fifth on each measure, and the class *both / Hansen only / CoRE Stack only / neither / insufficient forest*. Headline window 2017–2023; 2019–2022 and Hansen's full span in rows of their own, never pooled. Run 2026-10-06T19:28:04Z. The three-measure version of 6 Oct is in the repository's first commit only. |
-| `verify_agreement.py` | stage 1 check; writes nothing. Rebuilds the agreement table's arithmetic from the sources with no code shared with the builder: 42 of 42 checks passed; n = 11,468 units, 3,711 assessed. |
-| `02_assemble_degradation.py` | stage 1, last. Copies the sources' columns into `degradation_by_unit.csv`, one row per unit, and gates 66 sums against the sources' own summary tables. Hansen and CoRE Stack are required; NIRv is optional — while it is not built its columns are blank and `nirv_status` is `pending`. Run 2026-10-06T19:10:56Z: 11,468 rows × 62 columns, NIRv pending. |
+| `02_build_agreement.py` | stage 1. Hansen beside CoRE Stack, unit by unit, from the two sources' own tables (no Earth Engine): each unit's rate on one reference land (`treecover2000` > 10), a flag for the worst fifth on each measure, and the class *both / Hansen only / CoRE Stack only / neither / insufficient forest*. Headline window 2017–2023; 2019–2022 and Hansen's full span in rows of their own, never pooled. Run 2026-10-07T07:55:00Z. The three-measure version of 6 Oct is in the repository's first commit only. |
+| `verify_agreement.py` | stage 1 check; writes nothing. Rebuilds the agreement tables' arithmetic from the sources, importing nothing from the builder: 55 of 55 checks passed; n = 11,468 units, 3,711 assessed. Its docstring lists what it re-derives and what it only checks (the bootstrap intervals). |
+| `02_assemble_degradation.py` | stage 1, last. Copies the sources' columns into `degradation_by_unit.csv`, one row per unit, and gates 66 sums against the sources' own summary tables. Hansen and CoRE Stack are required; NIRv is optional — while it is not built its columns are blank and `nirv_status` is `pending`. Run 2026-10-06T21:26:10Z: 11,468 rows × 63 columns, NIRv pending. |
 | `02_propose_forest_floor.py` | stage 1, a recommendation only: how many units, and how much forest and loss, survive a minimum forest area. Changes no stage-1 output. Run 5 Oct 2026 (UTC). |
 | `03_build_need.py` | stage 2. Census counts, ADI and the SECC poverty rate per unit from village-level rows, and the reported `forest_dependent_households` construct. Independently replicated. |
 | `04_build_allocation.py` | stage 3. Point-in-polygon allocation; reconciles to the verified totals to the rupee before writing. |
@@ -194,7 +194,7 @@ the forest is — a longitude-correlated bias in the denominator of every per-he
 | | |
 |---|---|
 | In | `units.gpkg` uploaded as an Earth Engine table asset (`scripts/02_upload_units_asset.py`; the asset is `projects/replicating-paper/assets/ictd/units`) |
-| Out | one table per source in `20_degradation/`, each with a row for every one of the 11,468 units, the outside-village units included; **`degradation_by_unit.csv`**, the sources side by side (11,468 rows × 62 columns, assembled 2026-10-06T19:10:56Z); and `agreement_by_unit.csv`, which sets Hansen against CoRE Stack |
+| Out | one table per source in `20_degradation/`, each with a row for every one of the 11,468 units, the outside-village units included; **`degradation_by_unit.csv`**, the sources side by side (11,468 rows × 63 columns, assembled 2026-10-06T21:26:10Z); and `agreement_by_unit.csv`, which sets Hansen against CoRE Stack |
 
 Columns of `degradation_by_unit.csv`: `unit_id`, `unit_level`, `outside_village`, `forest_ha`, `hansen_loss_ha` (total and by
 year 2001–2025), land and loss by band of year-2000 canopy (`land_ha_tc_*`, `hansen_loss_ha_tc_*`),
@@ -214,7 +214,7 @@ correction for the date of each image. **NIRv is a reported column, not a measur
 |---|---|---|
 | Hansen Global Forest Change v1.13 | `hansen_by_unit.csv`, `hansen_by_unit_thresholds.csv`, `hansen_loss_by_canopy_band.csv`, `hansen_loss_by_canopy_band_by_unit.csv` | built; independently replicated twice |
 | CoRE Stack tree-change classes 2017–2023 | `corestack_by_unit.csv`, `corestack_by_unit_bands.csv` | built, every class by canopy band |
-| Hansen beside CoRE Stack | `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv` | built; arithmetic rebuilt independently (42 of 42 checks passed) |
+| Hansen beside CoRE Stack | `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`; and what they assume: `agreement_intervals_by_district.csv`, `agreement_by_zone.csv`, `agreement_floor_repeatability.csv` | built; arithmetic rebuilt by a second script (55 of 55 checks passed) |
 | the sources side by side | `degradation_by_unit.csv` | built; NIRv columns blank, `nirv_status` = pending |
 | NIRv, Landsat 8, 2013–2025 — a reported column | — | **pending**: 52 of 84 tiles of observations exported at 2026-10-06T20:59:37Z, 13 blocks queued behind them, the project in restricted mode. `scripts/run_nirv_chain.py` fills the columns when the queue ends |
 | minimum forest area for stage 4 | `forest_floor_options.csv`, `forest_floor_repeatability.csv` | a recommendation, applied to nothing |
@@ -247,9 +247,18 @@ correction for the date of each image. **NIRv is a reported column, not a measur
   its rate is in the worst fifth of the assessed units. **Headline window 2017–2023** — the span of the CoRE Stack
   product, and the years in which plantation went from 24.2 per cent of Odisha's scheme expenditure (2016-17) to
   3.3 (2018-19): 255 units are flagged by both, against 148 expected of unrelated flags (odds ratio 2.67,
-  95 % interval 2.20–3.19); 487 by Hansen alone, 487 by CoRE Stack alone, 2,482 by neither. Rank
-  correlation of the two rates 0.36; with CoRE Stack's *improvement* class, the placebo, +0.03. They agree
-  more than chance and far from fully; where one flags a unit and the other does not, say which. Hansen's full span
+  95 % interval 1.70–4.39); 487 by Hansen alone, 487 by CoRE Stack alone, 2,482 by neither. Rank
+  correlation of the two rates 0.36 (0.22–0.47). They agree more than chance and far from fully; where one flags a unit and the
+  other does not, say which. Three things to carry with the figure. **(1) Quote the intervals from
+  `agreement_intervals_by_district.csv`**, which resamples whole districts, as above; the ones in the summary table
+  treat units as independent and are 2.7 times too narrow for the odds ratio. Within districts the odds ratio is
+  2.37: the agreement is not only that both are high in the same districts. **(2) The placebo is clean in one
+  of CoRE Stack's two zone models and not in the other** (`agreement_by_zone.csv`): the Hansen rate's correlation with
+  the *improvement* class is +0.03 pooled and +0.06 in the Eastern Plateau and Hills model (2,921 units), but
+  +0.29 in the East Coast Plains and Hills model (630 units; with degradation there, 0.53). **(3) The 50 ha floor is the
+  one proposed for stage 4, not ruled on**, and its evidence was measured on the > 30 mask; on this table's land a
+  unit's loss rate is repeatable at 0.73 at 50–100 ha and passes 0.8 only from 100 ha
+  (`agreement_floor_repeatability.csv`). Hansen's full span
   2001–2025 beside the same CoRE Stack classes is reported separately (236 by both, odds ratio 2.27) and is
   not one period: **never average or pool the windows.** A pixel-by-pixel overlap was not run (it needs an Earth
   Engine job).
@@ -271,7 +280,8 @@ correction for the date of each image. **NIRv is a reported column, not a measur
 - **`hansen_loss_ha` counts loss only inside the mask**, and 4,310 units have no forest by it and 6,265 have
   under a hectare, so a loss *rate* per unit is undefined or noise for most units. The recommendation for
   stage 4, for the project owner to rule on, is a floor of 50 ha of forest (2,635 units keep 98.6 % of the
-  forest and 98.8 % of the loss), with 10 and 100 ha as alternatives. It is applied to no stage-1 output.
+  forest and 98.8 % of the loss), with 10 and 100 ha as alternatives. No stage-1 column is masked by it; since 7 Oct it is
+  the floor of the agreement table (on `treecover2000` > 10 land) and the default setting of the demo layer.
 - **Reconciliation.** Against Global Forest Watch's published Odisha totals, like for like
   (`treecover2000` > T): tree cover in 2000 is 0.66 %, 0.64 % and 0.67 % lower at T = 10, 30 and 50, and loss
   2001–2020 0.26 % lower — the units cover 0.46 % less area than Global Forest Watch's boundary. Against the

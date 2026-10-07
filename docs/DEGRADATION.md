@@ -254,10 +254,12 @@ number of pixels apart), so nothing is resampled; they both have a value on 17.5
 
 ### 4b. Do Hansen and CoRE Stack point at the same units? (task D)
 
-**State: built for all 11,468 units (run 2026-10-06T19:28:04Z), from the two sources' own per-unit tables; no Earth Engine. Its
-arithmetic was then rebuilt cell by cell by a script that shares no code with the builder (`scripts/verify_agreement.py`:
-42 of 42 checks passed).** Tables: `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`. NIRv is not
-in this table (§5).
+**State: built for all 11,468 units (run 2026-10-07T07:55:00Z), from the two sources' own per-unit tables; no Earth Engine. Its
+arithmetic was then rebuilt by a script that imports nothing from the builder (`scripts/verify_agreement.py`:
+55 of 55 checks passed; its docstring lists what it re-derives and what it only checks — the bootstrap intervals are
+checked, not rebuilt).** Tables: `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`, and three
+that say what the first three assume: `agreement_intervals_by_district.csv`, `agreement_by_zone.csv`,
+`agreement_floor_repeatability.csv`. NIRv is not in this table (§5).
 
 **What is compared, and at what scale.** Hansen dates the outright removal of tree cover. CoRE Stack classes a 25 m
 pixel inside its own tree mask by whether canopy density or height moved a class between two three-year periods. They
@@ -302,37 +304,74 @@ So what the two measures record over 2017–2023 is the condition of the forest 
 scheme stopped paying for it. A measure ending in 2016 could say nothing about that. (This is alignment in time. It
 is not, by itself, evidence that one caused the other; stage 4 is where that is argued.)
 
-**The headline.** Units flagged by both, beside the number two unrelated flags of those sizes would share; intervals
-are 95 per cent, from resampling units.
+**The headline.** Units flagged by both, beside the number two unrelated flags of those sizes would share. Intervals
+are 95 per cent, from resampling **whole districts** (28 districts hold the assessed units) — see *What the intervals
+assume*, below.
 
 | | units | insufficient forest | assessed | flagged by Hansen | flagged by CoRE Stack | **by both** | expected if unrelated | observed / expected | odds ratio | Hansen only | CoRE Stack only | neither |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| all units | 11,468 | 7,757 | 3,711 | 742 | 742 | **255** | 148.4 | 1.72 (1.57–1.87) | 2.67 (2.20–3.19) | 487 | 487 | 2,482 |
-| LGD panchayat units | 7,976 | 5,472 | 2,504 | 456 | 391 | **129** | 71.2 | 1.81 (1.59–2.04) | 2.69 (2.11–3.42) | 327 | 262 | 1,786 |
-| outside-village units | 3,492 | 2,285 | 1,207 | 286 | 351 | **126** | 83.2 | 1.51 (1.35–1.69) | 2.44 (1.86–3.23) | 160 | 225 | 696 |
+| all units | 11,468 | 7,757 | 3,711 | 742 | 742 | **255** | 148.4 | 1.72 (1.34–2.34) | 2.67 (1.70–4.39) | 487 | 487 | 2,482 |
+| LGD panchayat units | 7,976 | 5,472 | 2,504 | 456 | 391 | **129** | 71.2 | 1.81 (1.24–2.76) | 2.69 (1.40–5.48) | 327 | 262 | 1,786 |
+| outside-village units | 3,492 | 2,285 | 1,207 | 286 | 351 | **126** | 83.2 | 1.51 (1.29–2.05) | 2.44 (1.78–4.19) | 160 | 225 | 696 |
 
-Rank correlation (Spearman) across assessed units between the Hansen rate 2017–2023 and each CoRE Stack rate. Class 1,
-*improvement*, is the placebo: it comes from the same classifiers as class −1 and should not go with clearance.
+Rank correlation (Spearman) across assessed units between the Hansen rate 2017–2023 and each CoRE Stack rate, with
+the same intervals. Class 1, *improvement*, is the placebo: it comes from the same classifiers as class −1 and should
+not go with clearance.
 
 | | class −1 (degradation) | class −1 minus class 1 (net) | classes −1, 3, 4 | class −2 (tree cover lost) | class 1 (improvement, the placebo) |
 |---|---|---|---|---|---|
-| all units | 0.36 (0.34–0.39) | 0.25 (0.21–0.27) | 0.36 | 0.18 (0.15–0.21) | 0.03 (-0.00–0.06) |
-| LGD panchayat units | 0.37 (0.33–0.40) | 0.24 (0.20–0.28) | 0.36 | 0.15 (0.11–0.18) | 0.03 (-0.01–0.06) |
-| outside-village units | 0.32 (0.28–0.37) | 0.23 (0.18–0.28) | 0.32 | 0.32 (0.27–0.37) | -0.00 (-0.06–0.05) |
+| all units | 0.36 (0.22–0.47) | 0.25 (0.10–0.39) | 0.36 | 0.18 (0.07–0.26) | 0.03 (−0.12 to 0.14) |
+| LGD panchayat units | 0.37 (0.18–0.51) | 0.24 (0.08–0.40) | 0.36 | 0.15 (0.03–0.26) | 0.03 (−0.12 to 0.15) |
+| outside-village units | 0.32 (0.24–0.41) | 0.23 (0.13–0.36) | 0.32 | 0.32 (0.21–0.41) | −0.00 (−0.15 to 0.11) |
+
+**What the intervals assume.** The intervals in `agreement_summary.csv` resample units one at a time, as if each unit
+were an independent draw. They are not — neighbouring units share forest, terrain and administration — and what that
+assumption hides shows when whole districts are resampled instead: every interval is 2.7 to 4.7 times wider (all units):
+
+| | estimate | 95 % interval, units resampled singly | **whole districts resampled** | times wider |
+|---|---|---|---|---|
+| odds ratio | 2.67 | 2.20–3.19 | **1.70–4.39** | 2.7 |
+| observed / expected | 1.72 | 1.57–1.87 | **1.34–2.34** | 3.3 |
+| rank correlation with class −1 | 0.36 | 0.34–0.39 | **0.22–0.47** | 4.5 |
+| with class −1 minus class 1 | 0.25 | 0.21–0.27 | **0.10–0.39** | 4.7 |
+| with class −2 | 0.18 | 0.15–0.21 | **0.07–0.26** | 3.0 |
+| with class 1 (the placebo) | 0.03 | −0.00 to 0.06 | **−0.12 to 0.14** | 4.1 |
+
+**The district intervals are the ones to quote**, and they are the ones in the two tables above; the single-unit ones
+are a lower bound on the uncertainty. With 28 clusters they are rough themselves. The conclusion survives them: the odds ratio's lower
+bound stays above 1 in both kinds of unit. In every resample the flags are those of the full sample.
+
+Is the agreement only that both measures are high in the same districts? No. The odds ratio **within districts**
+(Mantel–Haenszel, pooled over the districts) is 2.37 for all units, 2.89 in the LGD panchayat units and 2.16 in the
+outside-village units, against 2.67 overall: the agreement holds unit by unit inside a district.
 
 **What this shows.**
 
 1. **The two measures agree more than chance, and far from fully.** 255 units are in the top fifth on both, against
-   148 expected of unrelated flags: 1.72 times as many, odds ratio 2.67 (2.20–3.19). But 487 units are flagged by
+   148 expected of unrelated flags: 1.72 times as many, odds ratio 2.67 (1.70–4.39). But 487 units are flagged by
    Hansen alone and 487 by CoRE Stack alone: of the units either measure puts in its worst fifth, 34 per cent are in
    the other's. Where both flag a unit the claim that it degraded is as strong as these two sources can make it. Where
    one does, the table says which, and neither is preferred.
-2. **The placebo behaves.** A unit's Hansen rate rises with its CoRE Stack degradation rate (Spearman 0.36) and not with
-   its improvement rate (+0.03); units in Hansen's worst fifth are *less* often in the top fifth for improvement than
-   chance would give (105 against 148; odds ratio 0.60, 0.48–0.75). So the agreement is with degradation, not with
-   CoRE Stack's classifier simply being busy where there is forest.
-3. **It holds in both kinds of unit**, a little more strongly in the LGD panchayat units (observed over expected
-   1.81) than in the outside-village units (1.51).
+2. **The placebo holds in one of CoRE Stack's two zone models and not in the other.** Pooled, a unit's Hansen rate rises
+   with its CoRE Stack degradation rate (Spearman 0.36 (0.22–0.47)) and not with its improvement rate (0.03 (−0.12 to 0.14)),
+   and units in Hansen's worst fifth are *less* often in the top fifth for improvement than chance would give (105
+   against 148). But the pooled figure mixes two models that differ (§4a). Split by the model covering a unit's land:
+
+   | units whose valued land is under | assessed | flagged by Hansen, % | both, class −1 | expected | odds ratio | Spearman with class −1 | **with class 1, the placebo** | units reaching the pooled class 1 cut | of them flagged by Hansen | expected | median class 1 rate, % |
+   |---|---|---|---|---|---|---|---|---|---|---|---|
+   | Eastern Plateau and Hills model only | 2,921 | 18.4 | 160 | 99.3 | 2.24 | 0.33 (0.30–0.37) | 0.06 (0.03–0.10) | 698 | 98 | 128.6 | 15.7 |
+   | East Coast Plains and Hills model only | 630 | 25.7 | 80 | 36.5 | 6.39 | 0.53 (0.47–0.58) | 0.29 (0.22–0.37) | 13 | 4 | 3.3 | 4.2 |
+   | both models | 160 | 26.2 | 15 | 16.0 | 0.87 | 0.05 (−0.14 to 0.21) | 0.02 (−0.13 to 0.17) | 31 | 3 | 8.1 | 11.2 |
+
+   (Intervals here resample units singly.) In the Eastern Plateau and Hills model, which holds 79 per cent of the
+   assessed units, the placebo is clean: 0.06 against 0.33 for degradation. **In the East Coast Plains and Hills model it is
+   not: there the Hansen rate goes with improvement at 0.29** — less than with degradation (0.53), but far from
+   nothing — which is what one would see if the classifier there were busy wherever the forest is changing at all.
+   The flag cannot test it there: only 13 of its 630 units reach the pooled improvement cut. And in the 160 units
+   that straddle the two models there is no agreement to speak of (odds ratio 0.87; Spearman 0.05, interval
+   −0.14 to 0.21). The agreement on class −1 itself holds inside each model taken alone (odds ratios 2.24 and 6.39).
+3. **It holds in both kinds of unit** — observed over expected 1.81 (1.24–2.76) in the LGD panchayat units and
+   1.51 (1.29–2.05) in the outside-village units. The difference between the two is well inside the intervals.
 4. **The class that should match Hansen best matches it worst.** Class −2, "tree cover lost", is the class the producers
    validated and the one that names what Hansen measures; its rank correlation with the Hansen rate is 0.18 over all
    assessed units (0.32 in the outside-village units, 0.15 in the LGD panchayat ones), below that of class −1. On land with
@@ -347,7 +386,9 @@ Rank correlation (Spearman) across assessed units between the Hansen rate 2017�
    9,046 km² of class −1 in the same units.
 
 **The other windows, reported separately** (all units, 50 ha floor). The full-span row sets Hansen's loss in any year
-2001–2025 beside a product that starts in 2017; it is not one period and is not a test of agreement.
+2001–2025 beside a product that starts in 2017; it is not one period and is not a test of agreement. In this table and
+the two after it the intervals resample units singly — district intervals were made for the headline only — so read
+them as too narrow by the factor above.
 
 | Hansen loss dated | Hansen top-fifth cut, % of reference land | Hansen loss in the window, km² | both | expected | observed / expected | odds ratio | Spearman with class −1 | with class 1 |
 |---|---|---|---|---|---|---|---|---|
@@ -359,8 +400,9 @@ CoRE Stack's "2017" is the mode of the agricultural years 2016-17 to 2018-19 and
 so a loss dated 2017 or 2018 falls inside its first period and one dated 2023 inside its second. Keeping only the
 years strictly between the two periods (2019–2022) changes little.
 
-**The minimum forest** (headline window, all units). A unit's rate on a few hectares is noise (§4c); the finding does
-not depend on where the floor is set.
+**The minimum forest** (headline window, all units). A unit's rate on a few hectares is noise (§4c). 50 ha is the
+floor *proposed* for stage 4, which the project owner has not ruled on; it is used here because a floor is needed.
+The finding does not depend on where it is set:
 
 | at least | assessed units | both | expected | observed / expected | odds ratio | Spearman with class −1 |
 |---|---|---|---|---|---|---|
@@ -368,11 +410,29 @@ not depend on where the floor is set.
 | 50 ha (delivered) | 3,711 | 255 | 148.4 | 1.72 (1.57–1.87) | 2.67 (2.20–3.19) | 0.36 |
 | 100 ha | 2,891 | 184 | 115.6 | 1.59 (1.43–1.76) | 2.27 (1.86–2.79) | 0.33 |
 
+The evidence for 50 ha in §4c was measured on the `treecover2000` > 30 mask, which is not this table's land. The same
+test on the reference land used here — the rank correlation of a unit's Hansen loss rate between odd and even years,
+by how much of that land the unit has (`agreement_floor_repeatability.csv`):
+
+| reference land in the unit | units | odd against even years, 2001–2025 | within 2017–2023 | the same class of forest on the > 30 mask (§4c) |
+|---|---|---|---|---|
+| 10 to 25 ha | 1,199 | 0.60 | 0.60 | 0.72 |
+| 25 to 50 ha | 874 | 0.70 | 0.65 | 0.77 |
+| 50 to 100 ha | 839 | 0.73 | 0.73 | 0.81 |
+| 100 to 250 ha | 988 | 0.84 | 0.80 | 0.89 |
+| 250 to 500 ha | 622 | 0.91 | 0.83 | 0.91 |
+| 500 to 1,000 ha | 542 | 0.93 | 0.87 | 0.94 |
+
+On this land the mark of 0.8 that §4c uses is reached from 100 ha, not from 50: at 50 to 100 ha a unit's rate is repeatable
+at 0.73. So the 50 ha floor is weaker here than its own justification says. The 100 ha row above is the
+stricter reading: 2,891 units assessed, 184 flagged by both against 116 expected. Which floor stage 4 uses is the owner's
+to rule.
+
 **Other readings of "CoRE Stack says degraded"** (headline window, all units, 50 ha floor; `agreement_definitions.csv`).
 
 | CoRE Stack flag on | top-fifth cut, % of valued land | both | expected | observed / expected | odds ratio |
 |---|---|---|---|---|---|
-| class -1 (delivered) | 23.99 | 255 | 148.4 | 1.72 | 2.67 (2.22–3.18) |
+| class -1 (delivered) | 23.99 | 255 | 148.4 | 1.72 | 2.67 (2.20–3.19) |
 | classes -1, 3 and 4 | 25.82 | 251 | 148.4 | 1.69 | 2.58 (2.14–3.09) |
 | class -1 minus class 1 | 10.80 | 234 | 148.4 | 1.58 | 2.23 (1.86–2.68) |
 | class -2, tree cover lost | 0.61 | 217 | 148.4 | 1.46 | 1.92 (1.58–2.31) |
@@ -387,12 +447,19 @@ not depend on where the floor is set.
   (28 per cent) and 0 are class −2; of 2,914 valued points with no Hansen loss in any year, 668 are class −1
   (23 per cent) and 8 are class −2.
 - **The flag is relative** to the assessed units of this layer; a different set of units would move the cuts.
+- **It is not a clean test in the East Coast Plains and Hills model**, where the placebo fails (point 2).
 - **A class −1 rate carries the zone it lies in.** The two agro-climatic zone models differ (§4a: the downward share is
   0.75 in one and 0.54 in the other), so part of what CoRE Stack "flags" follows the zone boundary.
 - **The two rates stand on two grids**, Hansen's 30 m and CoRE Stack's 25 m; over all units the reference land differs
   by +0.0037 per cent between them.
 
-### 4c. A minimum forest area for stage 4 (task E) — a recommendation, applied to nothing
+### 4c. A minimum forest area for stage 4 (task E) — a recommendation, not ruled on
+
+**Where the proposed floor is used since 7 October 2026.** When this section was written the 50 ha floor was applied to
+no table. It is now the floor of the agreement table (§4b), applied there to land with `treecover2000` > 10 — a
+different land from the one it was measured on, and weaker on it (§4b, *The minimum forest*) — and the default setting
+of the demo layer (`docs/LAYER.md`), which offers 1 ha beside it. No stage-1 column is masked by it, and it is still a
+recommendation: the project owner has not ruled.
 
 Stage 1 covers all 11,468 units whatever this section says. `scripts/02_propose_forest_floor.py` writes
 `forest_floor_options.csv` and `forest_floor_repeatability.csv` (run 2026-10-05T21:46:29Z).
@@ -961,7 +1028,7 @@ What was applied, and where:
 | CoRE Stack tallies (§4a, task C) | **one careful pass**: the script's gates, a hand check on three units, and a reconciliation to the producers' one published Odisha figure |
 | NIRv (§5, task B) | **full independent replication, two rounds** — a separate agent, docstring only, no Earth Engine, the same scenes from another archive. Round 1 confirmed the first design's values bit for bit and found that they follow the calendar; the design was changed on that finding. Round 2 confirmed the stored observations, the standardisation's arithmetic and the per-unit figures on test areas, and set out the new measure's limits. Its units are saved for comparison with the state-wide run, which does not exist yet. Before any of it: three independent critics of the design, and every band and table tested against a local recomputation |
 | the assembly, `degradation_by_unit.csv` (task 1 of 7 October) | **one careful pass**: the script's own gates — every unit once, the yearly columns adding to the total, the > 30 band equal to the Hansen table, and 66 sums against the three sources' own summary tables — and an independent reviewer who rebuilt the columns from the sources (*The careful pass of 7 October*, below) |
-| agreement table (§4b, task D) | **its arithmetic checked directly**: `scripts/verify_agreement.py` shares no code with the builder and rebuilds, from the two sources' per-unit tables, each unit's reference land, rates, flags and class and every count, expected count, odds ratio and rank correlation of the summary — 42 of 42 checks passed; n = 11,468 units, 3,711 assessed. Then **one careful pass** by an independent reviewer (below) |
+| agreement table (§4b, task D) | **its arithmetic checked directly**: `scripts/verify_agreement.py` shares no code with the builder and rebuilds, from the two sources' per-unit tables, each unit's reference land, rates, flags and class and every count, expected count, odds ratio and rank correlation of the summary — 55 of 55 checks passed; n = 11,468 units, 3,711 assessed. Then **one careful pass** by an independent reviewer (below) |
 | housekeeping: a district for each outside-village unit, the git repository (task 5) | **one careful pass**: the script's gates and an independent reviewer (below) |
 | the demo layer, `60_layer/` (task 6; `docs/LAYER.md`) | **by hand, in a browser**: the map was opened, 16 units were clicked — forest from none to the largest, both kinds of unit — and all 656 values displayed for them were read off the page and compared with the stage tables. Then, because sixteen is not 11,468, `scripts/verify_layer.py` rebuilt every displayed field of every unit from the stage tables: 78 of 78 checks passed; n = 11,468 units, 42 fields a unit, 14 class arrays |
 | minimum forest area (§4c, task E) | one careful pass; it is arithmetic on the replicated Hansen table |
@@ -1174,7 +1241,50 @@ real units. These are tests of arithmetic on small areas. They are not results a
 holds the tests of the three-measure agreement script of 6 October; that script was replaced on 7 October by one that
 reads tables only (§4b), and its tests are retired with it.
 
-**The careful pass of 7 October** had not reported when this was written.
+**The careful pass of 7 October.** Three reviewers, one part each, read-only, each rebuilding the figures with code
+of its own and none of them allowed Earth Engine; a finding of weight was then to be given to a second agent told to
+refute it. The session ended while they were running. The two reviews that had come back were kept; the third was run
+again; the findings of the first two were reproduced here instead of by second agents, except one.
+
+- *The assembly.* The reviewer rebuilt every column of `degradation_by_unit.csv` for all 11,468 units from the
+  sources' tables: no number in the table or its record failed to reproduce. What it found was in the path not yet
+  taken — what the script does when NIRv lands, which the chain runs unattended. NIRv columns were copied and marked
+  "built" with no check against NIRv's own summary table, and a NIRv table that was on disk but short of a unit, or
+  built for another layer, came out as "pending" with exit 0: the chain would have announced a fill that had not
+  happened. A second agent could not refute the first; the second was reproduced here. Both are fixed. NIRv is now
+  held to `nirv_by_unit_level.csv` and to the row and blank-cell counts in its own record; a table that is there and
+  cannot be used ends the script with exit 1; and the chain passes `--require-nirv`, under which "pending" is an error
+  too. Tested in a sandbox copy on made-up NIRv tables — one good, ten bad in different ways, each ending as it
+  should. From the same review: every unit is held to a second per-unit table of its source (13 columns, largest gap
+  0.0003 ha), because sums by unit type cannot see a row given to the wrong unit; 78 sums are held to the sources' summary tables,
+  the periods of the yearly columns among them; the table is read back as text before it replaces the old one; the
+  record lists every file read; and `nirv_trend_ha_unadjusted` is carried, so that each pair of NIRv areas has its own
+  land (63 columns). The docstring now says that `land_tc_gt10_ha` is measured on CoRE Stack's grid and is not the sum of
+  the two Hansen band columns.
+- *The agreement table.* The reviewer recomputed the summary and definitions tables with a percentile and a rank
+  correlation written by hand, and every unit's class in the three windows (its count: 702 and 180 cells, 0 differing).
+  **No number failed to reproduce; four findings changed what §4b says.** (1) The intervals resampled units singly, as
+  if independent. Resampling whole districts makes them 2.7 to 4.7 times wider; those are now the intervals quoted, with
+  the odds ratio within districts beside them (`agreement_intervals_by_district.csv`). (2) "The placebo behaves" was
+  true pooled and in one of CoRE Stack's two zone models and false in the other; §4b says so now, from
+  `agreement_by_zone.csv`. (3) The evidence cited for the 50 ha floor was measured on the `treecover2000` > 30 mask,
+  not on this table's land, where it is weaker (`agreement_floor_repeatability.csv`); and the README still said the
+  floor was applied to nothing. (4) `scripts/verify_agreement.py` claimed to compare cell by cell and did not: run on
+  tampered copies, it passed with the cuts, the counts of flagged units, the window labels, most intervals and most of
+  the definitions table altered, and a blank cell passed any comparison. It was rewritten (55 checks; its docstring
+  lists what it re-derives and what it only checks) and then tried on eighteen tampered copies of the tables: it
+  fails on seventeen and passes the one it says it cannot catch, an interval widened without losing its estimate.
+  Lesser things: two gates in the builder that could not fail were replaced by a recount from the tables read back
+  from disk; the delivered reading had one interval in the summary and another in the definitions table, drawn twice,
+  and now has one; the docstring says that the flags are held fixed in every resample and which correlations carry an
+  interval. The builder's code for (1) to (3) was written without the reviewer's and reproduces its figures — the zone
+  and repeatability tables exactly, the district intervals to within the difference between two random streams.
+  `agreement_by_unit.csv` and `agreement_summary.csv` are byte for byte what they were before the pass, so nothing
+  downstream of them moved.
+- *The housekeeping* (the districts of the outside-village units, the git repository). **This reviewer had not reported when this was written.**
+
+The reviewers' own scripts are in `.session_scratch_2026-10-05/careful_pass/`, with the sandbox tests of the assembler
+and of the verifier.
 
 **The reviews before the unattended run.** Before the rewritten NIRv and agreement scripts were left to run for most
 of a day, four independent reviewers read them, each with one question — will Earth Engine run this at state size;
