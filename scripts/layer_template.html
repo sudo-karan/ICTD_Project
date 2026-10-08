@@ -8,6 +8,11 @@
   Built by scripts/06_build_layer.py. Self-contained: no network request is made. Keep data.js beside this file.
   Leaflet __LEAFLET_VERSION__ (BSD 2-Clause, (c) Volodymyr Agafonkin, CloudMade) is embedded below, unmodified.
 -->
+<!--
+  Added 8 Oct 2026. One exception to the sentence above: the decision view has an optional overlay, off unless ticked, that asks a
+  map-tile service on the network. Its code is not in this file but in a third one, overlay.js, loaded only on that tick. Without
+  overlay.js beside it, this page is the offline page.
+-->
 <style>
 /*LEAFLET_CSS*/
 </style>
@@ -58,6 +63,29 @@ table.kv td.num { white-space: nowrap; }
 #modal th, #modal td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; vertical-align: top; }
 .fatal { padding: 30px; font-size: 16px; }
 .dlabel { font-size: 11px; font-weight: 600; color: #222; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff; white-space: nowrap; pointer-events: none; }
+/* the decision view (added 8 Oct 2026): a list under the map, shown only while that view is on */
+#ranked { display: none; position: absolute; left: 0; right: 0; bottom: 0; height: 44%; z-index: 850; background: #fff; border-top: 2px solid #777; overflow: auto; box-sizing: border-box; padding: 6px 10px; font-size: 12.5px; }
+#mapwrap.dv #ranked { display: block; }
+#mapwrap.dv #map { bottom: 44%; }
+#mapwrap.dv #legend { bottom: calc(44% + 14px); max-height: calc(56% - 40px); }
+#ranked select { width: auto; max-width: 100%; margin: 0 6px 4px 0; }
+table.rk { border-collapse: collapse; width: 100%; }
+table.rk th, table.rk td { border-bottom: 1px solid #ddd; padding: 2px 6px; text-align: left; vertical-align: top; }
+table.rk th { position: sticky; top: 0; background: #f3f3f0; font-weight: 600; }
+table.rk td.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.rk td:nth-child(1) { min-width: 150px; }
+table.rk td:nth-child(7) { min-width: 210px; }
+table.rk tr.r { cursor: pointer; }
+table.rk tr.r:hover { background: #f2f2f2; }
+.tierchip { display: inline-block; border-left: 12px solid #999; padding: 1px 6px; background: #f6f6f6; }
+table.why { border-collapse: collapse; width: 100%; margin: 4px 0; }
+table.why td, table.why th { border: 1px solid #ddd; padding: 2px 5px; font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; }
+table.why td:first-child, table.why th:first-child { text-align: left; }
+table.grid6 td { text-align: left; color: #777; }
+table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; font-weight: 600; }
+.gov { background: #eef3f8; border: 1px solid #9db3c8; border-radius: 3px; padding: 4px 6px; font-size: 12.5px; margin: 6px 0; }
+#dv .tiers div { display: flex; align-items: center; margin: 1px 0; }
+#dv .tiers button { padding: 0 6px; margin: 0 3px 0 0; font-size: 11px; }
 .leaflet-container { font: inherit; }
 </style>
 </head>
@@ -67,6 +95,8 @@ table.kv td.num { white-space: nowrap; }
     <h1 id="title"></h1>
     <p class="sub" id="subtitle"></p>
     <p><button id="b_about">What this is, and how to read it</button><button id="b_sources">Sources and licences</button></p>
+    <h2>Decision view</h2>
+    <div id="dv"></div>
     <h2>Layer</h2>
     <div id="layers"></div>
     <h2>Honest colour</h2>
@@ -101,10 +131,13 @@ table.kv td.num { white-space: nowrap; }
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
   var N = D.id.length, CODES = D.codes;
   var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1, legend: true };
+  var DV = D.decision || null;             // the decision view (added 8 Oct 2026): beside the layers, changing none of them
+  state.window = DV ? DV.default_window : ""; state.tiers = DV ? DV.tiers.slice() : []; state.rank = -1; state.st = "0"; state.keepOut = true; state.overlay = false;
   var layerById = {};
   D.layers.forEach(function (l) { layerById[l.id] = l; });
 
   // ---- the map: no tiles, nothing fetched ------------------------------------------------------------------------------
+  // (added 8 Oct 2026) The one exception is the decision view's optional overlay: dvOverlay(), near the end of this script, loads overlay.js on a tick.
   var Hatch = L.Canvas.extend({
     _fillStroke: function (ctx, layer) {
       L.Canvas.prototype._fillStroke.call(this, ctx, layer);
@@ -130,6 +163,7 @@ table.kv td.num { white-space: nowrap; }
   }
   function shape(g) { return g.map(function (poly) { return poly.map(ring); }); }
   function classOf(i) {
+    if (state.layer === "decision") { return dvCellOf(i); }
     var l = layerById[state.layer], s = l.floored ? l.cls[state.floor] : l.cls.all;
     return l.classes[CODES.indexOf(s.charAt(i))];
   }
@@ -177,6 +211,7 @@ table.kv td.num { white-space: nowrap; }
     for (var k = 0; k < N; k++) { polys[k].setStyle(style(k)); }
   }
   function showLegend() {
+    if (state.layer === "decision") { dvLegend(); return; }
     var l = layerById[state.layer], counts = l.floored ? l.counts[state.floor] : l.counts.all, h, k, c, sep = false;
     h = '<div class="lh"><div class="t">' + esc(l.legend_title) + '</div><button id="b_legend" title="Hide or show the legend, to see the map under it">' + (state.legend ? "Hide" : "Show") + "</button></div>";
     if (!state.legend) { $("legend").innerHTML = h; return; }
@@ -188,6 +223,7 @@ table.kv td.num { white-space: nowrap; }
     h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
     h += '<p class="note">' + esc(l.this_shows) + "</p>";
     if (l.floored) { h += '<p class="note">' + esc(l.floor_note[state.floor]) + "</p>"; }
+    if (state.overlay) { h += dvOverlayNote(); }
     $("legend").innerHTML = h;
   }
   function showInfo() {
@@ -209,7 +245,9 @@ table.kv td.num { white-space: nowrap; }
         h += "</p>";
       }
       if (sec.note) { h += '<p class="note">' + esc(sec.note) + "</p>"; }
+      if (sec.top && state.layer === "decision") { h += dvWhy(state.sel); }
     });
+    if (state.layer !== "decision") { h += dvWhy(state.sel); }
     $("info").innerHTML = h;
     $("info").scrollTop = 0;
   }
@@ -226,6 +264,7 @@ table.kv td.num { white-space: nowrap; }
   function setLayer(id) {
     if (!layerById[id] || layerById[id].pending) { return; }
     state.layer = id;
+    dvSync();
     var r = document.querySelectorAll('input[name=layer]');
     for (var k = 0; k < r.length; k++) { r[k].checked = r[k].value === id; }
     restyle(); showLegend(); writeHash();
@@ -260,6 +299,7 @@ table.kv td.num { white-space: nowrap; }
   function writeHash() {
     var show = state.lgd && state.out ? "" : "&show=" + (state.lgd ? "lgd" : state.out ? "out" : "none");
     var h = "layer=" + state.layer + "&floor=" + state.floor + show + (state.sel >= 0 ? "&unit=" + encodeURIComponent(D.id[state.sel]) : "");
+    h += dvHash();
     if (window.history && history.replaceState) { history.replaceState(null, "", "#" + h); } else { location.hash = h; }
   }
   function readHash() {
@@ -285,6 +325,267 @@ table.kv td.num { white-space: nowrap; }
   $("legend").addEventListener("click", function (e) { if (e.target.id === "b_legend") { state.legend = !state.legend; showLegend(); } });
   $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
 
+  // ---- the decision view (added 8 Oct 2026) ------------------------------------------------------------------------------------
+  // Six cells from 55_decision/condition_by_unit.csv, ranked within ONE district. It stands beside the layers and changes none of
+  // them. Like the rest of the page it works out no figure: it looks up text the builder made, joins it, and counts places in the
+  // order of tiers. Address parts of its own: layer=decision, window=<id>, rank=<district>, tiers=<cell ids joined by dots>,
+  // st=18|33|50, keepout=0. The one thing that can ask the network for anything is the overlay, and its code is not in this file.
+  var ovLayer = null, ovSeen = { ok: 0, bad: 0, run: 0 }, own = Object.prototype.hasOwnProperty;
+  function dvFill(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o[k] === undefined ? m : o[k]; }); }
+  function dvWindow() { for (var k = 0; k < DV.windows.length; k++) { if (DV.windows[k].id === state.window) { return DV.windows[k]; } } return DV.windows[0]; }
+  function dvCellById(id) { for (var k = 0; k < DV.cells.length; k++) { if (DV.cells[k].id === id) { return DV.cells[k]; } } return null; }
+  function dvCellOf(i) { return DV.cells[CODES.indexOf(DV.cls[state.window].charAt(i))]; }
+  function dvTierLabel(cell) {
+    var k = state.tiers.indexOf(cell.id);
+    return k < 0 ? dvFill(DV.t.unranked, { name: cell.name }) : dvFill(DV.t.tier, { k: k + 1, name: cell.name });
+  }
+  function dvOrderChanged() { return state.tiers.join() !== DV.tiers.join(); }
+  function dvOrderList() { return state.tiers.map(function (id, k) { return (k + 1) + " " + dvCellById(id).name; }).join("; "); }
+  function dvOrderWords() { return dvOrderChanged() ? DV.t.order_changed + " (" + dvOrderList() + ")" : DV.t.order_default; }
+  function dvCorro(i) { return DV.corro_labels[DV.corro_letters.indexOf(DV.corro.charAt(i))]; }
+  function dvCheck(i) { return DV.check_labels[parseInt(DV.check.charAt(i), 36)]; }
+  function dvOverlayOn() { return (ovSeen.bad ? DV.overlay.partial + " " : "") + dvFill(DV.overlay.on, { window: dvWindow().label }) + " " + DV.overlay.version + " " + DV.overlay.attribution; }
+  function dvOverlayNote() { return '<p class="note" id="legend_overlay">' + esc((ovSeen.bad ? DV.overlay.partial + " " : "") + dvFill(DV.overlay.legend, { window: dvWindow().label })) + "</p>"; }
+  function dvLegend() {
+    var w = dvWindow(), list = state.tiers.concat([DV.unranked]), h, k, cell, idx;
+    h = '<div class="lh"><div class="t">' + esc(dvFill(DV.t.legend_title, { window: w.label })) + '</div><button id="b_legend" title="Hide or show the legend, to see the map under it">' + (state.legend ? "Hide" : "Show") + "</button></div>";
+    if (!state.legend) { $("legend").innerHTML = h + (state.overlay ? dvOverlayNote() : ""); return; }       // the overlay's credit and its warning stay on the map when the rest of the legend is put away
+    for (k = 0; k < list.length; k++) {
+      cell = dvCellById(list[k]); idx = DV.cells.indexOf(cell);
+      if (list[k] === DV.unranked) { h += '<div class="flatsep"></div>'; }
+      h += '<div class="lr"><span class="sw" style="background:' + cell.color + '"></span>' + esc(dvTierLabel(cell)) + ' <span class="n">(' + esc(DV.counts[state.window][idx])
+        + (state.rank >= 0 ? "; " + esc(DV.dcounts[state.window][state.rank][idx]) + " in " + esc(D.districts[state.rank].name) : "") + ")</span></div>";
+    }
+    h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
+    h += '<p class="note">' + esc(dvFill(DV.t.legend_note, { smin: DV.standing_min, lmin: DV.loss_min, order: dvOrderWords() })) + "</p>";
+    if (state.overlay) { h += dvOverlayNote(); }
+    $("legend").innerHTML = h;
+  }
+  function dvControls() {
+    var h = '<label class="layer"><input type="radio" name="dlayer" id="r_decision" value="decision"> ' + esc(DV.radio) + "</label>";
+    h += '<div id="dv_more" style="display:none"><p class="sub" style="margin-top:8px">' + esc(DV.t.window_head) + ":</p>";
+    DV.windows.forEach(function (w) { h += '<label class="layer"><input type="radio" name="dwindow" value="' + w.id + '"> ' + esc(w.label) + ' <span class="sub">' + esc(w.is) + "</span></label>"; });
+    h += '<p class="sub" style="margin-top:8px">' + esc(DV.t.tiers_head) + ':</p><div class="tiers" id="dv_tiers"></div><p><button id="b_tier_reset">' + esc(DV.t.reset) + "</button></p>";
+    h += '<label class="layer"><input type="checkbox" id="c_overlay"' + (DV.overlay.available ? "" : " disabled") + "> " + esc(DV.overlay.label) + "</label>";
+    h += '<p class="sub" id="overlaymsg">' + esc(DV.overlay.available ? DV.overlay.note + " " + DV.overlay.version : DV.overlay.unavailable) + "</p></div>";
+    $("dv").innerHTML = h;
+  }
+  function dvTiers() {
+    var h = "", r = document.querySelectorAll("input[name=dwindow]"), k;
+    state.tiers.forEach(function (id, n) {
+      var c = dvCellById(id);
+      h += '<div><button data-tier="' + n + '" data-move="-1" title="Move up"' + (n === 0 ? " disabled" : "") + '>&#9650;</button><button data-tier="' + n + '" data-move="1" title="Move down"'
+        + (n === state.tiers.length - 1 ? " disabled" : "") + '>&#9660;</button><span class="sw" style="background:' + c.color + '"></span><span>' + esc((n + 1) + " " + c.name) + "</span></div>";
+    });
+    $("dv_tiers").innerHTML = h;
+    for (k = 0; k < r.length; k++) { r[k].checked = r[k].value === state.window; }
+  }
+  function dvRows() {       // the units of the chosen district, tier by tier, each cell in the order the builder gave it; the filter only leaves rows out
+    var per = DV.rank[state.window][state.rank], st = layerById.st_share.cls.all, need = DV.st_codes[state.st] || "", out = { rows: [], dropped: 0, outKept: 0, outDropped: 0 }, t, cell, idx, j, i;
+    for (t = 0; t < state.tiers.length; t++) {
+      cell = dvCellById(state.tiers[t]); idx = DV.cells.indexOf(cell);
+      for (j = 0; j < per[idx].length; j++) {
+        i = per[idx][j];
+        if (need) {
+          if (D.out.charAt(i) === "1") { if (state.keepOut) { out.outKept++; } else { out.outDropped++; continue; } }
+          else if (need.indexOf(st.charAt(i)) < 0) { out.dropped++; continue; }
+        }
+        out.rows.push([i, cell]);
+      }
+    }
+    return out;
+  }
+  function dvFilterLabel() { for (var k = 0; k < DV.t.st_options.length; k++) { if (DV.t.st_options[k][0] === state.st) { return DV.t.st_options[k][1]; } } return ""; }
+  function dvRanked() {
+    var el = $("ranked"), w, h, opts, r = null, L, F = DV ? DV.fields : null, un;
+    if (!el) { return; }
+    if (state.layer !== "decision") { el.innerHTML = ""; return; }
+    w = dvWindow();
+    opts = '<option value="">' + esc(DV.t.district_pick) + "</option>";
+    D.districts.forEach(function (d, i) { opts += '<option value="' + i + '"' + (i === state.rank ? " selected" : "") + ">" + esc(d.name) + "</option>"; });
+    if (state.rank >= 0) { r = dvRows(); }
+    h = '<p style="margin:2px 0 6px"><select id="rank_district">' + opts + '</select><select id="rank_st">'
+      + DV.t.st_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.st ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"
+      + '<label><input type="checkbox" id="c_keep_out"' + (state.keepOut ? " checked" : "") + (state.st === "0" ? " disabled" : "") + "> " + esc(DV.t.keep_out) + (state.st === "0" ? " " + esc(DV.t.keep_out_off) : "") + "</label> "
+      + '<button id="b_export"' + (!r || !r.rows.length ? " disabled" : "") + ">" + esc(DV.t.export) + "</button></p>";
+    if (state.rank < 0) { el.innerHTML = h + '<p id="rank_msg">' + esc(DV.t.rank_none) + "</p>"; return; }
+    L = DV.loss[state.window];
+    h += '<p id="rank_head"><b>' + esc(dvFill(DV.t.rank_head, { district: D.districts[state.rank].name, n: r.rows.length, window: w.label, order: dvOrderWords() })) + "</b></p>";
+    if (state.st !== "0") {
+      h += '<p class="note" id="rank_filter">' + esc(dvFill(DV.t.rank_filter_note, { label: dvFilterLabel(), m: r.dropped })) + " "
+        + esc(state.keepOut ? dvFill(DV.t.rank_out_kept, { k: r.outKept }) : dvFill(DV.t.rank_out_dropped, { k: r.outDropped })) + "</p>";
+    }
+    h += '<table class="rk"><tr>' + DV.t.cols.map(function (c) { return "<th>" + esc(dvFill(c, { window: w.label })) + "</th>"; }).join("") + "</tr>";
+    r.rows.forEach(function (x) {
+      var i = x[0], cell = x[1], f = D.f[i];
+      h += '<tr class="r" data-u="' + i + '"><td><span class="tierchip" style="border-left-color:' + cell.color + '">' + esc(dvTierLabel(cell)) + "</span></td><td>" + esc(f[F.name]) + " (" + esc(f[F.id]) + ")</td><td>"
+        + esc(DV.t.kind[+D.out.charAt(i)]) + '</td><td class="n">' + esc(DV.sd[i]) + '</td><td class="n">' + esc(DV.so[i]) + '</td><td class="n">' + esc(L.f[i]) + "</td><td>" + esc(dvCorro(i)) + "</td><td>"
+        + esc(f[F.st]) + "</td><td>" + esc(f[F.adi]) + "</td><td>" + esc(f[F.fn]) + "</td></tr>";
+    });
+    h += "</table>";
+    un = DV.cells.indexOf(dvCellById(DV.unranked));
+    h += '<p class="note" id="rank_unranked">' + esc(dvFill(DV.t.rank_unranked, { n: DV.dcounts[state.window][state.rank][un], name: dvCellById(DV.unranked).name })) + " " + esc(DV.t.lower_bound) + "</p>";
+    el.innerHTML = h;
+  }
+  function dvWhy(i) {       // the block every unit's panel carries: the hectares, the two tests, the cell, the tier and why
+    if (!DV || i < 0) { return ""; }
+    var keepW = state.window, keepT = state.tiers, plain = state.layer !== "decision";
+    if (plain) { state.window = DV.default_window; state.tiers = DV.tiers.slice(); }
+    var w = dvWindow(), cell = dvCellOf(i), L = DV.loss[state.window], t = DV.t, little = cell.row === "little or none", h, rows, g;
+    h = '<div id="dvwhy"><h3>' + esc(t.why_head) + '</h3><p><span class="tierchip" style="border-left-color:' + cell.color + '">' + esc(dvTierLabel(cell)) + "</span></p>";
+    h += '<p class="note" data-w="window">' + esc(dvFill(t.why_window, { window: w.label, is: w.is })) + "</p>";
+    h += '<table class="why"><tr><th>' + esc(t.why_cols[0]) + "</th><th>" + esc(t.why_cols[1]) + "</th><th>" + esc(dvFill(t.why_cols[2], { window: w.label })) + "</th></tr>";
+    rows = [[t.why_rows[0], DV.sd[i], L.d[i]], [t.why_rows[1], DV.so[i], L.o[i]], [t.why_rows[2], DV.low[i], L.l[i]]];
+    rows.forEach(function (r) { h += "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + " ha</td><td>" + esc(r[2]) + " ha</td></tr>"; });
+    h += '</table><p class="note">' + esc(t.why_low) + " " + esc(t.lower_bound) + "</p>";
+    h += '<p data-w="standing">' + esc(little ? dvFill(t.why_standing_little, { sf: DV.sf[i], smin: DV.standing_min })
+                            : dvFill(t.why_standing_some, { sf: DV.sf[i], smin: DV.standing_min, row: cell.row, cmp: cell.row === "mostly dense" ? t.cmp_dense : t.cmp_open })) + "</p>";
+    h += '<p data-w="loss">' + esc(dvFill(cell.loss === "some" ? t.why_loss_some : t.why_loss_none, { fl: L.f[i], lmin: DV.loss_min })) + "</p>";
+    if (DV.near.charAt(i) === "1") { h += '<p class="note" data-w="near">' + esc(t.near) + "</p>"; }
+    g = '<table class="why grid6"><tr><th></th><th>' + esc(t.grid_cols[0]) + "</th><th>" + esc(t.grid_cols[1]) + "</th></tr>";
+    DV.grid.forEach(function (gr) {
+      g += "<tr><td>" + esc(gr[0]) + "</td>";
+      gr.slice(1).forEach(function (id) { g += "<td" + (id === cell.id ? ' class="in"' : "") + ">" + esc(dvCellById(id).name) + "</td>"; });
+      g += "</tr>";
+    });
+    h += g + "</table>";
+    h += '<p data-w="cell">' + esc(dvFill(t.why_cell, { name: cell.name, rests: cell.rests })) + " " + esc(state.tiers.indexOf(cell.id) < 0 ? t.why_unranked
+      : dvFill(t.why_order, { order: dvOrderWords(), tier: dvTierLabel(cell) }) + " " + (dvOrderChanged() ? dvFill(t.why_was, { ptier: dvFill(t.tier, { k: DV.tiers.indexOf(cell.id) + 1, name: cell.name }) }) + " " : "") + DV.tier_why[cell.id]) + "</p>";
+    h += '<p data-w="corro"><b>' + esc(t.corro_head) + ":</b> " + esc(dvCorro(i)) + "</p>";
+    h += '<p data-w="work"><b>' + esc(t.work_head) + ":</b> " + esc(cell.work) + "</p>" + (DV.work_note ? '<p class="note" data-w="worknote">' + esc(DV.work_note) + "</p>" : "");
+    if (D.out.charAt(i) === "1") { h += '<div class="gov">' + esc(DV.governance) + '</div><p data-w="district"><b>' + esc(t.district_head) + ":</b> " + esc(dvCheck(i)) + "</p>"; }
+    state.window = keepW; state.tiers = keepT;
+    return h + "</div>";
+  }
+  function dvSync() {
+    if (!DV) { return; }
+    var on = state.layer === "decision", el = $("mapwrap");
+    if ($("dv_more")) { $("dv_more").style.display = on ? "" : "none"; }
+    if ($("r_decision")) { $("r_decision").checked = on; }
+    if (!on && state.overlay) { dvOverlay(false); }
+    if ((el.className === "dv") !== on) { el.className = on ? "dv" : ""; map.invalidateSize({ animate: false }); if (state.sel >= 0) { showInfo(); } }      // the open panel is drawn again: 'why this tier' changes its place with the view
+    dvRanked();
+  }
+  function setDecision() {
+    var r = document.querySelectorAll("input[name=layer]"), k;
+    state.layer = "decision";
+    for (k = 0; k < r.length; k++) { r[k].checked = r[k].value === "decision"; }
+    dvSync(); restyle(); showLegend(); writeHash();
+  }
+  function dvAll() {        // after the window, the order of tiers, the district or the filter changed
+    dvTiers();
+    if (state.layer === "decision") { restyle(); showLegend(); dvRanked(); }
+    if (state.sel >= 0) { showInfo(); }
+    if (state.overlay && ovLayer && ovLayer._ictdWindow !== state.window) { dvOverlay("again"); }
+    writeHash();
+  }
+  function dvHash() {
+    var h = "";
+    if (!DV || state.layer !== "decision") { return h; }
+    if (state.window !== DV.default_window) { h += "&window=" + state.window; }
+    if (dvOrderChanged()) { h += "&tiers=" + state.tiers.join("."); }
+    if (state.rank >= 0) { h += "&rank=" + encodeURIComponent(D.districts[state.rank].name); }
+    if (state.st !== "0") { h += "&st=" + state.st; if (!state.keepOut) { h += "&keepout=0"; } }
+    return h;
+  }
+  function dvFromAddress(h0) {
+    if (!DV || h0.layer !== "decision") { return; }
+    var w, t, r = -1, st, keep, k, changed;
+    w = (h0.window && own.call(DV.cls, h0.window)) ? h0.window : DV.default_window;
+    t = h0.tiers ? h0.tiers.split(".") : null;
+    if (!t || t.slice().sort().join() !== DV.tiers.slice().sort().join()) { t = DV.tiers.slice(); }
+    if (h0.rank) { for (k = 0; k < D.districts.length; k++) { if (D.districts[k].name.toLowerCase() === h0.rank.toLowerCase()) { r = k; break; } } }
+    st = (h0.st && own.call(DV.st_codes, h0.st)) ? h0.st : "0";
+    keep = !(st !== "0" && h0.keepout === "0");
+    changed = w !== state.window || t.join() !== state.tiers.join() || r !== state.rank || st !== state.st || keep !== state.keepOut;
+    state.window = w; state.tiers = t; state.st = st; state.keepOut = keep;
+    if (r !== state.rank) { state.rank = r; if (r >= 0) { gotoDistrict(r); } }
+    if (state.layer !== "decision") { setDecision(); dvTiers(); }
+    if (changed) { dvAll(); }
+  }
+  function dvOverlayMsg(text) { $("overlaymsg").textContent = text; }
+  function dvOverlayOff(text) {
+    if (ovLayer) { map.removeLayer(ovLayer); ovLayer = null; }
+    state.overlay = false; $("c_overlay").checked = false; dvOverlayMsg(text); showLegend();
+  }
+  function dvOverlay(on) {  // the optional online overlay: its code is in overlay.js, which is asked for here and nowhere else, and only on a tick
+    var s;
+    if (!on) { dvOverlayOff(DV.overlay.available ? DV.overlay.note + " " + DV.overlay.version : DV.overlay.unavailable); return; }
+    if (!DV.overlay.available) { dvOverlayOff(DV.overlay.unavailable); return; }
+    if (navigator.onLine === false) { dvOverlayOff(DV.overlay.offline); return; }
+    function add() {
+      if (state.layer !== "decision" || !$("c_overlay").checked) { $("c_overlay").checked = false; return; }      // its file can arrive after the box was unticked or the view left: then nothing is drawn
+      if (!map.getPane("sitelevel")) { map.createPane("sitelevel"); map.getPane("sitelevel").style.zIndex = 450; map.getPane("sitelevel").style.pointerEvents = "none"; }
+      ovSeen = { ok: 0, bad: 0, run: 0 };
+      if (ovLayer) { map.removeLayer(ovLayer); }
+      ovLayer = window.ICTD_OVERLAY.make(L, "sitelevel", dvWindow().years[0], dvWindow().years[1]);
+      ovLayer.on("tileload", function () { ovSeen.ok++; ovSeen.run = 0; });
+      ovLayer.on("tileerror", function () {      // any failed tile: say at once that pink may be missing. Eight in a row after some arrived: the connection went
+        ovSeen.bad++; ovSeen.run++;
+        if (ovSeen.ok && ovSeen.run >= 8) { dvOverlayOff(DV.overlay.lost); }
+        else if (state.overlay) { dvOverlayMsg(dvOverlayOn()); showLegend(); }
+      });
+      ovLayer.on("load", function () {           // every tile asked for has now arrived or failed: if none arrived, the service could not be reached
+        var mine = this;                         // taken off on a timer, not here: the map library reads the layer's map straight after this event, and a layer taken off inside it has none
+        setTimeout(function () { if (state.overlay && ovLayer === mine && !ovSeen.ok && ovSeen.bad) { dvOverlayOff(DV.overlay.failed); } }, 0);
+      });
+      ovLayer._ictdWindow = state.window;
+      ovLayer.addTo(map);
+      state.overlay = true; dvOverlayMsg(dvOverlayOn()); showLegend();
+    }
+    if (on === "again") { add(); return; }                    // the window changed while the overlay was on: the same file, the tiles of the new years
+    if (window.ICTD_OVERLAY) { add(); return; }
+    s = document.createElement("script");
+    s.onload = function () { if (window.ICTD_OVERLAY) { add(); } else { dvOverlayOff(DV.overlay.missing); } };
+    s.onerror = function () { dvOverlayOff(DV.overlay.missing); };
+    s.src = "overlay.js";
+    document.head.appendChild(s);
+  }
+  function dvExport() {     // the ranked list as a file: every row says which window, which order of tiers and which build made it
+    if (state.rank < 0) { return; }
+    var w = dvWindow(), r = dvRows(), L = DV.loss[state.window], F = DV.fields, d = D.districts[state.rank].name, lines = [DV.t.export_cols.join(",")], text, name, a;
+    var q = function (s) { s = String(s); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }, plain = function (s) { return String(s).replace(/,/g, ""); };
+    var order = dvOrderList() + "; not ranked: " + dvCellById(DV.unranked).name;
+    r.rows.forEach(function (x) {
+      var i = x[0], cell = x[1], f = D.f[i];
+      lines.push([d, f[F.id], f[F.name], DV.t.kind[+D.out.charAt(i)], D.out.charAt(i), w.label, "2025", dvTierLabel(cell), cell.def, order, dvOrderChanged() ? DV.t.order_changed : DV.t.order_default, DV.t.within_tier,
+                  plain(DV.sd[i]), plain(L.d[i]), plain(DV.so[i]), plain(L.o[i]), plain(DV.low[i]), plain(L.l[i]), plain(DV.sf[i]), plain(L.f[i]), DV.standing_min, DV.loss_min, DV.near.charAt(i) === "1" ? "yes" : "no",
+                  dvCorro(i), "2017-2023", f[F.st], f[F.adi], f[F.fn], dvCheck(i), dvFilterLabel() + (state.st !== "0" ? (state.keepOut ? "; outside-village units kept" : "; outside-village units left out") : ""), DV.built].map(q).join(","));
+    });
+    text = lines.join("\r\n") + "\r\n";
+    name = "ranked_" + d.replace(/[^A-Za-z]+/g, "_") + "_" + state.window + ".csv";
+    window.ICTD_EXPORT = { name: name, text: text };            // for checking the page: the very text of the file just offered
+    a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
+    a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+  if (DV) {
+    (function () { var rk = document.createElement("div"); rk.id = "ranked"; $("mapwrap").appendChild(rk); })();
+    dvControls(); dvTiers();
+    document.addEventListener("change", function (e) {
+      var t = e.target;
+      if (t.id === "r_decision") { setDecision(); }
+      else if (t.name === "dwindow") { state.window = t.value; dvAll(); }
+      else if (t.id === "rank_district") { state.rank = t.value === "" ? -1 : +t.value; if (state.rank >= 0) { gotoDistrict(state.rank); } dvAll(); }
+      else if (t.id === "rank_st") { state.st = t.value; dvAll(); }
+      else if (t.id === "c_keep_out") { state.keepOut = t.checked; dvAll(); }
+      else if (t.id === "c_overlay") { dvOverlay(t.checked); }
+    });
+    document.addEventListener("click", function (e) {
+      var t = e.target, k, m, x, row;
+      if (t.id === "b_tier_reset") { state.tiers = DV.tiers.slice(); dvAll(); }
+      else if (t.id === "b_export") { dvExport(); }
+      else if (t.getAttribute && t.getAttribute("data-tier") !== null) {
+        k = +t.getAttribute("data-tier"); m = k + (+t.getAttribute("data-move"));
+        if (m >= 0 && m < state.tiers.length) { x = state.tiers[k]; state.tiers[k] = state.tiers[m]; state.tiers[m] = x; dvAll(); }
+      } else {
+        row = t.closest ? t.closest("tr.r") : null;
+        if (row) { select(+row.getAttribute("data-u"), true); }
+      }
+    });
+  }
+
   // ---- start: the layer, floor and unit can be given in the address after #, and followed when the address changes -----
   // Also: show=lgd|out|both|none (which kinds of unit are drawn), district=<name>, q=<what to search for>, open=about|sources.
   function fromAddress(first) {
@@ -295,6 +596,7 @@ table.kv td.num { white-space: nowrap; }
     }
     if (first || (h0.floor && h0.floor !== state.floor)) { setFloor(D.floors.some(function (f) { return f.id === h0.floor; }) ? h0.floor : D.default_floor); }
     if (first || (h0.layer && h0.layer !== state.layer)) { setLayer(h0.layer && layerById[h0.layer] && !layerById[h0.layer].pending ? h0.layer : D.default_layer); }
+    dvFromAddress(h0);
     k = h0.unit ? D.id.indexOf(h0.unit) : -1;
     if (k >= 0 && k !== state.sel) { select(k, true); } else if (first) { showInfo(); }
     if (h0.district) {

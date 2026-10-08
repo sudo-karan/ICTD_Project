@@ -77,6 +77,8 @@ import pandas as pd
 import shapely
 from pyproj import Geod
 
+import _layer_decision                                       # the decision view (added 8 Oct 2026): what it adds to the layer, from 55_decision/
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "60_layer"
 VENDOR = Path(__file__).resolve().parent / "vendor" / "leaflet-1.9.4"
@@ -87,6 +89,7 @@ SIMPLIFY_M = 30.0
 MAX_BYTES = 25_000_000
 STAGE_RECORDS = ("10_units/units.provenance.json", "10_units/outside_village_district.provenance.json", "20_degradation/hansen.provenance.json", "20_degradation/corestack.provenance.json",
                  "20_degradation/agreement.provenance.json", "20_degradation/forest_floor.provenance.json", "30_need/need.provenance.json", "40_allocation/allocation.provenance.json")
+STAGE_RECORDS = STAGE_RECORDS + ("55_decision/decision.provenance.json",)                       # the decision view (added 8 Oct 2026)
 FLOORS = {"100": 100.0, "50": 50.0, "1": 1.0}      # hectares; the first is the default: the floor ruled on 7 Oct 2026
 FLOOR_LABEL = {"100": " (default: the floor ruled for the analysis)", "50": " (the earlier proposal: shown as a sensitivity)", "1": " (every unit with measurable forest)"}
 ZONE_EXCLUDED = "#bcd3d6"
@@ -606,6 +609,14 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
         "districts": districts, "id": ids.tolist(), "out": "".join("1" if o else "0" for o in outside), "f": F, "bar": bars, "g": shapes,
     }
 
+    # ---- the decision view (added 8 Oct 2026): beside the layers above; nothing above is changed by it ------------------------------
+    dv = _layer_decision.build(ROOT, ids.tolist(), outside, [d["name"] for d in districts], summ, [c["label"] for c in by["st_share"]["classes"]],
+                               {"name": 0, "id": 1, "st": c0 + 22, "adi": c0 + 24, "fn": c0 + 18}, also, fails, started)
+    stop_if_failed("building the decision view")
+    payload["decision"] = dv["payload"]
+    payload["about_html"] += dv["about_html"]
+    payload["sources_html"] = payload["sources_html"].replace("</table>", dv["sources_rows"] + "</table>")
+
     # ---- write: the table, the data file, the page ------------------------------------------------------------------------------------
     js, css = (VENDOR / "leaflet.js").read_text(encoding="utf-8"), (VENDOR / "leaflet.css").read_text(encoding="utf-8")
     if sha256(VENDOR / "leaflet.js") != LEAFLET_SHA256:
@@ -631,6 +642,10 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
     T.to_csv(OUT / "layer_by_unit.csv", index=False)
     (OUT / "index.html").write_text(page, encoding="utf-8")
     (OUT / "data.js").write_text(data, encoding="utf-8")
+    if dv["overlay_js"]:                                     # the optional online overlay: a third file, asked for only when its box is ticked
+        (OUT / "overlay.js").write_text(dv["overlay_js"], encoding="utf-8")
+    elif (OUT / "overlay.js").exists():
+        (OUT / "overlay.js").unlink()
     with zipfile.ZipFile(OUT / "_size_check.zip", "w", zipfile.ZIP_DEFLATED) as z:
         z.write(OUT / "index.html", "index.html")
         z.write(OUT / "data.js", "data.js")
@@ -643,6 +658,7 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
                    "embedded": {"leaflet": "1.9.4", "leaflet_js_sha256": LEAFLET_SHA256, "licence": "BSD 2-Clause"},
                    "outputs": {"index.html": sizes["index.html"], "data.js": sizes["data.js"], "sha256": {"index.html": sha256(OUT / "index.html"), "data.js": sha256(OUT / "data.js")}, "both_bytes": sum(sizes.values()), "both_zipped_bytes": zipped, "limit_bytes": MAX_BYTES, "network_requests": 0},
                    "geometry": area_error, "floors_ha": FLOORS, "default_floor_ha": FLOORS[next(iter(FLOORS))],
+                   "decision_view": {**dv["record"], "overlay_file": ({"path": "60_layer/overlay.js", "bytes": (OUT / "overlay.js").stat().st_size, "sha256": sha256(OUT / "overlay.js")} if dv["overlay_js"] else None)},
                    "layers": [{"id": L["id"], "title": L["title"], "classes": [c["label"] for c in L["classes"]], "units_per_class": {f: [int((x == i).sum()) for i in range(len(L["classes"]))] for f, x in L["_arrays"].items()}} for L in layers],
                    "omitted_on_purpose": {"columns": list(SHRUG_COLUMNS), "why": "SHRUG is CC BY-NC-SA 4.0; a shared file carrying its estimates could become a derived work under that licence. They remain in 30_need/need_by_unit.csv"},
                    "checks_passed": {"class_counts_equal_the_stage_tables_own": {k: v[0] for k, v in checks.items()}, "totals_equal_the_stage_tables_own": {k: round(v[0], 3) for k, v in totals.items()},
