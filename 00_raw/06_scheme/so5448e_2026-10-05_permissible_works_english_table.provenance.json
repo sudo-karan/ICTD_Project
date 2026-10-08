@@ -1,0 +1,61 @@
+{
+  "script": "00_raw/06_scheme/_build_schedule_extract.py",
+  "run_utc": "2026-10-08T22:32:57Z",
+  "inputs": [
+    {
+      "path": "00_raw/06_scheme/egazette_276796_SO5448E_2026-10-05_list_of_permissible_works.pdf",
+      "bytes": 1700498,
+      "sha256": "ec89d3a85bf49f1a4218b897c1daca2b3ab86d71b42f8f52c2d9860b6e0279a4"
+    },
+    {
+      "path": "00_raw/06_scheme/so5448e_2026-10-05_permissible_works_verbatim_transcription.txt",
+      "bytes": 39785,
+      "sha256": "de0bc3421b60fdbe9038589c4bfd07163c67e7bf98504c20426fed45901247ab"
+    },
+    {
+      "path": "00_raw/06_scheme/pib_2319426_2026-10-06_ministry_notifies_375_permissible_works.html",
+      "bytes": 129620,
+      "sha256": "0088ed1e4b0c7b1a467b0a6ed59cc6392d3d9c530c34c2e4f8f349351e5b3dc8"
+    }
+  ],
+  "source_url": "https://egazette.gov.in/WriteReadData/2026/276796.pdf",
+  "totals_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2319426",
+  "document": "Ministry of Rural Development notification S.O. 5448(E), 5 October 2026; Gazette of India, Extraordinary, Part II, Section 3(ii), No. 5238; Gazette ID CG-DL-E-05102026-276796",
+  "checks_passed": {
+    "rows": 375,
+    "serials_run_1_to_375": true,
+    "rows_by_category_equal_the_ministrys_published_totals": {
+      "I": 128,
+      "II": 111,
+      "III": 98,
+      "IV": 38
+    },
+    "rows_equal_the_ministrys_published_total": 375,
+    "rows_walked_in_the_pdfs_own_order_each_work_type_and_name_whole_and_on_its_own_row": 375,
+    "sub_item_headings_met_on_the_way_and_held_word_for_word": 30,
+    "category_headings_met_on_the_way_and_held_word_for_word": 4,
+    "capitals_are_compared": true,
+    "dashes_are_compared": true,
+    "rows_that_begin_on_their_own_page_below_the_row_before_with_both_cells_on_one_line_at_their_columns_left_edges": 375,
+    "rows_whose_two_cells_read_whole_from_the_positions_of_the_words_are_the_transcriptions": 375,
+    "spaces_inside_headings_are_compared": true,
+    "left_edges_of_the_two_columns_in_points": {
+      "work_type": 131,
+      "work_name": 265
+    },
+    "published_totals_from": "Press Information Bureau release 2319426, 6 October 2026",
+    "work_names_and_types_found_word_for_word_in_the_pdf_text_layer": 750
+  },
+  "not_checked": [
+    "the digits of the serial numbers against the PDF: they are not in its text layer and were read from the page images by the transcriber; what is established is that the n-th row printed is the n-th row here",
+    "the Hindi half of the notification",
+    "amendments after 8 October 2026"
+  ],
+  "table": {
+    "path": "00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv",
+    "rows": 375,
+    "columns": 8,
+    "blank_cells": 0,
+    "sha256": "ac7e642dd1d0e040f220351b31a269d9097bbbab0bb12330696ef015d9a54d12"
+  }
+}

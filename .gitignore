@@ -45,3 +45,11 @@ indian_village_boundaries/
 
 # logs of the unattended NIRv chain (scripts/run_nirv_chain.py)
 logs/
+
+# the Gazette PDFs of 00_raw/06_scheme/ (added 8 Oct 2026): fetched files, each with its URL, bytes and sha256 in the manifest.
+# The table and the transcription made from them here stay tracked, with the script that checks them.
+00_raw/06_scheme/*.pdf
+00_raw/06_scheme/*.html
+
+# the decision tables are a stage output like the others (added 8 Oct 2026)
+55_decision/
