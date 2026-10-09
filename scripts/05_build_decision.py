@@ -56,8 +56,11 @@ THE HECTARES (the lossless record; the cell is a summary of it). Names: dense = 
                        ten-thousandth of a hectare (a square metre): the source rounds each year's loss and the band's area
                        to four decimals separately. The provenance record counts them.
   standing_forest_ha = standing_dense_ha + standing_open_ha
-  "Standing" is always NOW, through 2025, whatever window is asked for. It is a LOWER BOUND on tree cover present: Hansen
-  does not net off gain, so land that lost its cover and grew it back, and land that gained cover since 2000, is not in it.
+  "Standing" is always NOW, through 2025, whatever window is asked for. It is THE FOREST OF 2000 WITH NO LOSS RECORDED
+  SINCE; NOT A MEASURE OF TREE COVER TODAY. It was called a lower bound until the owner's ruling of 9 October 2026; it is
+  not strictly a bound in either direction: gain is not netted off (which makes it too low), and the provider of the data
+  puts missed loss at about one eighth and false loss at about one eighth (00_raw/05_forest_reference/provider_cautions.json),
+  and cautions that cover today cannot be had by subtracting recorded loss from the cover of 2000.
   For each window W = (first year, last year), inclusive:
   loss_dense_ha_W  = the sum of loss_ha_gt30_<year>     over the years of W
   loss_open_ha_W   = the sum of loss_ha_gt10le30_<year> over the years of W
@@ -65,6 +68,17 @@ THE HECTARES (the lossless record; the cell is a summary of it). Names: dense = 
   loss_low_ha_W    = the sum of loss_ha_le10_<year> over the years of W   REPORTED ONLY. It decides nothing: most of it is on
                      pixels with no canopy at all in 2000, and its rise over time is largely the producers' change of method
                      (docs/RESULTS.md section 3.1).
+  LOSS AS A SHARE (added 9 October 2026 by the owner's ruling; it stands BESIDE the cell and changes no cell):
+  forest_at_window_start_ha_W = (area_ha_gt30 - the sum of loss_ha_gt30_<year> over the years BEFORE W's first year)
+                              + (area_ha_gt10le30 - the same sum for gt10le30), each of the two set to 0 where the
+                                subtraction gives less than 0. For the window 2001_2025 no year is before it: it is
+                                dense_2000_ha + open_2000_ha.
+  forest_loss_share_pct_W     = forest_loss_ha_W / forest_at_window_start_ha_W x 100, in whole numbers and rounded half up
+                                to two decimals: with both in ten-thousandths of a hectare,
+                                (2 x loss x 10000 + start) // (2 x start) hundredths of a per cent, written with two decimals.
+                                BLANK where q(forest_at_window_start_ha_W) < STANDING_MIN_HA: too little forest for a share
+                                to mean anything; forest_loss_share_blank_because_W then holds that reason in words, and is
+                                blank wherever a share is given. The run stops if a share would be above 100.
 THE WINDOWS, each with its own columns (suffix): 2018_2025 (the default: the years after plantation fell out of the scheme's
 spending), 2001_2025 (the full record), 2017_2023 (CoRE Stack's window, so that corroboration is like for like),
 2021_2025 (the most recent five years).
@@ -79,12 +93,14 @@ THE ROW (standing forest now; the same in every window)
   mostly_open      otherwise
 THE COLUMN (forest loss in the window)     some if q(forest_loss_W) >= LOSS_MIN_HA, else none
 THE SIX CELLS  cell_<W> =
-  dense_none   "Protect - intact closed forest"                       mostly_dense,   none
-  dense_loss   "Closed forest under pressure - find the cause first"  mostly_dense,   some
-  open_none    "Open forest - assisted natural regeneration candidate" mostly_open,    none
-  open_loss    "Open forest still losing - restore"                   mostly_open,    some
-  little_loss  "Little forest left, recent loss - verify on the ground" little_or_none, some
-  little_none  "Not a forest site"                                    little_or_none, none
+  dense_none   "Closed forest, little or no loss recorded - protect"                    mostly_dense,   none
+  dense_loss   "Closed forest, loss recorded - find the cause first"                    mostly_dense,   some
+  open_none    "Open forest, little or no loss recorded - assisted natural regeneration candidate"   mostly_open, none
+  open_loss    "Open forest, loss recorded - restore"                                   mostly_open,    some
+  little_loss  "Little forest left, loss recorded - verify on the ground"               little_or_none, some
+  little_none  "Not a forest site"                                                      little_or_none, none
+  The names state the test and no more (the owner's ruling of 9 October 2026; five of them were renamed then, and no
+  unit changed cell: scripts/05_check_rename.py holds every assignment against the table as it stood before).
 NEAR THE DENSE/OPEN BOUNDARY. dense_open_ratio = the smaller of standing_dense_ha and standing_open_ha over the larger,
 on the exact four-decimal figures, rounded half up to four decimals; 0 where one of the two is zero; blank if both are.
 near_dense_open_boundary = 1 for a unit in the row mostly_dense or mostly_open for which 10 x the smaller >= 8 x the
@@ -93,7 +109,13 @@ ORDER WITHIN A CELL, WITHIN A DISTRICT. order_in_district_cell_<W> = 1, 2, 3 ...
 one cell, LGD panchayat and outside-village units together: a cell with loss (dense_loss, open_loss, little_loss) by
 forest_loss_ha_W, largest first; dense_none by standing_dense_ha, open_none by standing_open_ha, little_none by
 standing_forest_ha, largest first - each on the exact four-decimal figure, not the printed hundredth; ties by unit_id as
-text, ascending. tier_provisional_2018_2025 = 1 ... 5, a whole number: the place of cell_2018_2025 in the provisional
+text, ascending.
+ORDER BY SHARE (added 9 October 2026). order_in_district_cell_by_share_<W> = 1, 2, 3 ... in the same groups. In a cell
+with loss: the units that have a share first, by forest_loss_ha_W / forest_at_window_start_ha_W as an exact fraction of
+the two four-decimal figures (not the printed share), largest first, ties by forest_loss_ha_W, largest first, then by
+unit_id as text; after them the units with no share, by forest_loss_ha_W, largest first, then unit_id. In a cell without
+loss it is order_in_district_cell_<W> itself: those cells stay ordered by standing hectares.
+tier_provisional_2018_2025 = 1 ... 5, a whole number: the place of cell_2018_2025 in the provisional
 order of tiers below (open_loss, dense_loss, open_none, dense_none, little_loss); blank for little_none. There is NO
 order across districts and NO score: among the LGD panchayat units of the agreement test's headline the two forest measures
 agree within districts, and their agreement across the state is not established (docs/RESULTS.md sections 5.1 and 5.2).
@@ -130,20 +152,24 @@ OUTPUT: 55_decision/ and nowhere else
   condition_by_unit.csv            one row per unit, 11,468, in the order of unit_id as text (code-point order). Every
                                    hectare is written with exactly four decimals, the ratio likewise; the tier, the order
                                    columns and the two 0/1 flags as whole numbers; a blank as an empty field; UTF-8, no
-                                   byte-order mark. Its 51 columns, in order:
+                                   byte-order mark. Its 67 columns, in order:
                                      unit_id, unit_name, unit_level, outside_village, pc11_district_code (the district's code
                                      as resolved under THE DISTRICT), district, dense_2000_ha, open_2000_ha, low_2000_ha,
                                      standing_dense_ha, standing_open_ha, standing_forest_ha, standing_row (THE ROW),
                                      dense_open_ratio, near_dense_open_boundary;
                                      then for each window W in the order 2018_2025, 2001_2025, 2017_2023, 2021_2025:
                                      loss_dense_ha_W, loss_open_ha_W, forest_loss_ha_W, loss_low_ha_W, loss_column_W (THE
-                                     COLUMN: some or none), cell_W, order_in_district_cell_W;
+                                     COLUMN: some or none), cell_W, order_in_district_cell_W, forest_at_window_start_ha_W,
+                                     forest_loss_share_pct_W, forest_loss_share_blank_because_W,
+                                     order_in_district_cell_by_share_W;
                                      then tier_provisional_2018_2025, corroboration, corroboration_basis, corroboration_window,
                                      agreement_reference_ha, agreement_corestack_valued_ha, district_check, governance_prompt
   condition_cells.csv              units, standing hectares and loss by window x kind of unit x cell
   condition_cells_by_district.csv  units by window x district x cell
   condition_sensitivity.csv        units per cell at each pair of thresholds (3 x 3), and how many units change cell
   condition_boundary.csv           how many units sit near the dense/open boundary, at four ratios
+  condition_share.csv              loss as a share, by window x cell: units with a share and without one, how the printed
+                                   share falls into three classes, its median and its largest value
   condition_threshold_evidence.csv what the two proposed thresholds rest on, each row with a key: the pixel, the one-hectare
                                    definition, recurrence, repeatability on the threshold's own land, and how the loss
                                    column follows the size of a unit's forest
@@ -161,7 +187,10 @@ STOP CONDITIONS (the tables are written to a temporary folder, read back as text
   - the existing comparison's floor is 100 ha and its window 2017-2023, its classes are the six this script has words
     for, and "insufficient_forest" means under 100 ha on one of the two grids;
   - per unit and band: the yearly losses add up to the table's own total (to 0.002 ha);
-  - ON THE FILE AS WRITTEN, read back as text: every one of its 24 hectare columns equals the figure computed or copied;
+  - ON THE FILE AS WRITTEN, read back as text: every one of its 28 hectare columns equals the figure computed or copied,
+    and the four share columns and their reasons likewise; forest at the start of the window less the forest loss of the
+    window is standing forest, exactly, in the three windows that end in 2025 (except where a band was set to 0), and for
+    2001_2025 it is the forest of 2000;
     and, per unit, standing +
     loss 2001-2025 = the year-2000 band hectares for the dense band and for the open band, exactly, except in the units
     where standing was set to 0 - there the gap is what the source's rounding put below zero, and may not pass 0.002 ha
@@ -178,9 +207,12 @@ STOP CONDITIONS (the tables are written to a temporary folder, read back as text
   - the Forest Survey extract still holds the one-hectare wording the loss threshold cites; the repeatability worked out
     here on land with canopy above 10 % equals agreement_floor_repeatability.csv in the two classes that table has in
     common; plantation's share of expenditure in the scheme's state report more than halves between FY2016-17 and FY2018-19;
-  - every unit is in exactly one cell in every window, and its row is the same in all four.
+  - every unit is in exactly one cell in every window, and its row is the same in all four;
+  - no share is above 100, a share is blank exactly where the forest at the window's start prints under the standing
+    minimum, and every unit of the two forest rows has a share in every window.
 """
 import datetime, hashlib, json, shutil, sys
+from fractions import Fraction
 from pathlib import Path
 
 import numpy as np
@@ -193,19 +225,21 @@ WINDOWS = {"2018_2025": (2018, 2025), "2001_2025": (2001, 2025), "2017_2023": (2
 WINDOW_IS = {"2018_2025": "the default: the years after plantation fell out of spending in the scheme's state report", "2001_2025": "the full record",
              "2017_2023": "CoRE Stack's window, so that corroboration is like for like", "2021_2025": "the most recent five years"}
 DEFAULT_WINDOW = "2018_2025"
-STANDING_MIN_HA, LOSS_MIN_HA = 10.0, 1.0                      # PROPOSALS, flagged for the project owner. Never the agreement test's 100 ha
+STANDING_MIN_HA, LOSS_MIN_HA = 10.0, 1.0                      # proposed 8 Oct 2026, ACCEPTED by the project owner on 9 Oct 2026. Never the agreement test's 100 ha
+THRESHOLDS_STATUS = "RULED by the project owner on 9 October 2026: accepted as proposed. The agreement test's 100 ha is not used here."
 STANDING_ALTERNATIVES, LOSS_ALTERNATIVES = (5.0, 25.0), (0.5, 2.0)
 NEAR_RATIO = 0.8
 RATIOS = (0.5, 2 / 3, 0.8, 0.9)
 AGREEMENT_FLOOR_HA = 100.0                                   # the existing comparison's own floor: read here only to say why a unit was not compared
 BANDS = {"dense": "gt30", "open": "gt10le30", "low": "le10"}
 _L, _S = f"{LOSS_MIN_HA:g} ha", f"{STANDING_MIN_HA:g} ha"
-CELLS = {  # id: (row, column, name, what the name rests on). The names are the project owner's; each sentence after it says the cell's own test and no more
-    "dense_none": ("mostly_dense", "none", "Protect - intact closed forest", f"Mostly closed forest, with under {_L} of forest loss recorded in the window: protection and conservation work, not planting."),
-    "dense_loss": ("mostly_dense", "some", "Closed forest under pressure - find the cause first", f"Mostly closed forest, with {_L} or more of forest loss recorded in the window: the cause comes before any work."),
-    "open_none": ("mostly_open", "none", "Open forest - assisted natural regeneration candidate", f"Mostly open forest, with under {_L} of forest loss recorded in the window: a candidate for assisted natural regeneration."),
-    "open_loss": ("mostly_open", "some", "Open forest still losing - restore", f"Mostly open forest, with {_L} or more of forest loss recorded in the window: restoration."),
-    "little_loss": ("little_or_none", "some", "Little forest left, recent loss - verify on the ground", f"Under {_S} of standing forest, and {_L} or more of forest loss recorded in the window: to be verified on the ground."),
+NO_SHARE = f"under {_S} of forest at the start of the window: too little for a share to mean anything"
+CELLS = {  # id: (row, column, name, what the name rests on). The names are the project owner's, as ruled on 9 October 2026: each states the test. The sentence after it says the cell's own test and no more
+    "dense_none": ("mostly_dense", "none", "Closed forest, little or no loss recorded - protect", f"Mostly closed forest, with under {_L} of forest loss recorded in the window: protection and conservation work, not planting."),
+    "dense_loss": ("mostly_dense", "some", "Closed forest, loss recorded - find the cause first", f"Mostly closed forest, with {_L} or more of forest loss recorded in the window: the cause comes before any work."),
+    "open_none": ("mostly_open", "none", "Open forest, little or no loss recorded - assisted natural regeneration candidate", f"Mostly open forest, with under {_L} of forest loss recorded in the window: a candidate for assisted natural regeneration."),
+    "open_loss": ("mostly_open", "some", "Open forest, loss recorded - restore", f"Mostly open forest, with {_L} or more of forest loss recorded in the window: restoration."),
+    "little_loss": ("little_or_none", "some", "Little forest left, loss recorded - verify on the ground", f"Under {_S} of standing forest, and {_L} or more of forest loss recorded in the window: to be verified on the ground."),
     "little_none": ("little_or_none", "none", "Not a forest site", f"Under {_S} of standing forest, whatever the size of the unit, and under {_L} of forest loss recorded in the window."),
 }
 # PROVISIONAL, to be set with the Foundation for Ecological Security. A user control in the layer, not a constant of the analysis.
@@ -376,9 +410,20 @@ def main():
     ratio_tt = (2 * small * 10000 + big) // np.where(big > 0, 2 * big, 1)            # the ratio in ten-thousandths, rounded half up, in whole numbers
     T["dense_open_ratio"] = np.where(big > 0, ha(ratio_tt), "")
     T["near_dense_open_boundary"] = ((row != "little_or_none") & (10 * small >= int(NEAR_RATIO * 10) * big)).astype(int)
-    cells, half_up_cells = {}, {}
+    cells, half_up_cells, start_of, has_share, share_hh, start_below_zero = {}, {}, {}, {}, {}, {}
+    loss_cells = ["dense_loss", "open_loss", "little_loss"]
     for w in WINDOWS:
         ld, lo, ll = win[w]["dense"], win[w]["open"], win[w]["low"]
+        # forest at the start of the window, and the loss of the window as a share of it: beside the cell, never in it
+        raw_start = {b: area[b] - yearly[b][:, [y - 2001 for y in range(2001, WINDOWS[w][0])]].sum(axis=1) for b in ("dense", "open")}
+        start_below_zero[w] = {b: int((raw_start[b] < 0).sum()) for b in raw_start}
+        if min(raw_start[b].min() for b in raw_start) < -20:
+            fails.append(f"window {w}: forest at the start of the window is below zero by more than the source's rounding explains")
+        start_of[w] = np.maximum(raw_start["dense"], 0) + np.maximum(raw_start["open"], 0)
+        has_share[w] = q(start_of[w]) >= int(STANDING_MIN_HA * 100)
+        if ((ld + lo)[has_share[w]] > start_of[w][has_share[w]]).any():
+            fails.append(f"window {w}: in a unit with a share, more forest was lost in the window than stood at its start")
+        share_hh[w] = np.where(has_share[w], (2 * (ld + lo) * 10000 + start_of[w]) // np.where(start_of[w] > 0, 2 * start_of[w], 1), -1)       # hundredths of a per cent, half up, in whole numbers
         hu = lambda x: (x + 50) // 100                                   # the other common rule, half up on the decimal figure: only to say how many cells it would change
         hl = hu(sd + so) < int(STANDING_MIN_HA * 100)
         half_up_cells[w] = np.array([{("little_or_none", "none"): "little_none", ("little_or_none", "some"): "little_loss", ("mostly_dense", "none"): "dense_none", ("mostly_dense", "some"): "dense_loss",
@@ -394,6 +439,20 @@ def main():
         order = pd.DataFrame({"d": district, "c": cell, "k": -key, "u": ids.to_numpy()}).sort_values(["d", "c", "k", "u"], kind="mergesort")
         order["o"] = order.groupby(["d", "c"]).cumcount() + 1
         T[f"order_in_district_cell_{w}"] = order["o"].reindex(T.index).to_numpy()
+        T[f"forest_at_window_start_ha_{w}"] = ha(start_of[w])
+        T[f"forest_loss_share_pct_{w}"] = np.array([f"{int(x) // 100}.{int(x) % 100:02d}" if h else "" for x, h in zip(share_hh[w], has_share[w])], dtype=object)
+        T[f"forest_loss_share_blank_because_{w}"] = np.where(has_share[w], "", NO_SHARE)
+        # the second order within a district and a cell: by share in the cells with loss; the cells without loss keep the order by standing hectares
+        by_share = T[f"order_in_district_cell_{w}"].to_numpy().copy()
+        fl_w, id_text = (ld + lo), ids.to_numpy()
+        groups_ = pd.DataFrame({"d": district, "c": cell, "i": np.arange(n)})
+        for (d_, c_), g_ in groups_[np.isin(cell, loss_cells)].groupby(["d", "c"]):
+            members = sorted(g_["i"], key=lambda i: (0, -Fraction(int(fl_w[i]), int(start_of[w][i])), -int(fl_w[i]), id_text[i]) if has_share[w][i] else (1, Fraction(0), -int(fl_w[i]), id_text[i]))
+            for place_, i in enumerate(members, 1):
+                by_share[i] = place_
+        T[f"order_in_district_cell_by_share_{w}"] = by_share
+        if (~has_share[w] & (row != "little_or_none")).any():
+            fails.append(f"window {w}: a unit with at least the standing minimum now has no share: forest at the window's start cannot be less than what stands")
     place = {c: str(i + 1) for i, (c, _) in enumerate(TIERS)}
     T["tier_provisional_" + DEFAULT_WINDOW] = [place.get(c, "") for c in cells[DEFAULT_WINDOW]]
 
@@ -478,6 +537,22 @@ def main():
                               "n_near_the_boundary": int((m & forest_site & (small >= r_ * big - 1e-9)).sum()), "of_them_mostly_dense": int((m & (row == "mostly_dense") & (small >= r_ * big - 1e-9)).sum()),
                               "of_them_mostly_open": int((m & (row == "mostly_open") & (small >= r_ * big - 1e-9)).sum())} for r_ in RATIOS for label, m in level.items()])
 
+    # ---- loss as a share, by window and cell: on the share AS PRINTED, like every other figure that is compared with a line ------------------
+    share_rows, share_counts = [], {}
+    for w in WINDOWS:
+        hh, has = share_hh[w], has_share[w]
+        share_counts[w] = {"units_with_a_share": int(has.sum()), "units_with_no_share": int((~has).sum()), "units_with_no_share_in_a_cell_with_loss": int((~has & np.isin(cells[w], loss_cells)).sum()),
+                           "units_with_no_share_by_cell": {c: int((~has & (cells[w] == c)).sum()) for c in CELLS if (~has & (cells[w] == c)).any()},
+                           "bands_set_to_zero_at_the_start_of_the_window": start_below_zero[w], "largest_share_pct": round(int(hh[has].max()) / 100, 2)}
+        for cell in CELLS:
+            k = cells[w] == cell
+            v = np.sort(hh[k & has])
+            share_rows.append({"window": w, "cell": cell, "cell_name": CELLS[cell][2], "n_units": int(k.sum()), "n_with_a_share": int((k & has).sum()), "n_no_share_too_little_forest_at_the_start": int((k & ~has).sum()),
+                               "share_under_1pct": int((v < 100).sum()), "share_1_to_under_5pct": int(((v >= 100) & (v < 500)).sum()), "share_5pct_or_more": int((v >= 500).sum()),
+                               "median_share_pct": (f"{(int(v[(len(v) - 1) // 2]) + int(v[len(v) // 2])) / 200:.3f}" if len(v) else ""), "largest_share_pct": (f"{int(v[-1]) / 100:.2f}" if len(v) else ""),
+                               "forest_at_window_start_ha": round(int(start_of[w][k].sum()) / 1e4, 2), "forest_loss_ha_in_window": round(int((win[w]["dense"][k] + win[w]["open"][k]).sum()) / 1e4, 2)})
+    share_table = pd.DataFrame(share_rows)
+
     # ---- what the two thresholds rest on -----------------------------------------------------------------------------------------------------
     # Every row has a key that the layer and the document look it up by; "what" says it in words.
     R = pd.read_csv(use("20_degradation/forest_floor_repeatability.csv", "the area of one pixel in the middle of the state")).set_index("forest_ha_from")
@@ -530,6 +605,12 @@ def main():
            {"key": "dense_loss_under_01pct", "about": "loss threshold: size", "what": f"window {DEFAULT_WINDOW}: units in the cell dense_loss whose forest loss in the window is under 0.1 % of their standing forest", "value": int((dl & (1000 * fl0 < sf)).sum()), "n": int(dl.sum()), "source": "this table"},
            {"key": "none_cell_over_2pct", "about": "loss threshold: size", "what": f"window {DEFAULT_WINDOW}: forest-site units in a cell with no loss whose forest loss in the window is over 2 % of their standing forest",
             "value": int(((row != "little_or_none") & ~some0 & (100 * fl0 > 2 * sf)).sum()), "n": int(((row != "little_or_none") & ~some0).sum()), "source": "this table"}]
+    hh0, has0 = share_hh[DEFAULT_WINDOW], has_share[DEFAULT_WINDOW]
+    none0 = (row != "little_or_none") & ~some0
+    ev += [{"key": "dense_loss_share_under_1pct", "about": "loss as a share", "what": f"window {DEFAULT_WINDOW}: units in the cell dense_loss whose forest loss in the window, as printed, is under 1 % of their forest at the start of the window",
+            "value": int((dl & has0 & (hh0 < 100)).sum()), "n": int(dl.sum()), "source": "this table: forest_loss_share_pct"},
+           {"key": "none_cell_share_over_2pct", "about": "loss as a share", "what": f"window {DEFAULT_WINDOW}: forest-site units in a cell with no loss whose forest loss in the window, as printed, is over 2 % of their forest at the start of the window",
+            "value": int((none0 & has0 & (hh0 > 200)).sum()), "n": int(none0.sum()), "source": "this table: forest_loss_share_pct"}]
     total_standing = float((sd + so).sum())
     # repeatability on the land the standing minimum is about (canopy above 10 % in 2000, dense and open), by the method of agreement_floor_repeatability.csv, and held against it
     AFR = pd.read_csv(use("20_degradation/agreement_floor_repeatability.csv", "its two classes in common, checked against"))
@@ -613,7 +694,7 @@ def main():
     if TMP.exists():
         shutil.rmtree(TMP)
     TMP.mkdir()
-    tables = {"condition_by_unit.csv": T, "condition_cells.csv": cells_table, "condition_cells_by_district.csv": by_district, "condition_sensitivity.csv": sens, "condition_boundary.csv": boundary,
+    tables = {"condition_by_unit.csv": T, "condition_cells.csv": cells_table, "condition_cells_by_district.csv": by_district, "condition_sensitivity.csv": sens, "condition_boundary.csv": boundary, "condition_share.csv": share_table,
               "condition_threshold_evidence.csv": evidence, "tiers.csv": tiers, "work_types.csv": work}
     if naming is not None:
         tables["work_rows_naming_forest.csv"] = naming
@@ -629,12 +710,36 @@ def main():
         computed = {"dense_2000_ha": area["dense"], "open_2000_ha": area["open"], "low_2000_ha": area["low"], "standing_dense_ha": sd, "standing_open_ha": so, "standing_forest_ha": sd + so}
         computed.update({"agreement_reference_ha": ref, "agreement_corestack_valued_ha": val})                  # copied from the agreement table: read back like the rest
         for w in WINDOWS:
-            computed.update({f"loss_dense_ha_{w}": win[w]["dense"], f"loss_open_ha_{w}": win[w]["open"], f"forest_loss_ha_{w}": win[w]["dense"] + win[w]["open"], f"loss_low_ha_{w}": win[w]["low"]})
+            computed.update({f"loss_dense_ha_{w}": win[w]["dense"], f"loss_open_ha_{w}": win[w]["open"], f"forest_loss_ha_{w}": win[w]["dense"] + win[w]["open"], f"loss_low_ha_{w}": win[w]["low"],
+                             f"forest_at_window_start_ha_{w}": start_of[w]})
         if len(computed) != sum(1 for c_ in back.columns if c_.endswith("_ha") or "_ha_" in c_):
             wrong.append("a hectare column of the table is not among those read back")
         for col, v in computed.items():
             if not np.array_equal(tt(col), v):
                 wrong.append(f"{col} does not read back as it was computed")
+        # the share, on the file: the text of each share is the figure computed; blank exactly where the forest at the start prints under the minimum, and then the reason is there
+        share_identity = {}
+        for w in WINDOWS:
+            txt_, why_, st_ = back[f"forest_loss_share_pct_{w}"].to_numpy(), back[f"forest_loss_share_blank_because_{w}"].to_numpy(), tt(f"forest_at_window_start_ha_{w}")
+            given = txt_ != ""
+            want_ = np.array([f"{int(x) // 100}.{int(x) % 100:02d}" if h else "" for x, h in zip(share_hh[w], has_share[w])], dtype=object)
+            if not np.array_equal(txt_, want_) or not np.array_equal(given, q(st_) >= int(STANDING_MIN_HA * 100)) or not np.array_equal(why_ == NO_SHARE, ~given) or not set(why_) <= {"", NO_SHARE}:
+                wrong.append(f"window {w}: the share, its blanks or their reason do not read back as computed")
+            if given.any() and max(float(v) for v in txt_[given]) > 100:
+                wrong.append(f"window {w}: a share above 100 is written")
+            if WINDOWS[w][1] == 2025:                                     # forest at the start less the loss of the window is what stands, where no band was set to 0
+                gap = st_ - tt(f"forest_loss_ha_{w}") - tt("standing_forest_ha")
+                exact = ~(clipped["dense"] | clipped["open"])
+                if (gap[exact] != 0).any() or np.abs(gap).max() > 20:
+                    wrong.append(f"window {w}: forest at the start of the window less the loss of the window is not standing forest (largest gap {np.abs(gap).max() / 1e4:.4f} ha)")
+                share_identity[w] = {"units_exact": int((gap == 0).sum()), "units_not_exact": int((gap != 0).sum()), "largest_gap_ha": round(float(np.abs(gap).max()) / 1e4, 4)}
+            if w == "2001_2025" and not np.array_equal(st_, tt("dense_2000_ha") + tt("open_2000_ha")):
+                wrong.append("window 2001_2025: forest at the start of the window is not the forest of 2000")
+            if list(back[f"order_in_district_cell_by_share_{w}"]) != [str(x) for x in T[f"order_in_district_cell_by_share_{w}"]]:
+                wrong.append(f"window {w}: the order by share does not read back as computed")
+            same_ = ~np.isin(cells[w], loss_cells)
+            if not np.array_equal(back[f"order_in_district_cell_by_share_{w}"].to_numpy()[same_], back[f"order_in_district_cell_{w}"].to_numpy()[same_]):
+                wrong.append(f"window {w}: in a cell without loss the order by share is not the order by standing hectares")
         identity = {}
         for b in ("dense", "open"):
             gap = tt(f"standing_{b}_ha") + tt(f"loss_{b}_ha_2001_2025") - tt(f"{b}_2000_ha")        # on the file: standing + all loss - the year-2000 band
@@ -662,7 +767,14 @@ def main():
     with open(TMP / "decision.provenance.json", "w", encoding="utf-8") as fh:
         json.dump({"script": "scripts/05_build_decision.py", "script_sha256": sha256(__file__), "run_utc": started, "inputs": inputs,
                    "definitions": {"arithmetic": "whole ten-thousandths of a hectare; the thresholds are compared with the figure as the map prints it - format(x, '.2f') of the four-decimal figure as a double, the rule of every other hectare on the map",
-                                   "standing": "year-2000 band hectares less ALL Hansen loss on them through 2025; always now, whatever the window. A LOWER BOUND: Hansen does not net off gain",
+                                   "standing": "year-2000 band hectares less ALL Hansen loss recorded on them through 2025; always now, whatever the window: the forest of 2000 with no loss recorded since; not a measure of tree cover today",
+                                   "standing_was_called": "a lower bound, until the owner's ruling of 9 October 2026. It is not strictly a bound in either direction: gain is not netted off, and the provider's record of the data gives "
+                                                          "rates of missed and of false loss and cautions against subtracting loss from the cover of 2000 (00_raw/05_forest_reference/provider_cautions.json)",
+                                   "forest_at_window_start": "dense and open hectares of 2000 less the forest loss recorded in the years before the window's first year, each band set to 0 where that is below 0",
+                                   "forest_loss_share_pct": f"forest loss in the window / forest at the start of the window x 100, half up to two decimals in whole numbers; blank where the forest at the start prints under {STANDING_MIN_HA:g} ha, "
+                                                            f"with the reason in forest_loss_share_blank_because ('{NO_SHARE}'). It stands beside the cell and decides no cell",
+                                   "order_by_share": "within a district, within a cell with loss: units with a share by the exact fraction loss / forest at the start, largest first, ties by loss then unit_id; then the units with no share by loss. "
+                                                     "In a cell without loss it is the order by standing hectares",
                                    "forest_loss_in_a_window": "loss on the dense band plus loss on the open band in the window's years, by the band the forest was in, in 2000",
                                    "loss_on_low_canopy": "reported only; decides nothing (docs/RESULTS.md section 3.1)", "bands": {"dense": "treecover2000 > 30", "open": "10 < treecover2000 <= 30", "low": "treecover2000 <= 10"},
                                    "windows": {w: {"years": list(v), "is": WINDOW_IS[w]} for w, v in WINDOWS.items()}, "default_window": DEFAULT_WINDOW,
@@ -673,7 +785,7 @@ def main():
                                    "near_dense_open_boundary": f"row mostly_dense or mostly_open, and the smaller of standing dense and standing open is at least {NEAR_RATIO:g} of the larger",
                                    "corroboration": "copied from agreement_by_unit.csv; its window is 2017-2023 whatever window is selected; no new statistic",
                                    "district": "lgd_panchayat units: their Census-2011 district; outside_village units: the district assigned in outside_village_district.csv"},
-                   "thresholds": {"status": "PROPOSED, for the project owner to rule on. The agreement test's 100 ha is not used here.",
+                   "thresholds": {"status": THRESHOLDS_STATUS,
                                   "standing_min_ha": STANDING_MIN_HA, "loss_min_ha": LOSS_MIN_HA, "alternatives": {"standing_min_ha": list(STANDING_ALTERNATIVES), "loss_min_ha": list(LOSS_ALTERNATIVES)},
                                   "pixel_ha": round(pixel_ha, 4), "pixel_ha_is": "one pixel in the middle of the state; a pixel is a little smaller to the north", "rationale_table": "55_decision/condition_threshold_evidence.csv", "sensitivity_table": "55_decision/condition_sensitivity.csv"},
                    "tiers": {"status": "PROVISIONAL - to be set with the Foundation for Ecological Security; a user control in the layer, not a constant", "order": [c for c, _ in TIERS], "unranked": UNRANKED,
@@ -681,7 +793,9 @@ def main():
                              "note": "a forester could reasonably put dense_loss above open_loss"},
                    "work_types": {"registered": bool(schedule.is_file()), "field_when_not_registered": PENDING, "list": SCHEDULE_CITE if schedule.is_file() else "", "rows_cited": WORK_ROWS if schedule.is_file() else {},
                                   "words_in_no_row_of_the_list": ["regeneration", "forest land", "grazing", "biodiversity"] if schedule.is_file() else [], "note": WORK_NOTE if schedule.is_file() else ""},
-                   "checks_passed": {"units_each_once": n,
+                   "names": {"ruled_on": "2026-10-09", "what": "five of the six cells were renamed by the project owner's ruling so that each name states its test; the ids of the cells, the thresholds, the tier order and every unit's cell are unchanged",
+                             "gate": "scripts/05_check_rename.py holds every unit's cell in every window against the table as it stood before the ruling, and writes 55_decision/rename_gate.json"},
+                   "checks_passed": {"units_each_once": n, "share_tested_on_the_file_as_written": share_identity,
                                      "standing_plus_all_loss_against_the_band_hectares_per_unit": identity,
                                      "that_identity_was_tested_on": "the file as written, read back as text; exact except in the units where standing was set to 0",
                                      "standing_set_to_zero_where_the_sources_rounding_put_it_below": below_zero,
@@ -700,7 +814,7 @@ def main():
                                                                                   "unit_windows_with_some_loss_and_under_the_threshold_in_the_fourth_decimal": int(sum(((cells[w] != "x") & (q(win[w]["dense"] + win[w]["open"]) >= int(LOSS_MIN_HA * 100))
                                                                                                                                                                    & (win[w]["dense"] + win[w]["open"] < int(LOSS_MIN_HA * 10000))).sum() for w in WINDOWS))}, "district_check_counts_equal_the_district_records_own": {k: int(v.sum()) for k, v in status.items()}},
                    "counts": {"units": n, "by_level": {"lgd_panchayat": int((~outside).sum()), "outside_village": int(outside.sum())}, "standing_row": {r: int((row == r).sum()) for r in ("mostly_dense", "mostly_open", "little_or_none")},
-                              "cells": counts, "near_dense_open_boundary": int(T["near_dense_open_boundary"].sum()),
+                              "cells": counts, "near_dense_open_boundary": int(T["near_dense_open_boundary"].sum()), "loss_as_a_share": share_counts,
                               "corroboration_two_bases_pooled_do_not_quote": {k: int((corro == k).sum()) for k in four + ["not_compared"]},
                               "corroboration_note": "the pooled counts add flags cut in two populations (the headline, and every unit kept for the East Coast units): quote the counts by basis under checks_passed",
                               "corroboration_basis": {k: int((basis == k).sum()) for k in sorted(set(basis))}},
@@ -711,7 +825,9 @@ def main():
     for f in sorted(TMP.iterdir()):
         f.replace(OUT / f.name)
     TMP.rmdir()
-    print(f"55_decision/: condition_by_unit.csv n = {n:,} units, {len(T.columns)} columns; thresholds (proposed) standing {STANDING_MIN_HA:g} ha, loss {LOSS_MIN_HA:g} ha")
+    print(f"55_decision/: condition_by_unit.csv n = {n:,} units, {len(T.columns)} columns; thresholds (ruled 9 Oct 2026) standing {STANDING_MIN_HA:g} ha, loss {LOSS_MIN_HA:g} ha")
+    for w in WINDOWS:
+        print(f"  share {w}: {share_counts[w]['units_with_a_share']:,} units with a share, {share_counts[w]['units_with_no_share']:,} without (of them in a cell with loss: {share_counts[w]['units_with_no_share_in_a_cell_with_loss']:,})")
     for w in WINDOWS:
         print(f"  {w}: " + "; ".join(f"{c} {counts[w][c]:,}" for c in CELLS))
     print(f"  rows: " + "; ".join(f"{r} {int((row == r).sum()):,}" for r in ("mostly_dense", "mostly_open", "little_or_none")) + f"; near the dense/open boundary {int(T['near_dense_open_boundary'].sum()):,}")
