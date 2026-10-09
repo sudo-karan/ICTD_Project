@@ -1,6 +1,6 @@
 # Results: the state of the pipeline, and every headline number with its caveat
 
-*Written 2026-10-07T12:24:19Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
+*Written 2026-10-09T05:37:27Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
 from the file named for it in the appendix (§13), and each conclusion drawn from figures was tested against them before
 it was written. The figures change only when the files do.*
 
@@ -24,7 +24,7 @@ checks made on them. It holds no finding about whether spending follows need, an
 | need | `30_need/need_by_unit.csv` | built, 2026-10-05T20:22:49Z | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, 2026-10-05T20:25:06Z | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: passed (§8) |
 | the comparison of the three | `50_gap/` | **not built** | - |
-| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, 2026-10-07T12:05:18Z | `scripts/verify_layer.py`: 92 of 92 checks passed; every control exercised in two browser engines, and the page opened and read in the Safari application (§10) |
+| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, 2026-10-09T04:08:22Z | `scripts/verify_layer.py`: 92 of 92 checks passed; every control exercised in two browser engines, and the page last opened and read in the Safari application on an earlier build, not on this one (§10) |
 
 Three statements carry most of what follows.
 
@@ -460,23 +460,26 @@ stands whatever stage 4 turns out to be.
 
 ## 10. The map layer
 
-**What it is.** Two files, `60_layer/index.html` and `60_layer/data.js` (19.8 MB together, 5.5 MB
+**What it is.** Two files, `60_layer/index.html` and `60_layer/data.js` (22.5 MB together, 6.0 MB
 zipped), that open from disk in a browser and fetch nothing from the network: a map of the 11,468 units with a layer
 for each measure above, a panel of 44 figures for a clicked unit, a search, filters by kind of unit and by
 district, and a minimum of forest below which a unit is drawn grey (100 ha unless changed). It is a demonstration
 for discussion with people who know the places. It is not a verdict on any place.
 
 - **Checked against the stage tables** by `scripts/verify_layer.py`: 92 of 92 checks passed.
-- **Every control exercised on the build that is on disk** (2026-10-07T12:05:18Z), by `scripts/exercise_layer.py`, which writes
+- **Every control exercised on the build that is on disk** (2026-10-09T04:08:22Z), by `scripts/exercise_layer.py`, which writes
   `60_layer/exercise_chrome.json` and `60_layer/exercise_webkit.json`. In Chrome (Chrome/154.0.8037.99), opened from disk
   and driven with real mouse and keyboard events: 53 of 53 actions did what they should, and for
   29 units clicked on the map 1,276 of 1,276 displayed values equalled the stage tables. In
   WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine), with events made in script: 53 of 53, and for 29
   units 1,276 of 1,276. `docs/LAYER.md` lists each action and what happened.
-- **Opened in the Safari application itself, from disk**, by `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application). There
-  the page was driven by its address alone and its text read back; nothing was clicked. 48 of 48 addresses
-  showed what they should (every layer, every minimum of forest, the search, the two text panels), and for the same
-  29 units 1,265 of 1,265 values the panel should show were in the page's text.
+- **Not opened in the Safari application on this build.** That check was left out of this build's checks, and their
+  record gives the reason: "the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell". The last run of `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application), was on
+  the layer built 2026-10-08T22:42:59Z, not the one on disk: there the page was driven by its address alone and its text read
+  back, nothing was clicked, 48 of 48 addresses showed what they should (every layer, every minimum of
+  forest, the search, the two text panels), and for the same 29 units 1,265 of 1,265 values the
+  panel should show were in the page's text. On the build on disk the layer was exercised in Chrome and in Safari's
+  engine only.
 - **Not done.** No click was made in the Safari application, only in its engine: that needs a Safari setting that is
   the owner's to change. And Firefox was not installed on the machine, so the layer has not been opened in it.
 - **Left out on purpose**: the SHRUG-derived columns (§7).
@@ -597,7 +600,7 @@ Collected from `docs/UNITS.md`, `docs/DEGRADATION.md`, `docs/NEED.md`, `docs/NRM
   reports a community that did not favour the mapping of inequity; whether those two layers belong in what is shown is
   the Foundation's call (`docs/LAYER.md` §9).
 - The layer's controls were exercised in Chrome and in Safari's engine. In the Safari application it was opened and
-  read, not clicked. It has not been opened in Firefox, on a phone, in print, or on a machine with little memory
+  read, not clicked, and on an earlier build than the one on disk. It has not been opened in Firefox, on a phone, in print, or on a machine with little memory
   (§10).
 
 ## 13. Where every figure comes from
@@ -608,7 +611,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-07T12:24:19Z | this run | the UTC time at which this script ran |
+| 2026-10-09T05:37:27Z | this run | the UTC time at which this script ran |
 | 2026-10-05T20:11:19Z | `10_units/units.provenance.json` | key `run_utc` |
 | 2026-10-05T20:44:23Z | `20_degradation/hansen.provenance.json` | key `run_utc` |
 | 2026-10-05T21:40:02Z | `20_degradation/corestack.provenance.json` | key `run_utc` |
@@ -617,8 +620,9 @@ This section is the script's own record of what it read. Paths are relative to t
 | 2026-10-05T20:22:49Z | `30_need/need.provenance.json` | key `run_utc` |
 | 2026-10-05T20:25:06Z | `40_allocation/allocation.provenance.json` | key `run_utc` |
 | passed | `scripts/verify_r620.py` | its exit status and last line, run by this script as it wrote the document |
-| 2026-10-07T12:05:18Z | `60_layer/layer.provenance.json` | key `run_utc` |
+| 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 92 of 92 checks passed | `scripts/verify_layer.py` | its exit status and last line, run by this script as it wrote the document |
+| and the page last opened and read in the Safari application on an earlier build, not on this one | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: the check in the Safari application is named there |
 | 26.7 | `10_units/units.provenance.json` | computed here: outside-village km² ÷ km² of all units × 100. From: key `counts` → `km2_outside_any_revenue_village`; key `counts` → `km2` |
 | 59.4 | `20_degradation/hansen_by_unit_level.csv` | column `share_of_all_forest_pct`; row where `unit_level` is 'outside_village' |
 | 57.2 | `20_degradation/hansen_by_unit_level.csv` | column `share_of_all_loss_pct`; row where `unit_level` is 'outside_village' |
@@ -819,8 +823,8 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1,048 | `40_allocation/allocation.provenance.json` | key `join` → `units_with_no_works` |
 | 804 | `40_allocation/allocation.provenance.json` | key `join` → `units_with_no_works_by_level` → `outside_village` |
 | 40.6 | `20_degradation/hansen_by_unit_level.csv` | computed here: read as it stands. From: column `share_of_all_forest_pct`; row where `unit_level` is 'lgd_panchayat' |
-| 19.8 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
-| 5.5 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
+| 22.5 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
+| 6.0 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
 | 44 | `60_layer/layer.provenance.json` | key `table` → `fields_per_unit_in_the_panel` |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
 | 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_as_expected` |
@@ -834,7 +838,9 @@ This section is the script's own record of what it read. Paths are relative to t
 | 29 | `60_layer/exercise_webkit.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_equal` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_compared` |
+| the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
 | Safari 27.0 (the application) | `60_layer/exercise_safari.json` | key `summary` → `browser` |
+| 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_as_expected` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_tried` |
 | 29 | `60_layer/exercise_safari.json` | key `summary` → `units_opened_by_address` |
@@ -850,6 +856,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 83 | `30_need/need.provenance.json` | key `checks_passed` → `panchayat_file` → `ids_where_it_holds_more` |
 | 101 | `30_need/need.provenance.json` | key `checks_passed` → `secc` → `units` → `rate_resting_on_fewer_than_100_people` |
 | 73 | `30_need/need.provenance.json` | key `checks_passed` → `secc` → `units` → `some_of_the_rate_from_a_shrid_shared_with_another_id` |
+| , and on an earlier build than the one on disk | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc`, against the layer's own record |
 
 ### 13.2 Tables, in the order they appear
 
@@ -901,10 +908,11 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `40_allocation/assets_district_fy.csv` | 65,174 | `5e8dcd030f973f36` | - |
 | `40_allocation/panchayat_of_record_check.csv` | 363 | `f36e1bd24b73ce67` | - |
 | `40_allocation/state_fy_r620_vs_dump.csv` | 2,707 | `bd845de7118bc579` | - |
-| `60_layer/exercise_chrome.json` | 26,805 | `ce123a5eceb856f0` | 2026-10-07T12:15:32Z |
-| `60_layer/exercise_safari.json` | 17,705 | `12641834ae541c7e` | 2026-10-07T12:22:56Z |
-| `60_layer/exercise_webkit.json` | 27,296 | `2ebc01f1d2add139` | 2026-10-07T12:10:32Z |
-| `60_layer/layer.provenance.json` | 14,664 | `6e93fd76b286d905` | 2026-10-07T12:05:18Z |
+| `60_layer/decision_runs.json` | 5,712 | `652a4083b557d2d5` | - |
+| `60_layer/exercise_chrome.json` | 26,807 | `a4ecf3b563655739` | 2026-10-09T04:13:56Z |
+| `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
+| `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
+| `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
 
 ### 13.4 Statements tested before they were written
 
@@ -966,7 +974,7 @@ Each of these is something the text says in words. The script tested it against 
 - the files the hand check (WebKit) opened have the sha256 the layer's record gives
 - the hand check (WebKit) met no script error
 - in the hand check every control did what it should and every displayed value equalled the stage tables
-- the check in the Safari application was made on the build of the layer that is on disk
+- the check in the Safari application was not made on the build of the layer that is on disk, and the runner's record of that build names it as left out with a reason, every check it did run having passed
 - in the Safari application every address showed what it should and every value a panel should show was in the page's text
 - the units opened in the Safari application are the units clicked in Chrome
 - the reconciliation table has one row for the area of a pixel
@@ -1011,4 +1019,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*242 figures and 10 tables (330 cells) from 33 files; 61 statements tested; 32 totals compared. Written 2026-10-07T12:24:19Z by `scripts/write_results.py` (sha256 `bd4f2cfcee8569de`).*
+*246 figures and 10 tables (330 cells) from 34 files; 61 statements tested; 32 totals compared. Written 2026-10-09T05:37:27Z by `scripts/write_results.py` (sha256 `50f98f23f30e9685`).*

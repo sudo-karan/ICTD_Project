@@ -9,12 +9,18 @@ This file is the brief. Read it fully before writing code.
 written by `scripts/write_results.py` from the stage outputs, with the file each figure came from listed in its
 appendix; where this brief and that document differ on a figure, that document is the later one.
 
+**For the decision view - where forest work is warranted, read as six cells ranked within a district - read
+`docs/DECISION_LAYER.md`**, written by `scripts/write_decision_layer.py` to the same standard. Its section 17 lists the
+owner's rulings of 9 October 2026 and what is still open for the Foundation for Ecological Security.
+
 ---
 
 ## 1. The question
 
 Under VB–G RAM G (in force 1 July 2026), every village plan is drawn on the Yuktdhara portal from a
-fixed list of 318 permissible works. Of 155 portal layers, 46 across five categories concern water;
+fixed list of 375 permissible works: the list notified as S.O. 5448(E) on 5 October 2026, registered in
+`00_raw/06_scheme/` (375 rows). The figure of 318 that stood here until 9 October 2026 came from a draft of the
+list circulated for comments. Of 155 portal layers, 46 across five categories concern water;
 forest has four static layers describing legal boundaries and a land-degradation product from 2015–16.
 Water carries a minimum expenditure floor (65 / 40 / 30 % by groundwater category); no other domain does.
 
@@ -106,9 +112,11 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 ```
 .
 ├── README.md                  this brief
-├── 00_raw/                    downloaded or verified inputs — NEVER modify
-│   ├── data_manifest.csv      81 rows: id/url, exact bytes, licence, how verified
-│   ├── 05_forest_reference/   Global Forest Watch workbook and ISFR 2023 extracts that stage 1 reconciles to
+├── 00_raw/                    downloaded or verified inputs — a file here at a commit is never edited; a new input adds files and manifest rows
+│   ├── data_manifest.csv      92 rows: id/url, exact bytes, licence, how verified
+│   ├── 05_forest_reference/   Global Forest Watch workbook and ISFR 2023 extracts that stage 1 reconciles to; since 9 Oct 2026 also five
+│   │                          pages of the providers of Hansen's data and the extract of their cautions (6 manifest rows)
+│   ├── 06_scheme/             the notified list of permissible works, S.O. 5448(E) of 5 Oct 2026: PDFs, transcription, table, check (5 manifest rows)
 │   ├── cfr_fra/
 │   ├── mis_reports/           the four .xls originals plus their parsed CSVs
 │   └── mgnrega_assets/        district-level summaries (the 2 GB of raw assets is NOT here)
@@ -117,15 +125,17 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 ├── 30_need/                   stage 2 output
 ├── 40_allocation/             stage 3 output
 ├── 50_gap/                    stage 4 output
+├── 55_decision/               the decision tables: every unit in one of six cells, for four windows of years (git-ignored; rebuilt by a script)
 ├── 60_layer/                  the demo layer: one offline HTML map and its data file (git-ignored; rebuilt by a script)
+├── 70_share/                  a copy of the layer made to be passed on: the same two files without the map overlay, a README, a zip (git-ignored)
 ├── logs/                      run logs of the NIRv chain (git-ignored)
 ├── scripts/                   one script per step; vendor/ holds the one library the layer embeds
 ├── figures/
 └── docs/
 ```
 
-`00_raw/` is immutable. Every transformation writes into a numbered folder. That is what makes the
-methods section of the paper writable.
+Files in `00_raw/` at a commit are never edited; registering a new input adds files and manifest rows. Every
+transformation writes into a numbered folder. That is what makes the methods section of the paper writable.
 
 ### Scripts already present
 
@@ -166,6 +176,19 @@ methods section of the paper writable.
 | `_browser_chrome.py`, `_browser_webkit.py`, `wkdriver.swift` | not steps and write nothing: the two small drivers `exercise_layer.py` uses, standard library only; the Swift source is compiled into the temporary folder when first needed. |
 | `write_results.py` | writes `docs/RESULTS.md`. No figure is typed in it: each is read from a stage output and listed with its file in the document's appendix. Stops if the text carries a digit of its own, if a figure is blank, if a conclusion in words does not hold in the figures, if a total two files both carry differs, or if a verifier fails. |
 | `vendor/leaflet-1.9.4/` | Leaflet 1.9.4 (BSD 2-Clause), the one third-party library, embedded in the layer so that it needs no network. Its SHA-256 is checked at build. |
+| `00_raw/06_scheme/_build_schedule_extract.py` | inside `00_raw/`, like `cfr_fra/_build_mota.py`: makes the table of the 375 permissible works from the transcription of the Gazette's list and stops unless the Ministry's own totals, the order of the rows and every cell, read whole from the positions of the words in the PDF, agree. Its output is registered: it is not run again. |
+| `00_raw/05_forest_reference/_build_provider_cautions.py` | inside `00_raw/`: takes the cautions the providers attach to Hansen's data, word for word, from two registered pages into `provider_cautions.json`, and stops unless every sentence stands in its page. Its output is registered: it is not run again. |
+| `05_build_decision.py` | the decision tables, `55_decision/`. Every unit in one of six cells for four windows, from stage 1's hectares alone: the forest of 2000 with no loss recorded since (dense, open), and the forest loss of the window. Two thresholds, accepted by the owner on 9 Oct 2026 (10 ha, 1 ha). Beside the cell, never in it: the forest at the start of the window and the loss as a share of it. Stops unless standing plus lost equals the year-2000 band on the file as written. No Earth Engine. |
+| `05_check_rename.py` | the gate on the renaming of five cells (9 Oct 2026): every unit's cell in every window, through the owner's list of names, against the table as it stood when he ruled on it; and every column that table had, cell for cell. Stops on one mismatch. |
+| `_layer_decision.py` | not a step and writes nothing: the decision view's data and every sentence it shows, built for `06_build_layer.py`. |
+| `layer_overlay.js`, `layer_overlay.json` | the optional online overlay of the decision view (Hansen loss tiles from Global Forest Watch) and the registration of its endpoint, its terms and the two points of them that are unresolved. Its code goes into a third file, `60_layer/overlay.js`, so that the layer's two files still ask the network for nothing. |
+| `verify_decision.py` | check; writes nothing. Shares no code with the builders: re-adds every hectare of the decision view from stage 1's yearly columns, re-derives every cell, order, share and count, and holds the names, the export's columns and the page's handlers against what is written out in it. |
+| `exercise_decision.py` | the decision view's check in a browser (`chrome`, `webkit`): every new control, units of all six cells opened on the map, two exported lists checked field by field, the overlay online, offline and failing. |
+| `exercise_decision_safari.py` | the decision view in the Safari application, by address, with the unchanged Safari script's routine and one function replaced. Not part of the regression gate. |
+| `run_decision_checks.py` | runs both verifiers and the browser checks one at a time and writes down every run, a failed one included (`60_layer/decision_runs.json`). |
+| `07_build_share.py` | the copy made to be passed on, `70_share/`: the layer's two files byte for byte, without `overlay.js`, a README (how to open it, what it is and is not, credits, that terms for passing it on are not yet agreed) and a zip. |
+| `exercise_share.py` | the gate on that copy: opened from disk in Chrome, its overlay control says its file is not beside the page and the page asks the network for nothing. |
+| `write_decision_layer.py` | writes `docs/DECISION_LAYER.md` with the reading functions and the gates of `write_results.py`: no figure is typed. |
 
 ---
 
@@ -445,6 +468,27 @@ drawn; outside-village units are hatched. `docs/LAYER.md` is the full account. W
 - **SHRUG-derived columns are left out** (the poverty rate): SHRUG is CC BY-NC-SA 4.0. They stay in `30_need/`.
   The unit shapes derive from DataMeet's village boundaries and carry the ODbL.
 - **Not run by any other stage.** Rebuild with `.venv/bin/python scripts/06_build_layer.py`, then `scripts/verify_layer.py`.
+
+### The decision view — `55_decision/`, a view in `60_layer/`, and the copy in `70_share/` (8 and 9 October 2026)
+
+The owner reads the supervisor's request as one for a decision layer: something a planner opens to see where forest
+work is warranted. It is added beside the measurements and replaces none of them. `docs/DECISION_LAYER.md` is the full
+account; the figures are there and are not repeated here. What must not be lost:
+
+- **Six cells, from Hansen's hectares alone**: forest standing (the forest of 2000 with no loss recorded since; not a
+  measure of tree cover today) is mostly closed, mostly open, or little; forest loss in a window of years is recorded
+  or not. The names state the test (renamed on 9 October 2026; no unit moved, and `scripts/05_check_rename.py` holds it).
+- **No score and no state-wide ranking.** Units are listed tier by tier within one district. The order of tiers is
+  provisional, to be set with the Foundation for Ecological Security. Need and allocation stand beside the tier.
+- **Loss is also shown as a share** of the forest at the start of the window, beside the cell and never in it.
+- **The work-type field of a cell cites rows of the notified list of permissible works** by serial number. Which rows
+  bear on which cell is a proposal, for the Foundation.
+- **The map overlay is the one thing that can ask the network for anything**, it is off unless ticked, and its code is
+  a third file. **The copy to pass on is `70_share/`, which leaves that file out.** Terms for passing it on are not
+  yet agreed.
+- **Rebuild** with `scripts/05_build_decision.py`, `scripts/05_check_rename.py`, `scripts/06_build_layer.py`,
+  `scripts/run_decision_checks.py`, `scripts/07_build_share.py`, `scripts/exercise_share.py`, then
+  `scripts/write_decision_layer.py`.
 
 ---
 

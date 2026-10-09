@@ -1,7 +1,7 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-08T23:05:23Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
-file, and §20 says which. It describes the decision table built 2026-10-08T22:39:52Z and the layer built 2026-10-08T22:42:59Z.*
+*Written 2026-10-09T05:45:06Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
 
 ## 1. What this is
 
@@ -13,9 +13,9 @@ in his words, to the recharge-potential layer of CLART in Commons Connect.
 
 This document describes that layer. Four things about it come first.
 
-- **It is added; nothing is replaced.** The measurement stays exactly as it was. No file of `10_units/` to `50_gap/`,
-  no existing column, `docs/RESULTS.md` and `scripts/write_results.py` were changed. The new tables are in a new
-  folder, `55_decision/` (9 tables and a run record). The view is a new entry in the layer of `60_layer/`,
+- **It is added; nothing is replaced.** The measurement stays exactly as it was. No file of `10_units/` to `50_gap/`
+  and no existing column was changed. The new tables are in a new folder, `55_decision/` (10 tables, a run
+  record and the record of a gate). The view is a new entry in the layer of `60_layer/`,
   beside the existing ones, which keep their behaviour and their defaults (§16 says how that was checked).
 - **It is a way of reading the measurements, not a new measurement.** Each of the 11,468 units
   (7,976 LGD panchayat units and 3,492 outside-village units) is placed in one of six cells by two questions put
@@ -23,10 +23,13 @@ This document describes that layer. Four things about it come first.
   window of years. No unit is without a cell in any window. The cells are put in an order of tiers. That is all.
 - **There is no score.** No index, no weights, no number out of a hundred. Need and past allocation are shown beside
   a unit's tier and are never folded into it (§10).
-- **Three things in it are decisions that have not been taken.** The two thresholds (10 ha of standing forest;
-  1 ha of forest loss) are proposals of this project, shipped as the default and awaiting a ruling (§5). The
-  order of tiers is provisional, to be set with the Foundation for Ecological Security (§8). And which rows of the
-  official list of works bear on which cell is a proposal too (§13). §17 lists every decision that is the owner's.
+- **The owner ruled on it on 9 October 2026, and three things are still open.** He accepted the two thresholds as
+  proposed (10 ha of standing forest; 1 ha of forest loss), renamed five of the six cells so that each name
+  states its test, had the loss of the window shown also as a share of the forest, struck the words "lower bound",
+  took one column out of the exported list, and had a copy of the layer made without the map overlay. Still open, for
+  the Foundation for Ecological Security: the order of tiers (§8), which rows of the official list of works bear on
+  which cell (§13), and whether Scheduled Tribe share appears in a list they pass on (§10). §17 gives every ruling and
+  every open point.
 
 Neither threshold is the 100 ha floor of the agreement statistics. That floor stays what it was, for the purpose
 it was set for, and the decision view does not use it.
@@ -34,7 +37,7 @@ it was set for, and the decision view does not use it.
 Stage 4, the argument about why forest was lost or work withheld, is not built. Nothing here stands in for it.
 
 The two verifiers were run by this script as it wrote the document: `scripts/verify_layer.py`, unchanged, gave
-"92 of 92 checks passed"; `scripts/verify_decision.py`, new, gave "55 of 55 checks passed".
+"92 of 92 checks passed"; `scripts/verify_decision.py`, new, gave "61 of 61 checks passed".
 
 ## 2. Why a unit and not a pixel
 
@@ -47,7 +50,7 @@ hectares are kept. The cell is a summary of them, and a unit's panel shows them 
 
 ## 3. The record behind every cell
 
-`55_decision/condition_by_unit.csv` has one row for each of the 11,468 units and 51 columns. Before any
+`55_decision/condition_by_unit.csv` has one row for each of the 11,468 units and 67 columns. Before any
 cell, it records, from Hansen (UMD/hansen/global_forest_change_2025_v1_13, as tabulated by stage 1, by band of canopy in the year 2000):
 
 - **standing dense** hectares: land with `treecover2000 > 30`, less all loss Hansen records on it through 2025;
@@ -55,12 +58,17 @@ cell, it records, from Hansen (UMD/hansen/global_forest_change_2025_v1_13, as ta
 - **forest loss** in each window, split by the band the forest was in: lost from dense, lost from open;
 - **loss on land with `treecover2000 <= 10`** in each window. It is reported, and it decides nothing.
 
-**"Standing" is always now**, through 2025, whatever window is chosen. **It is a lower bound.** Hansen does not net off
-gain: land that lost its cover and grew it back, and land that has gained cover since 2000, is not in it. The table's
-run record says so, and so does the layer, in the legend, in every unit's panel and under the ranked list.
+**"Standing" is always now**, through 2025, whatever window is chosen. **It is the forest of 2000 with no loss recorded since; not a measure of tree cover today.** That is the wording
+the owner ruled on 9 October 2026, and it is what the table's run record says and what the layer says in the legend,
+in every unit's panel and under the ranked list.
 
-**It is not a measure of tree cover today**, and the layer says that too. It is the forest of the year 2000 on which
-no loss has been recorded. The split into dense and open is that of 2000: a stand that has thinned since is still
+**Until that ruling it was called a lower bound, and it is not strictly one in either direction.** It is too low
+where forest grew: Hansen does not net off gain, so land that lost its cover and grew it back, and land that has
+gained cover since 2000, is not in it. And recorded loss is itself uncertain both ways. The provider's record of the
+data, registered in `00_raw/` (§14), says in its own words: "Accordingly, “net” loss cannot be calculated by subtracting figures for tree cover gain from tree cover loss, and current (post-2000) tree cover cannot be determined by subtracting figures for annual tree cover loss from year 2000 tree cover." and "In the original publication, the authors evaluated the overall prevalence of false positives (commission errors) in this data at 13%, and the prevalence of false negatives (omission errors) at 12%, though the accuracy varies by biome and thus may be higher or lower in any particular location." With missed loss
+at about 12 per cent the subtraction leaves in forest that was lost; with false loss at about 13 per cent
+it takes out forest that was not. So the words "lower bound" were taken out of the layer, the tables' record and this
+document, and the reason is kept here. The split into dense and open is that of 2000: a stand that has thinned since is still
 "dense" here. And the provider of the data cautions against reading the subtraction as present cover (§18).
 
 **Why the lowest band decides nothing.** `docs/RESULTS.md` §3.1: of the 917 km² of loss recorded on land with
@@ -113,14 +121,15 @@ cell follows the printed total.
 **What is blank in the table, and why.** `unit_name` in 168 units that have no name; `dense_open_ratio` in
 708 units with no standing forest in either band; the tier in the units of the cell that is outside the
 ranked list; the district check and the governance prompt in the 7,976 LGD panchayat units, which they do not
-concern. No hectare and no cell is blank.
+concern; and, in each window, the share of the units that have none, whose reason is then given in words in the
+column beside it, which is blank wherever a share is given (§5.4). No hectare and no cell is blank.
 
 ## 4. The four windows
 
 Loss is counted over a window of years, and the window is a choice. There are four, each with its own cell for every
 unit. The layer opens on the first.
 
-| window | what it is | Protect - intact closed forest | Closed forest under pressure - find the cause first | Open forest - assisted natural regeneration candidate | Open forest still losing - restore | Little forest left, recent loss - verify on the ground | Not a forest site | units in another cell than in the default window |
+| window | what it is | Closed forest, little or no loss recorded - protect | Closed forest, loss recorded - find the cause first | Open forest, little or no loss recorded - assisted natural regeneration candidate | Open forest, loss recorded - restore | Little forest left, loss recorded - verify on the ground | Not a forest site | units in another cell than in the default window |
 |---|---|---|---|---|---|---|---|---|
 | 2018–2025 | the default: the years after plantation fell out of spending in the scheme's state report | 1,040 | 1,295 | 3,055 | 406 | 33 | 5,639 | - |
 | 2001–2025 | the full record | 618 | 1,717 | 2,661 | 800 | 74 | 5,598 | 857 |
@@ -136,21 +145,23 @@ stage reads those two shares and stops if the second is not under half the first
 caveats come with that reason; the first and the third are from `docs/RESULTS.md` §8, the second is this document's. The high-plantation years of that report are a snapshot
 frozen long ago (the row for FY2016-17 carries the stamp 10/10/2020). A financial year runs from April, and Hansen's
 years are calendar years, so the window and the regime do not start on the same day. And why plantation fell is not
-something these tables can say. Whether this window should be the default is the owner's to confirm (§17).
+something these tables can say. The owner confirmed this window as the default, with these three caveats, on
+9 October 2026 (§17).
 
-**The names were written for recent loss.** Under the full record, "still losing" and "recent" mean at any time since
-2001: of the 800 units in "Open forest still losing - restore" under 2001–2025, 394 lost under 1 ha in 2018–2025.
-The layer's About text says so.
+**A cell's name speaks of loss recorded in the window chosen.** Under the full record that is at any time since 2001:
+of the 800 units in "Open forest, loss recorded - restore" under 2001–2025, 394 lost under 1 ha in 2018–2025. The
+layer's About text says so.
 
 **The window is named wherever a cell is shown**: in the legend's title, in every unit's panel, at the head of the
 ranked list and in every row of an exported list (§15). The corroboration badge carries its own window, 2017–2023,
 whatever window is chosen (§11).
 
-## 5. The two thresholds: proposals that await a ruling
+## 5. The two thresholds: proposed on 8 October 2026, accepted by the owner on 9 October 2026
 
-Two thresholds turn hectares into cells. **Both are decisions, and neither has been taken by the owner.** What follows
-is what this project proposes, why, and how much the answer moves if the proposal is wrong. The proposals are shipped
-as the layer's default so that there is something to look at.
+Two thresholds turn hectares into cells. **Both are decisions. The owner took them on 9 October 2026, as they were
+proposed** (§17): the standing minimum, and the loss minimum as the rule of the cells. What follows is what was
+proposed, why, and how much the answer moves at two alternatives; none of it changed with the ruling. What the ruling
+added is §5.4: because a fixed number of hectares follows the size of a forest, the loss is now also shown as a share.
 
 - **(a) The standing minimum: 10 ha.** A unit with less standing forest than this, dense and open together, has
   "little or none".
@@ -223,15 +234,16 @@ it is a share of.*
 Of forest sites with ten to twenty-five hectares standing, 5 per cent have "some" loss; of those with five
 thousand or more, 85 per cent: 101 of 119 units in the state. In 22 of the
 30 districts the unit with the most standing forest is in a cell with loss. A cell with loss therefore says
-little about a large unit's rate of loss: 349 of the units in "Closed forest under pressure - find the cause first" lost under one per cent
+little about a large unit's rate of loss: 349 of the units in "Closed forest, loss recorded - find the cause first" lost under one per cent
 of their standing forest in the window, and 50 lost under a tenth of one per cent. The unit of that cell
 with the most forest, kuchilaghati (132731), Mayurbhanj, has 55,114 ha standing and lost 35.77 ha. And the other way:
 76 forest-site units lost more than two per cent of their forest in the window and are in a cell
 without loss, because that came to less than 1 ha. A unit's panel shows the hectares, so a reader can see which
 kind of unit is in front of them; the cell alone does not say. The recurrence that speaks for the loss minimum is
 also mostly a matter of large units: among forest sites of ten to twenty-five hectares that lost 1 ha or more in
-the first half of the window, 50 per cent (n = 32) did so again in the second. Whether "some
-loss" should be a number of hectares, a share, or both, is part of the ruling the owner is asked for (§17).
+the first half of the window, 50 per cent (n = 32) did so again in the second. The owner's
+ruling on this (§17): the minimum stays a number of hectares as the rule of the cells; the names of the cells no
+longer claim more than that rule (§7); and the loss is shown as a share beside the cell (§5.4).
 
 ### 5.2 The standing minimum
 
@@ -270,7 +282,7 @@ half or more of the unit's land. Their panels say what the test is.
 Every combination of the proposal and its two alternatives (5 and 25 ha standing; 0.5 and
 2 ha of loss), in the default window:
 
-| standing minimum, ha | loss minimum, ha | Protect - intact closed forest | Closed forest under pressure - find the cause first | Open forest - assisted natural regeneration candidate | Open forest still losing - restore | Little forest left, recent loss - verify on the ground | Not a forest site | units in another cell than at the proposal |
+| standing minimum, ha | loss minimum, ha | Closed forest, little or no loss recorded - protect | Closed forest, loss recorded - find the cause first | Open forest, little or no loss recorded - assisted natural regeneration candidate | Open forest, loss recorded - restore | Little forest left, loss recorded - verify on the ground | Not a forest site | units in another cell than at the proposal |
 |---|---|---|---|---|---|---|---|---|
 | 5 | 0.5 | 917 | 1,456 | 3,851 | 562 | 24 | 4,658 | 1,288 |
 | 5 | 1 | 1,072 | 1,301 | 3,994 | 419 | 14 | 4,668 | 990 |
@@ -297,6 +309,65 @@ same four moves in each window:
 | 2021–2025 | 990 | 1,207 | 321 | 279 |
 
 *Units whose cell differs from their cell at the proposal, of 11,468.*
+
+### 5.4 Loss as a share: beside the cell, never in it
+
+Added by the owner's ruling of 9 October 2026. It changes no cell: `scripts/05_check_rename.py` holds every unit's cell
+in every window against the table as it stood before (§16).
+
+For each unit and each window the table now carries two more figures:
+
+- **forest at the start of the window**: the unit's dense and open hectares of 2000, less the forest loss recorded in
+  the years before the window's first year (`forest_at_window_start_ha`). For the full record that is the forest of 2000;
+- **the loss of the window as a share of it**, in per cent (`forest_loss_share_pct`), rounded half up to two decimals
+  in whole numbers.
+
+**Where the forest at the start of the window is under the standing minimum, 10 ha as printed, no share is
+given**: a share of almost nothing means nothing. The table then holds the reason in words, "under 10 ha of forest at the start of the window: too little for a share to mean anything", and the
+layer shows words, not a blank and not a zero. In the default window 5,808 units have a share and 5,660
+have none; 22 of those are in a cell with loss recorded, all of them in the cell with little forest
+left. By window:
+
+| window | units with a share | units with none | of those, in a cell with loss recorded |
+|---|---|---|---|
+| 2018–2025 | 5,808 | 5,660 | 22 |
+| 2001–2025 | 5,824 | 5,644 | 50 |
+| 2017–2023 | 5,809 | 5,659 | 15 |
+| 2021–2025 | 5,805 | 5,663 | 15 |
+
+*n = 11,468 units in each window.*
+
+How the share falls across the cells, in the default window:
+
+| cell | units | with a share | no share: too little forest at the start | share under one per cent | one to under five per cent | five per cent or more | median share, % | largest share, % |
+|---|---|---|---|---|---|---|---|---|
+| Open forest, loss recorded - restore | 406 | 406 | 0 | 81 | 158 | 167 | 3.69 | 59.90 |
+| Closed forest, loss recorded - find the cause first | 1,295 | 1,295 | 0 | 349 | 512 | 434 | 2.87 | 53.55 |
+| Open forest, little or no loss recorded - assisted natural regeneration candidate | 3,055 | 3,055 | 0 | 2,961 | 89 | 5 | 0.00 | 7.93 |
+| Closed forest, little or no loss recorded - protect | 1,040 | 1,040 | 0 | 989 | 45 | 6 | 0.00 | 7.27 |
+| Little forest left, loss recorded - verify on the ground | 33 | 11 | 22 | 0 | 0 | 11 | 36.09 | 72.73 |
+| Not a forest site | 5,639 | 1 | 5,638 | 0 | 1 | 0 | 2.85 | 2.85 |
+
+*n = 11,468 units. The share is classed as printed. The median is of the units that have a share.*
+
+Read against §5.1: 349 of the units in "Closed forest, loss recorded - find the cause first" lost under one per cent of the forest they had
+at the start of the window, and 74 forest sites in a cell with little or no loss recorded lost over two
+per cent of theirs. (§5.1 counts the same two things against standing forest, which is the forest at the start less
+the loss of the window; the counts differ by the units that sit between the two denominators.) The unit of that cell
+with the most forest, kuchilaghati (132731), Mayurbhanj, had 55,150 ha at the start of the window and lost 0.06 per cent of it.
+
+**A second order in the ranked list.** Within a tier the list is ordered by hectares lost, as before and as it
+opens, or by share lost. It applies to the cells with loss recorded: there the units that have a share come first,
+largest share first, and the units with no share after them, by hectares lost. The cells with little or no loss
+recorded stay ordered by standing hectares under either choice. In the default window 1,653 of the
+1,734 units in a cell with loss have another place within their district and cell by share than by
+hectares. The order in use is named in the head of the list, carried in the page's address and written in every row
+of an exported list (§15). It is an order within a tier; it moves no unit between tiers and it is not a score.
+
+**What was not done for these two columns.** They were not in the table that two independent replicators rebuilt on
+8 October 2026. `scripts/verify_decision.py`, which shares no code with the build, rebuilds both from the yearly
+columns of stage 1 for every unit and window, with the blanks, their reason and their count, and the order by share
+(§16). That is one independent rebuild, not two.
 
 ## 6. Mostly dense or mostly open, and the units near that line
 
@@ -336,35 +407,66 @@ none, or some. In the default window, in the provisional order of tiers:
 
 | cell | standing forest now | forest loss in the window | units | LGD panchayat units | outside-village units | standing dense, ha | standing open, ha | forest loss in the window, ha | of the units, near the dense and open line |
 |---|---|---|---|---|---|---|---|---|---|
-| Open forest still losing - restore | mostly open | some | 406 | 294 | 112 | 51,741 | 86,627 | 4,603 | 98 |
-| Closed forest under pressure - find the cause first | mostly dense | some | 1,295 | 745 | 550 | 1,918,704 | 489,316 | 84,957 | 106 |
-| Open forest - assisted natural regeneration candidate | mostly open | none | 3,055 | 2,441 | 614 | 117,869 | 293,921 | 161 | 206 |
-| Protect - intact closed forest | mostly dense | none | 1,040 | 526 | 514 | 418,475 | 170,432 | 176 | 193 |
-| Little forest left, recent loss - verify on the ground | little or none | some | 33 | 19 | 14 | 64 | 116 | 97 | 0 |
+| Open forest, loss recorded - restore | mostly open | some | 406 | 294 | 112 | 51,741 | 86,627 | 4,603 | 98 |
+| Closed forest, loss recorded - find the cause first | mostly dense | some | 1,295 | 745 | 550 | 1,918,704 | 489,316 | 84,957 | 106 |
+| Open forest, little or no loss recorded - assisted natural regeneration candidate | mostly open | none | 3,055 | 2,441 | 614 | 117,869 | 293,921 | 161 | 206 |
+| Closed forest, little or no loss recorded - protect | mostly dense | none | 1,040 | 526 | 514 | 418,475 | 170,432 | 176 | 193 |
+| Little forest left, loss recorded - verify on the ground | little or none | some | 33 | 19 | 14 | 64 | 116 | 97 | 0 |
 | Not a forest site | little or none | none | 5,639 | 3,951 | 1,688 | 927 | 11,899 | 34 | 0 |
 
 *n = 11,468 units: every unit is in one row. Hectares are sums over the units of the cell; "standing" is through
-2025 and a lower bound.*
+2025, and is the forest of 2000 with no loss recorded since; not a measure of tree cover today.*
 
-Five things about the names.
+**Five of the six names were changed on 9 October 2026, by the owner's ruling, and no unit moved.** With a flat
+minimum of 1 ha of loss, the first names claimed more than the test behind them:
 
-- **They are the owner's**, with one change of typography: the layer writes the dash in them as a hyphen. The
-  governance prompt of §12, which was given as a quotation, keeps its dash.
-- **"Intact" in "Protect - intact closed forest" claims less than it sounds.** It means that Hansen records under 1 ha of forest
-  loss in the window chosen. The 1,040 units of that cell still carry 176 ha of recorded forest loss
-  in the window between them; 422 of them lost 1 ha or more at some time in 2001–2025, and only
-  226 have no recorded forest loss at all since 2001. And Hansen cannot see a canopy thinning: of the
-  671 of those units that the comparison with CoRE Stack covers, 157 are flagged by CoRE Stack
-  for degradation, 19 of them under the East Coast model, where that flag is itself unreliable (§11). Whether
-  the cell should keep the word is the owner's call (§17). The sentence under each cell's name in a unit's panel now
-  states the cell's own test, in hectares, and nothing stronger.
-- **"Open forest - assisted natural regeneration candidate"** is the largest cell among the forest sites by number of units (3,055). The official list of
+| name until 9 October 2026 | name as ruled |
+|---|---|
+| Open forest still losing - restore | Open forest, loss recorded - restore |
+| Closed forest under pressure - find the cause first | Closed forest, loss recorded - find the cause first |
+| Open forest - assisted natural regeneration candidate | Open forest, little or no loss recorded - assisted natural regeneration candidate |
+| Protect - intact closed forest | Closed forest, little or no loss recorded - protect |
+| Little forest left, recent loss - verify on the ground | Little forest left, loss recorded - verify on the ground |
+| Not a forest site | unchanged |
+
+*Six cells. The first column is read from the tiers table of the build of 8 October 2026, kept with the session's
+working files; the second from the one on disk.*
+
+Why, in figures read from the files:
+
+- **"Under pressure" mostly meant large.** 349 of the 1,295 units of that cell lost under one per cent of
+  the forest they had at the start of the window. The one with the most forest, kuchilaghati (132731), Mayurbhanj, has 55,114 ha
+  standing and lost 35.77 ha. And 76 forest sites that lost over two per cent of their standing
+  forest are in cells without loss, because that came to less than 1 ha (§5.1, §5.4).
+- **"Intact" was contradicted.** Of the 671 units of that cell that the comparison with CoRE Stack
+  covers, 157 are flagged by CoRE Stack for degradation (19 of them under the East Coast model, where
+  that flag is itself unreliable, §11). The 1,040 units of the cell carry 176 ha of forest loss in the
+  window between them; 422 of them lost 1 ha or more at some time in 2001–2025, and only 226
+  have no recorded forest loss at all since 2001. And Hansen cannot see a canopy thinning.
+- **A name now states the test and no more.** "Loss recorded" is 1 ha or more of forest loss in the window
+  chosen; "little or no loss recorded" is less than that. The words after the hyphen say what the cell points to, as
+  before. The sentence under each name in a unit's panel states the same test in hectares.
+
+**The gate on the renaming.** Every unit's cell as it stood before, in each of the four windows, was taken through
+that list of names and compared with the table as it is now: 45,872 assignments, and every one matches. The
+51 columns the table had are equal as text in every row (584,868 cells), so the hectares, the orders
+within a cell, the tier and the corroboration are what they were; 16 columns were added beside them
+(§5.4). `scripts/05_check_rename.py` does this, stops on one mismatch, and writes `55_decision/rename_gate.json`. The
+table it compares with, whose `sha256` begins `f129962e816e4da3`, is the one two independent replicators rebuilt on
+8 October 2026 (§16).
+
+More about the names.
+
+- **They are the owner's**, with one change of typography that he accepted: the layer writes the dash in them as a
+  hyphen. The governance prompt of §12, which was given as a quotation, keeps its dash. Every name is shown in full
+  everywhere, the legend included: none was shortened there.
+- **"Open forest, little or no loss recorded - assisted natural regeneration candidate"** is the largest cell among the forest sites by number of units (3,055). The official list of
   permissible works does not name that work (§13).
-- **"Open forest still losing - restore" is about what stands, not about what was lost.** A unit is in that cell when the forest standing
+- **"Open forest, loss recorded - restore" is about what stands, not about what was lost.** A unit is in that cell when the forest standing
   in it is mostly open and it lost forest of either band. 41 per cent of the cell's forest loss in the
   window was from the dense band, and in 102 of its 406 units more was lost from dense than from open.
   The panel shows the two losses apart.
-- **"Little forest left, recent loss - verify on the ground"** holds 33 units. Little forest stands in them and loss is recorded: plantation
+- **"Little forest left, loss recorded - verify on the ground"** holds 33 units. Little forest stands in them and loss is recorded: plantation
   felled, regrowth cleared, or an error. The name says what to do about that.
 
 **The order inside a cell**, as the run record states it: "within a district, within a cell: cells with loss by forest loss in the window, largest first; the others by standing hectares of the row's band; ties by unit_id. No order across districts; no score". The order is kept district by district and
@@ -381,11 +483,11 @@ The ranked view puts the cells in an order. The status of that order, as the run
 
 | tier, as the layer labels it | the line recorded for it |
 |---|---|
-| Tier 1: Open forest still losing - restore | Open forest is where the standing canopy is thinnest, and loss is recorded in the window: restoration has the most to hold on to and the most to lose by waiting. |
-| Tier 2: Closed forest under pressure - find the cause first | Closed forest with loss recorded in the window needs its cause found before any work is planned; a forester could reasonably put this tier first. |
-| Tier 3: Open forest - assisted natural regeneration candidate | Open forest with under 1 ha of loss recorded in the window is a candidate for assisted natural regeneration. |
-| Tier 4: Protect - intact closed forest | Closed forest with under 1 ha of loss recorded in the window calls for protection and conservation work, not planting. |
-| Tier 5: Little forest left, recent loss - verify on the ground | Little forest stands and loss is recorded in the window: the record may be of plantation felled, of regrowth cleared, or of error - it has to be seen on the ground. |
+| Tier 1: Open forest, loss recorded - restore | Open forest is where the standing canopy is thinnest, and loss is recorded in the window: restoration has the most to hold on to and the most to lose by waiting. |
+| Tier 2: Closed forest, loss recorded - find the cause first | Closed forest with loss recorded in the window needs its cause found before any work is planned; a forester could reasonably put this tier first. |
+| Tier 3: Open forest, little or no loss recorded - assisted natural regeneration candidate | Open forest with under 1 ha of loss recorded in the window is a candidate for assisted natural regeneration. |
+| Tier 4: Closed forest, little or no loss recorded - protect | Closed forest with under 1 ha of loss recorded in the window calls for protection and conservation work, not planting. |
+| Tier 5: Little forest left, loss recorded - verify on the ground | Little forest stands and loss is recorded in the window: the record may be of plantation felled, of regrowth cleared, or of error - it has to be seen on the ground. |
 | Not ranked: Not a forest site | On the map, outside the ranked list: under 10 ha of standing forest and under 1 ha of forest loss recorded in the window to act on. |
 
 *Six cells: five tiers and the one cell left outside the ranked list.*
@@ -395,7 +497,7 @@ the tier is for and give no argument for its place: why, of the two cells withou
 comes before closed is argued nowhere yet. It is the owner's provisional order.
 
 **A forester could reasonably put the second tier above the first.** Closed forest that is being removed is arguably
-the more urgent thing to understand; open forest that is still losing is arguably where work has most to gain. That is
+the more urgent thing to understand; open forest with loss recorded is arguably where work has most to gain. That is
 a judgement for the Foundation, and the order above is only where the layer starts.
 
 So **the order is a control in the layer, not a constant.** A user can move any tier up or down and go back to the
@@ -454,8 +556,9 @@ units and of districts are from the decision table.
 So "the two measures do not agree across the state" is not what the file says; "for LGD panchayat units at the
 headline, agreement across the state is not established" is. What the file does bear out for LGD panchayat units is
 that agreement within districts holds at all three floors, where agreement across the state does not hold at the
-headline. That, and not the absence of agreement across the state, is the case for ranking within a district. Whether
-it still carries the design is the owner's to say (§17). No state-wide ranking was built either way.
+headline. That, and not the absence of agreement across the state, is the case for ranking within a district. The
+owner accepted this narrower wording, which is the one the layer uses, on 9 October 2026 (§17). No state-wide ranking
+was built.
 
 What a district's list holds, in the default window:
 
@@ -499,7 +602,7 @@ outside-village unit in the district assigned to it (§12).*
 ## 10. What stands beside the tier, and what stays out
 
 In the ranked list each unit's row carries, beside its tier label: standing dense and standing open hectares; forest
-loss in the window; the corroboration badge (§11); Scheduled Tribe share (`st_share`); the development index of 2011
+loss in the window, and that loss as a share of the forest at the window's start (§5.4); the corroboration badge (§11); Scheduled Tribe share (`st_share`); the development index of 2011
 (`adi_2011`); past expenditure on work types that name forest; and whether it is an outside-village unit.
 
 - **Need and allocation are beside the tier and never inside it.** They do not move a unit up or down.
@@ -521,11 +624,12 @@ loss in the window; the corroboration badge (§11); Scheduled Tribe share (`st_s
   this state, the community did not favour the mapping of inequity. That paper is not among the files registered in
   `00_raw/`, so this document repeats the record and has not read the paper again.
 - **SHRUG-derived columns stay out**, as before: no poverty estimate is in the decision table, the view or the export.
-  One judgement recorded earlier carries over and reaches further now: the development index of 2011 is kept in the
-  layer on the reading, set out in `docs/DATA_NOTES.md`, that it is computed from census rows; a stricter reading of
-  SHRUG's terms would remove it. With the decision view it is also a column of an exported file meant to be passed on.
-  Keeping it there is the owner's call, and whether it and Scheduled Tribe share belong in a shared list is the
-  Foundation's.
+  One judgement recorded earlier carries over: the development index of 2011 is kept in the layer on the reading, set
+  out in `docs/DATA_NOTES.md`, that it is computed from census rows; a stricter reading of SHRUG's terms would remove
+  it. **By the owner's ruling of 9 October 2026 it is no longer a column of the exported list**, which is the file that
+  gets passed on; it stays in the interactive view, as a layer of its own and as a column of the list on the page.
+  The copy of the layer made to be passed on (§14) is that interactive view, so the index is in it; the exported file
+  is not. Whether Scheduled Tribe share belongs in a list that is passed on is still the Foundation's call.
 
 ## 11. Corroboration: what the existing comparison already says
 
@@ -569,11 +673,11 @@ How the badge falls across the cells, in the default window:
 
 | cell, in the default window | units | both measures flag it | only Hansen | only CoRE Stack | neither | not compared |
 |---|---|---|---|---|---|---|
-| Open forest still losing - restore | 406 | 2 | 72 | 9 | 141 | 182 |
-| Closed forest under pressure - find the cause first | 1,295 | 194 | 335 | 170 | 461 | 135 |
-| Open forest - assisted natural regeneration candidate | 3,055 | 0 | 1 | 65 | 770 | 2,219 |
-| Protect - intact closed forest | 1,040 | 0 | 1 | 157 | 513 | 369 |
-| Little forest left, recent loss - verify on the ground | 33 | 0 | 0 | 0 | 0 | 33 |
+| Open forest, loss recorded - restore | 406 | 2 | 72 | 9 | 141 | 182 |
+| Closed forest, loss recorded - find the cause first | 1,295 | 194 | 335 | 170 | 461 | 135 |
+| Open forest, little or no loss recorded - assisted natural regeneration candidate | 3,055 | 0 | 1 | 65 | 770 | 2,219 |
+| Closed forest, little or no loss recorded - protect | 1,040 | 0 | 1 | 157 | 513 | 369 |
+| Little forest left, loss recorded - verify on the ground | 33 | 0 | 0 | 0 | 0 | 33 |
 | Not a forest site | 5,639 | 0 | 0 | 0 | 0 | 5,639 |
 
 *n = 11,468 units. The badge is of 2017–2023 and the cells here are of 2018–2025: the two are not the same years.*
@@ -654,11 +758,11 @@ list's own work type for those rows:
 
 | cell | its work-type field, as every unit of the cell shows it |
 |---|---|
-| Open forest still losing - restore | Plantation - Sl. 105 Line plantation of forestry trees for community; Sl. 108 Wasteland block plantation of forestry trees for community; Sl. 110 Block plantation of forestry trees in fields for community. Afforestation - Sl. 91 Raising of bamboo plantation for community. Soil moisture conservation - Sl. 121 Construction of continuous contour trench for community; Sl. 123 Construction of staggered contour trench for community. Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
-| Closed forest under pressure - find the cause first | Find the cause before choosing work; no row of the list is a way of finding it. If the cause is fire: Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
-| Open forest - assisted natural regeneration candidate | Assisted natural regeneration is not in the list: the word regeneration is in none of its 375 rows. Rows that could support it: Soil moisture conservation - Sl. 121 Construction of continuous contour trench for community; Sl. 123 Construction of staggered contour trench for community. Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
-| Protect - intact closed forest | Protection, not planting. In the list: Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
-| Little forest left, recent loss - verify on the ground | None until the recorded loss has been seen on the ground. |
+| Open forest, loss recorded - restore | Plantation - Sl. 105 Line plantation of forestry trees for community; Sl. 108 Wasteland block plantation of forestry trees for community; Sl. 110 Block plantation of forestry trees in fields for community. Afforestation - Sl. 91 Raising of bamboo plantation for community. Soil moisture conservation - Sl. 121 Construction of continuous contour trench for community; Sl. 123 Construction of staggered contour trench for community. Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
+| Closed forest, loss recorded - find the cause first | Find the cause before choosing work; no row of the list is a way of finding it. If the cause is fire: Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
+| Open forest, little or no loss recorded - assisted natural regeneration candidate | Assisted natural regeneration is not in the list: the word regeneration is in none of its 375 rows. Rows that could support it: Soil moisture conservation - Sl. 121 Construction of continuous contour trench for community; Sl. 123 Construction of staggered contour trench for community. Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
+| Closed forest, little or no loss recorded - protect | Protection, not planting. In the list: Forest fire management works - Sl. 372 Raising of firebreak hedges for community; Sl. 373 Construction of forest fire line for community; Sl. 374 Raising of fuel buffer zone for community. |
+| Little forest left, loss recorded - verify on the ground | None until the recorded loss has been seen on the ground. |
 | Not a forest site | None: not a forest site. |
 
 *Six cells; 9 distinct rows of the list are cited, each by its serial number, and this script checked that the
@@ -773,12 +877,32 @@ together, where the unit tables keep them apart, and it is a picture to find pla
 
 **Two points about the terms are unresolved, and they are the owner's to decide** (§17). Two points, both the project owner's to decide; one note to gfw@wri.org could settle both. (1) API keys. The terms read 'each request to an API must include one of Your Account's unique API keys'. The tile service's reference declares no key scheme and the service returns every tile without one. The provider's developer page counts the Tile Cache among the Data API's five core services and says 'Some endpoints require users to include an API key with their request'; the guide it links says 'To make most requests to the GFW Data API using third-party applications (e.g., scripts or websites), you need an API key.' Nothing read says whether tiles drawn in a page like this one are among them. (2) Attribution. The terms bind a user to the Attribution Requirements page, which asks for the words and link 'powered by Resource Watch' on maps made with 'the Resource Watch API'. Whether that page governs the tile service of Global Forest Watch is not said anywhere read, and the page is to be archived. The overlay credits the data's authors, its licence and the tile provider, and does not carry those words
 
-**Where the quoted pages are.** They are a third party's pages and not inputs of any table, so they were not
-registered in `00_raw/`. Copies of the 5 pages quoted, fetched on 8 October 2026, are with the session's
-working files, and this script looked in them for 13 of the sentences the registration quotes, whole or
-by their distinguishing words, and stops if one is missing. It did not look for every quotation. If the owner wants them registered as inputs, that is one move and a manifest row each. The provider's
-cautions about the data (§18) are kept in the same registration: if the overlay is withdrawn, they need a home of
-their own, or the layer's About text loses one sentence.
+**Where the quoted pages are.** By the owner's ruling of 9 October 2026, 5 of the provider's pages are now
+registered in `00_raw/05_forest_reference/`, each with a manifest row giving its address, bytes, `sha256` and date:
+the provider's record of the dataset, its terms of service, the attribution page those terms point to, the reference
+of the tile service, and the University of Maryland's page for the version of the data used here. They are fetched
+files and are not in git.
+The registered files are byte for byte the copies read on 8 October 2026. The developer page and the guide to API
+keys, which the note on the unresolved terms also quotes, are still only with the session's working files. This
+script looked in 5 of the copies for 13 of the sentences the overlay's registration quotes, whole or
+by their distinguishing words, and stops if one is missing. It did not look for every quotation.
+
+**The provider's cautions about the data have a home of their own.** `00_raw/05_forest_reference/provider_cautions.json`
+holds 13 sentences taken word for word from two of those pages - the provider's record of the dataset and the
+University's page - and the four percentages those sentences state. It is made and checked by the script beside it,
+and it is in git. The layer's About text quotes the cautions from that file and no longer from the overlay's
+registration, so they stay whether or not the overlay is shipped (§18 gives them).
+
+**A copy without the overlay.** `scripts/07_build_share.py` writes `70_share/`: a folder with the layer's `index.html`
+and `data.js`, byte for byte, and a README; no `overlay.js`; and a zip of that folder beside it (6.0 MB).
+The README says how to open the copy, what it is and is not, that the map overlay is not in it, whose data it draws
+on (12 rows, read from the layer's own list of sources) and that terms for passing it on are not yet
+agreed. The page in the copy is the same page, so its box "Site-level overlay" is still there. `scripts/exercise_share.py`
+opened the copy from disk in Chrome (Chrome/154.0.8037.99): 6 of 6 steps did what they should. The
+two files are byte for byte the layer's; the page loaded those two files and asked the network for nothing; with the
+box ticked the control said "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before.", the box was unticked again and no tile was drawn. The browser logged once
+that a file was not found, which is the point of the copy; nothing else was logged. One thing the owner should know:
+the copy is the interactive view, so the layer of the development index of 2011 is in it (§10).
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew 12 tiles of
 12 asked for, from the registered host and no other (one address asked for: `https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&end_year=2025`), with the
@@ -795,8 +919,8 @@ Chrome's alone (§16).
 
 No screenshot and no exported file should lose which window, which thresholds and which order produced it.
 
-- **The legend**: its title names the window; a note under it gives both thresholds, says they are proposed, says that
-  standing forest is a lower bound, and states the tier order in use.
+- **The legend**: its title names the window; a note under it gives both thresholds, says what standing forest is in
+  the owner's words (§3), and states the tier order in use.
 - **Every unit's panel** carries a block, "why this tier", on every unit and not behind any toggle: right under the
   unit's name in the decision view, and after the panel's own sections in every other view, so that the existing
   panels read as they did. In those other views the block is always of the default window and the provisional order,
@@ -804,27 +928,43 @@ No screenshot and no exported file should lose which window, which thresholds an
   them, so the block is what the same address shows on a fresh page. It shows the six hectare figures (standing dense, lost from dense, standing open, lost from
   open, land with ten per cent canopy or less, lost on it), with the window in the table's heading; the sentence that
   puts the unit in its row, with the standing minimum; the sentence that puts it in its column, with the loss minimum;
+  the forest at the start of the window and the loss as a share of it, or the words that say why no share is given;
   the grid of six cells with the unit's own outlined; the cell's place under the tier order in use, and the one line
   of reason for that place (when the user has changed the order, it says that the reason is the one given for the
   cell's provisional place); the corroboration badge with its own window; and the work-type field (§13). For an
   outside-village unit it adds the governance prompt and what the district rests on (§12).
-- **The head of the ranked list** names the district, the window and the tier order, says what orders the units
-  within a tier, and under a filter says what was left out.
-- **Every row of an exported list** carries all of it. The export has 31 columns: `district`, `unit_id`, `unit_name`, `unit_type`, `outside_village`, `window_of_forest_loss`, `standing_forest_is_through`, `tier_label`, `tier_definition`, `tier_order_in_use`, `tier_order_is`, `order_within_a_tier`, `standing_dense_ha`, `lost_from_dense_in_window_ha`, `standing_open_ha`, `lost_from_open_in_window_ha`, `land_with_10pct_canopy_or_less_in_2000_ha`, `lost_on_that_land_in_window_ha_reported_only`, `standing_forest_ha`, `forest_loss_in_window_ha`, `standing_minimum`, `loss_minimum`, `close_call_dense_or_open`, `corroboration`, `corroboration_window`, `scheduled_tribe_share`, `development_index_2011`, `forest_named_expenditure_geotagged_record_ends_FY2017_18`, `district_assigned_by`, `filter_in_use`, `layer_built_utc`.
+- **The head of the ranked list** names the district, the window and the tier order, says which of the two orders
+  within a tier is in use (by hectares lost, or by share lost: §5.4), and under a filter says what was left out.
+- **Every row of an exported list** carries all of it. **The export has 32 columns**: `district`, `unit_id`, `unit_name`, `unit_type`, `outside_village`, `window_of_forest_loss`, `standing_forest_is_through`, `tier_label`, `tier_definition`, `tier_order_in_use`, `tier_order_is`, `order_within_a_tier`, `standing_dense_ha`, `lost_from_dense_in_window_ha`, `standing_open_ha`, `lost_from_open_in_window_ha`, `land_with_10pct_canopy_or_less_in_2000_ha`, `lost_on_that_land_in_window_ha_reported_only`, `standing_forest_ha`, `forest_loss_in_window_ha`, `forest_at_window_start_ha`, `forest_loss_share_pct`, `standing_minimum`, `loss_minimum`, `close_call_dense_or_open`, `corroboration`, `corroboration_window`, `scheduled_tribe_share`, `forest_named_expenditure_geotagged_record_ends_FY2017_18`, `district_assigned_by`, `filter_in_use`, `layer_built_utc`. By the
+  owner's ruling of 9 October 2026 the development index of 2011 is not among them, and the forest at the start of the
+  window and the loss as a share of it are. Where a unit has no share the cell says so in words.
 - **The address** of a decision view says all of it too: the window, the district, the order of tiers where the user
-  changed it, and the filter. A part left out means its default, on a page already open as on a fresh one. The
+  changed it, the filter, and the order within a tier where it is by share. A part left out means its default, on a page already open as on a fresh one. The
   address of an ordinary layer carries nothing of the decision view, as before.
 
 Two exports were opened and checked field by field, each value under its own column name and the names held against
 a list written out in the check, so that neither the window nor the order in the file could be a constant and no name
 could drift from its value. The first: Rayagada, window 2018-2025, under an order the user had changed
-("1 Closed forest under pressure - find the cause first; 2 Open forest still losing - restore; 3 Protect - intact closed forest; 4 Little forest left, recent loss - verify on the ground; 5 Open forest - assisted natural regeneration candidate; not ranked: Not a forest site") and a filter ("Scheduled Tribe share 18 % or more; outside-village units left out"): 201 rows, as the tables give, and all 6,231 cells equal
+("1 Closed forest, loss recorded - find the cause first; 2 Open forest, loss recorded - restore; 3 Closed forest, little or no loss recorded - protect; 4 Little forest left, loss recorded - verify on the ground; 5 Open forest, little or no loss recorded - assisted natural regeneration candidate; not ranked: Not a forest site") and a filter ("Scheduled Tribe share 18 % or more; outside-village units left out"): 201 rows, as the tables give, and all 6,432 cells equal
 to the tables. The
-second: Ganjam, window 2017-2023, the provisional order, "No filter": 455 rows and all
-14,105 cells equal. Each row said which order had made it. An empty list is not offered as a file: with no row
+second: Ganjam, window 2017-2023, the provisional order, "No filter", ordered by share within a tier:
+455 rows and all 14,560 cells equal. Each row said which order of tiers had made it and what ordered the
+units within a tier; the first list was ordered by hectares lost and the second by share. 1 row of the
+first list had no share and said so in words. An empty list is not offered as a file: with no row
 to carry the window, the export button is off.
 
 ## 16. How it was verified: which check was applied where
+
+**This build applies the owner's rulings of 9 October 2026, and it was verified lightly, on purpose.** No unit changes
+cell, so, as he instructed, no independent replication was made, no adversarial review, and no run in the Safari
+application. What follows says which check was applied to what.
+
+**That no unit changed cell.**
+
+- *The gate on the renaming*, `scripts/05_check_rename.py`, run 2026-10-09T04:08:58Z: 45,872 assignments - every unit, every
+  window - taken through the owner's list of names, and every one matches; the 51 columns the table had are
+  equal as text in every row (584,868 cells); the two thresholds, the order of tiers and the default window are
+  what they were (§7). It stops on one mismatch.
 
 **The decision table, `55_decision/condition_by_unit.csv`.**
 
@@ -833,23 +973,32 @@ to carry the window, the export button is off.
   equal to the figure computed; the reconciliation of §3 made on the file itself, for each unit and in total; its
   yearly sums against stage 1's own totals; its repeatability figures against the existing table's; its
   corroboration counts against the agreement record's own; its district-check counts against the district record's
-  own. Its run record lists what passed.
-- *Full independent replication.* Two agents, each given the script's docstring and nothing else of it, rebuilt the
-  table for all four windows by different means (pandas, with every hectare held as a whole number of ten-thousandths; the Python standard library alone, with decimal arithmetic). Each table was hashed before it was compared. Over
-  46 of the table's 51 columns and 527,528 cells each, **no cell differs in value** from the
-  decision table; 0 differ in how a value is written. Neither replicator wrote the five columns that the docstring they were given described without naming (the standing row, and the loss column of each window); each of those repeats what the unit's cell already says, and in no unit and no window does it differ from what the cell implies. The two replicators' files are the same byte for byte. The docstring has since been given a list of the table's columns; the table's bytes did not change. The replicators reported 29 places
-  where the docstring left them a choice; none changed a value. The record of this comparison is a working file of the
-  session, not a stage output (§20); this script checks that it is of the table that is on disk, byte for byte.
-- *`scripts/verify_decision.py`*, which shares no code with the builders: "55 of 55 checks passed". It re-adds every hectare
+  own; and, added with the rulings, every share and its blank as written, no share above a hundred, and the forest at
+  the start of a window less the loss of the window equal to standing forest where the window runs to the last year.
+  Its run record lists what passed.
+- *The independent replication of 8 October 2026 still covers what it covered, and no more.* Two agents, each given
+  the script's docstring and nothing else of it, rebuilt the table as it stood then, for all four windows, by
+  different means (pandas, with every hectare held as a whole number of ten-thousandths; the Python standard library alone, with decimal arithmetic). Each table was hashed before it was compared. Over 46 of that table's
+  51 columns and 527,528 cells each, **no cell differs in value**; 0 differ in how a value is
+  written. Neither replicator wrote the five columns that the docstring they were given described without naming (the standing row, and the loss column of each window); each of those repeats what the unit's cell already says, and in no unit and no window does it differ from what the cell implies. The two replicators' files are the same byte for byte. The docstring has since been given a list of the table's columns; the table's bytes did not change. The replicators reported 29 places where the docstring left them a choice; none changed a
+  value. The gate above holds that each of those 51 columns is, cell for cell, in today's table of
+  67 columns. **The 16 columns added on 9 October 2026 were not replicated**: the forest at the
+  start of each window, the share, the reason for a blank share and the order by share. They are rebuilt by the
+  verifier below, once. The record of the replication is a working file of the session, not a stage output (§20).
+- *`scripts/verify_decision.py`*, which shares no code with the builders: "61 of 61 checks passed". It re-adds every hectare
   from stage 1's yearly columns, re-derives every cell from the printed hectares, every unit's district from
   `10_units/`, the order of every list from those, and every count and share of the layer's About text with its
-  statements of the thresholds, the windows and the tier order; it holds the tier
-  order and the six names against the owner's specification written out in it, and the rows the cells cite against
-  the registered list.
+  statements of the thresholds, the windows and the tier order; it holds the tier order and the six names against the
+  owner's specification written out in it, and the rows the cells cite against the registered list. Extended with the
+  rulings: it rebuilds the forest at the start of each window and the share for every unit and window from the yearly
+  columns, the blanks with their reason and their count, and the order by share in the table and on the page; it
+  holds the five new names as he gave them and that none of the old names, and nowhere the words "lower bound", is
+  left in the page or its data; and it holds the export's columns, one for one with the expressions that fill them.
 
 **How the checks were run.** By `scripts/run_decision_checks.py`, one after another and never two at once, on the
-build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). Of
-the 8 checks, 8 passed on their first run. The runs of each browser check are given with it below.
+build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). In
+this pass it ran 6 checks, and 6 passed on their first run. The runs of each browser check are
+given with it below.
 
 **The regression gate: the existing views.**
 
@@ -860,215 +1009,239 @@ the 8 checks, 8 passed on their first run. The runs of each browser check are gi
   Runs made of it on this build: 1; runs that passed: 1.
 - `scripts/exercise_layer.py`, unchanged, in WebKit (WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine)): 53 of 53 actions; 29
   units; 1,276 of 1,276 values. Runs made of it on this build: 1; runs that passed every step:
-  1; steps that failed in any run: none. **This check has failed a step once, and the owner should
-  know.** On the build before this one (built 2026-10-08T13:02:50Z), 3 runs were made and in 1, the
-  first, one step failed: a drag of the map made in script, which did not move the map. The next two runs passed. No
-  cause was established. One candidate, not tested: the step before the drag is a zoom by the mouse wheel, and the map
-  library ignores a mouse-down while it still marks a zoom as under way, so a drag begun a moment too soon does
-  nothing; the unchanged script waits a fixed time. Nothing in the drag touches what was added. The log of the failed
-  run is with the session's working files.
-- **`scripts/exercise_layer_safari.py`, unchanged and run by itself, in the Safari application: passed.** Run
-  2026-10-08T22:53:16Z on the layer built 2026-10-08T22:42:59Z: 48 addresses showed what they should and 1,265 values of the
-  units' panels were in the page's text. Nothing is clicked in Safari; the page is driven by its address. **This check
-  is fragile, and the owner should know how.** Runs made of it on this build: 1; runs that passed:
-  1. On 8 October 2026, on a build before this one, it stopped at its first reading, twice, before any assertion: Safari held another window of the same page, and had just been started in the background. Since then it has passed with Safari already running, in the background, with no other window showing the layer.
-  The two causes are in how the script finds and waits for its window, not in the layer;
-  `scripts/exercise_decision_safari.py` describes them. The script was not edited. Before each Safari run the runner
-  closes any window an earlier run of these checks left open, and no other: in the pass reported here it closed
-  0. That was added after an earlier pass of the runner, whose record is kept with the session's working
-  files. It is of the layer built 2026-10-08T20:41:54Z: an earlier build, not the one described here. In it 3 runs of this script were made and
-  1 passed. The note added to that record by hand: *This is the record the runner wrote on 9 October 2026, as it was written, with this one note added. In it the unchanged Safari script was run three times. The first run, with Safari not yet running, stopped at its first reading and left its window open. The second run read that left-over window instead of its own, as Safari hands a window back by its title, and failed most of its addresses. While the second run was still going, the left-over window - the one whose address carried the first run's own mark - was closed by hand; no other window was touched. The third run then passed as written. The runner was changed after this pass to close such left-over windows of its own checks itself, before each Safari run, and to record how many it closed.*
-- *Added, and not a substitute for the line above:* `scripts/exercise_decision_safari.py` ran the main routine of that
-  unchanged script, every address and every comparison of it, in the Safari application (Safari 27.0 (the application)) with one
-  function replaced while it ran, the one that reads the window: title, address and text were each asked for through the address filter (first document whose URL starts with the marked address), never through the by-title reference Safari returns; a reading made before the window exists counts as 'nothing yet'. So run, 48 of 48 addresses
-  showed what they should and 1,265 of 1,265 values of 29 units' panels were in the page's
-  text.
-- **That nothing existing changed** was also checked directly. This script compared the record of the layer built
-  2026-10-07T12:05:18Z, kept with the session's working files, with today's: all 23 inputs that layer was
-  built from go into today's layer with the same hash, beside 11 new inputs. It asked git what changed since
-  the commit the batch started from (`44890a1`): four files that existed then have lines added and none removed,
-  and no other is modified, deleted or renamed.
+  1; steps that failed in any run: none.
+- **`scripts/exercise_layer_safari.py`, unchanged, in the Safari application: NOT RUN on this build.** The runner's
+  record names it as left out and gives the reason: "the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell". Its last record, still in `60_layer/`, is of the run
+  of 2026-10-08T22:53:16Z on the layer built 2026-10-08T22:42:59Z, the build the owner ruled on: 48 addresses showed what they
+  should and 1,265 values of the units' panels were in the page's text. So **the Safari third of the regression
+  gate is not shown for the build described here.** What can be said without it: that script reads the existing
+  views only; they are drawn by lines of the page that this batch did not touch (the table below) from stage tables
+  that did not change; and the same views passed the unchanged exercise in Chrome and in WebKit on this build. That
+  is an argument and not a run.
+- *The same holds for `scripts/exercise_decision_safari.py`*, which ran the main routine of that unchanged script in
+  the Safari application (Safari 27.0 (the application)) with one function replaced, the one that reads the window (title, address and text were each asked for through the address filter (first document whose URL starts with the marked address), never through the by-title reference Safari returns; a reading made before the window exists counts as 'nothing yet'): its last
+  record is of the layer built 2026-10-08T22:42:59Z, where 48 of 48 addresses showed what they should and
+  1,265 of 1,265 values of 29 units' panels were in the page's text. Not run on this build.
+- **That nothing existing changed in code or data** was also checked directly. This script compared the record of the
+  layer built 2026-10-07T12:05:18Z, kept with the session's working files, with today's: all 23 inputs that layer
+  was built from go into today's layer with the same hash, beside 13 new inputs. It asked git what changed
+  since the commit before the decision view (`44890a1`): four files of code and data that existed then have lines
+  added and none removed.
 
 | file that existed before | lines added | lines removed |
 |---|---|---|
-| `.gitignore` | 8 | 0 |
-| `00_raw/data_manifest.csv` | 5 | 0 |
+| `.gitignore` | 20 | 0 |
+| `00_raw/data_manifest.csv` | 11 | 0 |
 | `scripts/06_build_layer.py` | 16 | 0 |
-| `scripts/layer_template.html` | 302 | 0 |
+| `scripts/layer_template.html` | 311 | 0 |
 
-  *The lines added to `.gitignore` keep the fetched Gazette files, the press release and the derived folder
-  `55_decision/` out of git, like the other fetched files and stage outputs; those added to the manifest are the
-  five rows of §13.* In the session: the three unchanged check scripts, the results script and `docs/RESULTS.md` are as
-  committed (the runner's record says so of the check scripts each time it runs them); every key of the layer's data
-  that existed before is identical to that build except the build date and the two texts that were added to; the
-  table beside the map is identical cell for cell; and no file of `10_units/` to `50_gap/` was written.
-- **What did change for an existing view, and is the owner's to accept** (§17): a heading and one line, the decision
-  view's switch, now stand above the list of layers, which moves that list down by their height; and every unit's
-  panel now ends with the block "why this tier". The decision view's other controls stay folded away, its radio button is a group of its
-  own so that the keyboard moves through the existing layers as before, and an existing view's address is what it was.
+  *The lines added to `.gitignore` keep fetched files and stage outputs out of git; those added to the manifest are
+  the rows of §13 and §14.* The only other files that existed then and are modified are documents the owner ordered
+  brought up to date on 9 October 2026: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`; and the script that writes one of them. **`scripts/write_results.py`
+  was changed, by the owner's choice of 9 October 2026, in one rule** (38 lines added, 8 removed since that
+  commit): it refused to write `docs/RESULTS.md` unless the record of the check in the Safari application was of the
+  layer on disk; it now allows that record to be of an earlier build when the runner's record of this build names the
+  check as left out with a reason, and then says so in the text. Its rule for the Chrome and WebKit records is
+  unchanged. The unchanged check scripts that were run are as committed (the runner's record says so of each); and no
+  file of `10_units/` to `50_gap/` was written.
+- **What did change for an existing view**, and the owner accepted (§17): a heading and one line, the decision view's
+  switch, stand above the list of layers; and every unit's panel ends with the block "why this tier". The decision
+  view's other controls stay folded away, its radio button is a group of its own so that the keyboard moves through
+  the existing layers as before, and an existing view's address is what it was.
 
 **The new view.**
 
-- `scripts/exercise_decision.py` in Chrome: 51 of 51 steps did what they should (6
+- `scripts/exercise_decision.py` in Chrome: 53 of 53 steps did what they should (6
   of them are statements of what was not done, readings of the page's script errors or the summary of the clicks on
-  the map, the rest actions on the new
-  controls: the view's switch, the four windows, the district, 3 of the 8 tier arrows and the
-  way back, the filter and its
-  box, a row of the list, two exports, the legend, the address, two window sizes, leaving and returning, the overlay).
-  46 units opened by a click on the map, 18 LGD panchayat and 28 outside-village units, the
-  latter in 16 districts, covering all six cells in 2 windows and all 11
-  kinds of corroboration badge; 828 of 828 comparisons of the block "why this tier" with the tables held (eighteen
-  a unit: lines that must be there, lines that must not, and the block's place in the panel). A click that opens
-  nothing, or a unit that does not touch the one aimed at, fails the run: there was none. 0 clicks opened
-  a touching neighbour. The page's script errors were read at the end of every part and before every reload: none.
-  Runs made of it on this build: 1; runs that passed: 1.
-- The same in WebKit: 45 of 45 steps, 46 units, 828 of 828 lines. There
-  events are made inside the page, the exported text is read from the page and not from a saved file, and the browser
-  cannot be put offline or have an address blocked. Runs made of it on this build: 1; runs that passed:
-  1.
+  the map, the rest actions on the new controls: the view's switch, the four windows, the district, the order within
+  a tier, 3 of the 8 tier arrows and the way back, the filter and its box, a row of the
+  list, two exports, the legend, the address, two window sizes, leaving and returning, the overlay). 46 units
+  opened by a click on the map, 18 LGD panchayat and 28 outside-village units, the latter in
+  16 districts, covering all six cells in 2 windows and all 11 kinds of
+  corroboration badge; 874 of 874 comparisons of the block "why this tier" with the tables held
+  (nineteen a unit: lines that must be there, the share among them, lines that must not, and the block's place in the
+  panel). A click that opens nothing, or a unit that does not touch the one aimed at, fails the run: there was none.
+  0 clicks opened a touching neighbour. The page's script errors were read at the end of every part and
+  before every reload: none. Runs made of it on this build: 1; runs that passed: 1.
+- The same in WebKit: 47 of 47 steps, 46 units, 874 of 874 comparisons.
+  There events are made inside the page, the exported text is read from the page and not from a saved file, and the
+  browser cannot be put offline or have an address blocked. Runs made of it on this build: 1; runs that
+  passed: 1.
 - The exports, field by field: §15. The overlay, online in both and offline in Chrome: §14.
-- In the Safari application, by address and with nothing clicked: 59 of 59 addresses of the decision
-  view showed what they should, and 657 of 657 lines of "why this tier" for 46 units were in
-  the page's text in order.
+- In the Safari application, by address and with nothing clicked: **not run on this build** (the same reason). On
+  the build the owner ruled on, 59 of 59 addresses of the decision view showed what they should, and
+  657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
+  build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**What three adversarial reviews changed.** Before this build, reviewers set against the first version found things that
-its own checks had passed: a count of "slivers" that were mostly whole pixels; a sentence shown for every district
-that was true of the state and false of many districts; evidence on repeatability measured on the wrong land; a
-browser check that compared a stale panel twice and called it a neighbour; an overlay that stayed "on" after its
-tiles stopped arriving; and a clause of the provider's terms that had been left out. No cell, hectare or tier was
-wrong. Each was corrected, and checks were added for its like: the build's reconciliation is now made on the file as
-written, the verifier rebuilds the counts and shares of the About text, and the list of works is walked against the
-Gazette cell by cell. A second review, of those corrections, found that two of the new sentences repeated the fault -
-one in this document said of every district what is true of the state, one in the layer named a cell where it meant a
-row - and that several of the new checks were weaker than their names: the warning about failed tiles had been
-recorded as not seen and passed, labels were tied to their values by position only, the list of allowed names stopped
-at the top level, and the walk of the Gazette could not see the last row's end or the line between two columns. Those
-were corrected too. A third review, of this document as regenerated and of the newest checks, found one more false
-sentence in the layer - the badge of the few units where CoRE Stack classes too little of the land with canopy above
-ten per cent had dropped those words, and so said something untrue of each of them - and one more sentence of the
-About text that said of any district's list what holds only of districts pooled. It found again checks weaker than
-their names: the list's check let through a row split in two with two others run together, the gate "every tile asked
-for was drawn" read the requests made and not the tiles drawn, and the verifier's checks of the view's lists and of
-the page's handlers read fragments. Those were corrected as well: the list's check now reads each row's two cells
-whole from the positions of the words, the tile gate holds drawn against asked, and the handlers are held whole.
-What this history shows is that sentences in words are where this work has gone wrong, more than figures, and that
-each round of checking has found the round before it too generous to itself; there is no reason to think the third
-round was the last that would find something. The conclusions this text draws from figures are tested when it is written and listed in §20.4; a sentence
-that is not such a conclusion is tested by nothing, and a reader should hold the prose to the tables.
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-09T04:34:32Z, opened `70_share/`'s copy from disk
+in Chrome: 6 of 6 steps did what they should (§14).
 
-**What was not done.** No control was clicked in the Safari application. The layer has not been opened in Firefox
-(not installed on this machine), on a phone, in print, or on a machine with little memory. The district's list and
-the filter's list were set through their change events in both engines, because a native pop-up cannot be clicked in a
-window that is not on a screen. Two behaviours of the overlay were read in the page's code and not exercised in a
-browser: that nothing is drawn if its file arrives after the box has been unticked or the view left, and that the
-warning of a failed tile stays until the overlay is drawn again. 3 of the 8 tier arrows were pressed. The digits of the Gazette's serial numbers
-were read by eye.
-Nobody who knows these places has yet looked at a single tier.
+**The fragility of the Safari and WebKit checks: recorded, and by the owner's ruling not chased.** On the layer built
+2026-10-08T13:02:50Z, 3 runs of the unchanged WebKit exercise were made and in 1, the first, one step
+failed: a drag of the map made in script, which did not move the map. No cause was established. One candidate, not
+tested: the step before the drag is a zoom by the mouse wheel, and the map library ignores a mouse-down while it
+still marks a zoom as under way; the unchanged script waits a fixed time. Of the unchanged Safari script on that
+day: it stopped at its first reading, twice, before any assertion: Safari held another window of the same page, and had just been started in the background. On the layer built 2026-10-08T20:41:54Z, 3 runs of it were made and 1 passed; the note
+added by hand to that pass's record: *This is the record the runner wrote on 9 October 2026, as it was written, with this one note added. In it the unchanged Safari script was run three times. The first run, with Safari not yet running, stopped at its first reading and left its window open. The second run read that left-over window instead of its own, as Safari hands a window back by its title, and failed most of its addresses. While the second run was still going, the left-over window - the one whose address carried the first run's own mark - was closed by hand; no other window was touched. The third run then passed as written. The runner was changed after this pass to close such left-over windows of its own checks itself, before each Safari run, and to record how many it closed.* On the layer the owner ruled on, built 2026-10-08T22:42:59Z, all
+8 checks were run and 8 passed on their first run. And what happened to the owner's Safari
+windows on 8 October 2026, from the session's note of that day: *During the Safari runs of 8 October the Safari that the check had started in the background received a request to quit (the system log has it at 16:19:50 IST, as 'Handling Quit AppleEvent'); the scripts send no such request, and what sent it was not established - seven other jobs were running and the machine was heavily loaded. When Safari was started again, the three windows it had restored from the owner's last session - two Start Pages and the layer at #layer=forest_named_expenditure&floor=50&unit=132164 - were no longer open. They were not recreated. The scripts close only the window they mark with their own address, which was tested on two windows of one title.*
 
-## 17. Decisions that are the owner's
+**What three adversarial reviews changed, on 8 October 2026.** Reviewers set against the first version found things
+that its own checks had passed: a count of "slivers" that were mostly whole pixels; a sentence shown for every
+district that was true of the state and false of many districts; evidence on repeatability measured on the wrong
+land; a browser check that compared a stale panel twice and called it a neighbour; an overlay that stayed "on" after
+its tiles stopped arriving; and a clause of the provider's terms that had been left out. No cell, hectare or tier was
+wrong. A second review, of those corrections, found two new sentences that repeated the fault and several new checks
+weaker than their names. A third found one more false sentence in the layer - a badge that had dropped the words
+"with canopy above ten per cent" - and again checks weaker than their names: the list's check, the gate on tiles
+drawn, the verifier's checks of the view's lists and of the page's handlers. Each was corrected. What that history
+shows is that sentences in words are where this work has gone wrong, more than figures, and that each round of
+checking found the round before it too generous to itself. **No review was made of this build**, by the owner's
+instruction: it changes labels, adds two figures beside the cell and an order within a tier, and moves no unit. The
+conclusions this text draws from figures are tested when it is written and listed in §20.4; a sentence that is not
+such a conclusion is tested by nothing, and a reader should hold the prose to the tables.
 
-- **The standing minimum, 10 ha** (§5.2). A proposal. The alternatives move 990 and 1,207 units.
-- **The loss minimum, 1 ha** (§5.1). A proposal. The alternatives move 308 and 282 units. With it,
-  whether "some loss" should stay a number of hectares: as it is, the cell with closed forest and loss holds
-  349 units that lost under one per cent of their forest.
-- **The order of tiers** (§8). Provisional, to be set with the Foundation; in particular whether closed forest under
-  pressure goes above open forest still losing.
-- **The word "intact"** in the name of one cell (§7): 157 of its units are flagged by CoRE Stack, and
-  422 lost 1 ha or more at some time since 2001.
-- **The default window** (§4), and its reason, with the three caveats on that reason.
-- **The reason given for ranking only within a district** (§9). As the owner worded it, the file does not bear it
-  out for all units, at every floor, with the East Coast units kept, or of any one district; the layer now words it as
-  the file has it.
-- **Which rows of the list of permissible works bear on which cell** (§13), with the Foundation; and the forest-named
-  rows cited by none, above all the last row of the list.
-- **Whether to ship the overlay** while two points of the provider's terms are unresolved (§14).
-- **Whether Scheduled Tribe share appears in a ranked list that is shared** (§10): the Foundation's call.
-- **Where the reconciliation holds to a tolerance** (§3): standing set to zero in 3 units for dense
-  and 1 for open, where the source's rounding put it a square metre below; and "lost" taken as the sum
-  of the years, which is not the source's own total to the last digit in 1,765 units for dense and
-  1,478 for open.
-- **What changed for the existing views** (§16): a heading and one line above the list of layers, and a block at the
+**What was not done.** No run was made in the Safari application on this build, and no control was ever clicked
+there. The layer has not been opened in Firefox (not installed on this machine), on a phone, in print, or on a
+machine with little memory. The district's list, the filter's list and the list of the order within a tier were set
+through their change events in both engines, because a native pop-up cannot be clicked in a window that is not on a
+screen. Two behaviours of the overlay were read in the page's code and not exercised in a browser: that nothing is
+drawn if its file arrives after the box has been unticked or the view left, and that the warning of a failed tile
+stays until the overlay is drawn again. 3 of the 8 tier arrows were pressed. The digits of
+the Gazette's serial numbers were read by eye. The two columns of the share were rebuilt independently once, not
+twice. Nobody who knows these places has yet looked at a single tier.
+
+## 17. The owner's rulings of 9 October 2026, and what is still open
+
+On 9 October 2026 the owner read the list of decisions this section then held and ruled on it. It is split in two as
+he asked.
+
+### 17.1 Ruled on 9 October 2026
+
+**Accepted as proposed.**
+
+- **The standing minimum, 10 ha** (§5.2). The alternatives would move 990 and 1,207 units.
+- **The loss minimum, 1 ha, as the rule of the cells** (§5.1). The alternatives would move 308 and
+  282 units.
+- **The default window, 2018–2025, with its three caveats** (§4).
+- **The narrower wording of the reason for ranking only within a district**, which is the one the layer uses (§9):
+  it holds for LGD panchayat units at the headline, not for all units, at every floor, with the East Coast units
+  kept, or of any one district.
+- **The rounding tolerance** (§3): standing set to zero in 3 units for dense and 1 for
+  open, where the source's rounding put it a square metre below; and "lost" taken as the sum of the years, which is
+  not the source's own total to the last digit in 1,765 units for dense and 1,478 for open.
+- **The additions to the existing views** (§16): a heading and one line above the list of layers, and a block at the
   end of every unit's panel.
-- **The dash in the cells' names** (§7), written as a hyphen; and the owner's sentence that "every lost pixel is bare
-  by construction" (§2), which the layer and this document give in the weaker form the source bears out.
-- **What was written into `00_raw/` after the first registration** (§13): the Ministry's press release as a fifth
-  file, and a check script that was rewritten in place after each review, with its run record and the notes of the
-  new manifest rows. No line that was in `00_raw/` at the last commit was changed or removed: the manifest, which
-  was there, has five rows appended (§16), and the batch's own new files in `00_raw/06_scheme/` were rewritten in
-  place. The standing rule says `00_raw/` is never edited or overwritten, so this is for the owner to accept or not.
-- **Whether the provider's pages quoted in §14 should be registered as inputs**, and where the provider's cautions
-  about the data should live if the overlay is withdrawn.
-- **The development index of 2011 in an exported file** (§10).
-- **The margin of the "close call" flag, a fifth** (§6): this project's round number, with nothing in the evidence
-  behind it; it changes no cell.
-- **Four existing documents now describe an earlier state** and were left alone as instructed: `docs/RESULTS.md` and
-  `docs/LAYER.md` describe the layer of 7 October 2026; `README.md` does not list `55_decision/`, the new scripts or
-  the new rows of the manifest; and the note in `docs/DATA_NOTES.md` on what to know before the layer is sent was
-  written for that layer and does not cover the two sources the decision view adds, the tile provider and the
-  Gazette's list. `scripts/write_results.py` has not been run since and would now read today's
-  layer; a copy of that build is kept with the session's working files so that the hashes in `docs/RESULTS.md` still
-  resolve to something.
-- **How fragile the Safari check of the regression gate is** (§16). It passed as written on this build, and only once
-  no other Safari window showed the layer.
-- **What happened to the owner's Safari windows on 8 October 2026**, from the session's note of that day's runs:
-  During the Safari runs of 8 October the Safari that the check had started in the background received a request to quit (the system log has it at 16:19:50 IST, as 'Handling Quit AppleEvent'); the scripts send no such request, and what sent it was not established - seven other jobs were running and the machine was heavily loaded. When Safari was started again, the three windows it had restored from the owner's last session - two Start Pages and the layer at #layer=forest_named_expenditure&floor=50&unit=132164 - were no longer open. They were not recreated. The scripts close only the window they mark with their own address, which was tested on two windows of one title.
-- **One failed step in one run of the unchanged WebKit exercise, on the build before this one** (§16): whether a
-  check that can fail a step for a cause not established is good enough as a gate.
+- **Hyphen for dash** in the cells' names (§7).
+- **The weaker form of "every lost pixel is bare by construction"** (§2), which is the form the source bears out.
+- **The margin of the "close call" flag, a fifth** (§6).
+- **The fragility of the Safari and WebKit checks**: to be recorded, and not chased (§16 records it).
+
+**Changed by the rulings, and done in this build.**
+
+- **Five cells renamed, labels only** (§7), because with a flat minimum of 1 ha the first names over-claimed:
+  349 units of the cell then called "under pressure" lost under one per cent of their forest, and
+  157 units of the cell then called "intact" are flagged by CoRE Stack. No unit changed cell: 45,872
+  assignments held by the gate.
+- **Loss as a share, beside the cell and not in it** (§5.4), with a second order within a tier, by share lost.
+  Blank, with the reason in words, where the forest at the start of the window is under the standing minimum:
+  5,660 units in the default window.
+- **"Lower bound" taken out** (§3) of the layer, the tables' record and this document, and replaced by the owner's
+  words; the reason is kept in §3 and §18.
+- **The export** (§15, §10): the development index of 2011 removed from it and kept in the interactive view; the
+  forest at the start of the window and the share added; 32 columns.
+- **The provider's cautions given a home of their own** (§14): 5 of the provider's pages registered in
+  `00_raw/` with manifest rows, and the cautions quoted in the layer's About text from the dataset record whether or
+  not the overlay is shipped.
+- **A copy of the layer without the overlay**, `70_share/`, with a README and a zip (§14).
+- **The standing rule on `00_raw/`**, reworded in `CLAUDE.md` as he gave it: files in `00_raw/` at a commit are never
+  edited; registering a new input adds files and manifest rows. Under it the files this stage put into `00_raw/` on
+  8 October 2026, which were rewritten in place before they were committed, were not touched again: this build added
+  files and manifest rows there and changed nothing that was committed.
+- **The documents** brought up to date as he listed them (§18 says which were). To regenerate `docs/RESULTS.md` with
+  no run in the Safari application he chose, the same day, to change one rule of `scripts/write_results.py`: Chrome
+  and WebKit on the build on disk are enough, and the text says that Safari was not opened on it (§16).
+
+### 17.2 Still open, for the Foundation for Ecological Security
+
+- **The order of tiers** (§8). Provisional; in particular whether closed forest with loss recorded goes above open
+  forest with loss recorded. It is a control in the layer, and an exported list says which order made it.
+- **Which rows of the list of permissible works bear on which cell** (§13), and the forest-named rows cited by none,
+  above all the last row of the list.
+- **Whether Scheduled Tribe share appears in a list they pass on** (§10).
+
+Until these are settled a tier is a starting point for a conversation with the Foundation and not a recommendation.
+Two things are open that are not the Foundation's and that the owner knows of: the two points of the tile provider's
+terms (§14), which is why the copy made to be passed on has no overlay; and the terms on which that copy may be
+passed on, which are not yet agreed and which its README says are not.
 
 ## 18. What this does not show
 
-- **It is Hansen's record, read one way.** Standing forest is a lower bound and ignores gain. Loss is the removal of
-  cover; thinning under a canopy is invisible to it, and the split into dense and open is that of the year 2000. Tree
+- **It is Hansen's record, read one way.** Standing forest is the forest of 2000 with no loss recorded since; not a measure of tree cover today: it ignores gain, and it inherits
+  whatever recorded loss misses or wrongly includes (§3). Loss is the removal of cover; thinning under a canopy is
+  invisible to it, and the split into dense and open is that of the year 2000. Tree
   cover is any vegetation taller than five metres: a plantation counts as a natural forest does. The only second
   opinion is the corroboration badge, for the units it covers and for 2017–2023.
-- **The provider of the data cautions against part of what is done here.** From the provider's record of the dataset (https://data-api.globalforestwatch.org/dataset/umd_tree_cover_loss), in its words: 'Tree cover loss is defined as "stand replacement disturbance" which is considered to be clearing of at least half of tree cover within a 30-meter pixel. The exact threshold is variable both through space and time, and is biome-dependent.' 'In this data set, "tree cover" is defined as all vegetation greater than 5 meters in height, and may take the form of natural forests or plantations across a range of canopy densities.' '"loss" does not equate to deforestation.' 'current (post-2000) tree cover cannot be determined by subtracting figures for annual tree cover loss from year 2000 tree cover.' 'The 2011-2025 data was produced using an updated methodology ... Comparisons between the original 2001-2010 data and the 2011-2025 update should be performed with caution.' 'the authors are 75% confident that the loss occurred within the stated year, and 97% confident that it occurred within a year before or after.' The original publication put false positives at 13% and false negatives at 12% overall. The decision view's
-  "standing" is exactly such a subtraction. It is offered as a lower bound on the forest of 2000 that has no recorded
-  loss, and as nothing more. The two halves of the full record were made by different methods, which bears on the
-  window 2001–2025; and a loss can be a year off, which bears on the edges of every window.
+- **The provider of the data cautions against part of what is done here.** From Global Forest Watch's record of the
+  dataset, registered in `00_raw/` (§14), word for word: "Tree cover loss is defined as “stand replacement disturbance” which is considered to be clearing of at least half of tree cover within a 30-meter pixel." "“Loss” indicates the removal or mortality of tree cover and can be due to a variety of factors, including mechanical harvesting, fire, disease, or storm damage. As such, “loss” does not equate to deforestation." "Accordingly, “net” loss cannot be calculated by subtracting figures for tree cover gain from tree cover loss, and current (post-2000) tree cover cannot be determined by subtracting figures for annual tree cover loss from year 2000 tree cover."
+  "Comparisons between the original 2001-2010 data and the 2011-2025 update should be performed with caution." "In the original publication, the authors evaluated the overall prevalence of false positives (commission errors) in this data at 13%, and the prevalence of false negatives (omission errors) at 12%, though the accuracy varies by biome and thus may be higher or lower in any particular location." "Largely because of a delay between an actual disturbance and the event being observed by the satellite imagery, the authors are 75% confident that the loss occurred within the stated year, and 97% confident that it occurred within a year before or after." The University of Maryland, whose data it is, defines loss so:
+  "Forest loss during the period 2000-2025, defined as a stand-replacement disturbance, or a change from a forest to non-forest state." The decision view's "standing" is exactly the subtraction the record cautions against. It is offered
+  as the forest of 2000 with no loss recorded since, and as nothing more: not as tree cover today, and - since the
+  owner's ruling of 9 October 2026 - not as a lower bound on it either, because with loss missed at about 12 per
+  cent and loss falsely recorded at about 13 per cent it can err in either direction. The two halves of the full
+  record were made by different methods, which bears on the window 2001–2025; and a loss can be a year off, which
+  bears on the edges of every window.
 - **Recorded loss on open forest has risen steeply, and these tables cannot say why.** On the open band it goes
   23, 114, 226 km² across 2001–2010, 2011–2017 and 2018–2025, against 435, 444,
   674 on the dense band. `docs/RESULTS.md` §3.1 calls the like rise on the lowest band largely the producers'
   change of method. Whether the open band's rise is on the ground or in the method is not established here, and every
   cell with loss counts it.
 - **A cell's name says where the forest stands, not where the loss was.** The row is set by standing forest and the
-  column by loss from the dense and open bands together (§5). In 102 of the 406 units of "Open forest
-  still losing" more was lost from the dense band than from the open, and in 207 of the 1,295 units of
-  "Closed forest under pressure" more from the open than from the dense. The panel and the export show the two apart.
+  column by loss from the dense and open bands together (§5). In 102 of the 406 units of
+  "Open forest, loss recorded - restore" more was lost from the dense band than from the open, and in 207 of the 1,295 units
+  of "Closed forest, loss recorded - find the cause first" more from the open than from the dense. The panel and the export show the two apart.
 - **A cell is a summary of hectares in a unit.** It says nothing about where in the unit, why, or by whom. A unit in
   the first tier is a place to look, not a finding about a village. And because the loss minimum is a number of
   hectares, a cell with loss says more about the size of a large unit than about its rate of loss (§5.1).
 - **Every limit of the measurements carries over** (`docs/RESULTS.md` §12): the unit is a geometry and not a
   jurisdiction; the canopy bands are fixed at the year 2000; the agreement between the two measures is modest and
   depends on choices; the geotagged record of works ends in FY2017-18; the census is that of 2011.
-- **The thresholds, the order and the mapping to works are proposals** (§17). Until they are ruled on, a tier is a
-  starting point for a conversation with the Foundation and not a recommendation.
-- **`docs/RESULTS.md` and `docs/LAYER.md` describe the layer as it was built on 7 October 2026**, before the decision
-  view. They were not edited, as instructed. Their account of the existing views still holds, and the figures for the
-  layer's size, its checks and its browser runs in them are of that build; this document carries the ones of the
-  build described here: the layer's two files are now 21.8 MB together (5.8 MB zipped, against the
-  25.0 MB it is held under), and beside them is a third file of 1,213 bytes, the overlay's. One sentence of the existing About text, that Hansen "cannot see change on land that was
-  already open in 2000", is about change short of clearance; the decision view counts Hansen's clearance on that land.
+- **The order of tiers and the mapping to works are still open** (§17). Until the Foundation has set them, a tier is a
+  starting point for a conversation and not a recommendation.
+- **The other documents.** By the owner's instruction of 9 October 2026 these were brought up to date with the
+  decision view, and are modified since the commit before it: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`. A document of that instruction that is
+  not in this list was not changed and still describes the state before the decision view; §16 says which checks its
+  own script asks for. The layer's two files are now 22.5 MB together (6.0 MB zipped, against the
+  25.0 MB it is held under), and beside them is a third file of 1,213 bytes, the overlay's. One
+  sentence of the existing About text, that Hansen "cannot see change on land that was already open in 2000", is
+  about change short of clearance; the decision view counts Hansen's clearance on that land.
 
 ## 19. To rebuild
 
 ```
-.venv/bin/python 00_raw/06_scheme/_build_schedule_extract.py     # needs the Gazette PDF, the press release and pdftotext
 .venv/bin/python scripts/05_build_decision.py
+.venv/bin/python scripts/05_check_rename.py                      # the gate on the renaming: every unit's cell, against the table as ruled on
 .venv/bin/python scripts/06_build_layer.py --units 10_units/units.gpkg
-.venv/bin/python scripts/run_decision_checks.py                  # both verifiers, then the six browser checks, one at a time
+.venv/bin/python scripts/run_decision_checks.py                  # both verifiers, then the browser checks, one at a time
+.venv/bin/python scripts/07_build_share.py                       # the copy without the overlay, and its zip
+.venv/bin/python scripts/exercise_share.py                       # the copy opened from disk in Chrome
 .venv/bin/python scripts/write_decision_layer.py
 ```
 
-`scripts/run_decision_checks.py` runs each check in turn and writes `60_layer/decision_runs.json`, the record of every
-run it made, a failed one included; this document is written from that record and stops unless it is of the build in
-`60_layer/`. The overlay's steps need a connection; the Safari steps need the terminal's leave to control Safari and
-no other Safari window showing the layer. Some things this document reads are working files of the session and are
-rebuilt by no script: the record of the independent replication, the record of the trials of the list's check, the
-copies of the provider's pages, the record of the layer built on 7 October 2026, the note of the runs of
-8 October 2026 and the record of an earlier pass of the runner (§20). It stops if one is missing. The first three it also
-holds to files on disk - the decision table's hash, the check script's, the registration's quotations - and stops
-unless they agree; so a change to the table, to that script or to the registration needs the working file made
-again, by hand. The last three are of earlier builds and are reported as such; a rebuild does not stop on them.
+The two scripts inside `00_raw/` - the one that checks the list of permissible works and the one that extracts the
+provider's cautions - are not in this list: their outputs are registered, and a file in `00_raw/` at a commit is not
+written again. `scripts/run_decision_checks.py` runs each check in turn and writes `60_layer/decision_runs.json`,
+the record of every run it made, a failed one included; with `--leave-out safari --because "..."` it leaves the two
+checks in the Safari application out and writes the reason into the record. This document is written from that
+record and stops unless it is of the build in `60_layer/`. The overlay's steps need a connection; the Safari steps
+need the terminal's leave to control Safari and no other Safari window showing the layer.
+
+Some things this document reads are working files of the session and are rebuilt by no script: the record of the
+independent replication, the decision tables and the layer's records as they stood when the owner ruled on them, the
+record of the trials of the list's check, the copies of the provider's pages, the record of the layer built on
+7 October 2026, the note of the runs of 8 October 2026 and the record of a pass of the runner with a step made by hand
+(§20). It stops if one is missing. The gate on the renaming needs the table as it was ruled on, and stops unless that
+copy has the hash written in the gate's script.
 
 Run the browser checks one at a time, on a machine that is otherwise quiet.
 
@@ -1080,10 +1253,10 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-08T23:05:23Z | this run | the UTC time at which this script ran |
-| 2026-10-08T22:39:52Z | `55_decision/decision.provenance.json` | key `run_utc` |
-| 2026-10-08T22:42:59Z | `60_layer/layer.provenance.json` | key `run_utc` |
-| 9 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
+| 2026-10-09T05:45:06Z | this run | the UTC time at which this script ran |
+| 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
+| 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
+| 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
 | 11,468 | `55_decision/decision.provenance.json` | key `counts` → `units` |
 | 7,976 | `55_decision/decision.provenance.json` | key `counts` → `by_level` → `lgd_panchayat` |
 | 3,492 | `55_decision/decision.provenance.json` | key `counts` → `by_level` → `outside_village` |
@@ -1091,9 +1264,14 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1 | `55_decision/decision.provenance.json` | key `thresholds` → `loss_min_ha` |
 | 100 | `60_layer/layer.provenance.json` | key `default_floor_ha` |
 | 92 of 92 checks passed | `scripts/verify_layer.py` | its exit status and last line, run by this script as it wrote the document |
-| 55 of 55 checks passed | `scripts/verify_decision.py` | its exit status and last line, run by this script as it wrote the document |
-| 51 | `55_decision/decision.provenance.json` | key `tables` → `condition_by_unit.csv` → `columns` |
+| 61 of 61 checks passed | `scripts/verify_decision.py` | its exit status and last line, run by this script as it wrote the document |
+| 67 | `55_decision/decision.provenance.json` | key `tables` → `condition_by_unit.csv` → `columns` |
 | UMD/hansen/global_forest_change_2025_v1_13 | `20_degradation/hansen.provenance.json` | key `inputs`: the Earth Engine dataset it names |
+| the forest of 2000 with no loss recorded since; not a measure of tree cover today | `55_decision/decision.provenance.json` | key `definitions` → `standing`: its closing words |
+| Accordingly, “net” loss cannot be calculated by subtracting figures for tree cover gain from tree cover loss, and current (post-2000) tree cover cannot be de... | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `cover_today_is_not_cover_of_2000_less_loss` → `text` |
+| In the original publication, the authors evaluated the overall prevalence of false positives (commission errors) in this data at 13%, and the prevalence of f... | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `errors` → `text` |
+| 12 | `00_raw/05_forest_reference/provider_cautions.json` | key `percentages_read_from_the_sentences` → `false_negatives_pct` |
+| 13 | `00_raw/05_forest_reference/provider_cautions.json` | key `percentages_read_from_the_sentences` → `false_positives_pct` |
 | 917 | `20_degradation/hansen_loss_by_canopy_band.csv` | column `loss_km2_2001_2025`; row where `units` is 'all units' and `canopy_band` is 'le10' |
 | 826 | `20_degradation/hansen_loss_by_canopy_band.csv` | column `loss_km2_2001_2025`; row where `units` is 'all units' and `canopy_band` is 'eq0' |
 | 90 | `20_degradation/hansen_loss_by_canopy_band.csv` | computed here: loss on land with no canopy in 2000 ÷ loss on land with `treecover2000 <= 10` × 100. From: column `loss_km2_2001_2025`; row where `units` is 'all units' and `canopy_band` is 'eq0'; column `loss_km2_2001_2025`; row where `units` is 'all units' and `canopy_band` is 'le10' |
@@ -1125,7 +1303,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 3.3 | `40_allocation/state_fy_r620_vs_dump.csv` | column `r620_plantation_share_pct`; row where `fy` is '2018-19' |
 | 10/10/2020 | `40_allocation/state_fy_r620_vs_dump.csv` | column `r620_last_updated`; row where `fy` is '2016-17' |
 | 800 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2001_2025` is open_loss |
-| Open forest still losing - restore | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'open_loss' |
+| Open forest, loss recorded - restore | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'open_loss' |
 | 394 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2001_2025` is open_loss and whose `forest_loss_ha_2018_2025`, as printed, is under the loss minimum |
 | 0.0725 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'pixel_ha' |
 | 147 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'under_mid_pixel_2018_2025' |
@@ -1143,7 +1321,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 22 | `55_decision/condition_by_unit.csv` | districts whose row with the largest `standing_forest_ha` has a `cell_2018_2025` with loss |
 | 30 | `55_decision/condition_cells_by_district.csv` | column `district`: the number of distinct districts |
 | 349 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_under_1pct' |
-| Closed forest under pressure - find the cause first | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'dense_loss' |
+| Closed forest, loss recorded - find the cause first | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'dense_loss' |
 | 50 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_under_01pct' |
 | kuchilaghati (132731), Mayurbhanj | `55_decision/condition_by_unit.csv` | the row with the largest `standing_forest_ha` among those whose `cell_2018_2025` is dense_loss: its name, id and district |
 | 55,114 | `55_decision/condition_by_unit.csv` | `standing_forest_ha` of that row |
@@ -1171,25 +1349,40 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1,207 | `55_decision/condition_sensitivity.csv` | column `units_whose_cell_differs_from_the_default_all_cells`; row where `standing_min_ha` is 25.0 and `loss_min_ha` is 1.0 and `window` is '2018_2025' and `cell` is 'dense_none' |
 | 308 | `55_decision/condition_sensitivity.csv` | column `units_whose_cell_differs_from_the_default_all_cells`; row where `standing_min_ha` is 10.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'dense_none' |
 | 282 | `55_decision/condition_sensitivity.csv` | column `units_whose_cell_differs_from_the_default_all_cells`; row where `standing_min_ha` is 10.0 and `loss_min_ha` is 2.0 and `window` is '2018_2025' and `cell` is 'dense_none' |
+| under 10 ha of forest at the start of the window: too little for a share to mean anything | `55_decision/condition_by_unit.csv` | column `forest_loss_share_blank_because_2018_2025`: the one sentence it holds |
+| 5,808 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_a_share` |
+| 5,660 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share` |
+| 22 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share_in_a_cell_with_loss` |
+| 349 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_share_under_1pct' |
+| 74 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'none_cell_share_over_2pct' |
+| 55,150 | `55_decision/condition_by_unit.csv` | column `forest_at_window_start_ha_2018_2025` of the same row |
+| 0.06 | `55_decision/condition_by_unit.csv` | column `forest_loss_share_pct_2018_2025` of the row with the largest `standing_forest_ha` among those whose `cell_2018_2025` is dense_loss |
+| 1,653 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows in a cell with loss whose `order_in_district_cell_by_share_2018_2025` is not their `order_in_district_cell_2018_2025` |
+| 1,734 | `55_decision/condition_by_unit.csv` | rows whose `cell_2018_2025` is a cell with loss |
 | 2,335 | `55_decision/decision.provenance.json` | key `counts` → `standing_row` → `mostly_dense` |
 | 3,461 | `55_decision/decision.provenance.json` | key `counts` → `standing_row` → `mostly_open` |
 | 5,672 | `55_decision/decision.provenance.json` | key `counts` → `standing_row` → `little_or_none` |
 | 603 | `55_decision/condition_boundary.csv` | column `n_near_the_boundary`; row where `ratio_at_least` is 0.8 and `units` is 'all units' |
 | 10.4 | `55_decision/condition_boundary.csv`; `55_decision/condition_threshold_evidence.csv` | computed here: units near the boundary ÷ units that are mostly dense or mostly open × 100. From: column `n_near_the_boundary`; row where `ratio_at_least` is 0.8 and `units` is 'all units'; column `value`; row where `key` is 'units_standing_10' |
-| Protect - intact closed forest | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'dense_none' |
+| 1,295 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'dense_loss' |
+| 671 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `corroboration` is not not_compared |
+| 157 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `corroboration` is corestack_only or both |
+| 19 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none, whose `corroboration` is corestack_only or both, and whose `corroboration_basis` is east_coast_every_unit_kept |
 | 1,040 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'dense_none' |
 | 176 | `55_decision/condition_cells.csv` | column `forest_loss_ha_in_window`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'dense_none' |
 | 422 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `forest_loss_ha_2001_2025`, as printed, is the loss minimum or more |
 | 226 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `forest_loss_ha_2001_2025` is zero |
-| 671 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `corroboration` is not not_compared |
-| 157 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none and whose `corroboration` is corestack_only or both |
-| 19 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none, whose `corroboration` is corestack_only or both, and whose `corroboration_basis` is east_coast_every_unit_kept |
-| Open forest - assisted natural regeneration candidate | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'open_none' |
+| 45,872 | `55_decision/rename_gate.json` | key `assignments_compared_units_x_windows` |
+| 51 | `55_decision/rename_gate.json` | key `columns_the_table_had_before` |
+| 584,868 | `55_decision/rename_gate.json` | key `cells_compared_as_text` |
+| 16 | `55_decision/rename_gate.json` | key `columns_added_since_not_compared`: their number |
+| `f129962e816e4da3` | `55_decision/rename_gate.json` | key `table_before_is_the_one_ruled_on_sha256` |
+| Open forest, little or no loss recorded - assisted natural regeneration candidate | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'open_none' |
 | 3,055 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'open_none' |
 | 41 | `55_decision/condition_by_unit.csv` | computed here: loss from the dense band ÷ forest loss, in the cell with open forest and loss, × 100. From: worked out by this script from its rows: `loss_dense_ha_2018_2025` summed over the rows whose `cell_2018_2025` is open_loss; worked out by this script from its rows: `forest_loss_ha_2018_2025` summed over the rows whose `cell_2018_2025` is open_loss |
 | 102 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is open_loss and whose `loss_dense_ha_2018_2025` is larger than their `loss_open_ha_2018_2025` |
 | 406 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'open_loss' |
-| Little forest left, recent loss - verify on the ground | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'little_loss' |
+| Little forest left, loss recorded - verify on the ground | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'little_loss' |
 | 33 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'little_loss' |
 | within a district, within a cell: cells with loss by forest loss in the window, largest first; the others by standing hectares of the row's band; ties by uni... | `55_decision/decision.provenance.json` | key `definitions` → `order` |
 | PROVISIONAL - to be set with the Foundation for Ecological Security; a user control in the layer, not a constant | `55_decision/decision.provenance.json` | key `tiers` → `status` |
@@ -1286,26 +1479,35 @@ This section is the script's own record of what it read. Paths are relative to t
 | https://resourcewatch.org/api-attribution-requirements - it speaks of 'the Resource Watch API': 'Websites that use the Resource Watch API must include the "p... | `scripts/layer_overlay.json` | key `attribution_requirements_page` |
 | Two independent searches and an adversarial verifier read the provider's reference, dataset record and terms on 8 Oct 2026; tiles over central Odisha were fe... | `scripts/layer_overlay.json` | key `verified_how` |
 | Two points, both the project owner's to decide; one note to gfw@wri.org could settle both. (1) API keys. The terms read 'each request to an API must include ... | `scripts/layer_overlay.json` | key `terms_unresolved` |
+| 5 | `00_raw/data_manifest.csv` | the rows of the provider's pages registered on 9 October 2026: their number |
 | 5 | this run | the kept copies of the provider's pages that this script read |
 | 13 | `scripts/layer_overlay.json` | the sentences this script looked for in the kept copies of the provider's pages |
+| 13 | `00_raw/05_forest_reference/provider_cautions.json` | key `checks_passed` → `sentences_found_word_for_word` |
+| 6.0 | `70_share/share.provenance.json` | key `the_copy` → `zip` → `bytes` |
+| 12 | `70_share/share.provenance.json` | key `checks_passed` → `credits_read_from_the_layers_own_sources` |
+| Chrome/154.0.8037.99 | `70_share/exercise_share_chrome.json` | key `browser` |
+| 6 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
+| The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before. | `70_share/exercise_share_chrome.json` | key `summary` → `what_the_control_said_when_ticked` |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
 | https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&en... | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → `0` → `one_tile_address` |
 | 12 | `60_layer/exercise_decision_webkit.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_webkit.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
-| 31 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `columns`: their number |
+| 32 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `columns`: their number |
 | `district`, `unit_id`, `unit_name`, `unit_type`, `outside_village`, `window_of_forest_loss`, `standing_forest_is_through`, `tier_label`, `tier_definition`, `... | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `columns` |
 | Rayagada | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `district` |
 | 2018-2025 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `window` |
-| 1 Closed forest under pressure - find the cause first; 2 Open forest still losing - restore; 3 Protect - intact closed forest; 4 Little forest left, recent l... | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `tier_order` |
+| 1 Closed forest, loss recorded - find the cause first; 2 Open forest, loss recorded - restore; 3 Closed forest, little or no loss recorded - protect; 4 Littl... | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `tier_order` |
 | Scheduled Tribe share 18 % or more; outside-village units left out | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `filter` |
 | 201 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `rows` |
-| 6,231 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `cells_compared` |
+| 6,432 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `cells_compared` |
 | Ganjam | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `district` |
 | 2017-2023 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `window` |
 | No filter | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `filter` |
 | 455 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `rows` |
-| 14,105 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `cells_compared` |
+| 14,560 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export_second` → `cells_compared` |
+| 1 | `60_layer/exercise_decision_chrome.json` | key `summary` → `export` → `rows_with_no_share` |
+| 2026-10-09T04:08:58Z | `55_decision/rename_gate.json` | key `run_utc` |
 | pandas, with every hectare held as a whole number of ten-thousandths | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `replicator_a` → `means` |
 | the Python standard library alone, with decimal arithmetic | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `replicator_b` → `means` |
 | 46 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `columns_compared` |
@@ -1314,8 +1516,9 @@ This section is the script's own record of what it read. Paths are relative to t
 | 0 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `cells_that_differ_only_in_how_they_are_written` |
 | Neither replicator wrote the five columns that the docstring they were given described without naming (the standing row, and the loss column of each window);... | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `note` |
 | 29 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `ambiguities_reported` |
-| 8 | `60_layer/decision_runs.json` | key `checks`: their number |
-| 8 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
+| 67 | `55_decision/condition_by_unit.csv` | its columns: their number |
+| 6 | `60_layer/decision_runs.json` | key `checks`: their number |
+| 6 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
 | 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_chrome.json` | key `summary` → `units_clicked` |
@@ -1329,33 +1532,25 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_layer in WebKit' |
 | none | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit' |
-| 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
-| 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
-| 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
+| the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
 | 2026-10-08T22:53:16Z | `60_layer/exercise_safari.json` | key `summary` → `run_utc` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_tried` |
 | 1,265 | `60_layer/exercise_safari.json` | key `summary` → `values_compared` |
-| 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer_safari, as written' |
-| 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_layer_safari, as written' |
-| it stopped at its first reading, twice, before any assertion: Safari held another window of the same page, and had just been started in the background | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_safari_script_as_written` → `earlier_the_same_day_on_an_earlier_build` |
-| already running, in the background, with no other window showing the layer | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_safari_script_as_written` → `state_of_safari_when_it_passed` |
-| 0 | `60_layer/decision_runs.json` | key `checks`: `left_over_safari_windows_of_earlier_runs_closed_first`, summed over the runs of the two Safari checks (a run before which Safari was not running, or did not answer, counts none) |
-| 2026-10-08T20:41:54Z | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `layer_run_utc` |
-| an earlier build, not the one described here | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `layer_run_utc`, against the build in `60_layer/` |
-| 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `checks`: `runs_made` of the check 'exercise_layer_safari, as written' |
-| 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `checks`: `runs_that_passed` of the check 'exercise_layer_safari, as written' |
-| This is the record the runner wrote on 9 October 2026, as it was written, with this one note added. In it the unchanged Safari script was run three times. Th... | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `note_added_by_hand` |
 | Safari 27.0 (the application) | `60_layer/exercise_decision_safari.json` | key `summary` → `browser` |
 | title, address and text were each asked for through the address filter (first document whose URL starts with the marked address), never through the by-title ... | `60_layer/exercise_decision_safari.json` | key `summary` → `how_the_window_was_read` |
+| 2026-10-08T22:42:59Z | `60_layer/exercise_decision_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_decision_safari.json` | key `summary` → `part1_the_unchanged_scripts_main` → `addresses_tried` |
 | 1,265 | `60_layer/exercise_decision_safari.json` | key `summary` → `part1_the_unchanged_scripts_main` → `values_compared` |
 | 29 | `60_layer/exercise_decision_safari.json` | key `summary` → `part1_the_unchanged_scripts_main` → `units_opened_by_address` |
 | 2026-10-07T12:05:18Z | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | key `run_utc` |
 | 23 | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | key `inputs`: the files it lists with a sha256 |
-| 11 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
+| 13 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
 | `44890a1` | `git` | the commit this batch started from |
-| 51 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps` |
+| `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md` | `git diff --name-status 44890a1` | the documents among the files modified |
+| 38 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
+| 8 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
+| 53 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps` |
 | 6 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps_that_are_statements_and_not_actions` |
 | 3 | `60_layer/exercise_decision_chrome.json` | key `summary` → `tier_arrows_pressed` |
 | 8 | `60_layer/exercise_decision_chrome.json` | key `summary` → `tier_arrows_there_are` |
@@ -1365,27 +1560,43 @@ This section is the script's own record of what it read. Paths are relative to t
 | 16 | `60_layer/exercise_decision_chrome.json` | key `summary` → `districts_of_outside_village_units_opened`: their number |
 | 2 | `60_layer/exercise_decision_chrome.json` | key `summary` → `cells_and_windows_seen`: windows in which all six cells were opened |
 | 11 | `60_layer/exercise_decision_chrome.json` | key `summary` → `kinds_of_badge_there_are` |
-| 828 | `60_layer/exercise_decision_chrome.json` | key `summary` → `lines_compared` |
+| 874 | `60_layer/exercise_decision_chrome.json` | key `summary` → `lines_compared` |
 | 0 | `60_layer/exercise_decision_chrome.json` | key `summary` → `units_opened_that_touch_the_one_aimed_at` |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in Chrome' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_decision in Chrome' |
-| 45 | `60_layer/exercise_decision_webkit.json` | key `summary` → `steps` |
+| 47 | `60_layer/exercise_decision_webkit.json` | key `summary` → `steps` |
 | 46 | `60_layer/exercise_decision_webkit.json` | key `summary` → `units_opened` |
-| 828 | `60_layer/exercise_decision_webkit.json` | key `summary` → `lines_compared` |
+| 874 | `60_layer/exercise_decision_webkit.json` | key `summary` → `lines_compared` |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_decision in WebKit' |
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
+| 2026-10-09T04:34:32Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
+| 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
+| 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
+| it stopped at its first reading, twice, before any assertion: Safari held another window of the same page, and had just been started in the background | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_safari_script_as_written` → `earlier_the_same_day_on_an_earlier_build` |
+| 2026-10-08T20:41:54Z | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `layer_run_utc` |
+| 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `checks`: `runs_made` of the check 'exercise_layer_safari, as written' |
+| 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `checks`: `runs_that_passed` of the check 'exercise_layer_safari, as written' |
+| This is the record the runner wrote on 9 October 2026, as it was written, with this one note added. In it the unchanged Safari script was run three times. Th... | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | key `note_added_by_hand` |
+| 2026-10-08T22:42:59Z | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | key `layer_run_utc` |
+| 8 | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | key `checks`: their number |
+| 8 | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | key `checks`: the checks whose first run passed |
 | During the Safari runs of 8 October the Safari that the check had started in the background received a request to quit (the system log has it at 16:19:50 IST... | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `the_owners_safari_windows_on_8_october` |
-| From the provider's record of the dataset (https://data-api.globalforestwatch.org/dataset/umd_tree_cover_loss), in its words: 'Tree cover loss is defined as ... | `scripts/layer_overlay.json` | key `provider_cautions` |
+| Tree cover loss is defined as “stand replacement disturbance” which is considered to be clearing of at least half of tree cover within a 30-meter pixel. | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `loss_is` → `text` |
+| “Loss” indicates the removal or mortality of tree cover and can be due to a variety of factors, including mechanical harvesting, fire, disease, or storm dama... | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `loss_is_not_deforestation` → `text` |
+| Comparisons between the original 2001-2010 data and the 2011-2025 update should be performed with caution. | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `two_halves_of_the_record` → `text` |
+| Largely because of a delay between an actual disturbance and the event being observed by the satellite imagery, the authors are 75% confident that the loss o... | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `year_of_loss` → `text` |
+| Forest loss during the period 2000-2025, defined as a stand-replacement disturbance, or a change from a forest to non-forest state. | `00_raw/05_forest_reference/provider_cautions.json` | key `sentences` → `umd_loss_is` → `text` |
 | 23 | `20_degradation/hansen_loss_by_canopy_band.csv` | column `loss_km2_2001_2010`; row where `units` is 'all units' and `canopy_band` is 'gt10le30' |
 | 114 | `20_degradation/hansen_loss_by_canopy_band.csv` | column `loss_km2_2011_2017`; row where `units` is 'all units' and `canopy_band` is 'gt10le30' |
 | 226 | `20_degradation/hansen_loss_by_canopy_band.csv` | column `loss_km2_2018_2025`; row where `units` is 'all units' and `canopy_band` is 'gt10le30' |
 | 207 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is the cell of closed forest with loss and whose `loss_open_ha_2018_2025` is above their `loss_dense_ha_2018_2025` |
 | 1,295 | `55_decision/condition_cells.csv` | column `n_units`; row where `window` is '2018_2025' and `units` is 'all units' and `cell` is 'dense_loss' |
-| 21.8 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
-| 5.8 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
+| 22.5 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
+| 6.0 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
 | 25.0 | `60_layer/layer.provenance.json` | key `outputs` → `limit_bytes` |
 | 1,213 | `60_layer/layer.provenance.json` | key `decision_view` → `overlay_file` → `bytes` |
 
@@ -1409,9 +1620,15 @@ Every cell of a table that is not a typed label was read from the file and colum
 | §5.3, sensitivity in the default window | 80 | `55_decision/decision.provenance.json` | `thresholds` → `alternatives` → `standing_min_ha` → `0`, `thresholds` → `alternatives` → `loss_min_ha` → `0`, `thresholds` → `loss_min_ha`, `thresholds` → `alternatives` → `loss_min_ha` → `1`, `thresholds` → `standing_min_ha`, `thresholds` → `alternatives` → `standing_min_ha` → `1` |  |
 |  |  | `55_decision/condition_sensitivity.csv` | `n_units`, `units_whose_cell_differs_from_the_default_all_cells` | `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'dense_none'; `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'dense_loss'; `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'open_none'; `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'open_loss'; `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'little_loss'; `standing_min_ha` is 5.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'little_none'; `standing_min_ha` is 5.0 and `loss_min_ha` is 1.0 and `window` i ... |
 | §5.3, sensitivity by window | 16 | `55_decision/condition_sensitivity.csv` | `units_whose_cell_differs_from_the_default_all_cells` | `standing_min_ha` is 5.0 and `loss_min_ha` is 1.0 and `window` is '2018_2025' and `cell` is 'dense_none'; `standing_min_ha` is 25.0 and `loss_min_ha` is 1.0 and `window` is '2018_2025' and `cell` is 'dense_none'; `standing_min_ha` is 10.0 and `loss_min_ha` is 0.5 and `window` is '2018_2025' and `cell` is 'dense_none'; `standing_min_ha` is 10.0 and `loss_min_ha` is 2.0 and `window` is '2018_2025' and `cell` is 'dense_none'; `standing_min_ha` is 5.0 and `loss_min_ha` is 1.0 and `window` is '2001_2025' and `cell` is 'dense_none'; `standing_min_ha` is 25.0 and `loss_min_ha` is 1.0 and `window` is '2001_2025' and `cell` is 'dense_none'; `standing_min_ha` is 10.0 and `loss_min_ha` is 0.5 and `wind ... |
+| T_share_w | 16 | `this run` | the window's years |  |
+|  |  | `55_decision/decision.provenance.json` | `counts` → `loss_as_a_share` → `2018_2025` → `units_with_a_share`, `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share`, `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share_in_a_cell_with_loss`, `counts` → `loss_as_a_share` → `2001_2025` → `units_with_a_share`, `counts` → `loss_as_a_share` → `2001_2025` → `units_with_no_share`, `counts` → `loss_as_a_share` → `2001_2025` → `units_with_no_share_in_a_cell_with_loss`, `counts` → `loss_as_a_share` → `2017_2023` → `units_with_a_share`, `counts` → `loss_as_a_share` → `2017_2023` → `units_with_no_share`, `counts` → `loss_as_a_share` → `2017_2023` → `units_with_no_share_in_a_cell_with_loss`, `counts` → `loss_as_a_share` →  ... |  |
+| T_share | 54 | `55_decision/tiers.csv` | `cell_name` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
+|  |  | `55_decision/condition_share.csv` | `n_units`, `n_with_a_share`, `n_no_share_too_little_forest_at_the_start`, `share_under_1pct`, `share_1_to_under_5pct`, `share_5pct_or_more`, `median_share_pct`, `largest_share_pct` | `window` is '2018_2025' and `cell` is 'open_loss'; `window` is '2018_2025' and `cell` is 'dense_loss'; `window` is '2018_2025' and `cell` is 'open_none'; `window` is '2018_2025' and `cell` is 'dense_none'; `window` is '2018_2025' and `cell` is 'little_loss'; `window` is '2018_2025' and `cell` is 'little_none' |
 | §6, near the dense and open line | 60 | `55_decision/condition_boundary.csv` | `ratio_at_least`, `n_units_mostly_dense_or_mostly_open`, `n_near_the_boundary`, `of_them_mostly_dense`, `of_them_mostly_open` | `ratio_at_least` is 0.5 and `units` is 'all units'; `ratio_at_least` is 0.5 and `units` is 'lgd_panchayat'; `ratio_at_least` is 0.5 and `units` is 'outside_village'; `ratio_at_least` is 0.6667 and `units` is 'all units'; `ratio_at_least` is 0.6667 and `units` is 'lgd_panchayat'; `ratio_at_least` is 0.6667 and `units` is 'outside_village'; `ratio_at_least` is 0.8 and `units` is 'all units'; `ratio_at_least` is 0.8 and `units` is 'lgd_panchayat'; `ratio_at_least` is 0.8 and `units` is 'outside_village'; `ratio_at_least` is 0.9 and `units` is 'all units'; `ratio_at_least` is 0.9 and `units` is 'lgd_panchayat'; `ratio_at_least` is 0.9 and `units` is 'outside_village' |
 | §7, the six cells | 48 | `55_decision/tiers.csv` | `cell_name` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
 |  |  | `55_decision/condition_cells.csv` | `n_units`, `standing_dense_ha`, `standing_open_ha`, `forest_loss_ha_in_window`, `near_dense_open_boundary` | `window` is '2018_2025' and `units` is 'all units' and `cell` is 'open_loss'; `window` is '2018_2025' and `units` is 'lgd_panchayat' and `cell` is 'open_loss'; `window` is '2018_2025' and `units` is 'outside_village' and `cell` is 'open_loss'; `window` is '2018_2025' and `units` is 'all units' and `cell` is 'dense_loss'; `window` is '2018_2025' and `units` is 'lgd_panchayat' and `cell` is 'dense_loss'; `window` is '2018_2025' and `units` is 'outside_village' and `cell` is 'dense_loss'; `window` is '2018_2025' and `units` is 'all units' and `cell` is 'open_none'; `window` is '2018_2025' and `units` is 'lgd_panchayat' and `cell` is 'open_none'; `window` is '2018_2025' and `units` is 'outside_v ... |
+| T_names | 11 | `.session_scratch_2026-10-05/55_decision_2026-10-08_as_ruled_on/tiers.csv` *(working file)* | `cell_name` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
+|  |  | `55_decision/tiers.csv` | `cell_name` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss' |
 | §8, the tiers | 12 | `55_decision/tiers.csv` | `tier_label`, `why_this_place_in_the_order` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
 | §9, the odds ratios by floor | 12 | `20_degradation/agreement_summary.csv` | `minimum_reference_ha`, `n_assessed`, `odds_ratio`, `odds_ratio_lo95`, `odds_ratio_hi95`, `odds_ratio_within_districts`, `odds_ratio_within_districts_lo95`, `odds_ratio_within_districts_hi95` | `minimum_reference_ha` is 10.0 and `population` is 'east_coast_excluded' and `window` is 'common_2017_2023' and `units` is 'lgd_panchayat'; `minimum_reference_ha` is 50.0 and `population` is 'east_coast_excluded' and `window` is 'common_2017_2023' and `units` is 'lgd_panchayat'; `minimum_reference_ha` is 100.0 and `population` is 'east_coast_excluded' and `window` is 'common_2017_2023' and `units` is 'lgd_panchayat' |
 | §9, by district | 120 | `55_decision/condition_cells_by_district.csv` | `district`, worked out by this script from its rows: `n_units` summed over the cells other than the one outside the ranked list, window 2018_2025, district Anugul, worked out by this script from its rows: `n_outside_village` summed over the cells other than the one outside the ranked list, window 2018_2025, district Anugul, worked out by this script from its rows: `n_units` summed over the cells of the cell outside the ranked list, window 2018_2025, district Anugul, worked out by this script from its rows: `n_units` summed over the cells other than the one outside the ranked list, window 2018_2025, district Balangir, worked out by this script from its rows: `n_outside_village` summed over th ... |  |
@@ -1429,7 +1646,9 @@ Every cell of a table that is not a typed label was read from the file and colum
 
 | file | bytes | sha256 | the run stamp it carries |
 |---|---|---|---|
+| `.session_scratch_2026-10-05/55_decision_2026-10-08_as_ruled_on/tiers.csv` *(working file)* | 2,893 | `a734d457e7718afa` | - |
 | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | 14,664 | `6e93fd76b286d905` | 2026-10-07T12:05:18Z |
+| `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | 6,680 | `6eec553b95fa0587` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | 5,032 | `61eeeb47e485e682` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | 9,187 | `8d52b25a4496ad2c` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/apikey.html` *(working file)* | 2,165,712 | `9a1057979c6fe095` | - |
@@ -1438,13 +1657,20 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/developers.html` *(working file)* | 2,427,052 | `ad50f515ac6703c5` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/openapi.json` *(working file)* | 415,519 | `75e41eafb31af361` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/terms.html` *(working file)* | 91,265 | `edb7dcf50ddcfba4` | - |
+| `.session_scratch_2026-10-05/overlay_pages_2026-10-08/umd_v1_13_download.html` *(working file)* | 71,893 | `4b2d38f20e6cb6df` | - |
 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | 2,453 | `766935d525b3d3a1` | - |
 | `.session_scratch_2026-10-05/schedule_extract_trials_2026-10-09.json` *(working file)* | 11,344 | `7cc40b7344845767` | 2026-10-08T22:34:43Z |
+| `00_raw/05_forest_reference/gfw_dataset_record_umd_tree_cover_loss_2026-10-08.json` | 7,467 | `d6fda9a9023de671` | - |
+| `00_raw/05_forest_reference/gfw_terms_of_service_2026-10-08.html` | 91,265 | `edb7dcf50ddcfba4` | - |
+| `00_raw/05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json` | 415,519 | `75e41eafb31af361` | - |
 | `00_raw/05_forest_reference/isfr2023_vol1_pdf_pages_4_10_14_26_63_76_81.txt` | 23,670 | `c40f12b61de9ddd3` | - |
+| `00_raw/05_forest_reference/provider_cautions.json` | 11,359 | `018923092e50c3d6` | 2026-10-09T03:33:43Z |
+| `00_raw/05_forest_reference/resourcewatch_api_attribution_requirements_2026-10-08.html` | 110,355 | `b2b412bcaf9f2fc8` | - |
+| `00_raw/05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html` | 71,893 | `4b2d38f20e6cb6df` | - |
 | `00_raw/06_scheme/_build_schedule_extract.py` | 18,778 | `2363f4bea9466063` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | 92,751 | `ac7e642dd1d0e040` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.provenance.json` | 2,772 | `293d82fe6f6665f4` | 2026-10-08T22:32:57Z |
-| `00_raw/data_manifest.csv` | 53,308 | `daf5b0cf872ff340` | - |
+| `00_raw/data_manifest.csv` | 59,778 | `dca7f65d41e3b274` | - |
 | `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c` | - |
 | `20_degradation/agreement.provenance.json` | 10,756 | `0c0182e3a357255c` | 2026-10-07T10:08:15Z |
 | `20_degradation/agreement_by_zone.csv` | 1,995 | `df07ed89f94db597` | - |
@@ -1460,27 +1686,33 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `40_allocation/assets_district_fy.csv` | 65,174 | `5e8dcd030f973f36` | - |
 | `40_allocation/state_fy_r620_vs_dump.csv` | 2,707 | `bd845de7118bc579` | - |
 | `55_decision/condition_boundary.csv` | 587 | `0ba2695976dfb3e7` | - |
-| `55_decision/condition_by_unit.csv` | 4,564,603 | `f129962e816e4da3` | - |
-| `55_decision/condition_cells.csv` | 10,156 | `c8c45b27b4685c3e` | - |
+| `55_decision/condition_by_unit.csv` | 7,275,979 | `f5f8a218e86a16b7` | - |
+| `55_decision/condition_cells.csv` | 10,888 | `92687a08c37e4098` | - |
 | `55_decision/condition_cells_by_district.csv` | 25,656 | `7b570808887b85d5` | - |
 | `55_decision/condition_sensitivity.csv` | 9,850 | `a4e2bc786ec2593b` | - |
-| `55_decision/condition_threshold_evidence.csv` | 15,415 | `4b777ce5876fc273` | - |
-| `55_decision/decision.provenance.json` | 21,238 | `71092f9e4cc68a76` | 2026-10-08T22:39:52Z |
-| `55_decision/tiers.csv` | 2,893 | `a734d457e7718afa` | - |
+| `55_decision/condition_share.csv` | 3,133 | `dd81a6e4adf06933` | - |
+| `55_decision/condition_threshold_evidence.csv` | 15,901 | `6660628f5c963bed` | - |
+| `55_decision/decision.provenance.json` | 25,625 | `d62a8eb63f364179` | 2026-10-09T03:37:07Z |
+| `55_decision/rename_gate.json` | 4,088 | `1f620bab116db10c` | 2026-10-09T04:08:58Z |
+| `55_decision/tiers.csv` | 3,015 | `a7a7db34b7bcb90f` | - |
 | `55_decision/work_rows_naming_forest.csv` | 2,055 | `a1c52ae8265c0c5c` | - |
 | `55_decision/work_types.csv` | 5,133 | `f6d27c0a66b4100a` | - |
-| `60_layer/decision_runs.json` | 6,680 | `6eec553b95fa0587` | - |
-| `60_layer/exercise_chrome.json` | 26,807 | `fd67660046cce6b1` | 2026-10-08T22:47:56Z |
-| `60_layer/exercise_decision_chrome.json` | 49,549 | `531601febecedd19` | 2026-10-08T22:57:43Z |
+| `60_layer/data.js` | 22,260,285 | `c0224a1627682b2a` | - |
+| `60_layer/decision_runs.json` | 5,712 | `652a4083b557d2d5` | - |
+| `60_layer/exercise_chrome.json` | 26,807 | `a4ecf3b563655739` | 2026-10-09T04:13:56Z |
+| `60_layer/exercise_decision_chrome.json` | 51,675 | `5e7a51628b8337a1` | 2026-10-09T04:23:54Z |
 | `60_layer/exercise_decision_safari.json` | 59,230 | `4e0185fff677500e` | 2026-10-08T23:04:30Z |
-| `60_layer/exercise_decision_webkit.json` | 47,532 | `6ff26566ccc8dee8` | 2026-10-08T23:01:51Z |
+| `60_layer/exercise_decision_webkit.json` | 49,658 | `67cb27e124ecef92` | 2026-10-09T04:28:48Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,298 | `e8809fa640181a18` | 2026-10-08T22:52:01Z |
-| `60_layer/index.html` | 204,270 | `d230d23aab331e53` | - |
-| `60_layer/layer.provenance.json` | 23,303 | `dca0af5fd6384b74` | 2026-10-08T22:42:59Z |
-| `scripts/05_build_decision.py` | 75,106 | `a7358a2b3542b953` | - |
-| `scripts/layer_overlay.json` | 7,876 | `332968c0bd2a71c7` | - |
-| `scripts/run_decision_checks.py` | 8,411 | `2112fe31cb8b3624` | - |
+| `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
+| `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
+| `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
+| `70_share/exercise_share_chrome.json` | 3,497 | `2dccab23cee1e737` | 2026-10-09T04:34:32Z |
+| `70_share/share.provenance.json` | 2,251 | `896527eda72c5501` | 2026-10-09T04:08:59Z |
+| `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
+| `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
+| `scripts/run_decision_checks.py` | 9,681 | `48a395deca2576e3` | - |
+| `scripts/write_results.py` | 105,942 | `50f98f23f30e9685` | - |
 
 ### 20.4 Statements tested before they were written
 
@@ -1488,6 +1720,9 @@ Each of these is something the text says in words. The script tested it against 
 
 - the four windows of the table are the four named here, the first of them the default
 - the tier order names every cell but one, and that one is the cell left outside the ranked list
+- the decision table's record and the layer say of standing forest what the owner ruled, in his words, and the layer's decision view nowhere calls it a lower bound
+- the layer's About text quotes the provider's two cautions word for word from the registered record
+- the gate on the renaming was run on the decision table that is on disk: every unit's cell in every window matches through the owner's list of names, and every column the table had is unchanged
 - the layer in `60_layer/` was built from the decision table that is in `55_decision/`
 - stage 4 is not built: `50_gap/` holds no output
 - every unit has a cell in every window: no cell of the four cell columns is blank
@@ -1501,7 +1736,7 @@ Each of these is something the text says in words. The script tested it against 
 - on the table as read here, standing plus loss 2001-2025 never differs from the year-2000 dense band by more than one ten-thousandth of a hectare
 - on the table as read here, standing plus loss 2001-2025 never differs from the year-2000 open band by more than one ten-thousandth of a hectare
 - no unit's cell, in any window, depends on which of the two rounding rules is used
-- the decision table is blank in five columns and no other
+- the decision table is blank in five columns and, for each window, in the share where none is given and in the share's reason where one is: in every unit and window exactly one of those two is blank
 - plantation's share of expenditure in the state report more than halves between FY2016-17 and FY2018-19
 - plantation's share of expenditure in the state report is under one per cent in every year after FY2018-19
 - the default window's reason, as the layer shows it, names the state report it rests on
@@ -1522,8 +1757,25 @@ Each of these is something the text says in words. The script tested it against 
 - every unit with less land than the standing minimum is in the row 'little or none'
 - at the proposal no unit differs from the default
 - in the default window, moving the standing minimum to either alternative moves more units than moving the loss minimum to either of its own
+- in 2018_2025 a share is blank exactly where the table gives the reason in words, and the reason is one sentence
+- in 2018_2025 no share is above a hundred
+- in 2001_2025 a share is blank exactly where the table gives the reason in words, and the reason is one sentence
+- in 2001_2025 no share is above a hundred
+- in 2017_2023 a share is blank exactly where the table gives the reason in words, and the reason is one sentence
+- in 2017_2023 no share is above a hundred
+- in 2021_2025 a share is blank exactly where the table gives the reason in words, and the reason is one sentence
+- in 2021_2025 no share is above a hundred
+- in the cells without loss the order by share is the order by standing hectares, unit for unit
 - one ratio, and only one, is the flag carried in the table: the smaller within a fifth of the larger
-- the provisional order puts open forest still losing first and closed forest under pressure second, and the record notes that a forester could reverse them
+- the owner's list takes the old name of the cell open_loss to the name it has now
+- the owner's list takes the old name of the cell dense_loss to the name it has now
+- the owner's list takes the old name of the cell open_none to the name it has now
+- the owner's list takes the old name of the cell dense_none to the name it has now
+- the owner's list takes the old name of the cell little_loss to the name it has now
+- the owner's list takes the old name of the cell little_none to the name it has now
+- five of the six cells were renamed, and the order of the tiers table is what it was
+- the layer's record says no name was shortened for the legend
+- the provisional order puts open forest with loss recorded first and closed forest with loss recorded second, and the record notes that a forester could reverse them
 - no column name of the decision table carries the words score, index or weight, and every column is one the build's docstring names, by its own name or, for the columns of a window, under the letter W
 - the row read for the two odds ratios is the agreement test's delivered headline row for LGD panchayat units
 - within districts, the interval of the odds ratio for LGD panchayat units lies above one
@@ -1640,10 +1892,20 @@ Each of these is something the text says in words. The script tested it against 
 - in Chrome the overlay goes off when the decision view is left
 - every tile Chrome asked for was drawn - the tiles drawn, the tiles asked for and the requests to the tile host are one number - and no other host was asked
 - every tile WebKit asked for was drawn - the tiles drawn, the tiles asked for and the requests to the tile host are one number - and no other host was asked
+- the registered page `05_forest_reference/gfw_dataset_record_umd_tree_cover_loss_2026-10-08.json` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/gfw_terms_of_service_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/resourcewatch_api_attribution_requirements_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the extract of the provider's cautions is the file its manifest row describes, it was made from the two registered pages that are on disk, and the layer's record says the About text reads the cautions from it
+- the copy in `70_share/` is of the layer that is in `60_layer/`, its two files are byte for byte the layer's, it holds a README and no other file, and the check that opened it in Chrome was made on that copy and passed every step
+- what the copy's control said when ticked is the layer's own sentence for a file that is not beside the page
 - an exported row carries district, unit id, unit type, window, tier label, tier definition, the tier order in use and whether it was changed, what orders units within a tier, the six hectare figures, corroboration with its window, the outside-village flag and the build time
 - the export has the same columns in WebKit as in Chrome, and in the second list as in the first
 - in Chrome the exported file was saved by the browser, read back from disk, and equal to the text the page made (export)
 - in Chrome the exported file was saved by the browser, read back from disk, and equal to the text the page made (export_second)
+- the exported file has the number of columns the layer's record gives; the development index of 2011 is not among them; the forest at the start of the window and the share follow the forest loss of the window
+- of the two lists exported and checked, one was ordered within a tier by hectares lost and one by share lost, and at least one row had no share
 - of the two lists exported and checked, one was made under a changed tier order and one under the provisional order, and they are of different windows
 - `60_layer/exercise_chrome.json` is the record of a run on the layer that is in `60_layer/`
 - `60_layer/exercise_webkit.json` is the record of a run on the layer that is in `60_layer/`
@@ -1656,30 +1918,33 @@ Each of these is something the text says in words. The script tested it against 
 - in 60_layer/exercise_decision_chrome.json no click aimed at a unit opened nothing, and none opened a unit that does not touch the one aimed at
 - in 60_layer/exercise_decision_webkit.json no click aimed at a unit opened nothing, and none opened a unit that does not touch the one aimed at
 - the units opened in Chrome cover all six cells in at least two windows
-- the replication's record is of the decision table that is in `55_decision/`, byte for byte
+- the replication's record is of the table the rename gate compares with, and that gate was run on the decision table that is in `55_decision/`: so the columns the replication covered are, cell for cell, today's
 - replicator a's table has no cell whose value differs from the decision table's
 - replicator b's table has no cell whose value differs from the decision table's
 - the columns the replicators did not write are the difference between the table's columns and those compared, and none of them says anything the unit's cell does not
-- `60_layer/decision_runs.json` is the finished record of the checks run, one at a time, on the layer that is in `60_layer/`
+- `60_layer/decision_runs.json` is the finished record of the checks run, one at a time, on the layer that is in `60_layer/`, by the runner as it is on disk
+- the two checks in the Safari application were either run in this pass or are named in its record as not run, with the reason
+- the runner's record accounts for each of its eight checks once: run, or named as not run
 - the script of the check 'verify_layer' is byte for byte the one in the last commit
 - the script of the check 'exercise_layer in Chrome' is byte for byte the one in the last commit
 - the script of the check 'exercise_layer in WebKit' is byte for byte the one in the last commit
-- the script of the check 'exercise_layer_safari, as written' is byte for byte the one in the last commit
 - the last run of the check 'verify_layer' on this build passed
 - the last run of the check 'verify_decision' on this build passed
 - the last run of the check 'exercise_layer in Chrome' on this build passed
 - the last run of the check 'exercise_layer in WebKit' on this build passed
 - the last run of the check 'exercise_decision in Chrome' on this build passed
 - the last run of the check 'exercise_decision in WebKit' on this build passed
-- the last run of the check 'exercise_decision_safari, by address' on this build passed
-- the record of the runs and the record the unchanged Safari script wrote agree on whether it passed
-- on the build before this one, the run of the unchanged WebKit exercise that failed a step was the first made of it, and the step was the map drag
-- the kept record of an earlier pass of the runner is a finished record, made before the pass reported here, in which every check passed on its last run
-- the pass reported here was made by the runner as it is on disk, which closes the left-over windows of its own checks: each Safari run records how many it closed
+- the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the unchanged script passed
+- the record gives one reason for leaving out both Safari checks
+- on an earlier build, the run of the unchanged WebKit exercise that failed a step was the first made of it, and the step was the map drag
+- the kept record of the pass with a step made by hand is a finished record, made before the pass reported here, in which every check passed on its last run
+- the kept record of the checks of the build the owner ruled on is a finished record of that build
 - the map library embedded in the page ignores a mouse-down on a map that still marks a zoom as under way
-- `60_layer/exercise_decision_safari.json` is the record of a run on the layer and the decision table that are there
 - the four tracked files that existed before and were changed have lines added and none removed
-- no other file that existed at the start of the batch is modified, and none is deleted or renamed
+- of the files that existed before the decision view, the only ones modified are the four of code and data that were added to, documents the owner ordered brought up to date, and the script that writes one of those documents; none is deleted or renamed
+- if the results script is changed, the change is the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged
+- the three unchanged scripts of the regression gate that were run are as committed
+- no file of `00_raw/` that is in the last commit was edited: the manifest, if it differs from that commit, has rows appended to it and every committed byte in place
 - every stage table the layer of 7 October 2026 was built from goes into today's layer with the same sha256
 - recorded loss on the open band rises across the three periods several times faster than loss in the forest mask
 
@@ -1706,7 +1971,7 @@ Each of these is something the text says in words. The script tested it against 
 - units in the six cells of window 2021_2025, and the units
 - plantation's share in FY2016-17: in the state report's table and in the decision stage's evidence table
 - plantation's share in FY2018-19: in the state report's table and in the decision stage's evidence table
-- units of 'still losing' under the full record that lost under the minimum in the default window: counted here, and in the layer's record of its About text
+- units of the cell of open forest with loss under the full record that lost under the minimum in the default window: counted here, and in the layer's record of its About text
 - the area of a pixel in the evidence table and in the run record
 - units with a loss above zero and under the area of the pixel in the middle of the state, in the evidence table and counted here in the decision table
 - that count in the evidence table and in the layer's record of its About text
@@ -1734,6 +1999,33 @@ Each of these is something the text says in words. The script tested it against 
 - units in the six cells at 25 ha standing and 0.5 ha loss, window 2018_2025, and the units
 - units in the six cells at 25 ha standing and 1 ha loss, window 2018_2025, and the units
 - units in the six cells at 25 ha standing and 2 ha loss, window 2018_2025, and the units
+- units of the cell dense_none in the share table and in the table of cells
+- units of the cell dense_none with a share and without one, and its units
+- the three classes of the share in the cell dense_none, and its units with a share
+- units of the cell dense_loss in the share table and in the table of cells
+- units of the cell dense_loss with a share and without one, and its units
+- the three classes of the share in the cell dense_loss, and its units with a share
+- units of the cell open_none in the share table and in the table of cells
+- units of the cell open_none with a share and without one, and its units
+- the three classes of the share in the cell open_none, and its units with a share
+- units of the cell open_loss in the share table and in the table of cells
+- units of the cell open_loss with a share and without one, and its units
+- the three classes of the share in the cell open_loss, and its units with a share
+- units of the cell little_loss in the share table and in the table of cells
+- units of the cell little_loss with a share and without one, and its units
+- the three classes of the share in the cell little_loss, and its units with a share
+- units of the cell little_none in the share table and in the table of cells
+- units of the cell little_none with a share and without one, and its units
+- the three classes of the share in the cell little_none, and its units with a share
+- units with a share and without one in 2018_2025, and the units
+- units with no share in 2018_2025: in the run record and blank in the table
+- units with a share and without one in 2001_2025, and the units
+- units with no share in 2001_2025: in the run record and blank in the table
+- units with a share and without one in 2017_2023, and the units
+- units with no share in 2017_2023: in the run record and blank in the table
+- units with a share and without one in 2021_2025, and the units
+- units with no share in 2021_2025: in the run record and blank in the table
+- units of the cell of closed forest with loss whose share prints under one per cent: in the evidence table and in the share table
 - units near the boundary in the boundary table and in the run record
 - units near the boundary in the boundary table and counted in the decision table
 - forest-site units in the boundary table and in the evidence table
@@ -1745,9 +2037,9 @@ Each of these is something the text says in words. The script tested it against 
 - LGD panchayat and outside-village units in the cell open_loss, and its units
 - LGD panchayat and outside-village units in the cell little_loss, and its units
 - LGD panchayat and outside-village units in the cell little_none, and its units
-- units of the cell 'Protect' that CoRE Stack flags: counted here, and in the layer's record of its About text
-- units of 'Protect' that lost the minimum or more over the full record: counted here, and in the layer's record of its About text
-- units of 'Protect' flagged by CoRE Stack under the East Coast model: counted here, and in the layer's record of its About text
+- units of the closed-forest cell without loss that CoRE Stack flags: counted here, and in the layer's record of its About text
+- units of the closed-forest cell without loss that lost the minimum or more over the full record: counted here, and in the layer's record of its About text
+- units of the closed-forest cell without loss flagged by CoRE Stack under the East Coast model: counted here, and in the layer's record of its About text
 - LGD panchayat units of the headline: counted in the decision table, and in the agreement summary
 - districts with an LGD panchayat unit of the headline: counted in the decision table, and in the agreement summary
 - units in the ranked lists of all districts and units outside them, and the units
@@ -1801,6 +2093,7 @@ Each of these is something the text says in words. The script tested it against 
 - units opened as aimed and units opened that touch the one aimed at, and the units opened, 60_layer/exercise_decision_webkit.json
 - kinds of corroboration badge seen and kinds there are, 60_layer/exercise_decision_webkit.json
 - units opened in Chrome by kind, and the units opened
+- columns of the table that was replicated, and the columns the rename gate found unchanged
 - part one in Safari: addresses tried and addresses as expected
 - part one in Safari: values compared and values found
 - part two in Safari: addresses tried and addresses as expected
@@ -1810,4 +2103,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*308 figures and 19 tables (618 cells) from 52 files; 196 statements tested; 120 totals compared. Written 2026-10-08T23:05:23Z by `scripts/write_decision_layer.py` (sha256 `61fdfe89be0fc0dc`), with the reading functions of `scripts/write_results.py` (sha256 `bd4f2cfcee8569de`).*
+*346 figures and 22 tables (699 cells) from 67 files; 229 statements tested; 148 totals compared. Written 2026-10-09T05:45:06Z by `scripts/write_decision_layer.py` (sha256 `2166f13bc66bcb83`), with the reading functions of `scripts/write_results.py` (sha256 `50f98f23f30e9685`).*

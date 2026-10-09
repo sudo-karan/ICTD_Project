@@ -6,7 +6,7 @@ Read `README.md` first — it is the full brief. These are the standing rules.
 
 - **Never invent a number.** If it is not in `00_raw/`, leave it blank and say so in the output.
   This applies above all to the VGPP plantation unit cost (₹/ha) and district HQ coordinates.
-- `00_raw/` is immutable. Never edit or overwrite anything in it.
+- Files in `00_raw/` at a commit are never edited. Registering a new input adds files and manifest rows.
 - Every script writes into exactly one numbered folder (`10_units/`, `20_degradation/`, …) and records
   its input filenames and a UTC run timestamp in the output.
 - Where a source prints its own totals, check against them and fail loudly on mismatch.

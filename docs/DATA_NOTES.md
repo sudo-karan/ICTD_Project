@@ -154,6 +154,39 @@ included. Three things follow that the owner should know before the layer is sen
 - **ISFR is cited in the panel but no ISFR figure is on the map**; its terms (non-commercial use with
   acknowledgment) are therefore not engaged by the layer.
 
+**Brought up to date on 9 October 2026, for the decision view** (`docs/DECISION_LAYER.md` is the full account). The layer
+now has a second way of reading its measurements, two more sources, and a copy made to be passed on. What the owner
+should know before anything is sent:
+
+- **The copy to send is `70_share/`, not `60_layer/`.** `scripts/07_build_share.py` copies the layer's `index.html` and
+  `data.js` byte for byte, leaves out `overlay.js`, adds a README, and zips the folder. The page in the copy asks the
+  network for nothing: its box "Site-level overlay" says the overlay's file is not beside the page.
+  `scripts/exercise_share.py` opens the copy in Chrome and checks that.
+- **The tile provider.** In `60_layer/` the decision view can lay Hansen's loss over the map as tiles from Global Forest
+  Watch (World Resources Institute). It is off unless ticked, and its code is the one file left out of the copy. Two
+  points of the provider's terms are unresolved, and they are the owner's: the terms ask that each request to an API
+  carry an account's key, and the tile service's reference declares none; and they bind a user to an attribution page
+  written for another of the provider's services. Five of the provider's pages are registered in
+  `00_raw/05_forest_reference/` (manifest rows `gfw_dataset_record_umd_tree_cover_loss`,
+  `umd_global_forest_change_v1_13_page`, `gfw_terms_of_service_page`,
+  `resourcewatch_api_attribution_requirements_page`, `gfw_tile_cache_api_reference_openapi`); they are fetched files
+  and are not in git or in anything sent.
+- **The provider's cautions about the data are quoted in the layer** whether or not the overlay is there: short
+  quotations from the provider's record of the dataset, kept in `00_raw/05_forest_reference/provider_cautions.json`
+  with their source. The data itself is CC BY 4.0.
+- **The Gazette's list of permissible works.** The decision view names rows of the list notified as S.O. 5448(E) of 5
+  October 2026 (`00_raw/06_scheme/`, five manifest rows). It quotes work names and serial numbers. No licence is
+  stated for the Gazette; the manifest records what the eGazette site says of it. The PDFs and the Ministry's press
+  release are fetched files and are not in git or in anything sent; the table made from the list is.
+- **`adi_2011` and the exported list.** By the owner's ruling of 9 October 2026 the development index is no longer a
+  column of the list a user can export from the decision view, because that file is the one that gets passed on. It
+  is still in the interactive view, as a layer and as a column of the list on the page, and therefore in `70_share/`.
+  The judgement above stands for the view: a stricter reading of SHRUG's terms would take it out of the layer too.
+- **Scheduled Tribe share in a list that is passed on** is the Foundation's call (`docs/DECISION_LAYER.md` §17). It
+  is in the exported list.
+- **Terms for passing the copy on are not yet agreed.** The README inside `70_share/` says so and asks that the copy
+  not be passed on or published until they are.
+
 Not decided here: whether the layer may be passed on by the Foundation to others, and under what statement.
 
 **Other terms on file** (from `00_raw/data_manifest.csv`; none of these files is redistributed by the

@@ -11,6 +11,14 @@ file and the place in it; the document's appendix is that record. The run stops 
   5. one of the three verifiers fails.
 A figure that cannot be read is not written: a missing file, a missing key or a blank cell stops the run.
 
+The records of the layer's checks in a browser must be of the layer that is on disk, or the run stops - with ONE EXCEPTION,
+made on 9 October 2026 by the project owner's choice. Until then the record of the check in the Safari application
+(60_layer/exercise_safari.json) had to be of that build like the two others. Now it may be of an earlier build IF the
+runner's record of this build (60_layer/decision_runs.json, written by scripts/run_decision_checks.py) is finished, is of
+the layer on disk, and names that check as left out of its pass with a reason. The text then says, wherever it speaks of
+Safari, that the application was not opened on this build, gives the reason as the record has it, and gives the build the
+last Safari run was of. The Chrome and WebKit records must still be of the build on disk: that rule is unchanged.
+
 One group of figures has no stage output to come from: those of the NIRv replication, which are read from the
 working files of the session that made them (git-ignored, not rebuilt by any tracked script). The appendix marks them.
 
@@ -289,6 +297,7 @@ def main():
     EXC = "60_layer/exercise_chrome.json"
     EXW = "60_layer/exercise_webkit.json"
     EXS = "60_layer/exercise_safari.json"
+    RUNS = "60_layer/decision_runs.json"                    # scripts/run_decision_checks.py: every run of every check on a build, and the checks it was told to leave out
 
     # ==== 1. what this is ================================================================================================================
     show("written_utc", V(written, "this run", "the UTC time at which this script ran"), txt)
@@ -364,7 +373,7 @@ checks made on them. It holds no finding about whether spending follows need, an
 | need | `30_need/need_by_unit.csv` | built, {run_need} | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, {run_allocation} | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: {v_r620} (§8) |
 | the comparison of the three | `50_gap/` | **not built** | - |
-| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, {run_layer} | `scripts/verify_layer.py`: {v_layer}; every control exercised in two browser engines, and the page opened and read in the Safari application (§10) |
+| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, {run_layer} | `scripts/verify_layer.py`: {v_layer}; every control exercised in two browser engines, {safari_state} (§10) |
 
 Three statements carry most of what follows.
 
@@ -1148,12 +1157,37 @@ stands whatever stage 4 turns out to be.
         ex[tag] = [show(f"ex_{tag}_{k}", key(path, f"summary/{src}"), n0) for k, src in (("ok", "controls_as_expected"), ("n", "controls_exercised"), ("units", "units_clicked"), ("eq", "values_equal"), ("vals", "values_compared"))]
         hold(ex[tag][0].v == ex[tag][1].v and ex[tag][3].v == ex[tag][4].v, "in the hand check every control did what it should and every displayed value equalled the stage tables")
 
-    hold(key(EXS, "summary/layer_run_utc").v == key(L, "run_utc").v and J(EXS)["summary"]["files_sha256"] == key(L, "outputs/sha256").v, "the check in the Safari application was made on the build of the layer that is on disk")
+    safari_now = key(EXS, "summary/layer_run_utc").v == key(L, "run_utc").v and J(EXS)["summary"]["files_sha256"] == key(L, "outputs/sha256").v
+    if not safari_now:                                      # the one exception (9 October 2026): the runner's record of this build must name the Safari check as left out, with a reason
+        left = [x for x in key(RUNS, "checks_not_run_in_this_pass").v if x["check"] == "exercise_layer_safari, as written"]
+        hold(key(RUNS, "layer_run_utc").v == key(L, "run_utc").v and "unfinished" not in J(RUNS) and len(left) == 1 and left[0]["why"].strip() != ""
+             and all(x["last_run_passed"] for x in key(RUNS, "checks").v) and {"exercise_layer in Chrome", "exercise_layer in WebKit", "verify_layer"} <= {x["check"] for x in key(RUNS, "checks").v},
+             "the check in the Safari application was not made on the build of the layer that is on disk, and the runner's record of that build names it as left out with a reason, every check it did run having passed")
+        show("ex_s_why", V(left[0]["why"], RUNS, "key `checks_not_run_in_this_pass`: `why` of the check in the Safari application"), txt)
+        show("ex_s_build", key(EXS, "summary/layer_run_utc"), txt)
+    show("safari_state", V("and the page opened and read in the Safari application" if safari_now else "and the page last opened and read in the Safari application on an earlier build, not on this one",
+                           EXS if safari_now else RUNS, "whether the record of the check in the Safari application is of the layer on disk" if safari_now else "key `checks_not_run_in_this_pass`: the check in the Safari application is named there"), txt)
+    show("safari_limit", V("" if safari_now else ", and on an earlier build than the one on disk", EXS, "key `summary` → `layer_run_utc`, against the layer's own record"), txt)
     show("ex_s_browser", key(EXS, "summary/browser"), txt)
     sa = [show(f"ex_s_{k}", key(EXS, f"summary/{src}"), n0) for k, src in (("ok", "addresses_as_expected"), ("n", "addresses_tried"), ("units", "units_opened_by_address"), ("eq", "values_found"), ("vals", "values_compared"))]
     hold(sa[0].v == sa[1].v and sa[3].v == sa[4].v, "in the Safari application every address showed what it should and every value a panel should show was in the page's text")
     hold([u["unit"] for u in J(EXS)["units"]] == [u["opened"] for u in J(EXC)["units"]], "the units opened in the Safari application are the units clicked in Chrome")
 
+    if safari_now:
+        safari_bullet = """- **Opened in the Safari application itself, from disk**, by `scripts/exercise_layer_safari.py`, in {ex_s_browser}. There
+  the page was driven by its address alone and its text read back; nothing was clicked. {ex_s_ok} of {ex_s_n} addresses
+  showed what they should (every layer, every minimum of forest, the search, the two text panels), and for the same
+  {ex_s_units} units {ex_s_eq} of {ex_s_vals} values the panel should show were in the page's text.
+"""
+    else:
+        safari_bullet = """- **Not opened in the Safari application on this build.** That check was left out of this build's checks, and their
+  record gives the reason: "{ex_s_why}". The last run of `scripts/exercise_layer_safari.py`, in {ex_s_browser}, was on
+  the layer built {ex_s_build}, not the one on disk: there the page was driven by its address alone and its text read
+  back, nothing was clicked, {ex_s_ok} of {ex_s_n} addresses showed what they should (every layer, every minimum of
+  forest, the search, the two text panels), and for the same {ex_s_units} units {ex_s_eq} of {ex_s_vals} values the
+  panel should show were in the page's text. On the build on disk the layer was exercised in Chrome and in Safari's
+  engine only.
+"""
     DOC.append("""
 ## 10. The map layer
 
@@ -1170,11 +1204,7 @@ for discussion with people who know the places. It is not a verdict on any place
   {ex_c_units} units clicked on the map {ex_c_eq} of {ex_c_vals} displayed values equalled the stage tables. In
   {ex_w_browser}, with events made in script: {ex_w_ok} of {ex_w_n}, and for {ex_w_units}
   units {ex_w_eq} of {ex_w_vals}. `docs/LAYER.md` lists each action and what happened.
-- **Opened in the Safari application itself, from disk**, by `scripts/exercise_layer_safari.py`, in {ex_s_browser}. There
-  the page was driven by its address alone and its text read back; nothing was clicked. {ex_s_ok} of {ex_s_n} addresses
-  showed what they should (every layer, every minimum of forest, the search, the two text panels), and for the same
-  {ex_s_units} units {ex_s_eq} of {ex_s_vals} values the panel should show were in the page's text.
-- **Not done.** No click was made in the Safari application, only in its engine: that needs a Safari setting that is
+""" + safari_bullet + """- **Not done.** No click was made in the Safari application, only in its engine: that needs a Safari setting that is
   the owner's to change. And Firefox was not installed on the machine, so the layer has not been opened in it.
 - **Left out on purpose**: the SHRUG-derived columns (§7).
 - **The shapes are simplified** so that the file can be sent, with a tolerance of {layer_tol} m; {layer_small} very small
@@ -1308,7 +1338,7 @@ Collected from `docs/UNITS.md`, `docs/DEGRADATION.md`, `docs/NEED.md`, `docs/NRM
   reports a community that did not favour the mapping of inequity; whether those two layers belong in what is shown is
   the Foundation's call (`docs/LAYER.md` §9).
 - The layer's controls were exercised in Chrome and in Safari's engine. In the Safari application it was opened and
-  read, not clicked. It has not been opened in Firefox, on a phone, in print, or on a machine with little memory
+  read, not clicked{safari_limit}. It has not been opened in Firefox, on a phone, in print, or on a machine with little memory
   (§10).
 """)
 
