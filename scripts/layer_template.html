@@ -132,7 +132,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   var N = D.id.length, CODES = D.codes;
   var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1, legend: true };
   var DV = D.decision || null;             // the decision view (added 8 Oct 2026): beside the layers, changing none of them
-  state.window = DV ? DV.default_window : ""; state.tiers = DV ? DV.tiers.slice() : []; state.rank = -1; state.st = "0"; state.keepOut = true; state.overlay = false;
+  state.window = DV ? DV.default_window : ""; state.tiers = DV ? DV.tiers.slice() : []; state.rank = -1; state.st = "0"; state.keepOut = true; state.overlay = false; state.within = "ha";
   var layerById = {};
   D.layers.forEach(function (l) { layerById[l.id] = l; });
 
@@ -329,16 +329,18 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   // Six cells from 55_decision/condition_by_unit.csv, ranked within ONE district. It stands beside the layers and changes none of
   // them. Like the rest of the page it works out no figure: it looks up text the builder made, joins it, and counts places in the
   // order of tiers. Address parts of its own: layer=decision, window=<id>, rank=<district>, tiers=<cell ids joined by dots>,
-  // st=18|33|50, keepout=0. The one thing that can ask the network for anything is the overlay, and its code is not in this file.
+  // st=18|33|50, keepout=0, within=share (the order within a tier: by hectares lost unless it says share). The one thing that can ask the network for anything is the overlay, and its code is not in this file.
   var ovLayer = null, ovSeen = { ok: 0, bad: 0, run: 0 }, own = Object.prototype.hasOwnProperty;
   function dvFill(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o[k] === undefined ? m : o[k]; }); }
   function dvWindow() { for (var k = 0; k < DV.windows.length; k++) { if (DV.windows[k].id === state.window) { return DV.windows[k]; } } return DV.windows[0]; }
   function dvCellById(id) { for (var k = 0; k < DV.cells.length; k++) { if (DV.cells[k].id === id) { return DV.cells[k]; } } return null; }
   function dvCellOf(i) { return DV.cells[CODES.indexOf(DV.cls[state.window].charAt(i))]; }
-  function dvTierLabel(cell) {
-    var k = state.tiers.indexOf(cell.id);
-    return k < 0 ? dvFill(DV.t.unranked, { name: cell.name }) : dvFill(DV.t.tier, { k: k + 1, name: cell.name });
+  function dvTierLabel(cell, shown) {       // shown: the shorter form of the name that the legend alone may use
+    var k = state.tiers.indexOf(cell.id), name = shown || cell.name;
+    return k < 0 ? dvFill(DV.t.unranked, { name: name }) : dvFill(DV.t.tier, { k: k + 1, name: name });
   }
+  function dvWithin() { return state.within === "share" ? DV.t.within_tier_share : DV.t.within_tier; }
+  function dvShare(i) { var p = DV.loss[state.window].p[i]; return p === "" ? DV.t.no_share : p; }       // the share as text, or the words for a unit that has none
   function dvOrderChanged() { return state.tiers.join() !== DV.tiers.join(); }
   function dvOrderList() { return state.tiers.map(function (id, k) { return (k + 1) + " " + dvCellById(id).name; }).join("; "); }
   function dvOrderWords() { return dvOrderChanged() ? DV.t.order_changed + " (" + dvOrderList() + ")" : DV.t.order_default; }
@@ -353,7 +355,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     for (k = 0; k < list.length; k++) {
       cell = dvCellById(list[k]); idx = DV.cells.indexOf(cell);
       if (list[k] === DV.unranked) { h += '<div class="flatsep"></div>'; }
-      h += '<div class="lr"><span class="sw" style="background:' + cell.color + '"></span>' + esc(dvTierLabel(cell)) + ' <span class="n">(' + esc(DV.counts[state.window][idx])
+      h += '<div class="lr" title="' + esc(dvTierLabel(cell)) + '"><span class="sw" style="background:' + cell.color + '"></span>' + esc(dvTierLabel(cell, cell.legend)) + ' <span class="n">(' + esc(DV.counts[state.window][idx])
         + (state.rank >= 0 ? "; " + esc(DV.dcounts[state.window][state.rank][idx]) + " in " + esc(D.districts[state.rank].name) : "") + ")</span></div>";
     }
     h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
@@ -381,11 +383,13 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     for (k = 0; k < r.length; k++) { r[k].checked = r[k].value === state.window; }
   }
   function dvRows() {       // the units of the chosen district, tier by tier, each cell in the order the builder gave it; the filter only leaves rows out
-    var per = DV.rank[state.window][state.rank], st = layerById.st_share.cls.all, need = DV.st_codes[state.st] || "", out = { rows: [], dropped: 0, outKept: 0, outDropped: 0 }, t, cell, idx, j, i;
+    var per = DV.rank[state.window][state.rank], bys = state.within === "share" ? DV.rank_share[state.window][state.rank] : null, st = layerById.st_share.cls.all, need = DV.st_codes[state.st] || "",
+      out = { rows: [], dropped: 0, outKept: 0, outDropped: 0 }, t, cell, idx, j, i, list;
     for (t = 0; t < state.tiers.length; t++) {
       cell = dvCellById(state.tiers[t]); idx = DV.cells.indexOf(cell);
-      for (j = 0; j < per[idx].length; j++) {
-        i = per[idx][j];
+      list = (bys && bys[idx]) ? bys[idx] : per[idx];       // a cell without loss has no order by share: it keeps the order by standing hectares
+      for (j = 0; j < list.length; j++) {
+        i = list[j];
         if (need) {
           if (D.out.charAt(i) === "1") { if (state.keepOut) { out.outKept++; } else { out.outDropped++; continue; } }
           else if (need.indexOf(st.charAt(i)) < 0) { out.dropped++; continue; }
@@ -405,12 +409,13 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     D.districts.forEach(function (d, i) { opts += '<option value="' + i + '"' + (i === state.rank ? " selected" : "") + ">" + esc(d.name) + "</option>"; });
     if (state.rank >= 0) { r = dvRows(); }
     h = '<p style="margin:2px 0 6px"><select id="rank_district">' + opts + '</select><select id="rank_st">'
-      + DV.t.st_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.st ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"
+      + DV.t.st_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.st ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + '</select><select id="rank_within">'
+      + DV.t.within_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.within ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"
       + '<label><input type="checkbox" id="c_keep_out"' + (state.keepOut ? " checked" : "") + (state.st === "0" ? " disabled" : "") + "> " + esc(DV.t.keep_out) + (state.st === "0" ? " " + esc(DV.t.keep_out_off) : "") + "</label> "
       + '<button id="b_export"' + (!r || !r.rows.length ? " disabled" : "") + ">" + esc(DV.t.export) + "</button></p>";
     if (state.rank < 0) { el.innerHTML = h + '<p id="rank_msg">' + esc(DV.t.rank_none) + "</p>"; return; }
     L = DV.loss[state.window];
-    h += '<p id="rank_head"><b>' + esc(dvFill(DV.t.rank_head, { district: D.districts[state.rank].name, n: r.rows.length, window: w.label, order: dvOrderWords() })) + "</b></p>";
+    h += '<p id="rank_head"><b>' + esc(dvFill(DV.t.rank_head, { district: D.districts[state.rank].name, n: r.rows.length, window: w.label, order: dvOrderWords(), within: dvWithin() })) + "</b></p>";
     if (state.st !== "0") {
       h += '<p class="note" id="rank_filter">' + esc(dvFill(DV.t.rank_filter_note, { label: dvFilterLabel(), m: r.dropped })) + " "
         + esc(state.keepOut ? dvFill(DV.t.rank_out_kept, { k: r.outKept }) : dvFill(DV.t.rank_out_dropped, { k: r.outDropped })) + "</p>";
@@ -419,12 +424,12 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     r.rows.forEach(function (x) {
       var i = x[0], cell = x[1], f = D.f[i];
       h += '<tr class="r" data-u="' + i + '"><td><span class="tierchip" style="border-left-color:' + cell.color + '">' + esc(dvTierLabel(cell)) + "</span></td><td>" + esc(f[F.name]) + " (" + esc(f[F.id]) + ")</td><td>"
-        + esc(DV.t.kind[+D.out.charAt(i)]) + '</td><td class="n">' + esc(DV.sd[i]) + '</td><td class="n">' + esc(DV.so[i]) + '</td><td class="n">' + esc(L.f[i]) + "</td><td>" + esc(dvCorro(i)) + "</td><td>"
+        + esc(DV.t.kind[+D.out.charAt(i)]) + '</td><td class="n">' + esc(DV.sd[i]) + '</td><td class="n">' + esc(DV.so[i]) + '</td><td class="n">' + esc(L.f[i]) + '</td><td class="n">' + esc(dvShare(i)) + "</td><td>" + esc(dvCorro(i)) + "</td><td>"
         + esc(f[F.st]) + "</td><td>" + esc(f[F.adi]) + "</td><td>" + esc(f[F.fn]) + "</td></tr>";
     });
     h += "</table>";
     un = DV.cells.indexOf(dvCellById(DV.unranked));
-    h += '<p class="note" id="rank_unranked">' + esc(dvFill(DV.t.rank_unranked, { n: DV.dcounts[state.window][state.rank][un], name: dvCellById(DV.unranked).name })) + " " + esc(DV.t.lower_bound) + "</p>";
+    h += '<p class="note" id="rank_unranked">' + esc(dvFill(DV.t.rank_unranked, { n: DV.dcounts[state.window][state.rank][un], name: dvCellById(DV.unranked).name })) + " " + esc(DV.t.standing_is) + "</p>";
     el.innerHTML = h;
   }
   function dvWhy(i) {       // the block every unit's panel carries: the hectares, the two tests, the cell, the tier and why
@@ -437,10 +442,11 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     h += '<table class="why"><tr><th>' + esc(t.why_cols[0]) + "</th><th>" + esc(t.why_cols[1]) + "</th><th>" + esc(dvFill(t.why_cols[2], { window: w.label })) + "</th></tr>";
     rows = [[t.why_rows[0], DV.sd[i], L.d[i]], [t.why_rows[1], DV.so[i], L.o[i]], [t.why_rows[2], DV.low[i], L.l[i]]];
     rows.forEach(function (r) { h += "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + " ha</td><td>" + esc(r[2]) + " ha</td></tr>"; });
-    h += '</table><p class="note">' + esc(t.why_low) + " " + esc(t.lower_bound) + "</p>";
+    h += '</table><p class="note">' + esc(t.why_low) + " " + esc(t.standing_is) + "</p>";
     h += '<p data-w="standing">' + esc(little ? dvFill(t.why_standing_little, { sf: DV.sf[i], smin: DV.standing_min })
                             : dvFill(t.why_standing_some, { sf: DV.sf[i], smin: DV.standing_min, row: cell.row, cmp: cell.row === "mostly dense" ? t.cmp_dense : t.cmp_open })) + "</p>";
     h += '<p data-w="loss">' + esc(dvFill(cell.loss === "some" ? t.why_loss_some : t.why_loss_none, { fl: L.f[i], lmin: DV.loss_min })) + "</p>";
+    h += '<p data-w="share">' + esc(dvFill(L.p[i] === "" ? t.why_share_none : t.why_share, { start: L.s[i], share: L.p[i], window: w.label, smin: DV.standing_min })) + "</p>";
     if (DV.near.charAt(i) === "1") { h += '<p class="note" data-w="near">' + esc(t.near) + "</p>"; }
     g = '<table class="why grid6"><tr><th></th><th>' + esc(t.grid_cols[0]) + "</th><th>" + esc(t.grid_cols[1]) + "</th></tr>";
     DV.grid.forEach(function (gr) {
@@ -486,19 +492,21 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     if (dvOrderChanged()) { h += "&tiers=" + state.tiers.join("."); }
     if (state.rank >= 0) { h += "&rank=" + encodeURIComponent(D.districts[state.rank].name); }
     if (state.st !== "0") { h += "&st=" + state.st; if (!state.keepOut) { h += "&keepout=0"; } }
+    if (state.within !== "ha") { h += "&within=" + state.within; }
     return h;
   }
   function dvFromAddress(h0) {
     if (!DV || h0.layer !== "decision") { return; }
-    var w, t, r = -1, st, keep, k, changed;
+    var w, t, r = -1, st, keep, k, changed, wi;
     w = (h0.window && own.call(DV.cls, h0.window)) ? h0.window : DV.default_window;
     t = h0.tiers ? h0.tiers.split(".") : null;
     if (!t || t.slice().sort().join() !== DV.tiers.slice().sort().join()) { t = DV.tiers.slice(); }
     if (h0.rank) { for (k = 0; k < D.districts.length; k++) { if (D.districts[k].name.toLowerCase() === h0.rank.toLowerCase()) { r = k; break; } } }
     st = (h0.st && own.call(DV.st_codes, h0.st)) ? h0.st : "0";
     keep = !(st !== "0" && h0.keepout === "0");
-    changed = w !== state.window || t.join() !== state.tiers.join() || r !== state.rank || st !== state.st || keep !== state.keepOut;
-    state.window = w; state.tiers = t; state.st = st; state.keepOut = keep;
+    wi = h0.within === "share" ? "share" : "ha";
+    changed = w !== state.window || t.join() !== state.tiers.join() || r !== state.rank || st !== state.st || keep !== state.keepOut || wi !== state.within;
+    state.window = w; state.tiers = t; state.st = st; state.keepOut = keep; state.within = wi;
     if (r !== state.rank) { state.rank = r; if (r >= 0) { gotoDistrict(r); } }
     if (state.layer !== "decision") { setDecision(); dvTiers(); }
     if (changed) { dvAll(); }
@@ -548,9 +556,9 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     var order = dvOrderList() + "; not ranked: " + dvCellById(DV.unranked).name;
     r.rows.forEach(function (x) {
       var i = x[0], cell = x[1], f = D.f[i];
-      lines.push([d, f[F.id], f[F.name], DV.t.kind[+D.out.charAt(i)], D.out.charAt(i), w.label, "2025", dvTierLabel(cell), cell.def, order, dvOrderChanged() ? DV.t.order_changed : DV.t.order_default, DV.t.within_tier,
-                  plain(DV.sd[i]), plain(L.d[i]), plain(DV.so[i]), plain(L.o[i]), plain(DV.low[i]), plain(L.l[i]), plain(DV.sf[i]), plain(L.f[i]), DV.standing_min, DV.loss_min, DV.near.charAt(i) === "1" ? "yes" : "no",
-                  dvCorro(i), "2017-2023", f[F.st], f[F.adi], f[F.fn], dvCheck(i), dvFilterLabel() + (state.st !== "0" ? (state.keepOut ? "; outside-village units kept" : "; outside-village units left out") : ""), DV.built].map(q).join(","));
+      lines.push([d, f[F.id], f[F.name], DV.t.kind[+D.out.charAt(i)], D.out.charAt(i), w.label, "2025", dvTierLabel(cell), cell.def, order, dvOrderChanged() ? DV.t.order_changed : DV.t.order_default, dvWithin(),
+                  plain(DV.sd[i]), plain(L.d[i]), plain(DV.so[i]), plain(L.o[i]), plain(DV.low[i]), plain(L.l[i]), plain(DV.sf[i]), plain(L.f[i]), plain(L.s[i]), dvShare(i), DV.standing_min, DV.loss_min,
+                  DV.near.charAt(i) === "1" ? "yes" : "no", dvCorro(i), "2017-2023", f[F.st], f[F.fn], dvCheck(i), dvFilterLabel() + (state.st !== "0" ? (state.keepOut ? "; outside-village units kept" : "; outside-village units left out") : ""), DV.built].map(q).join(","));
     });
     text = lines.join("\r\n") + "\r\n";
     name = "ranked_" + d.replace(/[^A-Za-z]+/g, "_") + "_" + state.window + ".csv";
@@ -570,6 +578,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
       else if (t.id === "rank_district") { state.rank = t.value === "" ? -1 : +t.value; if (state.rank >= 0) { gotoDistrict(state.rank); } dvAll(); }
       else if (t.id === "rank_st") { state.st = t.value; dvAll(); }
       else if (t.id === "c_keep_out") { state.keepOut = t.checked; dvAll(); }
+      else if (t.id === "rank_within") { state.within = t.value; dvAll(); }
       else if (t.id === "c_overlay") { dvOverlay(t.checked); }
     });
     document.addEventListener("click", function (e) {
