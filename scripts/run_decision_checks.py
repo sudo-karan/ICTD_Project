@@ -2,7 +2,7 @@
 """Runs every check of the layer on the build that is in 60_layer/, ONE AT A TIME, and keeps a record of every run it
 makes - a run that fails included.
 
-    python scripts/run_decision_checks.py
+    python scripts/run_decision_checks.py [--leave-out safari --because "why"]
 
 Why this script exists (9 Oct 2026). The records the checks write (60_layer/exercise_*.json) hold only the LAST run of
 each. On 8 Oct one run of the unchanged WebKit exercise failed one step and the next two passed; nothing but a note made
@@ -17,6 +17,10 @@ For each script it also records whether the file is byte for byte the one in the
 "unchanged" means for the three checks of the regression gate, and the sha256 of the file as it was run; and its own.
 The browser exercises are given a temporary folder for their screenshots; it is not part of the record.
 
+A pass may LEAVE OUT the two checks in the Safari application (--leave-out safari), and must then say why (--because): the
+record names the checks that were not run and gives the reason, so that a pass without them cannot be read as a pass
+with them. On 9 October 2026 the owner ruled that the batch applying his rulings makes no run in the Safari application.
+
 Run it on a machine that is otherwise quiet. The overlay's steps need a connection. The Safari steps need the terminal's
 leave to control Safari, and no other Safari window showing the layer.
 
@@ -29,7 +33,7 @@ Safari is not started for this. How many it closed is in the record of each run.
 
 Output: 60_layer/decision_runs.json and nothing else of its own (each check writes its own record, as before). Exits 1
 unless the last run of every check passed."""
-import hashlib, json, re, subprocess, sys, tempfile, time
+import argparse, hashlib, json, re, subprocess, sys, tempfile, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -79,10 +83,19 @@ def as_committed(script):
 
 
 def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--leave-out", choices=["safari"], help="leave out the two checks made in the Safari application")
+    ap.add_argument("--because", default="", help="why they are left out: written into the record")
+    a = ap.parse_args()
+    if a.leave_out and not a.because.strip():
+        sys.exit("--leave-out needs --because: the record must say why a check was not run")
+    left_out = [c for c in CHECKS if a.leave_out == "safari" and "safari" in c[1]]
+    checks = [c for c in CHECKS if c not in left_out]
     layer = json.load(open(ROOT / "60_layer" / "layer.provenance.json"))["run_utc"]
     record = {"script": "scripts/run_decision_checks.py", "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "started_utc": now(), "layer_run_utc": layer, "one_at_a_time": True, "most_runs_of_a_check": MOST,
-              "files_sha256": {f: hashlib.sha256((ROOT / "60_layer" / f).read_bytes()).hexdigest() for f in ("index.html", "data.js")}, "checks": []}
-    for name, script, args, browser, gate in CHECKS:
+              "files_sha256": {f: hashlib.sha256((ROOT / "60_layer" / f).read_bytes()).hexdigest() for f in ("index.html", "data.js")},
+              "checks_not_run_in_this_pass": [{"check": c[0], "script": c[1], "of_the_regression_gate": c[4], "why": a.because.strip()} for c in left_out], "checks": []}
+    for name, script, args, browser, gate in checks:
         entry = {"check": name, "script": script, "arguments": [a for a in args if a != SHOTS], "of_the_regression_gate": gate, "file_is_as_committed": as_committed(script),
                  "file_sha256": hashlib.sha256((ROOT / script).read_bytes()).hexdigest(), "runs": []}
         for attempt in range(1, (MOST if browser else 1) + 1):
@@ -106,6 +119,8 @@ def main():
     record["every_check_passed_on_its_last_run"] = all(e["last_run_passed"] for e in record["checks"])
     record["every_check_passed_on_its_first_run"] = all(e["runs"][0]["exit"] == 0 for e in record["checks"])
     json.dump(record, open(OUT, "w", encoding="utf-8"), indent=1)
+    for c in left_out:
+        print(f"NOT RUN  {c[0]}: {a.because.strip()}")
     print(f"\n{sum(e['last_run_passed'] for e in record['checks'])} of {len(record['checks'])} checks passed on their last run; "
           f"{sum(e['runs'][0]['exit'] == 0 for e in record['checks'])} on their first; record: 60_layer/decision_runs.json")
     return 0 if record["every_check_passed_on_its_last_run"] else 1
