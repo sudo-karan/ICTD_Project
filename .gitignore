@@ -53,3 +53,15 @@ logs/
 
 # the decision tables are a stage output like the others (added 8 Oct 2026)
 55_decision/
+
+# the provider pages registered on 9 Oct 2026 in 00_raw/05_forest_reference/ (the owner's ruling of that day): fetched files, each
+# with its URL, bytes and sha256 in the manifest. The extract made from two of them, provider_cautions.json, stays tracked with
+# the script that makes it, like the two ISFR extracts.
+00_raw/05_forest_reference/gfw_dataset_record_umd_tree_cover_loss_2026-10-08.json
+00_raw/05_forest_reference/gfw_terms_of_service_2026-10-08.html
+00_raw/05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json
+00_raw/05_forest_reference/resourcewatch_api_attribution_requirements_2026-10-08.html
+00_raw/05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html
+
+# the copy of the layer made to be passed on is a stage output like the others (added 9 Oct 2026)
+70_share/
