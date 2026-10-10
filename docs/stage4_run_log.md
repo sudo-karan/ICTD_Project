@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T20:15:24Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T20:42:11Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -34,7 +34,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 | step | what | state |
 |---|---|---|
 | 0 | publish the shared copy to GitHub Pages | done |
-| 1 | fix the input listing and rebuild | not yet |
+| 1 | fix the input listing and rebuild | done |
 | 2 | Phase 5b: the need read against the Forest Survey's own figures | not yet |
 | 3 | finish Phase 6 | not yet |
 | 4 | Phase 7 | not yet |
@@ -82,6 +82,45 @@ sentences of `docs/DECISION_LAYER.md` that the fourth stage had overtaken were c
 | requests the page made over http or https, and those of them that did not go to https://sudo-karan.github.io | at least one, and none elsewhere | 3 (/ICTD_Project/, /ICTD_Project/data.js, /favicon.ico); elsewhere: 0 | yes |
 
 *From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*
+
+### Step 1: fix the input listing and rebuild
+
+The listing of inputs that step 0 writes (`50_gap/inputs_listing.json`) now holds every input that any step of the
+stage reads. It had held only the inputs that several steps share, and left out the files that one step each read on
+its own: the forest villages PDF; the two files of the layer that the districts step reads; and the provenance
+records of the earlier stages and the requirements file, which the gate on the environments reads. The verifier's
+part on the inputs had found that. The list of inputs is kept in one place, the shared module, and the shared module
+now stops any step that records an input from outside it, so the listing cannot fall behind again. The Forest
+Survey's table, which Step 2 reads, was put on the list at the same time, so that the list would not change twice.
+
+Every builder was then run again in the stage-4 environment, in the order given under "To rebuild", and
+`scripts/08_gap_compare_builds.py` (new) set every output beside the copy kept from before the change
+(`50_gap/before_step1/`). **No table of figures moved**: each is byte for byte what it was. The files that differ
+are records that carry a time or a hash, the listing itself, and the two text files of the models, whose first line
+is the time they were written; the table below gives each, with what differs and why. The verifier's part on the
+inputs, whose one failing check was this finding, passes every check on the rebuilt listing.
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_step1/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 20 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 20 of 20 | 20 of 20 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the build now that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_step1.csv`).*
+
+Files compared or listed: 43; byte for byte the same: 38. Every file that differs, is new or is gone (`50_gap/rebuild_step1_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `forest_villages_pdf_record.json` | record | keys that differ: checked_utc | the record carries the time of the check |
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_deck_tables: run_utc, shared_module_sha256; 08_build_gap_districts: inputs, run_utc, script_sha256, shared_module_sha256; 08_build_gap_panel: outputs, run_utc, shared_module_sha256; 08_build_gap_rights: forest_villages, outputs, run_utc, script_sha256, shared_module_sha256; 08_build_gap_units: outputs, run_utc, shared_module_sha256; 08_gap_environment: inputs, run_utc, script_sha256, shared_module_sha256; 08_gap_inputs: inputs, outputs, run_utc, script_sha256, shared_module_sha256 | every step was run again: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 21 then, 34 now) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+| `panel_models.txt` | text | 1 line(s) of 29: line 1 first | its first line carries the time it was written |
+| `unit_history_models.txt` | text | 1 line(s) of 51: line 1 first | its first line carries the time it was written |
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -154,9 +193,9 @@ says what was undone and rebuilt.
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T18:08:08Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T20:17:50Z)
 
-- `50_gap/inputs_listing.json` (18,145 bytes, sha256 `825ed1ac59aea15b`)
+- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `5a793d2a7a818a1e`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
@@ -185,7 +224,7 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-10T18:08:06Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-10T20:17:48Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
@@ -204,10 +243,23 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 - `40_allocation/assets_district_fy.csv` (65,174 bytes; 579 rows): `district_file`, `district_property`, `pc11_district_code`, `fy_work_start`, `n_works`, `n_works_expenditure_na`, `expenditure_total`, `n_works_plantation_category`, `n_works_plantation_category_expenditure_na`, `expenditure_plantation_category`, `n_works_forestry_worktype`, `n_works_forestry_worktype_expenditure_na`, `expenditure_forestry_worktype`, `n_works_forest_named_worktype`, `n_works_forest_named_worktype_expenditure_na`, `expenditure_forest_named_worktype`, `n_works_water`, `n_works_water_expenditure_na`, `expenditure_water`, `n_works_category_unknown`, `persondays`, `n_works_persondays_reported`
 - `55_decision/condition_by_unit.csv` (7,275,979 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `dense_2000_ha`, `open_2000_ha`, `low_2000_ha`, `standing_dense_ha`, `standing_open_ha`, `standing_forest_ha`, `standing_row`, `dense_open_ratio`, `near_dense_open_boundary`, `loss_dense_ha_2018_2025`, `loss_open_ha_2018_2025`, `forest_loss_ha_2018_2025`, `loss_low_ha_2018_2025`, `loss_column_2018_2025`, `cell_2018_2025`, `order_in_district_cell_2018_2025`, `forest_at_window_start_ha_2018_2025`, `forest_loss_share_pct_2018_2025`, `forest_loss_share_blank_because_2018_2025`, `order_in_district_cell_by_share_2018_2025`, `loss_dense_ha_2001_2025`, `loss_open_ha_2001_2025`, `forest_loss_ha_2001_2025`, `loss_low_ha_2001_2025`, `loss_column_2001_2025`, `cell_2001_2025`, `order_in_district_cell_2001_2025`, `forest_at_window_start_ha_2001_2025`, `forest_loss_share_pct_2001_2025`, `forest_loss_share_blank_because_2001_2025`, `order_in_district_cell_by_share_2001_2025`, `loss_dense_ha_2017_2023`, `loss_open_ha_2017_2023`, `forest_loss_ha_2017_2023`, `loss_low_ha_2017_2023`, `loss_column_2017_2023`, `cell_2017_2023`, `order_in_district_cell_2017_2023`, `forest_at_window_start_ha_2017_2023`, `forest_loss_share_pct_2017_2023`, `forest_loss_share_blank_because_2017_2023`, `order_in_district_cell_by_share_2017_2023`, `loss_dense_ha_2021_2025`, `loss_open_ha_2021_2025`, `forest_loss_ha_2021_2025`, `loss_low_ha_2021_2025`, `loss_column_2021_2025`, `cell_2021_2025`, `order_in_district_cell_2021_2025`, `forest_at_window_start_ha_2021_2025`, `forest_loss_share_pct_2021_2025`, `forest_loss_share_blank_because_2021_2025`, `order_in_district_cell_by_share_2021_2025`, `tier_provisional_2018_2025`, `corroboration`, `corroboration_basis`, `corroboration_window`, `agreement_reference_ha`, `agreement_corestack_valued_ha`, `district_check`, `governance_prompt`
 - `55_decision/tiers.csv` (3,015 bytes; 6 rows): `tier`, `cell`, `tier_label`, `cell_name`, `standing_row`, `loss_column`, `what_the_name_rests_on`, `why_this_place_in_the_order`, `status`
-- `docs/DATA_NOTES.md` (17,069 bytes)
+- `docs/DATA_NOTES.md` (17,554 bytes)
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
 - `scripts/06_build_layer.py` (69,130 bytes)
+- `60_layer/layer_by_unit.csv` (10,856,200 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `district_assigned_by`, `district_ambiguous`, `area_ha`, `forest_ha`, `hansen_loss_ha`, `land_ha_tc_gt10le30`, `hansen_loss_ha_tc_gt10le30`, `land_ha_tc_le10`, `hansen_loss_ha_tc_le10`, `hansen_loss_ha_tc_eq0`, `nirv_status`, `forest_pct_of_area`, `land_tc_gt10_ha`, `hansen_loss_pct_of_forest`, `hansen_loss_ha_2017_2023`, `hansen_loss_pct_of_land_tc_gt10le30`, `corestack_loss_ha_tc_gt10`, `corestack_degradation_ha_tc_gt10`, `corestack_partial_degradation_ha_tc_gt10`, `corestack_no_change_ha_tc_gt10`, `corestack_improvement_ha_tc_gt10`, `corestack_gain_ha_tc_gt10`, `corestack_valued_ha_tc_gt10`, `corestack_loss_pct`, `corestack_degradation_pct`, `corestack_partial_degradation_pct`, `corestack_no_change_pct`, `corestack_improvement_pct`, `corestack_gain_pct`, `corestack_net_pct`, `corestack_degradation_ha_all_land`, `corestack_tree_cover_start_ha_all_land`, `agreement_class`, `agreement_class_all_assessed`, `corestack_zone_model`, `agreement_reference_ha`, `agreement_hansen_rate_2017_2023_pct`, `agreement_corestack_degradation_rate_pct`, `n_works`, `expenditure_total`, `expenditure_plantation_category`, `expenditure_forest_named_worktype`, `expenditure_water`, `expenditure_total_lakh`, `expenditure_plantation_category_lakh`, `expenditure_forest_named_worktype_lakh`, `expenditure_water_lakh`, `population`, `households`, `st_pop`, `sc_pop`, `adi_2011`, `st_share_pct`, `sc_share_pct`, `class_forest_area`, `class_hansen_loss_floor_100_ha`, `class_hansen_loss_floor_50_ha`, `class_hansen_loss_floor_1_ha`, `class_canopy_band_loss_floor_100_ha`, `class_canopy_band_loss_floor_50_ha`, `class_canopy_band_loss_floor_1_ha`, `class_corestack_degradation_floor_100_ha`, `class_corestack_degradation_floor_50_ha`, `class_corestack_degradation_floor_1_ha`, `class_corestack_net_floor_100_ha`, `class_corestack_net_floor_50_ha`, `class_corestack_net_floor_1_ha`, `class_agreement`, `class_allocation`, `class_forest_named_expenditure`, `class_st_share`, `class_adi_2011`, `shape_area_change_pct`
+- `60_layer/data.js` (22,260,285 bytes)
+- `00_raw/01_cfr_fra/List_of_Forest_Villages_Old_Habitation.pdf` (4,506,869 bytes)
+- `00_raw/05_forest_reference/isfr2023_vol2_odisha_pdf_pages_260-265.txt` (27,495 bytes)
+- `requirements-stage4.txt` (2,110 bytes)
+- `20_degradation/hansen.provenance.json` (8,637 bytes)
+- `20_degradation/corestack.provenance.json` (12,320 bytes)
+- `20_degradation/agreement.provenance.json` (10,756 bytes)
+- `20_degradation/forest_floor.provenance.json` (1,891 bytes)
+- `30_need/need.provenance.json` (15,023 bytes)
+- `40_allocation/allocation.provenance.json` (15,953 bytes)
+- `40_allocation/r620_vs_dump.provenance.json` (2,804 bytes)
+- `55_decision/decision.provenance.json` (25,625 bytes)
 
 ## Phase 1: the five leftovers
 
@@ -361,7 +413,7 @@ will be written into `docs/GAP.md` by its writer.
 
 *30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
 
-### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T18:10:47Z)
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T20:20:22Z)
 
 - `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
 - `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
@@ -420,11 +472,11 @@ by its writer; they are not repeated here.
 
 *13 of 13 gates passed (`50_gap/gates_phase3.csv`).*
 
-### Files written by `scripts/08_build_gap_panel.py` (run 2026-10-10T18:24:03Z)
+### Files written by `scripts/08_build_gap_panel.py` (run 2026-10-10T20:36:57Z)
 
 - `50_gap/district_year_panel.csv` (59,379 bytes, sha256 `49012547ee8ec3f5`)
 - `50_gap/panel_models.csv` (5,072 bytes, sha256 `a8c7ef7ef69aa7dd`)
-- `50_gap/panel_models.txt` (4,986 bytes, sha256 `7bb227cc3eb69d7a`)
+- `50_gap/panel_models.txt` (4,986 bytes, sha256 `8a9e9fb1e9b2ba06`)
 - `50_gap/panel_models_wcb_grids.json` (21,704 bytes, sha256 `9defe9bcfc11abaa`)
 - `50_gap/gates_phase3.csv` (1,629 bytes, sha256 `6d12e48b7d993518`)
 
@@ -465,11 +517,11 @@ about fifty calls.
 
 *8 of 8 gates passed (`50_gap/gates_phase4.csv`).*
 
-### Files written by `scripts/08_build_gap_units.py` (run 2026-10-10T18:25:35Z)
+### Files written by `scripts/08_build_gap_units.py` (run 2026-10-10T20:38:22Z)
 
 - `50_gap/unit_history.csv` (1,983,358 bytes, sha256 `6fe3a6f4a660f2b2`)
 - `50_gap/unit_history_models.csv` (6,920 bytes, sha256 `f2684839d7db5310`)
-- `50_gap/unit_history_models.txt` (6,823 bytes, sha256 `d5dbbde193f74211`)
+- `50_gap/unit_history_models.txt` (6,823 bytes, sha256 `1c87824a24eba5c6`)
 - `50_gap/unit_history_models_wcb_grids.json` (24,175 bytes, sha256 `a8429977eef4ef10`)
 - `50_gap/gates_phase4.csv` (1,167 bytes, sha256 `c71ad60715956d7f`)
 
@@ -515,14 +567,14 @@ the summary page. The rule replaced it.
 
 *7 of 7 gates passed (`50_gap/gates_phase5.csv`).*
 
-### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T18:11:24Z)
+### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T20:21:11Z)
 
 - `50_gap/fra_by_district.csv` (4,568 bytes, sha256 `37cf178731fafc68`)
 - `50_gap/fra_summary.csv` (708 bytes, sha256 `cfbe515474ad9f4b`)
 - `50_gap/fra_two_reports.csv` (310 bytes, sha256 `8630d58c44690c10`)
 - `50_gap/forest_villages_text_layer_check.csv` (1,599 bytes, sha256 `dd77b52f5809ab48`)
 - `50_gap/forest_villages_districts_as_the_layer_reads_them.csv` (1,644 bytes, sha256 `357a86c94d2d2b63`)
-- `50_gap/forest_villages_pdf_record.json` (3,474 bytes, sha256 `299cc5135382f597`)
+- `50_gap/forest_villages_pdf_record.json` (3,474 bytes, sha256 `19d51a7098d3e650`)
 - `50_gap/gates_phase5.csv` (1,060 bytes, sha256 `6f8c180006589206`)
 
 ## The owner's corrections of 10 October 2026, after Phase 5
@@ -607,6 +659,7 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `db8ddb2` Handoff of 11 October, Step 0: the shared copy published, and the check of the live site
 - `825898d` Stage 4: the run log, with where the run stopped (Phase 6 in progress)
 - `b80a6c3` Stage 4, the owner's corrections of 10 October: its own environment, requirements-stage4.txt, the forest villages list under his two checks
 - `d9c5130` Stage 4, Phase 5: forest rights, at the level the data allow

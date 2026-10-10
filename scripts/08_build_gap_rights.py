@@ -109,7 +109,7 @@ from _gap_common import D, dsum  # noqa: E402
 STEP = "08_build_gap_rights"
 SEED = 20261010
 EXTENT_IS = "not an overlap: titles are not mapped, and 'community' lumps CR with CFR"
-PDF = G.ROOT / "00_raw/01_cfr_fra/List_of_Forest_Villages_Old_Habitation.pdf"
+PDF = G.IN["forest_villages_pdf"]
 SUMMARY_HEADING = "List of Forest / Un-Surveyed Villages in the Districts"
 
 

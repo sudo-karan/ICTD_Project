@@ -227,7 +227,7 @@ def adi_direction() -> dict:
 
 def adi_source_line() -> str:
     """The index's source and licence as the layer's own list of sources gives them, held against docs/DATA_NOTES.md."""
-    text = (G.ROOT / "60_layer/data.js").read_text(encoding="utf-8")
+    text = G.IN["layer_data_js"].read_text(encoding="utf-8")
     src = json.loads(text[text.index("{"):text.rindex("}") + 1])["sources_html"]
     row = re.search(r"<tr><td>(Aggregate Development Index 2011)</td><td>(.*?)</td><td>(.*?)</td></tr>", src, re.S)
     notes = " ".join(G.IN["data_notes"].read_text(encoding="utf-8").split())
@@ -252,8 +252,8 @@ def main() -> None:
                                     "tiers", "need_md", "adi_schema_docx", "data_notes", "layer_builder")}
     inputs["district_crosswalk"] = G.OUT / "district_crosswalk.csv"
     inputs["unit_district"] = G.OUT / "unit_district.csv"
-    inputs["layer_by_unit"] = G.ROOT / "60_layer/layer_by_unit.csv"
-    inputs["layer_data_js"] = G.ROOT / "60_layer/data.js"
+    inputs["layer_by_unit"] = G.IN["layer_by_unit"]
+    inputs["layer_data_js"] = G.IN["layer_data_js"]
     for p in inputs.values():
         if not p.exists():
             G.stop(f"an input is missing: {G.rel(p)} (run scripts/08_gap_inputs.py first)")

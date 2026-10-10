@@ -2,7 +2,11 @@
 
 Writes into `50_gap/` only:
 
-* `inputs_listing.json` - every input this stage reads: path, bytes, SHA-256, number of rows and the column names.
+* `inputs_listing.json` - every input any step of this stage reads: path, bytes, SHA-256, and, for a table, the number
+  of rows and the column names. It is written from the shared module's list of inputs (`IN`), and no step may record
+  an input from outside that list (the shared module stops it). Until 11 October 2026 the listing held only what
+  several steps share and left out twelve files that one step each reads on its own; the verifier's part on the
+  inputs found that.
 * `district_crosswalk.csv` - 30 rows: `r620_district` (as R6.20 spells it), `pc11_district_code`, `district_name`
   (as the repository spells it: the name the Odisha FRA table and the decision table carry for that code) and
   `match_rule`. Twenty-four R6.20 names equal the census name once both are upper-cased

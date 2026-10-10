@@ -10,7 +10,9 @@ Stage 4 runs in an environment of its own, outside the repository (`README.md` s
 
 What is in this module, and the conventions every builder keeps:
 
-* **Paths** of every input, in one place (`IN`), and the output folder `50_gap/`.
+* **Paths** of every input, in one place (`IN`), and the output folder `50_gap/`. `IN` holds every file that any step
+  of the stage reads and that is not the stage's own output: `record_step` stops a step that records an input from
+  anywhere else, so the listing of inputs that step 0 writes from `IN` cannot leave one out.
 * **Exact sums.** Hectares in the stage tables carry four decimals and money in R6.20 two. They are added as
   `decimal.Decimal`, so a district sum is exact and equals the same sum made in any other order. Floats are used only
   where a statistic needs them (ranks, regressions), and are made from the exact sums.
@@ -50,7 +52,6 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "50_gap"
 PROVENANCE = OUT / "gap.provenance.json"
-REQUIREMENTS = ROOT / "requirements-stage4.txt"                # what the stage-4 environment holds, pinned
 
 IN = {
     "r620_district": ROOT / "00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv",
@@ -74,7 +75,23 @@ IN = {
     "need_md": ROOT / "docs/NEED.md",
     "adi_schema_docx": ROOT / "00_raw/docs/Village_level_dataset_schema_31Oct2022.docx",
     "layer_builder": ROOT / "scripts/06_build_layer.py",
+    # read by one step each, and until 11 October 2026 named only in that step (so the listing of inputs left them out)
+    "layer_by_unit": ROOT / "60_layer/layer_by_unit.csv",                   # districts: the class of Scheduled Tribe share the layer shows for a unit
+    "layer_data_js": ROOT / "60_layer/data.js",                             # districts: the layer's own row of sources for the development index
+    "forest_villages_pdf": ROOT / "00_raw/01_cfr_fra/List_of_Forest_Villages_Old_Habitation.pdf",   # rights
+    "isfr_vol2_odisha": ROOT / "00_raw/05_forest_reference/isfr2023_vol2_odisha_pdf_pages_260-265.txt",   # Phase 5b: the Forest Survey's district table
+    "requirements": ROOT / "requirements-stage4.txt",                       # the environment
+    "provenance_hansen": ROOT / "20_degradation/hansen.provenance.json",    # the environment: the numpy each earlier stage was built with
+    "provenance_corestack": ROOT / "20_degradation/corestack.provenance.json",
+    "provenance_agreement": ROOT / "20_degradation/agreement.provenance.json",
+    "provenance_forest_floor": ROOT / "20_degradation/forest_floor.provenance.json",
+    "provenance_need": ROOT / "30_need/need.provenance.json",
+    "provenance_allocation": ROOT / "40_allocation/allocation.provenance.json",
+    "provenance_r620_vs_dump": ROOT / "40_allocation/r620_vs_dump.provenance.json",
+    "provenance_decision": ROOT / "55_decision/decision.provenance.json",
 }
+
+REQUIREMENTS = IN["requirements"]                              # what the stage-4 environment holds, pinned
 
 FY_ALL = [f"{y}-{y + 1}" for y in range(2014, 2027)]          # as R6.20 writes them
 PRE = FY_ALL[:4]                                               # FY2014-15 .. FY2017-18: stamp 10/10/2020
@@ -273,6 +290,11 @@ def require_stage4_environment() -> dict:
 def record_step(step: str, script: Path, inputs: dict, outputs: list[Path], extra: dict | None = None) -> None:
     """Write this builder's section of `50_gap/gap.provenance.json`, leaving every other section as it is."""
     env = require_stage4_environment()
+    listed = {p.resolve() for p in IN.values()}
+    stray = [rel(p) for p in inputs.values() if p.resolve() not in listed and not p.resolve().is_relative_to(OUT.resolve())]
+    if stray:
+        stop(f"the step {step} records an input that is neither the stage's own output nor in the list of inputs (IN), so the "
+             "listing of inputs would leave it out: " + ", ".join(stray))
     OUT.mkdir(parents=True, exist_ok=True)
     record = {}
     if PROVENANCE.exists():

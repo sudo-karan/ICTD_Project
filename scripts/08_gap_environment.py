@@ -41,9 +41,7 @@ import _gap_common as G  # noqa: E402
 
 STEP = "08_gap_environment"
 MAIN_PYTHON = Path(os.environ.get("ICTD_MAIN_PYTHON", G.ROOT / ".venv" / "bin" / "python"))
-EARLIER_RECORDS = ["20_degradation/hansen.provenance.json", "20_degradation/corestack.provenance.json", "20_degradation/agreement.provenance.json",
-                   "20_degradation/forest_floor.provenance.json", "30_need/need.provenance.json", "40_allocation/allocation.provenance.json",
-                   "40_allocation/r620_vs_dump.provenance.json", "55_decision/decision.provenance.json"]
+EARLIER_RECORDS = [G.rel(p) for k, p in G.IN.items() if k.startswith("provenance_")]   # the provenance records of the earlier stages, from the list of inputs
 BEFORE = G.OUT / "environment_before_stage4.txt"
 NAMED = {"wildboottest": r"0\.3\.2", "numba": r"0\.62\.1", "numpy": r"2\.3\.\d+"}
 
@@ -127,7 +125,7 @@ def main() -> None:
     for row in rows:
         print(("ok   " if row["pass"] == "yes" else "FAIL ") + row["gate"] + "  |  expected " + row["expected"] + "  |  found " + row["found"])
     failed = [row for row in rows if row["pass"] != "yes"]
-    inputs = {"requirements": G.REQUIREMENTS, **{f"earlier_record_{i}": G.ROOT / rec for i, rec in enumerate(EARLIER_RECORDS)}}
+    inputs = {"requirements": G.IN["requirements"], **{k: p for k, p in G.IN.items() if k.startswith("provenance_")}}
     if BEFORE.exists():
         inputs["main_environment_before_stage4"] = BEFORE
     G.record_step(STEP, Path(__file__), inputs, [G.OUT / "gates_environment.csv", G.OUT / "environment_main_now.txt"],

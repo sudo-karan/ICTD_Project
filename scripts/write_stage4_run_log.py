@@ -377,7 +377,22 @@ The documents that said the terms were not yet agreed were brought up to date in
 sentences of `docs/DECISION_LAYER.md` that the fourth stage had overtaken were corrected with them: how
 `scripts/write_results.py` has changed since the decision view was built, and which stage folders that build wrote.
 """),
-    (1, "fix the input listing and rebuild", False, ""),
+    (1, "fix the input listing and rebuild", True, """
+The listing of inputs that step 0 writes (`50_gap/inputs_listing.json`) now holds every input that any step of the
+stage reads. It had held only the inputs that several steps share, and left out the files that one step each read on
+its own: the forest villages PDF; the two files of the layer that the districts step reads; and the provenance
+records of the earlier stages and the requirements file, which the gate on the environments reads. The verifier's
+part on the inputs had found that. The list of inputs is kept in one place, the shared module, and the shared module
+now stops any step that records an input from outside it, so the listing cannot fall behind again. The Forest
+Survey's table, which Step 2 reads, was put on the list at the same time, so that the list would not change twice.
+
+Every builder was then run again in the stage-4 environment, in the order given under "To rebuild", and
+`scripts/08_gap_compare_builds.py` (new) set every output beside the copy kept from before the change
+(`50_gap/before_step1/`). **No table of figures moved**: each is byte for byte what it was. The files that differ
+are records that carry a time or a hash, the listing itself, and the two text files of the models, whose first line
+is the time they were written; the table below gives each, with what differs and why. The verifier's part on the
+inputs, whose one failing check was this finding, passes every check on the rebuilt listing.
+"""),
     (2, "Phase 5b: the need read against the Forest Survey's own figures", False, ""),
     (3, "finish Phase 6", False, ""),
     (4, "Phase 7", False, ""),
@@ -414,7 +429,36 @@ def handoff() -> list[str]:
             out += [f"### Step {n}: {what}", "", notes.strip(), ""]
             if n == 0:
                 out += publication()
+            if n == 1:
+                out += rebuild("step1")
+            if n == 2:
+                out += forest_survey()
     return out
+
+
+def rebuild(name: str) -> list[str]:
+    """A rebuild set against the build kept from before it: the gates of `scripts/08_gap_compare_builds.py`, and every file that differs."""
+    gates, diff = GAP / f"gates_{name}.csv", GAP / f"rebuild_{name}_differences.csv"
+    if not (gates.exists() and diff.exists()):
+        return []
+    out = ["**The rebuild against the build before it.**", ""] + gate_table(gates) + [""]
+    r = rows(diff)
+    some = [x for x in r if x["same_bytes"] != "yes"]
+    out += [f"Files compared or listed: {len(r)}; byte for byte the same: {sum(x['same_bytes'] == 'yes' for x in r)}. Every file that differs, is new or is gone "
+            f"(`50_gap/rebuild_{name}_differences.csv`):", "", "| file | kind | what differs | why |", "|---|---|---|---|"]
+    out += [f"| `{esc(x['file'])}` | {esc(x['kind'])} | {esc(x['what_differs'])} | {esc(x['why'])} |" for x in some]
+    return out + [""]
+
+
+def forest_survey() -> list[str]:
+    """Phase 5b: its gates, and its four rank correlations as the table gives them."""
+    gates, summ = GAP / "gates_phase5b.csv", GAP / "fsi_summary.csv"
+    if not (gates.exists() and summ.exists()):
+        return []
+    out = ["**Gates of Phase 5b.**", ""] + gate_table(gates) + ["", "**The four rank correlations** (`50_gap/fsi_summary.csv`; 30 districts in each):", "",
+           "| id | what | Spearman's rho | 95 % bootstrap interval | permutation p | size taken out of both sides |", "|---|---|---|---|---|---|"]
+    out += [f"| {x['id']} | {esc(x['what'])} | {x['rho']} | {x['ci95_lo']} to {x['ci95_hi']} | {x['p_permutation']} | {x['size_free']} |" for x in rows(summ)]
+    return out + [""]
 
 
 def corrections(prov: dict) -> list[str]:
