@@ -1,6 +1,6 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-10T20:13:52Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+*Written 2026-10-10T22:35:00Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
 file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
 
 ## 1. What this is
@@ -34,9 +34,9 @@ This document describes that layer. Four things about it come first.
 Neither threshold is the 100 ha floor of the agreement statistics. That floor stays what it was, for the purpose
 it was set for, and the decision view does not use it.
 
-Stage 4, the comparison of forest condition, need and allocation, was being built in `50_gap/` when this was written,
-as the owner specified it on 10 October 2026; its account, `docs/GAP.md`, was not written yet. Nothing here stands in
-for it.
+Stage 4 is built, and it is another document: `docs/GAP.md`, the comparison of forest condition, need and allocation, written
+from the tables in `50_gap/`. It describes where money went relative to where forest was lost. It is not an argument
+about why forest was lost or work withheld, and nothing here stands in for one.
 
 The two verifiers were run by this script as it wrote the document: `scripts/verify_layer.py`, unchanged, gave
 "92 of 92 checks passed"; `scripts/verify_decision.py` gave "62 of 62 checks passed".
@@ -1073,7 +1073,7 @@ it in a browser, are as they stood on 9 October 2026.
 | file that existed before | lines added | lines removed |
 |---|---|---|
 | `.gitignore` | 30 | 0 |
-| `00_raw/data_manifest.csv` | 15 | 0 |
+| `00_raw/data_manifest.csv` | 16 | 0 |
 | `scripts/06_build_layer.py` | 16 | 0 |
 | `scripts/layer_template.html` | 311 | 0 |
 
@@ -1083,7 +1083,7 @@ it in a browser, are as they stood on 9 October 2026.
   was changed, by the owner's choice of 9 October 2026, in one rule**: it refused to write `docs/RESULTS.md` unless
   the record of the check in the Safari application was of the layer on disk; it now allows that record to be of an
   earlier build when the runner's record of this build names the check as left out with a reason, and then says so in
-  the text. Its rule for the Chrome and WebKit records is unchanged. Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each verifier with the interpreter of its stage. With both changes the script has 134 lines added and 20 removed since that commit. The unchanged check scripts
+  the text. Its rule for the Chrome and WebKit records is unchanged. Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each verifier with the interpreter of its stage. With both changes the script has 140 lines added and 20 removed since that commit. The unchanged check scripts
   that were run are as committed (the runner's record says so of each); and the decision view's build wrote no file
   of `10_units/` to `40_allocation/`. `50_gap/` is the fourth stage's and was built after it (`docs/GAP.md`).
 - **What did change for an existing view**, and the owner accepted (§17): a heading and one line, the decision view's
@@ -1115,7 +1115,7 @@ it in a browser, are as they stood on 9 October 2026.
   657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
   build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T20:06:00Z, opened the copy in
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T22:16:08Z, opened the copy in
 `70_share/odisha_forest_decision_layer/` from disk in Chrome: 8 of 8 steps did what they
 should (§14).
 
@@ -1318,7 +1318,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T20:13:52Z | this run | the UTC time at which this script ran |
+| 2026-10-10T22:35:00Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
 | 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
@@ -1623,7 +1623,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 13 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
 | `44890a1` | `git` | the commit this batch started from |
 | `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md` | `git diff --name-status 44890a1` | the documents among the files modified |
-| 134 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
+| 140 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
 | 20 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
 | 53 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps` |
 | 6 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps_that_are_statements_and_not_actions` |
@@ -1647,7 +1647,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
-| 2026-10-10T20:06:00Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-10T22:16:08Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
 | 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
 | 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
 | 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
@@ -1748,7 +1748,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `00_raw/06_scheme/_build_schedule_extract.py` | 18,778 | `2363f4bea9466063` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | 92,751 | `ac7e642dd1d0e040` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.provenance.json` | 2,772 | `293d82fe6f6665f4` | 2026-10-08T22:32:57Z |
-| `00_raw/data_manifest.csv` | 65,068 | `41c3a73134d17efd` | - |
+| `00_raw/data_manifest.csv` | 66,182 | `c54969bf437fbd0d` | - |
 | `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c` | - |
 | `20_degradation/agreement.provenance.json` | 10,756 | `0c0182e3a357255c` | 2026-10-07T10:08:15Z |
 | `20_degradation/agreement_by_zone.csv` | 1,995 | `df07ed89f94db597` | - |
@@ -1785,7 +1785,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
 | `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
 | `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
-| `70_share/exercise_share_chrome.json` | 5,063 | `57a1648cec28d615` | 2026-10-10T20:06:00Z |
+| `70_share/exercise_share_chrome.json` | 5,063 | `01798797082efcbd` | 2026-10-10T22:16:08Z |
 | `70_share/odisha_forest_decision_layer/README.txt` | 7,390 | `8cf3242e8c5978ad` | - |
 | `70_share/odisha_forest_decision_layer/data.js` | 22,066,227 | `4df21a9f2c43845a` | - |
 | `70_share/odisha_forest_decision_layer/index.html` | 205,691 | `508144e070577a5e` | - |
@@ -1795,7 +1795,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
 | `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
 | `scripts/run_decision_checks.py` | 9,681 | `48a395deca2576e3` | - |
-| `scripts/write_results.py` | 113,096 | `b7dc015b0d85537a` | - |
+| `scripts/write_results.py` | 114,011 | `b918073042879cfc` | - |
 
 ### 20.4 Statements tested before they were written
 
@@ -1807,7 +1807,7 @@ Each of these is something the text says in words. The script tested it against 
 - the layer's About text quotes the provider's two cautions word for word from the registered record
 - the gate on the renaming was run on the decision table that is on disk: every unit's cell in every window matches through the owner's list of names, and every column the table had is unchanged
 - the layer in `60_layer/` was built from the decision table that is in `55_decision/`
-- stage 4 is being built: `50_gap/` holds the check of its inputs, and its account, `docs/GAP.md`, is not written yet
+- stage 4 is built: its tables are in `50_gap/` and its account is `docs/GAP.md`
 - every unit has a cell in every window: no cell of the four cell columns is blank
 - neither threshold of the decision view is the floor of the agreement test
 - most of the loss on the lowest band is on land with no canopy at all in 2000
@@ -2202,4 +2202,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*356 figures and 22 tables (699 cells) from 75 files; 240 statements tested; 153 totals compared. Written 2026-10-10T20:13:52Z by `scripts/write_decision_layer.py` (sha256 `1e986d2889c602c8`), with the reading functions of `scripts/write_results.py` (sha256 `b7dc015b0d85537a`).*
+*356 figures and 22 tables (699 cells) from 75 files; 240 statements tested; 153 totals compared. Written 2026-10-10T22:35:00Z by `scripts/write_decision_layer.py` (sha256 `1e986d2889c602c8`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*

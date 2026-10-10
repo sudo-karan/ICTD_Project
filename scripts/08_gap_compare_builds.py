@@ -1,6 +1,7 @@
 """Stage 4: one build of `50_gap/` set against a copy kept from the build before it. Writes into `50_gap/` only.
 
     ~/.venvs/ictd-stage4/bin/python scripts/08_gap_compare_builds.py before_step1 --name step1
+    ~/.venvs/ictd-stage4/bin/python scripts/08_gap_compare_builds.py before_step3 --name step3 --now before_step5
 
 When a builder or the shared module is changed and every step is run again, the question is whether any figure moved.
 Before such a rebuild the outputs are copied to a folder inside `50_gap/` (here `50_gap/before_step1/`); afterwards
@@ -11,10 +12,16 @@ this script compares, file by file, what is there with what is in `50_gap/` now:
   - a record (`.json`): which of its top-level keys differ (for the provenance record, which steps, and in which keys);
   - a text file: how many lines differ.
 
-A file is a *table of figures* if it is a `.csv` and not a gate table (`gates_*.csv`, `inputs_check.csv`). The gate:
-no table of figures has a cell, a column or a row that differs, and no table of figures is gone. A table that is new
-is listed and is not a failure. Gate tables are compared too and reported; a gate whose `pass` is not `yes` in the
-build now is a failure.
+A file is a *table of figures* if it is a `.csv` and neither a gate table (`gates_*.csv`, `inputs_check.csv`) nor a
+list this script or the closing checks write about a comparison (`rebuild_*_differences.csv`, `results_md_changes.csv`).
+The gate: no table of figures has a cell, a column or a row that differs, and no table of figures is gone. A table
+that is new is listed and is not a failure. Gate tables are compared too and reported; a gate whose `pass` is not
+`yes` in the build now is a failure.
+
+With `--now FOLDER` the later build is a kept copy too (a folder inside `50_gap/`), not `50_gap/` as it stands: a
+rebuild can then be set against the build before it after later steps have run. Until 11 October 2026 the lists of
+differences were classed as tables of figures, so the count of tables in the comparison written for Step 3 of the
+owner's handoff was one too high; that comparison was made again with this version.
 
 Writes `rebuild_<name>_differences.csv` (`file`, `kind`, `same_bytes`, `what_differs`, `why`: one row for every file
 of either build; `why` is filled for the files that are expected to differ, from the short list of reasons in this
@@ -32,6 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _gap_common as G  # noqa: E402
 
 GATE_TABLES = ("gates_", "inputs_check.csv")
+LISTS = ("rebuild_", "results_md_")                # lists of what differs between two versions of something: not tables of figures
 # Why a file may differ between two builds that give the same figures. A key is the start of a file's name.
 WHY = {
     "gap.provenance.json": "a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output",
@@ -40,6 +48,9 @@ WHY = {
     "unit_history_models.txt": "its first line carries the time it was written",
     "forest_villages_pdf_record.json": "the record carries the time of the check",
     "environment_main_now.txt": "the main environment's list of packages as found at the run",
+    "rebuild_": "a list this script writes: it differs when a comparison is made again",
+    "results_md_changes.csv": "a list the closing checks write: it differs when docs/RESULTS.md is written again",
+    "verify_gap_reviews.json": "not written by a builder",
     "figures_looked_at.json": "not written by a builder",
     "verify_gap_trials.json": "not written by a builder",
 }
@@ -48,7 +59,7 @@ WHY = {
 def kind_of(name: str) -> str:
     base = name.rsplit("/", 1)[-1]
     if base.endswith(".csv"):
-        return "gate table" if base.startswith(GATE_TABLES) else "table of figures"
+        return "gate table" if base.startswith(GATE_TABLES) else "list of differences" if base.startswith(LISTS) else "table of figures"
     return {"json": "record", "txt": "text", "md": "table as markdown"}.get(base.rsplit(".", 1)[-1], "other")
 
 
@@ -105,11 +116,13 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("before", help="the folder inside 50_gap/ that holds the earlier build")
     ap.add_argument("--name", required=True, help="the name the two output tables carry")
+    ap.add_argument("--now", help="a folder inside 50_gap/ that holds the later build; default: 50_gap/ as it stands")
     a = ap.parse_args()
     kept = G.OUT / a.before
-    if not kept.is_dir():
-        G.stop(f"{G.rel(kept)} is not there: no earlier build to compare with")
-    was, now = files_of(kept), files_of(G.OUT)
+    later = G.OUT / a.now if a.now else G.OUT
+    if not kept.is_dir() or not later.is_dir():
+        G.stop(f"{G.rel(kept if not kept.is_dir() else later)} is not there: no build to compare")
+    was, now = files_of(kept), files_of(later)
     own = {f"rebuild_{a.name}_differences.csv", f"gates_{a.name}.csv"}
     rows, moved, gone, new = [], [], [], []
     for name in sorted((set(was) | set(now)) - own):
@@ -136,7 +149,7 @@ def main() -> None:
     gates: list[tuple] = []
     add = lambda gate, expected, found, ok: gates.append((gate, str(expected), str(found), bool(ok)))
     tables = [r for r in rows if r["kind"] == "table of figures" and r["same_bytes"] in ("yes", "no")]
-    add(f"tables of figures in both builds ({G.rel(kept)}/ and 50_gap/) with a cell, a column or a number of rows that differs", "none",
+    add(f"tables of figures in both builds ({G.rel(kept)}/ and {G.rel(later)}/) with a cell, a column or a number of rows that differs", "none",
         ", ".join(moved) or f"none (of {len(tables)} tables compared)", not moved)
     add("tables of figures of the earlier build that are gone", "none", ", ".join(gone) or "none", not gone)
     same = sum(1 for r in tables if r["same_bytes"] == "yes")
@@ -147,7 +160,7 @@ def main() -> None:
     for name, p in now.items():
         if kind_of(name) == "gate table" and name not in own:
             failing += [f"{name}: {r['gate'][:60]}" for r in G.read_rows(p) if r.get("pass") != "yes"]
-    add("gates of the build now that did not pass (every gate table of 50_gap/)", "none", "; ".join(failing[:4]) or "none", not failing)
+    add(f"gates of the later build that did not pass (every gate table of {G.rel(later)}/)", "none", "; ".join(failing[:4]) or "none", not failing)
     grows = [{"gate": g, "expected": e, "found": f, "pass": "yes" if ok else "NO"} for g, e, f, ok in gates]
     G.write_rows(G.OUT / f"gates_{a.name}.csv", grows, ["gate", "expected", "found", "pass"])
     for r in rows:

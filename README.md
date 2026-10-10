@@ -13,6 +13,10 @@ appendix; where this brief and that document differ on a figure, that document i
 `docs/DECISION_LAYER.md`**, written by `scripts/write_decision_layer.py` to the same standard. Its section 17 lists the
 owner's rulings of 9 October 2026 and what is still open for the Foundation for Ecological Security.
 
+**For the comparison of need with allocation (stage 4, built 10 October 2026), read `docs/GAP.md`**, written by
+`scripts/write_gap.py` to the same standard. It describes where money went relative to where forest was lost, by
+district; it says nothing about cause.
+
 ---
 
 ## 0. Environments
@@ -72,7 +76,9 @@ Two limitations were stated and are what this pipeline exists to remove:
   forest *is*, not its condition;
 - remoteness, population and administrative capacity were not controlled for.
 
-Stage 1 replaces the first. Stage 4 removes the second. Nothing else about the earlier framing changes.
+Stage 1 replaces the first. Stage 4 was to remove the second; as built on 10 October 2026 it does not: it has no
+control for remoteness, whose coordinates are not in the repository (§4, stage 4). Nothing else about the earlier
+framing changes.
 
 ---
 
@@ -149,6 +155,8 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 │   ├── 05_forest_reference/   Global Forest Watch workbook and ISFR 2023 extracts that stage 1 reconciles to; since 9 and 10 Oct 2026 also
 │   │                          pages of the providers of Hansen's data and two dated extracts of what they say (each with its manifest row)
 │   ├── 06_scheme/             the notified list of permissible works, S.O. 5448(E) of 5 Oct 2026: PDFs, transcription, table, check (5 manifest rows)
+│   ├── 07_project_record/     the supervisor's comments on two decks as the owner recorded them (11 Oct 2026), read out of his note by the script
+│   │                          beside the record; `docs/GAP.md` quotes them from it (1 manifest row)
 │   ├── cfr_fra/
 │   ├── mis_reports/           the four .xls originals plus their parsed CSVs
 │   └── mgnrega_assets/        district-level summaries (the 2 GB of raw assets is NOT here)
@@ -163,7 +171,7 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 │                              without the map overlay and without the development index of 2011, a README; a zip beside it (git-ignored)
 ├── logs/                      run logs of the NIRv chain (git-ignored)
 ├── scripts/                   one script per step; vendor/ holds the one library the layer embeds
-├── figures/
+├── figures/                   `figures/stage4/`: the stage-4 figures, each with its CSV and caption (not in git)
 └── docs/
 ```
 
@@ -211,6 +219,7 @@ transformation writes into a numbered folder. That is what makes the methods sec
 | `vendor/leaflet-1.9.4/` | Leaflet 1.9.4 (BSD 2-Clause), the one third-party library, embedded in the layer so that it needs no network. Its SHA-256 is checked at build. |
 | `00_raw/06_scheme/_build_schedule_extract.py` | inside `00_raw/`, like `cfr_fra/_build_mota.py`: makes the table of the 375 permissible works from the transcription of the Gazette's list and stops unless the Ministry's own totals, the order of the rows and every cell, read whole from the positions of the words in the PDF, agree. Its output is registered: it is not run again. |
 | `00_raw/05_forest_reference/_build_provider_cautions.py` | inside `00_raw/`: takes the cautions the providers attach to Hansen's data, word for word, from two registered pages into `provider_cautions.json`, and stops unless every sentence stands in its page. Its output is registered: it is not run again. |
+| `00_raw/07_project_record/_build_supervisor_comments.py` | inside `00_raw/`: reads the supervisor's comments on two decks out of the owner's handoff note of 11 October 2026, word for word, into a small record, and stops unless the note is the file that was given and every point stands in it. The note is a working file and is not in git; the record is, and is registered. It is the owner's record, not the supervisor's own text. |
 | `05_build_decision.py` | the decision tables, `55_decision/`. Every unit in one of six cells for four windows, from stage 1's hectares alone: the forest of 2000 with no loss recorded since (dense, open), and the forest loss of the window. Two thresholds, accepted by the owner on 9 Oct 2026 (10 ha, 1 ha). Beside the cell, never in it: the forest at the start of the window and the loss as a share of it. Stops unless standing plus lost equals the year-2000 band on the file as written. No Earth Engine. |
 | `05_check_rename.py` | the gate on the renaming of five cells (9 Oct 2026): every unit's cell in every window, through the owner's list of names, against the table as it stood when he ruled on it; and every column that table had, cell for cell. Stops on one mismatch. |
 | `_layer_decision.py` | not a step and writes nothing: the decision view's data and every sentence it shows, built for `06_build_layer.py`. |
@@ -452,7 +461,88 @@ water plus plantation is an undercount of NRM by a share that moves from a tenth
 columns together. Use the R6.20 panel for the district-year time dimension the asset dump does not have:
 the dump stops at FY2017-18, R6.20 runs to FY2026-27.
 
-### Stage 4 — gap model
+### Stage 4 — need against allocation *(built 10 October 2026; `docs/GAP.md` is the account)*
+
+| | |
+|---|---|
+| In | the stage tables (`20_degradation/`, `30_need/`, `40_allocation/`, `55_decision/`), the R6.20 panel and its state totals, the Odisha FRA district table and the national one, the registered text of the Forest Survey's district table, and the forest villages PDF (opened and not used); `50_gap/inputs_listing.json` lists every one with its size and SHA-256 |
+| Out | `50_gap/`: `district_need.csv`, `district_allocation.csv`, `need_vs_allocation.csv` and its `_summary.csv`, `marginalisation_split.csv`, `what_more.csv`; `district_year_panel.csv`, `panel_models.csv`; `unit_history.csv`, `unit_history_models.csv`; `fra_by_district.csv`, `fra_summary.csv`, `fra_two_reports.csv`; `fsi_district_check.csv`, `fsi_summary.csv`; `deck_tables/`; `gap.provenance.json`; the gate tables of each step; and the records of the verifier's trials and of its review |
+
+The supervisor's question: *"determine which areas have seen forest degradation, are also marginalised, and have they
+seen good enough resource allocation in the past"*. The owner ruled on the design on 10 October 2026. **Stage 4
+describes where money went relative to where forest was lost. It says nothing about cause**, and its documents use
+"because", "led to", "effect of", "caused" and "drove" only to say what the analysis cannot show. The figures are in
+`docs/GAP.md`, written from the tables by `scripts/write_gap.py`, and are not repeated here.
+
+**The district is the unit of the headline**: current allocation exists only by district (R6.20). A history of units
+within districts is its companion.
+
+- **Need, per district.** "Forest" is Hansen canopy above 10 per cent in 2000, the decision table's two bands (dense,
+  above 30; open, 10 to 30). **N1**, the headline need, is forest loss in a window of years summed over the units
+  whose cell in that window is one of the three "loss recorded" cells. **N2** is the standing open-band hectares of
+  the units in the assisted-natural-regeneration cell. N1 is a flow and N2 a stock: they are never added. Both are
+  split into LGD-unit land and outside-village land.
+- **Allocation, per district.** R6.20 plantation expenditure for FY2014-15 to 2017-18 ("pre": the four tables frozen on
+  10/10/2020) and FY2018-19 to 2025-26 ("post"). FY2026-27 is a part year: reported alone, in no sum, share or model.
+  NRM and all expenditure are context; the three categories are nested and never added. From the geotagged record,
+  expenditure on forest-named work types and on the plantation category for works started by FY2017-18, summed over
+  the district's units: lifetime cost indexed by the year a work started, never in a sum with R6.20.
+- **Marginalisation, per district**, on the census population of LGD panchayat units only (outside-village land has
+  no census rows): Scheduled Tribe share in the layer's classes; the development index of 2011 and Scheduled Caste
+  share in terciles of ten districts. They split the comparison and never weight it. `poverty_rate` stays out.
+- **The comparisons** were fixed before any result was seen. **C1 is the headline**: N1 of 2018-2025 on all land
+  against post-period plantation expenditure. For each: every district's share of need and of allocation; their ratio
+  `r`; Spearman's rho over the districts with a two-sided permutation p (99,999 shuffles) and a percentile bootstrap
+  interval (9,999 draws of districts); the share of need in districts with `r` below 0.5 and above 2; and the gap
+  "the same money distributed by need; not a requirement". C2 to C12 vary the land, the need, the period, the window
+  and the districts kept; B1 is a benchmark (need against all expenditure: what district size alone produces). C7
+  leaves out, whole, the districts where units wholly under CoRE Stack's East Coast zone model hold most of the need;
+  a second reading of its rule is computed as `C7b` and marked as not fixed beforehand.
+- **What more is needed**, for C1: the hectares of N1 in districts with `r` below 1 and below 0.5; plantation works per
+  1,000 ha of N1 (an intensity, not a requirement); the cost at the VGPP rate, **blank: the rate is not in `00_raw/`**;
+  and, for scale only, the pre-period plantation share of all expenditure applied to the post-period total.
+- **The district-year panel** (30 districts × 13 financial years): plantation's share of district expenditure on
+  forest loss in the calendar year before, with district × period and financial-year fixed effects (P1, the
+  headline), and six variants. **The unit history**: within a district, the share of forest lost in 2018-2025 in
+  units that had forest-named works by FY2017-18 against units that had none, given their forest and earlier loss
+  (H1, the headline; units with 100 ha or more of forest at the start of 2018), and eight variants. Inference in both:
+  district clusters, CR1 standard errors for reference, and a restricted wild cluster bootstrap (the `wildboottest`
+  package, Webb weights) inverted for the interval that counts.
+- **Forest rights**, at the level the data allow: community titles and extent by district from the state's report,
+  set beside need; "not an overlap: titles are not mapped, and 'community' lumps CR with CFR". The list of forest
+  villages named in the manifest is registered and **not used**: it is a scan whose only text is a layer made by
+  someone else's character recognition, and that layer fails the first of the two checks the owner set for it, that
+  what is parsed from it equal every total and running serial number the file prints (`docs/GAP.md` §10).
+- **The need read against the Forest Survey's own figures** (Phase 5b, added by the owner on 11 October 2026): beside
+  each district's N1, the forest cover, its change with respect to 2021 and the scrub that the India State of Forest
+  Report of 2023 gives for the district, and four rank correlations. Hansen records gross loss by year; the Survey
+  reports a net change between two assessments: they are not the same quantity, neither can be subtracted from the
+  other, and the step names no reason for either figure (`docs/GAP.md` §11).
+
+| Script | What it does |
+|---|---|
+| `_gap_common.py` | not a step and writes nothing: paths, exact sums, the provenance record, the check of the environment, the rank statistics and the regression and bootstrap routines the builders share |
+| `08_gap_environment.py` | the gate on the two environments (§0): stage 4's holds exactly what `requirements-stage4.txt` pins; the main one has the `numpy` the earlier provenance records show, and its verifiers pass |
+| `08_gap_inputs.py` | step 0: lists every input with its columns; the crosswalk between R6.20's district names and the census codes; a district for every unit; the gates on what is already built |
+| `08_gap_leftovers_check.py` | the gates on the five leftovers of the batch of 9 October 2026 that were cleared before stage 4 |
+| `08_build_gap_districts.py` | need, allocation and marginalisation by district; the comparisons; the splits; what more is needed |
+| `08_build_gap_panel.py` | the district-year panel and the models P1 to P7 |
+| `08_build_gap_units.py` | the unit history table and the models H1 to H9 |
+| `08_build_gap_rights.py` | forest rights by district, the two reports set side by side, and the check of the forest villages PDF |
+| `08_build_gap_fsi.py` | Phase 5b: each district's need beside the Forest Survey of India's own figures for it (forest cover, its change with respect to 2021, scrub), from the registered text of the Survey's table, with every column held against the table's printed total; and four rank correlations |
+| `08_build_gap_deck_tables.py` | three small tables for the deck, cut from the stage's tables |
+| `08_gap_compare_builds.py` | check; after a builder or the shared module changes and steps are run again, sets each output beside a copy kept from the build before and holds that no table of figures moved; lists every file that differs, with why |
+| `verify_gap.py` | check; writes nothing. Recomputes the figures of the tables the stage's steps write into `50_gap/`, from the inputs, importing nothing from the builders. Its head says who wrote each of its ten parts, what it holds exactly and what only by key words, and what it does not read |
+| `verify_gap_trials.py` | plants deliberate errors, one at a time, in copies of the tables and records that the verifier catches each; a trial counts as caught only on a check of content, not on a stale digest |
+| `08_gap_closing_checks.py` | check; the gates of the last three phases of the run: every verifier, the deliberate errors and the record of the one review of the verifier (Phase 6); the figures and the deck tables (Phase 7); the documents, the manifest and every verifier once more (Phase 8) |
+| `make_stage4_figures.py` | the figures F1 to F6 in `figures/stage4/`, each with the CSV of what is plotted and a caption |
+| `write_gap.py` | writes `docs/GAP.md` with the reading functions and gates of `write_results.py`: no figure is typed |
+| `write_stage4_run_log.py` | writes `docs/stage4_run_log.md`: what each phase of the run did, its gates and its files |
+
+Rebuild: the order is at the end of `docs/stage4_run_log.md`. Stage 4 runs in an environment of its own, outside the
+repository and pinned in `requirements-stage4.txt` (§0); the main environment is as the earlier stages left it.
+
+#### Original specification (superseded 10 October 2026)
 
 > **Obsolete as written (5 Oct 2026). Do not build from this section.** The unit-level allocation data is
 > 97.8 % pre-FY2017-18 and cannot speak to the post-2018 collapse R6.20 records. Stage 4 is to be
@@ -474,6 +564,15 @@ absent.
 
 This is what converts "0.08 % is small" into "this LGD panchayat has *N* ha degrading, *M* forest-dependent
 households, received ₹*X* against an expected ₹*Y*, shortfall ₹*Z*".
+
+**Why it was superseded.** Three things it needs are not there. The per-unit record of works effectively ends in
+FY2017-18, so a regression of unit expenditure cannot speak to the years in which plantation fell out of the scheme.
+The coordinates of the district headquarters, for the remoteness control, and the VGPP plantation rate, for the
+costing, are not in the repository, and neither may be invented. And a ranked table of units across the state would
+rest on a comparison the analysis does not establish: at the 100 ha headline, with the East Coast units left out,
+the agreement of the two forest measures is not established for LGD panchayat units across the state
+(`docs/RESULTS.md` §5). So the owner respecified the stage on 10 October 2026 as it is described above: districts
+for the headline, units only within districts, and no costed shortfall until a rate is supplied.
 
 ---
 
@@ -748,15 +847,34 @@ say so in those words, and not claim a trajectory it no longer measures.
 
 ## 9. What the paper and deck need out of this
 
-1. A map of forest degradation per unit, with the two measures' agreement shown. `60_layer/` is a first version:
-   interactive, offline, every unit, built for the Foundation for Ecological Security.
-2. The need-versus-allocation scatter, residuals marked, confounders listed.
-3. A ranked table of LGD panchayat units: degradation, ST share, expected allocation, actual, shortfall.
-4. The costed shortfall — **only if the VGPP rate is supplied.**
-5. A sensitivity table for the outside-village rule (§5.1).
-6. A methods appendix listing every input with access date, size and checksum.
+**Figures** (`figures/stage4/`, made by `scripts/make_stage4_figures.py`; not in git). One claim per figure, axis
+titles with units, *n* on every panel, readable in greyscale (the map excepted), no title inside the image. Beside
+each, the CSV of exactly what is plotted and a caption with *n* and the source files.
 
-Figures: one chart per claim, readable in greyscale, axis units stated, *n* on every panel.
+- **F1** the state report: plantation as a share of all expenditure, and water as a share of NRM, FY2014-15 to
+  FY2026-27, with the four frozen years and the part year marked. Never stacked.
+- **F2** the outside-village asymmetry: LGD units' and outside-village units' shares of land, forest in 2000, loss
+  2001-2025, census population and expenditure in the geotagged record.
+- **F3** a map of the default-window cells of all 11,468 units, district boundaries made by dissolving the units.
+- **F4** C1: each district's share of need against its share of post-period plantation money, with the line of
+  equality; a second panel shows C5.
+- **F5** C1 by Scheduled Tribe class and by tercile of the development index: need share beside allocation share.
+- **F6** the estimates of the panel and unit models with their wild-bootstrap intervals, one panel per unit of
+  measurement, the headline rows marked.
+
+**Tables for the deck** (`50_gap/deck_tables/`): the 30 districts sorted by need, with their shares, `r`, Scheduled
+Tribe class and tercile of the development index; the marginalisation split for C1; the headline rows C1, P1 and H1.
+
+**Still wanted, and what became of the rest of the first list.**
+
+1. A map of forest degradation per unit, with the two measures' agreement shown: `60_layer/`, interactive and offline.
+2. The costed shortfall: **only if the VGPP rate is supplied.** The column is in `50_gap/what_more.csv`, blank.
+3. A sensitivity table for the outside-village rule (§5.1): stage 4 gives need on LGD-unit land and on
+   outside-village land apart (C2; F2), not the three unit layers side by side.
+4. A methods appendix listing every input with access date, size and checksum: `00_raw/data_manifest.csv` and the
+   provenance record beside each stage's output.
+5. Not produced, with the first specification of stage 4: a scatter with residuals marked, and a table of LGD
+   panchayat units ranked across the state by shortfall (§4, stage 4, "Original specification").
 
 ### Corrections the draft paper and deck still carry
 

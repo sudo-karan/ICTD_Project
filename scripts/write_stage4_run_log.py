@@ -262,6 +262,12 @@ builders, which is where the fault lay:
 The three steps were run again and every output set against a copy of the build kept from before
 (`50_gap/before_step3/`): no table of figures moved. The comparison is under "The rebuild after the review".
 
+*A correction to that comparison, made in Step 5.* As first written it counted one table of figures too many: the
+comparison script classed its own earlier list of differences as a table of figures. The script now sets such
+lists apart, and the comparison was made again, against a copy of the build kept just before Step 5
+(`50_gap/before_step5/`), so that it shows what the rebuild of this step moved and nothing later. The table below
+is the corrected one; the message of the commit of Step 3 carries the first count.
+
 **Planted errors that the part concerned did not catch.** The table gives them as the difference between planted
 and caught; all are the part on the inputs', and its reviewer left each as it was and said so:
 
@@ -411,6 +417,8 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 - `scripts/write_gap.py` wrote `docs/GAP.md` from the tables. No figure in it is typed; each conclusion drawn from
   figures was tested against them before it was written; its last section lists where every figure comes from. It
   has the sections the instruction lists, the owner's decisions of 10 October 2026, and the calls that are proposals.
+  What the owner's handoff of 11 October added to it, and the reading of the whole of it, are under Step 5 at the
+  head of this log.
 - `scripts/write_results.py` wrote `docs/RESULTS.md` again with the four changes the instruction allowed and no
   other: the sentences of its section 1 that said the fourth stage was not built, the stage table's row, section 11's
   bullet, and one section appended after the last, so that no section changed its number. **Every figure that
@@ -432,7 +440,7 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 - **Two sentences of `README.md` outside the stage 4 section were changed**: a pointer to `docs/GAP.md` was added at
   its head, and section 1 no longer says that stage 4 removes the earlier work's second limitation: as built it has
   no control for remoteness.
-- **The gate on the words of cause was widened** from `docs/GAP.md` to this log, the README's stage 4 text, the new
+- **The gate on the five words the owner named was widened** from `docs/GAP.md` to this log, the README's stage 4 text, the new
   section of `docs/RESULTS.md`, the figures' captions and the deck tables.
 - **Each verifier is run with the interpreter of its stage**: the writers of the documents find the other
   environment's interpreter themselves (`README.md`, its section on environments).
@@ -591,7 +599,63 @@ looked at again, and the record of that look stands. No figure was added. The ga
 Phase 7 below, with the notes on how the figure rules are held and what was changed after the figures were first
 looked at.
 """),
-    (5, "Phase 8, with the additions to the account of the stage", False, ""),
+    (5, "Phase 8, with the additions to the account of the stage", True, """
+`docs/GAP.md` was written with the additions the handoff set. Each statement was tested against the tables before
+it was written.
+
+- The headline is not read alone. The volumes come first; the rank correlation stands beside the benchmark of
+  district size and beside the comparison with size taken out of both sides.
+- A section sets the need beside the Forest Survey's own figures. It says what each source measures and that they
+  are not the same quantity, gives the four rank correlations, and names shifting cultivation and the harvest of
+  plantations only as readings this run cannot test.
+- H9 is written as a lead and not a finding, with the four things it is to be read with.
+- The two rank correlations on forest rights are read together.
+- "What this cannot show" names invasive cover, tree species and costing.
+- A section takes the supervisor's comments point by point: what answers each, by section and figure, and what is
+  not answered.
+
+**The reading of the whole document.** All of `docs/GAP.md` was then read for sentences that say more than the rows
+do. These were changed, and where a statement had no test, one was written:
+
+- two headings said that the window and the East Coast districts "do not matter"; what the rows show is that rho
+  moves little, and the headings now say that;
+- the three comparisons with earlier money give a higher rho than the headline; the text now adds that each
+  interval overlaps the headline's, so that none is shown to differ from it;
+- the owner's sentence on the panel's design says that loss rose after 2018; the two yearly means behind it are now
+  printed and tested;
+- a sentence on forest rights said both figures are larger in larger and more forested districts: forest was
+  tested, size was not. It now speaks of forest only, and the rank correlation of N1 with the forest of 2000 is
+  printed beside that of community extent;
+- two sentences said that gross loss and scrub "move together": they are ranks across districts at one time, and
+  the text now says so;
+- the paragraph of readings the run cannot test stated what rotational clearing does; it now only names the
+  readings;
+- outside-village land was said to be reached by no panchayat plan; the tables show that it lies in no panchayat
+  unit of the layer, and the text now says that;
+- what the plantation category takes in is now said as `README.md` has it, with the pointer;
+- the count of gates named the steps wrongly;
+- the verifier was said to recompute every figure of every table, here and in two places of `docs/RESULTS.md` and
+  `README.md`; each now says what it recomputes, and `docs/GAP.md` says what it does not hold.
+
+Three lead-ins that read as claims were kept: they are the owner's own words for what a comparison asks (the land
+that panchayat planning can reach; where open forest could regenerate; the old geography).
+
+**Calls made in this step.**
+
+- **The supervisor's comments are registered in a new folder of `00_raw/`**, with a manifest row. A script beside
+  the record reads them out of the owner's note, word for word, and stops unless the note is the file that was given
+  and every point stands in it. The folder that holds the group's documents is not in git and this record cannot be
+  fetched again, so it has a folder that is. The two steps that record the manifest were run again, and no table of
+  figures moved: the comparison is below.
+- **The fourth stage's headline row in `docs/RESULTS.md` follows the same order**: volumes first, then the rank
+  correlation beside the benchmark and the comparison with size taken out. Three figures were added for that, all
+  from the stage's own tables. No figure that the document already carried changed.
+- **`docs/LAYER.md` was written again**, as ruled; its sentence on stage 4 and the time of one check changed.
+- **A count in Step 3's comparison was corrected** (Phase 6 below).
+- **One word of the supervisor's question is spelt two ways.** Section 1 of `docs/GAP.md` quotes it as the owner's
+  prompt of 10 October gave it, and the new section quotes it as his note of 11 October records it. Each is left as
+  its source has it.
+"""),
     (6, "the decision view in WebKit, with the machine awake", False, ""),
 ]
 
@@ -628,6 +692,8 @@ def handoff() -> list[str]:
                 out += rebuild("step1")
             if n == 2:
                 out += forest_survey()
+            if n == 5:
+                out += rebuild("step5")
     return out
 
 

@@ -660,7 +660,7 @@ after the fixes:
 - The paper this layer borrows its vocabulary from reports that in one of its pilot blocks, Angul, in this state, the
   community did not favour mapping inequity (Commons Connect, ICTD 2024, p. 18). The Scheduled Tribe share and
   development index layers are of that kind. Whether they belong in what is shown is the Foundation's call.
-- Nothing here says why a unit lost forest or was passed over for work. Stage 4, the comparison of forest condition, need and allocation, was being built when this was written (`50_gap/`); it will describe where money went relative to where forest was lost and will not argue why either.
+- Nothing here says why a unit lost forest or was passed over for work. Stage 4, the comparison of forest condition, need and allocation, is another document, `docs/GAP.md`; it describes where money went relative to where forest was lost and does not argue why either.
 - **The copy to send is `70_share/odisha_forest_decision_layer/`, not this folder** (§11): the same two files without
   `overlay.js` and, since 10 October 2026, without the development index of 2011, with a README.
   Since 11 October 2026 the owner publishes that copy at https://sudo-karan.github.io/ICTD_Project/ (`docs/DECISION_LAYER.md` §14).
@@ -731,7 +731,7 @@ development index of 2011 - its layer, its value in the row of each of 11,468 un
 column of the ranked list, its row of the sources - and otherwise as they are; it leaves `overlay.js` out, adds a
 README and makes a zip of 6.00 MB beside the folder. This folder, `60_layer/`, keeps the index.
 Until 10 October 2026 the copy's two files were this folder's byte for byte. `scripts/exercise_share.py` opened the
-copy from disk in Chrome/154.0.8037.99 (2026-10-10T20:06:00Z): 8 of 8 steps did what
+copy from disk in Chrome/154.0.8037.99 (2026-10-10T22:16:08Z): 8 of 8 steps did what
 they should. It holds the copy's two files against this folder's under that rule and finds the index named in
 neither; the page asked the network for nothing, and with the overlay's box ticked the control said
 "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before."

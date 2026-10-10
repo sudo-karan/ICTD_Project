@@ -1,6 +1,6 @@
 # Results: the state of the pipeline, and every headline number with its caveat
 
-*Written 2026-10-09T05:37:27Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
+*Written 2026-10-10T22:33:10Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
 from the file named for it in the appendix (§13), and each conclusion drawn from figures was tested against them before
 it was written. The figures change only when the files do.*
 
@@ -9,10 +9,12 @@ it was written. The figures change only when the files do.*
 The project asks whether work under the rural employment guarantee (MGNREGA) in Odisha goes to the places where forest
 is degrading, and to the people who depend on it. To ask that, three things have to be measured on the same pieces of
 land: the condition of the forest (stage 1), social need (stage 2), and what the scheme spent (stage 3). Stage 0 builds
-the pieces of land, the *units*. A fourth stage would set the three beside one another.
+the pieces of land, the *units*. A fourth stage sets the three beside one another.
 
-**That fourth stage is not built.** The project owner is respecifying it. So this document reports measurements and the
-checks made on them. It holds no finding about whether spending follows need, and none should be read into it.
+**That fourth stage is built**, as the project owner specified it on 10 October 2026: districts for the headline,
+units only within districts. Its account is `docs/GAP.md`. The sections that follow report the measurements and the
+checks made on them, as they did before it was built; §14 gives the fourth stage's three headline rows. It describes
+where money went relative to where forest was lost, and it says nothing about why.
 
 | stage | main output | state | how it was checked |
 |---|---|---|---|
@@ -23,7 +25,7 @@ checks made on them. It holds no finding about whether spending follows need, an
 | forest: NIRv greenness trend | columns of `20_degradation/degradation_by_unit.csv` | **blank: the run was stopped, and it is not a measure** | replicated independently and found unfit (§6) |
 | need | `30_need/need_by_unit.csv` | built, 2026-10-05T20:22:49Z | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, 2026-10-05T20:25:06Z | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: passed (§8) |
-| the comparison of the three | `50_gap/` | **not built** | - |
+| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, 2026-10-10T20:20:22Z | the figures of every table its steps write, recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: 338 of 338 checks passed (§14) |
 | map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, 2026-10-09T04:08:22Z | `scripts/verify_layer.py`: 92 of 92 checks passed; every control exercised in two browser engines, and the page last opened and read in the Safari application on an earlier build, not on this one (§10) |
 
 Three statements carry most of what follows.
@@ -489,8 +491,9 @@ for discussion with people who know the places. It is not a verdict on any place
 
 ## 11. Not built, and inputs still blank
 
-- **Stage 4, the comparison of forest condition, need and allocation, is not built.** The project owner is
-  respecifying it. `50_gap/` is empty.
+- **Stage 4, the comparison of forest condition, need and allocation, is no longer in this list**: it was built on
+  10 October 2026 (§14; `docs/GAP.md`). It costs no shortfall and controls for no remoteness, for the two reasons
+  given below.
 - **The pixel-by-pixel overlap of Hansen's loss with CoRE Stack's degradation is not run** (§5.5). It needs an Earth
   Engine job.
 - **The state-wide NIRv run is stopped and nothing is queued** (§6). Its columns are blank.
@@ -611,7 +614,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-09T05:37:27Z | this run | the UTC time at which this script ran |
+| 2026-10-10T22:33:10Z | this run | the UTC time at which this script ran |
 | 2026-10-05T20:11:19Z | `10_units/units.provenance.json` | key `run_utc` |
 | 2026-10-05T20:44:23Z | `20_degradation/hansen.provenance.json` | key `run_utc` |
 | 2026-10-05T21:40:02Z | `20_degradation/corestack.provenance.json` | key `run_utc` |
@@ -620,6 +623,8 @@ This section is the script's own record of what it read. Paths are relative to t
 | 2026-10-05T20:22:49Z | `30_need/need.provenance.json` | key `run_utc` |
 | 2026-10-05T20:25:06Z | `40_allocation/allocation.provenance.json` | key `run_utc` |
 | passed | `scripts/verify_r620.py` | its exit status and last line, run by this script as it wrote the document |
+| 2026-10-10T20:20:22Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
+| 338 of 338 checks passed | `scripts/verify_gap.py` | its exit status and last line, run by this script as it wrote the document |
 | 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 92 of 92 checks passed | `scripts/verify_layer.py` | its exit status and last line, run by this script as it wrote the document |
 | and the page last opened and read in the Safari application on an earlier build, not on this one | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: the check in the Safari application is named there |
@@ -857,6 +862,30 @@ This section is the script's own record of what it read. Paths are relative to t
 | 101 | `30_need/need.provenance.json` | key `checks_passed` → `secc` → `units` → `rate_resting_on_fewer_than_100_people` |
 | 73 | `30_need/need.provenance.json` | key `checks_passed` → `secc` → `units` → `some_of_the_rate_from_a_shrid_shared_with_another_id` |
 | , and on an earlier build than the one on disk | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc`, against the layer's own record |
+| 67.1 | `50_gap/need_vs_allocation_summary.csv` | column `need_share_pct_where_r_below_0_5`; row where `comparison` is 'C1' |
+| 5 | `50_gap/need_vs_allocation_summary.csv` | column `n_districts_r_below_0_5`; row where `comparison` is 'C1' |
+| 1.9 | `50_gap/need_vs_allocation_summary.csv` | column `need_share_pct_where_r_above_2`; row where `comparison` is 'C1' |
+| 7,207.11 | `50_gap/need_vs_allocation_summary.csv` | column `sum_positive_gaps_lakh`; row where `comparison` is 'C1' |
+| 30 | `50_gap/need_vs_allocation_summary.csv` | column `n_districts`; row where `comparison` is 'C1' |
+| 0.67 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'C1' |
+| 0.38 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_lo`; row where `comparison` is 'C1' |
+| 0.84 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_hi`; row where `comparison` is 'C1' |
+| 0.00012 | `50_gap/need_vs_allocation_summary.csv` | column `p_permutation`; row where `comparison` is 'C1' |
+| 0.57 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'B1' |
+| 0.37 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'C12' |
+| 0.01 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_lo`; row where `comparison` is 'C12' |
+| 0.63 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_hi`; row where `comparison` is 'C12' |
+| 0.226 | `50_gap/panel_models.csv` | column `coefficient`; row where `id` is 'P1' |
+| −0.065 | `50_gap/panel_models.csv` | column `wcb_ci95_lo`; row where `id` is 'P1' |
+| 0.893 | `50_gap/panel_models.csv` | column `wcb_ci95_hi`; row where `id` is 'P1' |
+| 0.383 | `50_gap/panel_models.csv` | column `wcb_p`; row where `id` is 'P1' |
+| 360 | `50_gap/panel_models.csv` | column `n`; row where `id` is 'P1' |
+| −0.14 | `50_gap/unit_history_models.csv` | column `coefficient`; row where `id` is 'H1' |
+| −0.48 | `50_gap/unit_history_models.csv` | column `wcb_ci95_lo`; row where `id` is 'H1' |
+| 0.20 | `50_gap/unit_history_models.csv` | column `wcb_ci95_hi`; row where `id` is 'H1' |
+| 0.379 | `50_gap/unit_history_models.csv` | column `wcb_p`; row where `id` is 'H1' |
+| 2,889 | `50_gap/unit_history_models.csv` | column `n_units`; row where `id` is 'H1' |
+| 1,121 | `50_gap/unit_history_models.csv` | column `n_exposed`; row where `id` is 'H1' |
 
 ### 13.2 Tables, in the order they appear
 
@@ -908,6 +937,10 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `40_allocation/assets_district_fy.csv` | 65,174 | `5e8dcd030f973f36` | - |
 | `40_allocation/panchayat_of_record_check.csv` | 363 | `f36e1bd24b73ce67` | - |
 | `40_allocation/state_fy_r620_vs_dump.csv` | 2,707 | `bd845de7118bc579` | - |
+| `50_gap/gap.provenance.json` | 48,350 | `71e13ff7968600ae` | - |
+| `50_gap/need_vs_allocation_summary.csv` | 5,000 | `77831ac32e2c5717` | - |
+| `50_gap/panel_models.csv` | 5,072 | `a8c7ef7ef69aa7dd` | - |
+| `50_gap/unit_history_models.csv` | 6,920 | `f2684839d7db5310` | - |
 | `60_layer/decision_runs.json` | 5,712 | `652a4083b557d2d5` | - |
 | `60_layer/exercise_chrome.json` | 26,807 | `a4ecf3b563655739` | 2026-10-09T04:13:56Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
@@ -918,7 +951,10 @@ Every cell of a table that is not a typed label was read from the file and colum
 
 Each of these is something the text says in words. The script tested it against the figures and would have stopped had it failed.
 
-- stage 4 is not built: `50_gap/` holds no output
+- stage 4 is built: its tables are in `50_gap/`, every gate of every step of it that carries gates passed, and its account is `docs/GAP.md`
+- stage 4, the headline comparison: the rank correlation of need with post-period plantation money is above zero, and so is the benchmark's with all expenditure
+- stage 4: the benchmark's interval overlaps the headline's; with district size taken out of both sides the rank correlation is lower than either, and its interval still lies above zero
+- stage 4: the intervals of its panel headline and of its unit headline both include zero
 - the headline rows of `agreement_summary.csv` are the ones marked delivered
 - more than half the units have under a hectare of forest
 - loss on the lowest canopy band rises several times faster across the three periods than loss in the mask
@@ -1019,4 +1055,38 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*246 figures and 10 tables (330 cells) from 34 files; 61 statements tested; 32 totals compared. Written 2026-10-09T05:37:27Z by `scripts/write_results.py` (sha256 `50f98f23f30e9685`).*
+*272 figures and 10 tables (330 cells) from 38 files; 64 statements tested; 32 totals compared. Written 2026-10-10T22:33:10Z by `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+
+## 14. Stage 4: need against allocation
+
+*Added on 10 October 2026, after the section that says where every figure comes from, so that no section above changed
+its number. Its figures are listed in §13 with the others.*
+
+The fourth stage was built on 10 October 2026 as the project owner specified it that day. Its account is `docs/GAP.md`,
+written from the tables in `50_gap/` by `scripts/write_gap.py`; only its three headline rows are given here. **It
+describes where money went relative to where forest was lost. It does not say why.**
+
+- **`C1`, the comparison across districts.** Need is the forest loss of the years 2018 to 2025 in the units where loss is
+  recorded; allocation is plantation expenditure of FY2018-19 to FY2025-26 in the state report. 67.1 per cent
+  of the need lies in 5 districts whose share of the money is under half their share of the need, and
+  1.9 per cent in districts with more than twice their share. The same money distributed by need would move
+  7,207.11 lakh rupees; that is not a requirement. Across the 30 districts the rank correlation of need
+  and allocation is 0.67 (`95 %` interval 0.38 to 0.84; permutation p 0.00012), and it is not read
+  alone. The same need against all the scheme's expenditure, which is what district size alone gives, has
+  0.57, with an interval that overlaps the headline's. With size taken out of both sides the rank correlation is
+  0.37 (0.01 to 0.63).
+- **`P1`, the district-year panel.** Within a district and a period, plantation's share of the district's expenditure
+  against the forest loss of the year before: 0.226 percentage points for every `100 ha` (wild-cluster-bootstrap
+  interval −0.065 to 0.893; p 0.383; 360 district-years). The interval includes zero.
+- **`H1`, units within districts.** Units that had forest-named works by FY2017-18 against units of the same district
+  that had none, given their forest and their earlier loss: −0.14 percentage points of the forest at the start of
+  2018 lost in the years 2018 to 2025 (interval −0.48 to 0.20; p 0.379; 2,889 units, 1,121 of them
+  with such works). The interval includes zero. It is an association: planners sited the works.
+
+`scripts/verify_gap.py`, which imports nothing from the scripts that built the tables, recomputed the figures of
+every table the stage's steps write: 338 of 338 checks passed. What it does not hold is in `docs/GAP.md` §14.
+
+**What this changes in the sections above.** §11 says forest-rights titles are in no stage. The fourth stage sets the
+state's district table of community titles beside need (`docs/GAP.md` §10); it still joins no title to a unit, since
+titles are not mapped. §9 says its finding stands whatever stage 4 turns out to be: it does, and the fourth stage
+counts how much of the need lies on outside-village land.

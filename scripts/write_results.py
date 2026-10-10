@@ -337,9 +337,9 @@ def main():
     show("v_r620", verifier("verify_r620.py", a.draft), txt)
     # Stage 4 (10 October 2026): built. Its account is docs/GAP.md; this document carries its three headline rows in a section of their own (14).
     GS, GPM, GUM, GPROV = "50_gap/need_vs_allocation_summary.csv", "50_gap/panel_models.csv", "50_gap/unit_history_models.csv", "50_gap/gap.provenance.json"
-    GBUILDERS = ("08_gap_inputs", "08_build_gap_districts", "08_build_gap_panel", "08_build_gap_units", "08_build_gap_rights")
+    GBUILDERS = ("08_gap_environment", "08_gap_inputs", "08_build_gap_districts", "08_build_gap_panel", "08_build_gap_units", "08_build_gap_rights", "08_build_gap_fsi")
     hold((ROOT / "docs" / "GAP.md").is_file() and all(J(GPROV)["steps"][k_]["gates"] == J(GPROV)["steps"][k_]["gates_passed"] > 0 for k_ in GBUILDERS),
-         "stage 4 is built: its tables are in `50_gap/`, every gate of its five builders passed, and its account is `docs/GAP.md`")
+         "stage 4 is built: its tables are in `50_gap/`, every gate of every step of it that carries gates passed, and its account is `docs/GAP.md`")
     show("run_gap", V(J(GPROV)["steps"]["08_build_gap_districts"]["run_utc"], GPROV, "key `steps` → `08_build_gap_districts` → `run_utc`"), txt)
     show("v_gap", verifier("verify_gap.py", a.draft), txt)
     g = lambda col, **w: cell(GS, col, comparison="C1", **w)
@@ -351,6 +351,10 @@ def main():
     show("g_c1_gaps", g("sum_positive_gaps_lakh"), dec(2))
     g_b1 = show("g_b1_rho", cell(GS, "rho", comparison="B1"), dec(2))
     hold(g_lo.v > 0 and cell(GS, "ci95_lo", comparison="B1").v > 0, "stage 4, the headline comparison: the rank correlation of need with post-period plantation money is above zero, and so is the benchmark's with all expenditure")
+    g_c12, g_c12_lo = show("g_c12_rho", cell(GS, "rho", comparison="C12"), dec(2)), show("g_c12_lo", cell(GS, "ci95_lo", comparison="C12"), dec(2))
+    show("g_c12_hi", cell(GS, "ci95_hi", comparison="C12"), dec(2))
+    hold(cell(GS, "ci95_lo", comparison="B1").v < g_hi.v and g_lo.v < cell(GS, "ci95_hi", comparison="B1").v and g_c12.v < g_b1.v < g_rho.v and g_c12_lo.v > 0,
+         "stage 4: the benchmark's interval overlaps the headline's; with district size taken out of both sides the rank correlation is lower than either, and its interval still lies above zero")
     gp = lambda col: cell(GPM, col, id="P1")
     show("g_p1_b", gp("coefficient"), dec(3)); gp_lo, gp_hi = show("g_p1_lo", gp("wcb_ci95_lo"), dec(3)), show("g_p1_hi", gp("wcb_ci95_hi"), dec(3))
     show("g_p1_p", gp("wcb_p"), dec(3)); show("g_p1_n", gp("n"), n0)
@@ -420,7 +424,7 @@ where money went relative to where forest was lost, and it says nothing about wh
 | forest: NIRv greenness trend | columns of `20_degradation/degradation_by_unit.csv` | **blank: the run was stopped, and it is not a measure** | replicated independently and found unfit (§6) |
 | need | `30_need/need_by_unit.csv` | built, {run_need} | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, {run_allocation} | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: {v_r620} (§8) |
-| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, {run_gap} | every figure of every table recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: {v_gap} (§14) |
+| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, {run_gap} | the figures of every table its steps write, recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: {v_gap} (§14) |
 | map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, {run_layer} | `scripts/verify_layer.py`: {v_layer}; every control exercised in two browser engines, {safari_state} (§10) |
 
 Three statements carry most of what follows.
@@ -1403,12 +1407,14 @@ written from the tables in `50_gap/` by `scripts/write_gap.py`; only its three h
 describes where money went relative to where forest was lost. It does not say why.**
 
 - **`C1`, the comparison across districts.** Need is the forest loss of the years 2018 to 2025 in the units where loss is
-  recorded; allocation is plantation expenditure of FY2018-19 to FY2025-26 in the state report. Across {g_districts}
-  districts their rank correlation is {g_c1_rho} (`95 %` interval {g_c1_lo} to {g_c1_hi}; permutation p {g_c1_p}). Much
-  of that is district size: the same need against all the scheme's expenditure gives {g_b1_rho}. {g_c1_below} per cent
+  recorded; allocation is plantation expenditure of FY2018-19 to FY2025-26 in the state report. {g_c1_below} per cent
   of the need lies in {g_c1_below_n} districts whose share of the money is under half their share of the need, and
   {g_c1_above} per cent in districts with more than twice their share. The same money distributed by need would move
-  {g_c1_gaps} lakh rupees; that is not a requirement.
+  {g_c1_gaps} lakh rupees; that is not a requirement. Across the {g_districts} districts the rank correlation of need
+  and allocation is {g_c1_rho} (`95 %` interval {g_c1_lo} to {g_c1_hi}; permutation p {g_c1_p}), and it is not read
+  alone. The same need against all the scheme's expenditure, which is what district size alone gives, has
+  {g_b1_rho}, with an interval that overlaps the headline's. With size taken out of both sides the rank correlation is
+  {g_c12_rho} ({g_c12_lo} to {g_c12_hi}).
 - **`P1`, the district-year panel.** Within a district and a period, plantation's share of the district's expenditure
   against the forest loss of the year before: {g_p1_b} percentage points for every `100 ha` (wild-cluster-bootstrap
   interval {g_p1_lo} to {g_p1_hi}; p {g_p1_p}; {g_p1_n} district-years). The interval includes zero.
@@ -1417,8 +1423,8 @@ describes where money went relative to where forest was lost. It does not say wh
   2018 lost in the years 2018 to 2025 (interval {g_h1_lo} to {g_h1_hi}; p {g_h1_p}; {g_h1_n} units, {g_h1_exp} of them
   with such works). The interval includes zero. It is an association: planners sited the works.
 
-`scripts/verify_gap.py`, which imports nothing from the scripts that built the tables, recomputed every figure of
-every table of the stage: {v_gap}.
+`scripts/verify_gap.py`, which imports nothing from the scripts that built the tables, recomputed the figures of
+every table the stage's steps write: {v_gap}. What it does not hold is in `docs/GAP.md` §14.
 
 **What this changes in the sections above.** §11 says forest-rights titles are in no stage. The fourth stage sets the
 state's district table of community titles beside need (`docs/GAP.md` §10); it still joins no title to a unit, since

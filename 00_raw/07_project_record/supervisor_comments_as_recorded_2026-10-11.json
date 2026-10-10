@@ -1,0 +1,25 @@
+{
+ "what": "The supervisor's comments on two decks, as the project owner recorded them and gave them in his handoff note of 11 October 2026. This is the owner's record, word for word as it stands in his note; it is not the supervisor's own text.",
+ "given_in": "the owner's handoff note of 11 October 2026 (.session_scratch_2026-10-05/handoff/2026-10-11_finish_stage4.md, a working file that is not in git)",
+ "note_sha256": "d8b05a081aebfb5794a74122c221d8fc6607ea9384d5d30b16f2ca8dfe1848e2",
+ "made_by": "00_raw/07_project_record/_build_supervisor_comments.py",
+ "comments": [
+  {
+   "after": "the proposal deck",
+   "text": "1. Design an analysis framework for social-ecological need identification and quantification vs. resource allocation done so far, and what more is needed. 2. Look at Commons Connect and Shivani's paper in detail… 3. Explore access to data dumps of MGNREGA, CFR granted villages and boundaries, understand ATREE data carefully.",
+   "points": [
+    "1. Design an analysis framework for social-ecological need identification and quantification vs. resource allocation done so far, and what more is needed.",
+    "2. Look at Commons Connect and Shivani's paper in detail…",
+    "3. Explore access to data dumps of MGNREGA, CFR granted villages and boundaries, understand ATREE data carefully."
+   ]
+  },
+  {
+   "after": "the methodology deck",
+   "text": "1. Overall methodology not clear; what info is extracted from CFR docs and how it is being related to satellite data 2. Why not simply determine which areas have seen forest degradation, are also marginalized, and have they seen good enough resource allocation in the past",
+   "points": [
+    "1. Overall methodology not clear; what info is extracted from CFR docs and how it is being related to satellite data",
+    "2. Why not simply determine which areas have seen forest degradation, are also marginalized, and have they seen good enough resource allocation in the past"
+   ]
+  }
+ ]
+}

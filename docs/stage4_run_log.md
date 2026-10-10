@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T22:20:33Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T22:40:00Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1, 2, 3, 4, 5, 6, 7. The last is Phase 7, figures and tables for the paper and the deck. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2, 3, 4, 5, 6, 7, 8. The last is Phase 8, docs. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -19,7 +19,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 | 2 | Phase 5b: the need read against the Forest Survey's own figures | done |
 | 3 | finish Phase 6 | done |
 | 4 | Phase 7 | done |
-| 5 | Phase 8, with the additions to the account of the stage | not yet |
+| 5 | Phase 8, with the additions to the account of the stage | done |
 | 6 | the decision view in WebKit, with the machine awake | not yet |
 
 ### Step 0: publish the shared copy to GitHub Pages
@@ -205,6 +205,86 @@ looked at again, and the record of that look stands. No figure was added. The ga
 Phase 7 below, with the notes on how the figure rules are held and what was changed after the figures were first
 looked at.
 
+### Step 5: Phase 8, with the additions to the account of the stage
+
+`docs/GAP.md` was written with the additions the handoff set. Each statement was tested against the tables before
+it was written.
+
+- The headline is not read alone. The volumes come first; the rank correlation stands beside the benchmark of
+  district size and beside the comparison with size taken out of both sides.
+- A section sets the need beside the Forest Survey's own figures. It says what each source measures and that they
+  are not the same quantity, gives the four rank correlations, and names shifting cultivation and the harvest of
+  plantations only as readings this run cannot test.
+- H9 is written as a lead and not a finding, with the four things it is to be read with.
+- The two rank correlations on forest rights are read together.
+- "What this cannot show" names invasive cover, tree species and costing.
+- A section takes the supervisor's comments point by point: what answers each, by section and figure, and what is
+  not answered.
+
+**The reading of the whole document.** All of `docs/GAP.md` was then read for sentences that say more than the rows
+do. These were changed, and where a statement had no test, one was written:
+
+- two headings said that the window and the East Coast districts "do not matter"; what the rows show is that rho
+  moves little, and the headings now say that;
+- the three comparisons with earlier money give a higher rho than the headline; the text now adds that each
+  interval overlaps the headline's, so that none is shown to differ from it;
+- the owner's sentence on the panel's design says that loss rose after 2018; the two yearly means behind it are now
+  printed and tested;
+- a sentence on forest rights said both figures are larger in larger and more forested districts: forest was
+  tested, size was not. It now speaks of forest only, and the rank correlation of N1 with the forest of 2000 is
+  printed beside that of community extent;
+- two sentences said that gross loss and scrub "move together": they are ranks across districts at one time, and
+  the text now says so;
+- the paragraph of readings the run cannot test stated what rotational clearing does; it now only names the
+  readings;
+- outside-village land was said to be reached by no panchayat plan; the tables show that it lies in no panchayat
+  unit of the layer, and the text now says that;
+- what the plantation category takes in is now said as `README.md` has it, with the pointer;
+- the count of gates named the steps wrongly;
+- the verifier was said to recompute every figure of every table, here and in two places of `docs/RESULTS.md` and
+  `README.md`; each now says what it recomputes, and `docs/GAP.md` says what it does not hold.
+
+Three lead-ins that read as claims were kept: they are the owner's own words for what a comparison asks (the land
+that panchayat planning can reach; where open forest could regenerate; the old geography).
+
+**Calls made in this step.**
+
+- **The supervisor's comments are registered in a new folder of `00_raw/`**, with a manifest row. A script beside
+  the record reads them out of the owner's note, word for word, and stops unless the note is the file that was given
+  and every point stands in it. The folder that holds the group's documents is not in git and this record cannot be
+  fetched again, so it has a folder that is. The two steps that record the manifest were run again, and no table of
+  figures moved: the comparison is below.
+- **The fourth stage's headline row in `docs/RESULTS.md` follows the same order**: volumes first, then the rank
+  correlation beside the benchmark and the comparison with size taken out. Three figures were added for that, all
+  from the stage's own tables. No figure that the document already carried changed.
+- **`docs/LAYER.md` was written again**, as ruled; its sentence on stage 4 and the time of one check changed.
+- **A count in Step 3's comparison was corrected** (Phase 6 below).
+- **One word of the supervisor's question is spelt two ways.** Section 1 of `docs/GAP.md` quotes it as the owner's
+  prompt of 10 October gave it, and the new section quotes it as his note of 11 October records it. Each is left as
+  its source has it.
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_step5/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 22 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 22 of 22 | 22 of 22 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the later build that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_step5.csv`).*
+
+Files compared or listed: 53; byte for byte the same: 48. Every file that differs, is new or is gone (`50_gap/rebuild_step5_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `forest_villages_pdf_record.json` | record | keys that differ: checked_utc | the record carries the time of the check |
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_rights: forest_villages, inputs, outputs, run_utc; 08_gap_inputs: inputs, outputs, run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `gates_step3.csv` | gate table | 5 cell(s): row 1, gate: 'tables of figures in both buil' then, 'tables of figures in both buil' now; row 1, found: 'none (of 23 tables compared)' then, 'none (of 22 tables compared)' now; row 3, expected: '23 of 23' then, '22 of 22' now | a gate table: see the gate on the gates below |
+| `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+| `rebuild_step3_differences.csv` | list of differences | its number of rows: 48 then, 51 now | a list this script writes: it differs when a comparison is made again |
+
 ## Phase 0: inputs, crosswalk, gates
 
 **What was done.** Every input the stage reads was opened and listed with its columns (below). The district crosswalk
@@ -276,9 +356,9 @@ says what was undone and rebuilt.
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T20:17:50Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T22:21:21Z)
 
-- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `5a793d2a7a818a1e`)
+- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `e7544b139b1c3216`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
@@ -307,13 +387,13 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-10T20:17:48Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-10T22:21:20Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
 - `00_raw/cfr_fra/odisha_fra_mpr_district_2025-12-31.csv` (6,289 bytes; 30 rows): `district`, `pc11_district_code`, `frcs_constituted`, `claims_filed_gs_ind_st`, `claims_filed_gs_ind_otfd`, `claims_filed_gs_comm_st`, `claims_filed_gs_comm_otfd`, `claims_filed_gs_total_st`, `claims_filed_gs_total_otfd`, `claims_gs_to_sdlc_ind_st`, `claims_gs_to_sdlc_ind_otfd`, `claims_gs_to_sdlc_comm_st`, `claims_gs_to_sdlc_comm_otfd`, `claims_gs_to_sdlc_total_st`, `claims_gs_to_sdlc_total_otfd`, `claims_sdlc_to_dlc_ind_st`, `claims_sdlc_to_dlc_ind_otfd`, `claims_sdlc_to_dlc_comm_st`, `claims_sdlc_to_dlc_comm_otfd`, `claims_sdlc_to_dlc_total_st`, `claims_sdlc_to_dlc_total_otfd`, `claims_approved_dlc_ind_st`, `claims_approved_dlc_ind_otfd`, `claims_approved_dlc_comm_st`, `claims_approved_dlc_comm_otfd`, `claims_approved_dlc_total_st`, `claims_approved_dlc_total_otfd`, `titles_distributed_ind_st`, `titles_distributed_ind_otfd`, `titles_distributed_comm_st`, `titles_distributed_comm_otfd`, `titles_distributed_total_st`, `titles_distributed_total_otfd`, `extent_ha_ind_st`, `extent_ha_ind_otfd`, `extent_ha_comm_st`, `extent_ha_comm_otfd`, `extent_ha_total_st`, `extent_ha_total_otfd`, `claims_rejected_ind_st`, `claims_rejected_ind_otfd`, `claims_rejected_comm_st`, `claims_rejected_comm_otfd`, `claims_rejected_total_st`, `claims_rejected_total_otfd`
 - `00_raw/cfr_fra/mota_fra_state_wise_2025-12-31.csv` (2,273 bytes; 21 rows): `state`, `claims_received_individual`, `claims_received_community`, `claims_received_total`, `titles_distributed_individual`, `titles_distributed_community`, `titles_distributed_total`, `extent_acres_individual`, `extent_acres_community`, `extent_acres_total`, `extent_ha_individual`, `extent_ha_community`, `extent_ha_total`
-- `00_raw/data_manifest.csv` (65,068 bytes; 96 rows): `item_id`, `group`, `priority`, `title`, `kind`, `ref`, `bytes`, `bytes_exact`, `dest`, `licence_or_terms`, `how_verified_2026_10_04`, `notes`
+- `00_raw/data_manifest.csv` (66,182 bytes; 97 rows): `item_id`, `group`, `priority`, `title`, `kind`, `ref`, `bytes`, `bytes_exact`, `dest`, `licence_or_terms`, `how_verified_2026_10_04`, `notes`
 - `10_units/units.gpkg` (48,369,664 bytes; 11,468 rows): `unit_id`, `pc11_district_code`, `pc11_subdistrict_code`, `n_villages`, `unit_name`, `unit_level`, `outside_village`, `area_ha`
 - `10_units/outside_village_district.csv` (536,828 bytes; 3,492 rows): `unit_id`, `unit_name`, `district_2001_label`, `subdistrict_2001_label`, `pc11_district_code`, `district`, `assigned_by`, `area_cover_share`, `area_majority_district_code`, `area_majority_district`, `area_majority_share_of_unit`, `area_second_district_code`, `area_second_share_of_unit`, `area_majority_agrees_with_assigned`, `ambiguous_by_area`, `neighbours_district_code`, `neighbours_district`, `neighbours_share`, `neighbours_second_district_code`, `neighbours_second_share`, `neighbours_n_districts`, `neighbours_by_code_district_code`, `neighbours_agree_with_assigned`, `label_district_share_in_collar`, `label_absent_from_collar`, `ambiguous_by_collar`, `ambiguous`, `ambiguous_basis`, `area_ha`
 - `20_degradation/hansen_loss_by_canopy_band_by_unit.csv` (4,675,831 bytes; 11,468 rows): `unit_id`, `unit_level`, `outside_village`, `area_ha_le10`, `area_ha_gt10le30`, `area_ha_gt30`, `loss_ha_le10`, `loss_ha_gt10le30`, `loss_ha_gt30`, `loss_ha_any_cover`, `area_ha_eq0`, `loss_ha_eq0`, `loss_ha_le10_2001`, `loss_ha_le10_2002`, `loss_ha_le10_2003`, `loss_ha_le10_2004`, `loss_ha_le10_2005`, `loss_ha_le10_2006`, `loss_ha_le10_2007`, `loss_ha_le10_2008`, `loss_ha_le10_2009`, `loss_ha_le10_2010`, `loss_ha_le10_2011`, `loss_ha_le10_2012`, `loss_ha_le10_2013`, `loss_ha_le10_2014`, `loss_ha_le10_2015`, `loss_ha_le10_2016`, `loss_ha_le10_2017`, `loss_ha_le10_2018`, `loss_ha_le10_2019`, `loss_ha_le10_2020`, `loss_ha_le10_2021`, `loss_ha_le10_2022`, `loss_ha_le10_2023`, `loss_ha_le10_2024`, `loss_ha_le10_2025`, `loss_ha_gt10le30_2001`, `loss_ha_gt10le30_2002`, `loss_ha_gt10le30_2003`, `loss_ha_gt10le30_2004`, `loss_ha_gt10le30_2005`, `loss_ha_gt10le30_2006`, `loss_ha_gt10le30_2007`, `loss_ha_gt10le30_2008`, `loss_ha_gt10le30_2009`, `loss_ha_gt10le30_2010`, `loss_ha_gt10le30_2011`, `loss_ha_gt10le30_2012`, `loss_ha_gt10le30_2013`, `loss_ha_gt10le30_2014`, `loss_ha_gt10le30_2015`, `loss_ha_gt10le30_2016`, `loss_ha_gt10le30_2017`, `loss_ha_gt10le30_2018`, `loss_ha_gt10le30_2019`, `loss_ha_gt10le30_2020`, `loss_ha_gt10le30_2021`, `loss_ha_gt10le30_2022`, `loss_ha_gt10le30_2023`, `loss_ha_gt10le30_2024`, `loss_ha_gt10le30_2025`, `loss_ha_gt30_2001`, `loss_ha_gt30_2002`, `loss_ha_gt30_2003`, `loss_ha_gt30_2004`, `loss_ha_gt30_2005`, `loss_ha_gt30_2006`, `loss_ha_gt30_2007`, `loss_ha_gt30_2008`, `loss_ha_gt30_2009`, `loss_ha_gt30_2010`, `loss_ha_gt30_2011`, `loss_ha_gt30_2012`, `loss_ha_gt30_2013`, `loss_ha_gt30_2014`, `loss_ha_gt30_2015`, `loss_ha_gt30_2016`, `loss_ha_gt30_2017`, `loss_ha_gt30_2018`, `loss_ha_gt30_2019`, `loss_ha_gt30_2020`, `loss_ha_gt30_2021`, `loss_ha_gt30_2022`, `loss_ha_gt30_2023`, `loss_ha_gt30_2024`, `loss_ha_gt30_2025`
@@ -650,14 +730,14 @@ the summary page. The rule replaced it.
 
 *7 of 7 gates passed (`50_gap/gates_phase5.csv`).*
 
-### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T20:21:11Z)
+### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T22:21:36Z)
 
 - `50_gap/fra_by_district.csv` (4,568 bytes, sha256 `37cf178731fafc68`)
 - `50_gap/fra_summary.csv` (708 bytes, sha256 `cfbe515474ad9f4b`)
 - `50_gap/fra_two_reports.csv` (310 bytes, sha256 `8630d58c44690c10`)
 - `50_gap/forest_villages_text_layer_check.csv` (1,599 bytes, sha256 `dd77b52f5809ab48`)
 - `50_gap/forest_villages_districts_as_the_layer_reads_them.csv` (1,644 bytes, sha256 `357a86c94d2d2b63`)
-- `50_gap/forest_villages_pdf_record.json` (3,474 bytes, sha256 `19d51a7098d3e650`)
+- `50_gap/forest_villages_pdf_record.json` (3,474 bytes, sha256 `0c51a34156bfa4ce`)
 - `50_gap/gates_phase5.csv` (1,060 bytes, sha256 `6f8c180006589206`)
 
 ## The owner's corrections of 10 October 2026, after Phase 5
@@ -787,6 +867,12 @@ builders, which is where the fault lay:
 The three steps were run again and every output set against a copy of the build kept from before
 (`50_gap/before_step3/`): no table of figures moved. The comparison is under "The rebuild after the review".
 
+*A correction to that comparison, made in Step 5.* As first written it counted one table of figures too many: the
+comparison script classed its own earlier list of differences as a table of figures. The script now sets such
+lists apart, and the comparison was made again, against a copy of the build kept just before Step 5
+(`50_gap/before_step5/`), so that it shows what the rebuild of this step moved and nothing later. The table below
+is the corrected one; the message of the commit of Step 3 carries the first count.
+
 **Planted errors that the part concerned did not catch.** The table gives them as the difference between planted
 and caught; all are the part on the inputs', and its reviewer left each as it was and said so:
 
@@ -899,7 +985,7 @@ it assumed, is in `50_gap/verify_gap_reviews.json` (not in git; a copy is kept b
 | the review round: every check of every part passed on the real tables as its agent left the part | every one | inputs: 39 of 39; districts: 65 of 65; comparisons: 35 of 35; rights: 42 of 42; panel: 40 of 40; units: 44 of 44; environment+deck+texts: 32 of 32; fsi: 40 of 40 | yes |
 | the review round: the reader across all parts reported, and names it found defined in two pieces of the script | reported; none | reported; none | yes |
 | the record of the review round is of the verifier that is on disk | yes | yes | yes |
-| the rebuild that followed the review (three builders' definitions corrected): its gates, and the tables of figures that are byte for byte what they were | every gate; every table | 5 of 5 gates; 23 of 23 | yes |
+| the rebuild that followed the review (three builders' definitions corrected): its gates, and the tables of figures that are byte for byte what they were | every gate; every table | 5 of 5 gates; 22 of 22 | yes |
 
 *15 of 15 gates passed (`50_gap/gates_phase6.csv`).*
 
@@ -998,20 +1084,23 @@ The control, the verifier, every part, on an untouched copy: 338 of 338 checks p
 
 | gate | expected | found | pass |
 |---|---|---|---|
-| tables of figures in both builds (50_gap/before_step3/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 23 tables compared) | yes |
+| tables of figures in both builds (50_gap/before_step3/ and 50_gap/before_step5/) with a cell, a column or a number of rows that differs | none | none (of 22 tables compared) | yes |
 | tables of figures of the earlier build that are gone | none | none | yes |
-| tables of figures that are byte for byte what they were | 23 of 23 | 23 of 23 | yes |
+| tables of figures that are byte for byte what they were | 22 of 22 | 22 of 22 | yes |
 | files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
-| gates of the build now that did not pass (every gate table of 50_gap/) | none | none | yes |
+| gates of the later build that did not pass (every gate table of 50_gap/before_step5/) | none | none | yes |
 
 *5 of 5 gates passed (`50_gap/gates_step3.csv`).*
 
-Files compared or listed: 48; byte for byte the same: 46. Every file that differs, is new or is gone (`50_gap/rebuild_step3_differences.csv`):
+Files compared or listed: 51; byte for byte the same: 46. Every file that differs, is new or is gone (`50_gap/rebuild_step3_differences.csv`):
 
 | file | kind | what differs | why |
 |---|---|---|---|
 | `environment_main_now.txt` | text | 2 line(s) of 42: line 10 first | the main environment's list of packages as found at the run |
 | `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_deck_tables: run_utc, script_sha256; 08_build_gap_fsi: run_utc, script_sha256; 08_gap_environment: outputs, run_utc, script_sha256 | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `gates_phase6.csv` | gate table | new: not in the earlier build | written since the earlier build was kept |
+| `verify_gap_reviews.json` | record | new: not in the earlier build | written since the earlier build was kept |
+| `verify_gap_trials.json` | record | new: not in the earlier build | written since the earlier build was kept |
 
 ## Phase 7: figures and tables for the paper and the deck
 
@@ -1117,10 +1206,131 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 - `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.png` (363,743 bytes, sha256 `55bc528befd1ed74`)
 - `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.svg` (173,697 bytes, sha256 `a25a6b053af495fe`)
 
+## Phase 8: docs
+
+**What was done.**
+
+- `scripts/write_gap.py` wrote `docs/GAP.md` from the tables. No figure in it is typed; each conclusion drawn from
+  figures was tested against them before it was written; its last section lists where every figure comes from. It
+  has the sections the instruction lists, the owner's decisions of 10 October 2026, and the calls that are proposals.
+  What the owner's handoff of 11 October added to it, and the reading of the whole of it, are under Step 5 at the
+  head of this log.
+- `scripts/write_results.py` wrote `docs/RESULTS.md` again with the four changes the instruction allowed and no
+  other: the sentences of its section 1 that said the fourth stage was not built, the stage table's row, section 11's
+  bullet, and one section appended after the last, so that no section changed its number. **Every figure that
+  changed is listed below, old beside new.**
+- `scripts/write_decision_layer.py` wrote `docs/DECISION_LAYER.md` again: the sentence that said stage 4 is not built
+  now points to `docs/GAP.md`. The three counts of its section 5.1 were moved to the share a unit's panel prints in
+  Phase 1.
+- `README.md` has the stage as built, keeps the original specification under its own heading with a paragraph on why
+  it was superseded, and lists the six figures. Its section on environments came with the owner's corrections.
+- Every verifier was run once more: the last rows of the gate table.
+
+**Calls made in the run.**
+
+- **`docs/LAYER.md` was written again** by its working script: its sentence on stage 4 now points to `docs/GAP.md`.
+  The instruction did not list that document; left alone, it would have gone on saying the stage is being built.
+- **The new section of `docs/RESULTS.md` says what it changes in the sections above it** that the instruction did not
+  open: section 11's bullet on forest-rights titles and section 9's sentence on stage 4 are as they were, and the new
+  section says how the fourth stage bears on each.
+- **Two sentences of `README.md` outside the stage 4 section were changed**: a pointer to `docs/GAP.md` was added at
+  its head, and section 1 no longer says that stage 4 removes the earlier work's second limitation: as built it has
+  no control for remoteness.
+- **The gate on the five words the owner named was widened** from `docs/GAP.md` to this log, the README's stage 4 text, the new
+  section of `docs/RESULTS.md`, the figures' captions and the deck tables.
+- **Each verifier is run with the interpreter of its stage**: the writers of the documents find the other
+  environment's interpreter themselves (`README.md`, its section on environments).
+
+**What comes next.** Nothing: the run is complete. The report to the owner follows the order he asked for.
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| docs/GAP.md: the sections the owner listed (as headings) | all there | all 17 there | yes |
+| docs/GAP.md quotes the supervisor's question | yes | yes | yes |
+| docs/GAP.md, above its list of where every figure comes from: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| docs/stage4_run_log.md: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| README.md, the stage 4 section as built: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| README.md, why the original specification was superseded: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| README.md, section 9 as far as the corrections: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| docs/RESULTS.md, section 14: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| the six captions of figures/stage4/: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| the three deck tables: uses of "because", "led to", "effect of", "caused", "drove" (or "cause") outside a sentence that says what the analysis cannot show, the cells' own names apart | 0 | 0 | yes |
+| docs/GAP.md carries the label: the same money distributed by need; not a requirement | yes | yes | yes |
+| docs/GAP.md carries the label: not an overlap: titles are not mapped, and 'community' lumps CR with CFR | yes | yes | yes |
+| docs/GAP.md carries the label: VGPP ₹/ha not in 00_raw | yes | yes | yes |
+| docs/GAP.md carries the label: the size of the fall, measured by the scheme's own earlier share; not a measure of need; the earlier years are a frozen 2020 snapshot | yes | yes | yes |
+| docs/DECISION_LAYER.md no longer says stage 4 is not built, and points to docs/GAP.md | yes | yes | yes |
+| docs/RESULTS.md: the headings it had are all there, in their order and with their numbers, and one section is appended after the last | yes | 26 headings then, 27 now; the first 26 unchanged: yes; added: ## 14. Stage 4: need against allocation | yes |
+| docs/RESULTS.md above its section 13, against commit 16b1efd: lines gone or changed, and those of them outside the places the owner named (the time of writing, section 1's sentences on stage 4, the stage table's row, section 11's bullet) | none outside them | 7 lines gone or changed; outside the places named: 0 | yes |
+| docs/RESULTS.md, the figures of its section 13.1 against commit 16b1efd (written to 50_gap/results_md_changes.csv): printed differently; gone; added, and those added that are not read from 50_gap/ or from its verifier | printed differently: the time of writing and no other; gone: 0; added: stage 4's only | printed differently: 1 (2026-10-09T05:37:27Z -> 2026-10-10T22:33:10Z); gone: 0; added: 26, not stage 4's: 0 | yes |
+| docs/RESULTS.md no longer says the fourth stage is not built | yes | yes | yes |
+| 00_raw/data_manifest.csv against commit 16b1efd: rows then and now, and every earlier byte as it was | rows added, none changed | 92 then, 97 now; earlier bytes unchanged: yes | yes |
+| files of 00_raw/ that existed at commit 16b1efd and are changed or gone, the manifest apart | none | none | yes |
+| README.md: the stage 4 section is the specification as built, the original is kept under its heading with why it was superseded, and the figures list is F1 to F6 | yes | yes | yes |
+| README.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| docs/GAP.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| docs/RESULTS.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| docs/DECISION_LAYER.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| docs/LAYER.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| docs/stage4_run_log.md: a path of this machine, an address of a person, or anything that looks like a key or token | 0 | 0 | yes |
+| scripts/verify_r620.py (it prints no count of checks: its line of success) | it passes | OK  1170 district rows reconcile to all 39 printed Total rows | yes |
+| scripts/verify_layer.py | 92 of 92 checks passed | 92 of 92 checks passed | yes |
+| scripts/verify_decision.py | every check | 62 of 62 checks passed | yes |
+| scripts/verify_gap.py | every check | 338 of 338 checks passed | yes |
+| the gate on the shared copy (scripts/exercise_share.py, in Chrome): its record, run 2026-10-10T22:16:08Z, and whether it is of the files on disk | every step, and yes | 8 of 8 steps; yes | yes |
+
+*33 of 33 gates passed (`50_gap/gates_phase8.csv`).*
+
+### Figures of `docs/RESULTS.md` that changed when it was written again
+
+*Its section 13.1 lists every figure in its text with the file it is read from. This is that list set against the same list in the version of the commit before this run (`50_gap/results_md_changes.csv`, written by `scripts/08_gap_closing_checks.py --phase 8`).*
+
+**Printed differently, old → new: 1.**
+
+| before | now | file | where in the file |
+|---|---|---|---|
+| 2026-10-09T05:37:27Z | 2026-10-10T22:33:10Z | this run | the UTC time at which this script ran |
+
+**Gone: 0.**
+
+**Added: 26.**
+
+| as printed | file | where in the file |
+|---|---|---|
+| 2026-10-10T20:20:22Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
+| 338 of 338 checks passed | `scripts/verify_gap.py` | its exit status and last line, run by this script as it wrote the document |
+| 67.1 | `50_gap/need_vs_allocation_summary.csv` | column `need_share_pct_where_r_below_0_5`; row where `comparison` is 'C1' |
+| 5 | `50_gap/need_vs_allocation_summary.csv` | column `n_districts_r_below_0_5`; row where `comparison` is 'C1' |
+| 1.9 | `50_gap/need_vs_allocation_summary.csv` | column `need_share_pct_where_r_above_2`; row where `comparison` is 'C1' |
+| 7,207.11 | `50_gap/need_vs_allocation_summary.csv` | column `sum_positive_gaps_lakh`; row where `comparison` is 'C1' |
+| 30 | `50_gap/need_vs_allocation_summary.csv` | column `n_districts`; row where `comparison` is 'C1' |
+| 0.67 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'C1' |
+| 0.38 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_lo`; row where `comparison` is 'C1' |
+| 0.84 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_hi`; row where `comparison` is 'C1' |
+| 0.00012 | `50_gap/need_vs_allocation_summary.csv` | column `p_permutation`; row where `comparison` is 'C1' |
+| 0.57 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'B1' |
+| 0.37 | `50_gap/need_vs_allocation_summary.csv` | column `rho`; row where `comparison` is 'C12' |
+| 0.01 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_lo`; row where `comparison` is 'C12' |
+| 0.63 | `50_gap/need_vs_allocation_summary.csv` | column `ci95_hi`; row where `comparison` is 'C12' |
+| 0.226 | `50_gap/panel_models.csv` | column `coefficient`; row where `id` is 'P1' |
+| −0.065 | `50_gap/panel_models.csv` | column `wcb_ci95_lo`; row where `id` is 'P1' |
+| 0.893 | `50_gap/panel_models.csv` | column `wcb_ci95_hi`; row where `id` is 'P1' |
+| 0.383 | `50_gap/panel_models.csv` | column `wcb_p`; row where `id` is 'P1' |
+| 360 | `50_gap/panel_models.csv` | column `n`; row where `id` is 'P1' |
+| −0.14 | `50_gap/unit_history_models.csv` | column `coefficient`; row where `id` is 'H1' |
+| −0.48 | `50_gap/unit_history_models.csv` | column `wcb_ci95_lo`; row where `id` is 'H1' |
+| 0.20 | `50_gap/unit_history_models.csv` | column `wcb_ci95_hi`; row where `id` is 'H1' |
+| 0.379 | `50_gap/unit_history_models.csv` | column `wcb_p`; row where `id` is 'H1' |
+| 2,889 | `50_gap/unit_history_models.csv` | column `n_units`; row where `id` is 'H1' |
+| 1,121 | `50_gap/unit_history_models.csv` | column `n_exposed`; row where `id` is 'H1' |
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `db644c0` Handoff of 11 October, Step 4: Phase 7 - the six figures and the three deck tables, made again from the tables the verifier checked
 - `780b81c` Handoff of 11 October, Step 3: Phase 6 - the independent verifier, its one round of review, and 42 planted errors caught
 - `22a480a` Handoff of 11 October, Step 2: Phase 5b - the need read against the Forest Survey's own district figures
 - `74480bf` Handoff of 11 October, Step 1: the listing of inputs holds every input any step reads; rebuilt, and no table of figures moved
