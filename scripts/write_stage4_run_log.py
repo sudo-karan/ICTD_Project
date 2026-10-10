@@ -270,6 +270,37 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 **What comes next.** Phase 8: the documents.
 """),
     (8, "docs", ["gates_phase8.csv"], [], """
+**What was done.**
+
+- `scripts/write_gap.py` wrote `docs/GAP.md` from the tables. No figure in it is typed; each conclusion drawn from
+  figures was tested against them before it was written; its last section lists where every figure comes from. It
+  has the sections the instruction lists, the owner's decisions of 10 October 2026, and the calls that are proposals.
+- `scripts/write_results.py` wrote `docs/RESULTS.md` again with the four changes the instruction allowed and no
+  other: the sentences of its section 1 that said the fourth stage was not built, the stage table's row, section 11's
+  bullet, and one section appended after the last, so that no section changed its number. **Every figure that
+  changed is listed below, old beside new.**
+- `scripts/write_decision_layer.py` wrote `docs/DECISION_LAYER.md` again: the sentence that said stage 4 is not built
+  now points to `docs/GAP.md`. The three counts of its section 5.1 were moved to the share a unit's panel prints in
+  Phase 1.
+- `README.md` has the stage as built, keeps the original specification under its own heading with a paragraph on why
+  it was superseded, and lists the six figures. Its section on environments came with the owner's corrections.
+- Every verifier was run once more: the last rows of the gate table.
+
+**Calls made in the run.**
+
+- **`docs/LAYER.md` was written again** by its working script: its sentence on stage 4 now points to `docs/GAP.md`.
+  The instruction did not list that document; left alone, it would have gone on saying the stage is being built.
+- **The new section of `docs/RESULTS.md` says what it changes in the sections above it** that the instruction did not
+  open: section 11's bullet on forest-rights titles and section 9's sentence on stage 4 are as they were, and the new
+  section says how the fourth stage bears on each.
+- **Two sentences of `README.md` outside the stage 4 section were changed**: a pointer to `docs/GAP.md` was added at
+  its head, and section 1 no longer says that stage 4 removes the earlier work's second limitation: as built it has
+  no control for remoteness.
+- **The gate on the words of cause was widened** from `docs/GAP.md` to this log, the README's stage 4 text, the new
+  section of `docs/RESULTS.md`, the figures' captions and the deck tables.
+- **Each verifier is run with the interpreter of its stage**: the writers of the documents find the other
+  environment's interpreter themselves (`README.md`, its section on environments).
+
 **What comes next.** Nothing: the run is complete. The report to the owner follows the order he asked for.
 """),
 ]
@@ -351,6 +382,28 @@ def corrections(prov: dict) -> list[str]:
                 out.append(f"| `{step}` | `{name}` | {said} | {cells} |")
         out.append("")
     return out
+
+
+# Shown at the head of the log for as long as Phase 6 has no gate table. It is typed, and carries no figure of the analysis.
+STOPPED_IN_PHASE_6 = """
+**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026.** Phases 0 to 5 and
+the owner's corrections are committed. What is not:
+
+- **Phase 6, the verifier, is not finished.** `scripts/verify_gap.py` does not exist yet. Its parts are written and
+  every one runs on the tables, but the review of each part by a second agent was stopped part-way, so no reviewer
+  has reported; and one check of the part on the inputs fails for a reason that is the builder's: the listing of
+  inputs says it holds every input the stage reads and leaves out the files that three of the steps read on their own.
+  That is to be put right in the builder, and the tables built again, before the verifier is assembled, run and
+  tried against the deliberate errors.
+- **Phase 7 is ready and not committed**: the six figures and the three deck tables are made, their gates pass, and
+  every image has been looked at.
+- **Phase 8 is prepared and not run**: the writers of `docs/GAP.md` and of the new section of `docs/RESULTS.md` pass
+  their dry runs; neither document has been written.
+
+The scripts of those three phases are in the working tree, uncommitted. The working detail a fresh session needs
+(where the verifier's parts are kept, the state of each at the stop, the order of what is left) is in
+`.session_scratch_2026-10-05/IN_FLIGHT.md`, which is not in git.
+"""
 
 
 CORRECTIONS = """
@@ -491,6 +544,8 @@ def main() -> None:
                    if failed else " Every gate of every phase listed passed."), "",
                 "The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: "
                 "the section \"To rebuild\" at the end gives the order.", ""]
+        if not (GAP / "gates_phase6.csv").exists():
+            doc += [STOPPED_IN_PHASE_6.strip(), ""]
     for number, title, gate_files, steps, notes in done:
         doc += [f"## Phase {number}: {title}", "", notes.strip(), ""]
         for g in gate_files:

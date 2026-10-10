@@ -1,12 +1,30 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T18:37:42Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T19:28:15Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
 Phases written up below: 0, 1, 2, 3, 4, 5. The last is Phase 5, forest rights, at the level the data allow. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
+
+**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026.** Phases 0 to 5 and
+the owner's corrections are committed. What is not:
+
+- **Phase 6, the verifier, is not finished.** `scripts/verify_gap.py` does not exist yet. Its parts are written and
+  every one runs on the tables, but the review of each part by a second agent was stopped part-way, so no reviewer
+  has reported; and one check of the part on the inputs fails for a reason that is the builder's: the listing of
+  inputs says it holds every input the stage reads and leaves out the files that three of the steps read on their own.
+  That is to be put right in the builder, and the tables built again, before the verifier is assembled, run and
+  tried against the deliberate errors.
+- **Phase 7 is ready and not committed**: the six figures and the three deck tables are made, their gates pass, and
+  every image has been looked at.
+- **Phase 8 is prepared and not run**: the writers of `docs/GAP.md` and of the new section of `docs/RESULTS.md` pass
+  their dry runs; neither document has been written.
+
+The scripts of those three phases are in the working tree, uncommitted. The working detail a fresh session needs
+(where the verifier's parts are kept, the state of each at the stop, the order of what is left) is in
+`.session_scratch_2026-10-05/IN_FLIGHT.md`, which is not in git.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -532,6 +550,7 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `b80a6c3` Stage 4, the owner's corrections of 10 October: its own environment, requirements-stage4.txt, the forest villages list under his two checks
 - `d9c5130` Stage 4, Phase 5: forest rights, at the level the data allow
 - `957f3aa` Stage 4, Phase 4: the historical companion - units within districts
 - `a0cde28` Stage 4, Phase 3: the district-year panel and its models
