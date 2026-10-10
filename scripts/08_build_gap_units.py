@@ -1,6 +1,6 @@
 """Stage 4, the historical companion: units within districts. Writes into `50_gap/` only.
 
-    .venv/bin/python scripts/08_build_gap_units.py
+    ~/.venvs/ictd-stage4/bin/python scripts/08_build_gap_units.py
 
 The question: in the same district, did units that had forest-named works by FY2017-18 lose a different share of their
 forest in 2018-2025 than units that had none, given their forest and their earlier loss? The exposure comes before the
@@ -175,6 +175,7 @@ def sample(rows, floor, extra, which, outcome, exposure):
 
 
 def main() -> None:
+    G.require_stage4_environment()
     gates: list[tuple] = []
     add = lambda gate, expected, found, ok: gates.append((gate, str(expected), str(found), bool(ok)))
     inputs = {k: G.IN[k] for k in ("condition_by_unit", "hansen_bands", "need_by_unit", "corestack_by_unit", "allocation_by_unit_fy")}

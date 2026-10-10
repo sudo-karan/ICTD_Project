@@ -1,6 +1,6 @@
 """Stage 4: the district-year panel and its models. Writes into `50_gap/` only.
 
-    .venv/bin/python scripts/08_build_gap_panel.py
+    ~/.venvs/ictd-stage4/bin/python scripts/08_build_gap_panel.py
 
 DEFINITIONS (`scripts/verify_gap.py` is written from this text)
 
@@ -47,7 +47,8 @@ plantation is the scheme's label, not specific to forest.
 INFERENCE. 30 clusters, the districts. `se_cr1` is the cluster-robust standard error with the factor
 G/(G-1) x (N-1)/(N-K), for reference. The interval that counts is a restricted wild cluster bootstrap (the `wildboottest`
 package: Webb weights, the null imposed), inverted by refitting with y - b0 * x: the bracket starts at the estimate
-+/- 4 se_cr1 and is doubled, at most ten times, until p is below 0.05 at both ends; p is read on 16 equal steps to each
++/- 4 se_cr1 and is doubled as a whole (both ends together, so the two sides of a term always end the same number of
+se_cr1 from the estimate), at most ten times, until p is below 0.05 at both ends; p is read on 16 equal steps to each
 end and each side is bisected, to 0.001 se_cr1, inside the outermost step where p crosses 0.05. A side that never gets
 below 0.05 is reported unbounded. The p of this bootstrap need not fall steadily as b0 moves away from the estimate, so
 three things are kept for each side: `wcb_crossings_*` (the steps of the grid in which p crosses 0.05),
@@ -202,6 +203,7 @@ def design(rows: list[dict], fe: str, regressors: dict) -> tuple[np.ndarray, lis
 
 
 def main() -> None:
+    G.require_stage4_environment()
     gates: list[tuple] = []
     inputs = {"r620_district": G.IN["r620_district"], "r620_state": G.IN["r620_state"], "hansen_bands": G.IN["hansen_bands"],
               "condition_by_unit": G.IN["condition_by_unit"], "district_crosswalk": G.OUT / "district_crosswalk.csv",
@@ -293,7 +295,7 @@ def main() -> None:
     G.record_step(STEP, Path(__file__), inputs, outputs, {
         "seeds": {"base": SEED, "by_model_and_term": seeds, "bootstrap": "wildboottest, weights_type='webb', impose_null=True"},
         "B": {"P1": B_HEADLINE, "others": B_OTHER},
-        "interval": "test inversion: refit with y - b0 * x; bracket estimate +/- 4 CR1 se, doubled at most 10 times; 16 steps to each end; bisection to 0.001 CR1 se in the outermost step where p crosses 0.05",
+        "interval": "test inversion: refit with y - b0 * x; bracket estimate +/- 4 CR1 se, doubled as a whole (both ends together) at most 10 times until p is below 0.05 at both ends; 16 steps to each end; bisection to 0.001 CR1 se in the outermost step where p crosses 0.05",
         "gates": len(grows), "gates_passed": sum(r["pass"] == "yes" for r in grows)})
     for r in grows:
         print(("ok   " if r["pass"] == "yes" else "FAIL ") + r["gate"] + "  |  expected " + r["expected"] + "  |  found " + r["found"])

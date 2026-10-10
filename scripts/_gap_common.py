@@ -3,6 +3,11 @@
 Stage 4 is the comparison of forest condition, need and allocation, as the project owner ruled it on 10 October 2026
 (`docs/GAP.md`). Everything here reads tables already on disk. Nothing calls Earth Engine or the network.
 
+Stage 4 runs in an environment of its own, outside the repository (`README.md` section 0), which holds exactly what
+`requirements-stage4.txt` pins. The repository's main environment is not touched by it: the bootstrap package needs
+`numba`, which needs an older `numpy` than the earlier stages were built with. Every builder calls
+`require_stage4_environment()` first and stops if it is run anywhere else.
+
 What is in this module, and the conventions every builder keeps:
 
 * **Paths** of every input, in one place (`IN`), and the output folder `50_gap/`.
@@ -19,12 +24,15 @@ What is in this module, and the conventions every builder keeps:
 * **Cells.** The three "loss recorded" cells are `open_loss`, `dense_loss`, `little_loss`; the assisted-natural-
   regeneration cell is `open_none`. Their full names are read from `55_decision/tiers.csv`, never typed.
 * **The provenance record**, `50_gap/gap.provenance.json`: one section per builder, each with every input's SHA-256,
-  the seeds, the package versions and the run time in UTC. A builder rewrites its own section and no other.
+  the seeds, the package versions and the run time in UTC, and under `environment` every package the interpreter
+  holds with its version, the SHA-256 of `requirements-stage4.txt` and whether the two agree. A builder rewrites its
+  own section and no other.
 * **Rank statistics** for 30 districts (`spearman_with_inference`): Spearman's rho with average ranks for ties, a
   two-sided permutation p and a percentile bootstrap interval over districts, with the seeds given by the caller.
 * **Regressions** (`fit_cluster_model`): OLS on complete cases with dummies written out, CR1 standard errors by
   district for reference, and the interval that counts: a restricted wild cluster bootstrap (the `wildboottest`
-  package, Webb weights, the null imposed), inverted by refitting with `y - b0 * x` (`wcb_interval`).
+  package, Webb weights, the null imposed), inverted by refitting with `y - b0 * x` (`wcb_interval`). The bracket is
+  doubled as a whole, both ends together, until p is below 0.05 at both ends: the owner's sentence, to the letter.
 """
 from __future__ import annotations
 
@@ -42,6 +50,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "50_gap"
 PROVENANCE = OUT / "gap.provenance.json"
+REQUIREMENTS = ROOT / "requirements-stage4.txt"                # what the stage-4 environment holds, pinned
 
 IN = {
     "r620_district": ROOT / "00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv",
@@ -210,8 +219,60 @@ def package_versions(names=("python", "numpy", "pandas", "scipy", "statsmodels",
     return out
 
 
+def _canonical(name: str) -> str:
+    return name.strip().lower().replace("_", "-").replace(".", "-")
+
+
+def requirement_pins(path: Path | None = None) -> dict:
+    """`requirements-stage4.txt` as {package: version}: its lines of the form `name==version`, comments apart."""
+    pins = {}
+    for line in (path or REQUIREMENTS).read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        name, eq, version = line.partition("==")
+        if not eq or not version:
+            stop(f"{rel(path or REQUIREMENTS)}: a line is not `name==version`: {line!r}")
+        pins[_canonical(name)] = version.strip()
+    return pins
+
+
+def environment() -> dict:
+    """What the interpreter running this holds, set against `requirements-stage4.txt`.
+
+    Every installed distribution but `pip` itself is listed with its version (`pip freeze` leaves pip out too). The
+    environment "holds exactly what the file pins" when the two lists are the same: no package more, none fewer, no
+    version different.
+    """
+    import importlib.metadata as md
+    held = {}
+    for d in md.distributions():
+        name = _canonical(d.metadata["Name"])
+        if name != "pip":
+            held[name] = d.version
+    pins = requirement_pins()
+    differ = sorted(n for n in set(pins) | set(held) if pins.get(n) != held.get(n))
+    return {"python": sys.version.split()[0], "requirements_file": rel(REQUIREMENTS), "requirements_sha256": sha256(REQUIREMENTS),
+            "packages": dict(sorted(held.items())), "packages_pinned": len(pins),
+            "differences": [f"{n}: pinned {pins.get(n, 'not pinned')}, held {held.get(n, 'not installed')}" for n in differ],
+            "holds_exactly_what_the_file_pins": not differ}
+
+
+def require_stage4_environment() -> dict:
+    """Stop unless this interpreter holds exactly what `requirements-stage4.txt` pins. Returns `environment()`."""
+    if not REQUIREMENTS.exists():
+        stop(f"{rel(REQUIREMENTS)} is missing: stage 4 runs in the environment that file pins (README.md section 0)")
+    env = environment()
+    if not env["holds_exactly_what_the_file_pins"]:
+        stop("this is not the stage-4 environment: it does not hold exactly what requirements-stage4.txt pins "
+             "(README.md section 0 says how to make it). " + "; ".join(env["differences"][:8])
+             + (f"; and {len(env['differences']) - 8} more" if len(env["differences"]) > 8 else ""))
+    return env
+
+
 def record_step(step: str, script: Path, inputs: dict, outputs: list[Path], extra: dict | None = None) -> None:
     """Write this builder's section of `50_gap/gap.provenance.json`, leaving every other section as it is."""
+    env = require_stage4_environment()
     OUT.mkdir(parents=True, exist_ok=True)
     record = {}
     if PROVENANCE.exists():
@@ -229,6 +290,7 @@ def record_step(step: str, script: Path, inputs: dict, outputs: list[Path], extr
         "inputs": {k: {"path": rel(p), "bytes": p.stat().st_size, "sha256": sha256(p)} for k, p in inputs.items()},
         "outputs": {rel(p): {"bytes": p.stat().st_size, "sha256": sha256(p)} for p in outputs},
         "package_versions": package_versions(),
+        "environment": env,
     }
     if extra:
         section.update(extra)
@@ -347,8 +409,9 @@ def wcb_interval(y, X, names, clusters, param: str, B: int, seed: int, estimate:
     """The wild-cluster-bootstrap interval for `param`, by test inversion, and the p-value of H0: beta = 0.
 
     H0: beta = b0 is tested by refitting with `y - b0 * x` (the same seed every time, so the same bootstrap weights).
-    The bracket starts at the estimate +/- 4 CR1 standard errors and is doubled, at most `max_doublings` times, until p
-    is below `level` at both ends. p is then read on `grid_points` equal steps from the estimate to each end; a side is
+    The bracket starts at the estimate +/- 4 CR1 standard errors and is doubled as a whole (both ends move together,
+    so the two sides always reach the same number of standard errors from the estimate), at most `max_doublings` times,
+    until p is below `level` at both ends. p is then read on `grid_points` equal steps from the estimate to each end; a side is
     bisected, to within `tol_se` of a CR1 standard error, inside the OUTERMOST step in which p crosses `level`. If an
     end never gets below `level`, that side is reported unbounded. For each side three things are returned about how p
     behaved along the bracket, because the p of this bootstrap need not fall steadily: `crossings` (how many steps of
@@ -370,12 +433,12 @@ def wcb_interval(y, X, names, clusters, param: str, B: int, seed: int, estimate:
     t0, p0 = wcb_test(y, X, names, clusters, param, B, seed)
     out = {"wcb_t": t0, "wcb_p": p0, "B": B, "seed": seed, "weights": "webb", "impose_null": True}
     grids = {}
+    width = 4.0 * se_cr1
+    doublings = 0
+    while (p_at(estimate - width) >= level or p_at(estimate + width) >= level) and doublings < max_doublings:
+        width *= 2.0                                            # the bracket is doubled as a whole: both ends together
+        doublings += 1
     for side, sign in (("lo", -1.0), ("hi", 1.0)):
-        width = 4.0 * se_cr1
-        doublings = 0
-        while p_at(estimate + sign * width) >= level and doublings < max_doublings:
-            width *= 2.0
-            doublings += 1
         end = estimate + sign * width
         steps = [estimate + sign * width * k / grid_points for k in range(0, grid_points + 1)]
         ps = [p_at(b) for b in steps]

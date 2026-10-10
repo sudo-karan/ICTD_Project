@@ -22,9 +22,9 @@ Writes into `50_gap/` only:
   the owner's, read by him from the files and documents he names; none is changed here, and a gate that fails stops the
   run after the whole table has been written, so that what was found can be read.
 * its section of `gap.provenance.json`.
-* with `--verifiers`, and only then: `environment_verifiers_after_install.csv`, the last line (for `verify_r620.py`, its
-  line of success) of each verifier that existed before stage 4, run by this script under the environment as it now
-  is, with the time. It is how the run log shows that moving numpy changed no count. Nothing else is done in that mode.
+
+Run with the stage-4 interpreter (`README.md` section 0): `~/.venvs/ictd-stage4/bin/python scripts/08_gap_inputs.py`. The gate on the
+environments themselves is `scripts/08_gap_environment.py`.
 
 Sums of money and hectares are exact (`decimal.Decimal`). A share in per cent is compared after rounding to the two
 decimals the expected value has. No Earth Engine, no network.
@@ -275,27 +275,9 @@ def other_gates(fra, bands, cond, need, gates) -> None:
                   len(lgd) == 7976))
 
 
-def verifiers() -> None:
-    """Run the four verifiers that existed before stage 4 and write down what each said."""
-    import subprocess
-    out = []
-    for script in ("verify_r620.py", "verify_agreement.py", "verify_layer.py", "verify_decision.py"):
-        r = subprocess.run([sys.executable, str(G.ROOT / "scripts" / script)], capture_output=True, text=True, cwd=G.ROOT)
-        lines = [l.strip() for l in r.stdout.splitlines() if l.strip()]
-        said = next((l for l in lines if l.startswith("OK ")), lines[-1] if lines else "")
-        out.append({"verifier": f"scripts/{script}", "sha256": G.sha256(G.ROOT / "scripts" / script), "exit": r.returncode,
-                    "result": said, "run_utc": G.utc_now(), "numpy": G.package_versions()["numpy"]})
-        print(script, r.returncode, said)
-    G.write_rows(G.OUT / "environment_verifiers_after_install.csv", out,
-                 ["verifier", "sha256", "exit", "result", "run_utc", "numpy"])
-    if any(o["exit"] != 0 for o in out):
-        G.stop("a verifier that passed before the install does not pass now")
-
-
 def main() -> None:
+    G.require_stage4_environment()
     G.OUT.mkdir(parents=True, exist_ok=True)
-    if "--verifiers" in sys.argv[1:]:
-        return verifiers()
     files = listing()
     (G.OUT / "inputs_listing.json").write_text(json.dumps({"run_utc": G.utc_now(), "inputs": files}, indent=1) + "\n",
                                                encoding="utf-8")

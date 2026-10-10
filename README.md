@@ -15,6 +15,38 @@ owner's rulings of 9 October 2026 and what is still open for the Foundation for 
 
 ---
 
+## 0. Environments
+
+Two Python environments, both Python 3.12. Neither is in git.
+
+**The main environment, `.venv/` in the repository.** Stages 0 to 3, the decision tables, the layer and its copy, and
+their verifiers and document writers run here. `CLAUDE.md` lists what it is expected to hold; the versions each stage
+was built with are in the provenance record beside that stage's output. Stage 4 changes nothing in it.
+
+**Stage 4's own environment, outside the repository.** Stage 4 only reads files the earlier stages wrote. Its
+bootstrap package (`wildboottest`) needs `numba`, and `numba` needs an older `numpy` than the earlier stages were
+built with, so stage 4 has an environment of its own. `requirements-stage4.txt` pins exactly what that environment
+holds. To make it:
+
+```
+python3.12 -m venv ~/.venvs/ictd-stage4
+~/.venvs/ictd-stage4/bin/python -m pip install --only-binary=:all: -r requirements-stage4.txt
+~/.venvs/ictd-stage4/bin/python scripts/08_gap_environment.py     # the gate on both environments
+```
+
+Run with that interpreter: `scripts/08_gap_environment.py`, `08_gap_inputs.py`, every `08_build_gap_*.py`,
+`08_gap_closing_checks.py`, `verify_gap.py`, `verify_gap_trials.py`, `make_stage4_figures.py` and `write_gap.py`.
+Each builder stops unless the interpreter running it holds exactly what the file pins, no package more and none
+fewer, and writes the list into `50_gap/gap.provenance.json`. `08_gap_environment.py` holds, besides, that the main
+environment's `numpy` is the version the earlier stages' provenance records show, and that `verify_r620.py`,
+`verify_layer.py` and `verify_decision.py` pass there.
+
+A writer that needs a verifier of the other environment finds the other interpreter by itself: `write_results.py`
+(main) runs `verify_gap.py` with `~/.venvs/ictd-stage4/bin/python`, and `write_gap.py` (stage 4) runs the earlier
+verifiers with `.venv/bin/python`. Set `ICTD_STAGE4_ENV` or `ICTD_MAIN_PYTHON` if either is somewhere else.
+
+---
+
 ## 1. The question
 
 Under VB–G RAM G (in force 1 July 2026), every village plan is drawn on the Yuktdhara portal from a

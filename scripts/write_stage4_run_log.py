@@ -1,12 +1,16 @@
 """Writes `docs/stage4_run_log.md`: what each phase of the stage-4 run did, which gates passed, which files were
 written and what comes next, so that a fresh session can resume from it.
 
-    .venv/bin/python scripts/write_stage4_run_log.py
+    ~/.venvs/ictd-stage4/bin/python scripts/write_stage4_run_log.py [--through N]
+
+With `--through N` the log stops after Phase N, so that the commit that closes a phase carries the log as of that
+phase even where a later phase's files are already on disk.
 
 No figure in the log is typed. The gate tables are the gate files of `50_gap/` as the builders wrote them
 (`inputs_check.csv` and `gates_*.csv`: `gate`, `expected`, `found`, `pass`); the lists of files are read from
-`50_gap/gap.provenance.json`; the list of inputs and their columns from `50_gap/inputs_listing.json`; the package
-versions from the two lists of the environment kept in `50_gap/`. What is typed is the notes below: what a phase was
+`50_gap/gap.provenance.json` (the figures' from `figures/stage4/figures.provenance.json`); the list of inputs and
+their columns from `50_gap/inputs_listing.json`; the package versions and the gate on the two environments from `50_gap/gates_environment.csv` and the provenance record; the deliberate errors from `50_gap/verify_gap_trials.json`; the figures of `docs/RESULTS.md` that changed
+from `50_gap/results_md_changes.csv`. What is typed is the notes below: what a phase was
 for, what was decided in it, and where to pick up. The notes carry no figure of the analysis.
 
 Writes one file, `docs/stage4_run_log.md`. The stage outputs it reads are not in git: if `50_gap/` is empty, run the
@@ -14,6 +18,7 @@ builders in the order the log gives under "To rebuild" and then this script.
 """
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import subprocess
@@ -43,10 +48,15 @@ in `20_degradation/corestack_by_unit.csv` for every unit. The code that classes 
 not a function of its own: it is one expression inside `main()` of `scripts/06_build_layer.py`, built on that file's
 helper `classify`.
 
-**The environment.** The repository had no requirements file; `requirements.txt` was written, pinned. Installing
-`numba`, which `wildboottest` needs, moved `numpy` down, because the newest `numba` with a wheel for this machine does
-not take the `numpy` that was installed. The verifiers that existed were run again after the install and gave the
-counts they gave before (the table under "The environment" below).
+**The environment.** Stage 4 runs in an environment of its own, outside the repository, pinned in
+`requirements-stage4.txt` to exactly what it holds (`README.md` section 0). Every builder stops unless it is run
+there. The repository's main environment is as the earlier stages left it. The gate on both is
+`scripts/08_gap_environment.py`; its table is under "The environments" below.
+
+**That is the owner's correction, not how the run began.** In the first hours the bootstrap's packages were installed
+into the main environment, which moved its `numpy` down, and a file `requirements.txt` was written and committed with
+this phase. The owner ruled both out on the evening of 10 October 2026. The section "The owner's corrections" below
+says what was undone and rebuilt.
 
 **What comes next.** Phase 1: the five leftovers of the last batch.
 """),
@@ -146,8 +156,11 @@ by its writer; they are not repeated here.
   which cluster gets which weight for a given seed.
 - **The p of the wild cluster bootstrap does not fall steadily on every side.** In several models it settles at a
   level instead of going on down as the tested value moves away from the estimate, and in one model it climbs back
-  before falling again. The instruction's rule was applied as written: the bracket is doubled until p is below the
-  level at both ends, and the outermost crossing is reported. Every grid of p values is saved, not only those of the
+  before falling again. The instruction's rule is applied as written: the bracket is doubled, as a whole, until p is
+  below the level at both ends, and the outermost crossing is reported. **The first build did not do that**: it
+  doubled each side of the bracket on its own. The part of the verifier that was written from the definitions alone
+  reported the difference, the builder was changed, and the models were built again (the section on the owner's
+  corrections lists which files moved). Every grid of p values is saved, not only those of the
   two cases the instruction names, and three columns of the models table say, for each side, how many times p crossed
   the level, whether it climbed back, and where it stood at the end of the bracket.
 - **A warning from numpy** ("invalid value encountered in matmul") is printed during the bootstrap on this machine.
@@ -182,24 +195,78 @@ about fifty calls.
 community extent beside need with the label the instruction gave, computed the two rank correlations, and set the
 state's figures beside Odisha's row of the national report, read from the registered table.
 
-**The forest villages list: stopped at the instruction's fourth step, and why.** The PDF was already on disk in
-`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again; the instruction named
-`00_raw/cfr_fra/`, where the tables made from fetched files live. It is registered with a new manifest row that gives
-its exact size and SHA-256; the row that lists its address is as it was. Opened for the first time, it is a scan:
-every page is one image, and the only text in the file is a layer made by the scanner's character recognition. The
-instruction's third step (parse a text layer) and fourth (do not recognise characters in a scan) both bear on such a
-file. The script took the narrower course: it recognised nothing itself, and put the layer that is there to one test
-before using it - the arithmetic of the summary page. The layer fails it (the gate table gives the counts), and no
-printed total can be read, so nothing was parsed, no table was put beside the PDF, and no count was added to
-`district_need.csv`. The file is not matched to units. A transcription by eye, checked against the totals the pages
-print, as was done for the national report's table, is the owner's to ask for.
+**The forest villages list: the owner's rule, and where the step stopped.** The PDF was already on disk in
+`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again. It is registered with
+a manifest row that gives its exact size and SHA-256; the row that lists its address is as it was. It is a scan:
+every page is one image, and the only text in the file is a layer made by someone else's character recognition. The
+owner ruled on the evening of 10 October 2026 that the layer is unverified and is used only if two checks hold: (a)
+that the district counts parsed from it equal every total and running serial number the file prints, exactly; (b)
+that at least five pages chosen at random, rendered upright and read by a reader, match the parsed rows. The script
+reads the layer as `pdftotext` gives it and makes six parts of check (a); the last gate of the table below gives in
+how many rows each part holds. **Check (a) fails.** By the rule the step stopped there: check (b) was not run, nothing
+was parsed into a table beside the PDF, and no count was added to `district_need.csv`. No character recognition was
+run. The file is not matched to units.
+
+**One page was looked at, and that is not check (b).** To see what kind of failure the layer's one bad row of the
+summary page is, that page was rendered and read once by the session. The note is in the record
+(`50_gap/forest_villages_pdf_record.json`) and in `docs/GAP.md`. A transcription of that page by eye, checked against
+the totals it carries, as was done for the national report's table, is the owner's to ask for.
+
+**The first version of this step**, committed with this phase before the owner's rule, tested only the arithmetic of
+the summary page. The rule replaced it.
 
 **What comes next.** Phase 6: independent verification (`scripts/verify_gap.py`).
 """),
     (6, "independent verification", ["gates_phase6.csv"], [], """
 **What comes next.** Phase 7: figures and tables for the paper and the deck.
 """),
-    (7, "figures and tables for the paper and the deck", ["gates_phase7.csv"], ["make_stage4_figures", "08_build_gap_deck_tables"], """
+    (7, "figures and tables for the paper and the deck", ["gates_phase7.csv"], ["08_build_gap_deck_tables"], """
+**What was done.** `scripts/make_stage4_figures.py` drew the six figures the instruction lists into `figures/stage4/`:
+each as a PNG at the resolution asked, an SVG, the CSV of exactly what is plotted, and a caption that gives n and the
+source files. `scripts/08_build_gap_deck_tables.py` cut the three tables for the deck from the stage's tables into
+`50_gap/deck_tables/`, each as CSV and as markdown. Both were first run while the verifier's parts were being written,
+and both were run again after the verifier of Phase 6 had passed, so the figures and the deck tables on disk are of
+the tables it checked.
+
+**How the figure rules are held.** The gate table below gives, for each figure, what a script can measure: its four
+files; the resolution of the PNG; that no pixel is coloured (the map apart, whose palette is one chosen to be told
+apart with colour-blind vision and whose classes are named in its legend); that no title is inside the image; and that
+the script's own layout check found no text on text, no two pieces of text set end to end with less than a word's
+space between them, no label on another point's marker and no leader line through a label. The font is the first of
+Calibri, Carlito and matplotlib's default that the machine has; the gate table says which was found. One claim to a
+figure, units in the axis titles and n on every panel are held by how the script draws them and by its captions; no
+gate measures them.
+
+**The figures were looked at, after a first round in which they could not be.** When they were first drawn the
+session's file tools refused every call (Phase 1) and no image could be opened; the first captions said so. After the
+second loss of power the tools worked again, and each of the six PNGs was opened and looked at. Three faults were
+seen that the script's layout check had passed, and were put right:
+
+- **F1**: the two axis titles ran end to end up the page and read as one.
+- **F4**: two district names stood beside each other's points, each with its line running to its own, so that the
+  figure seemed to name the two points the wrong way round; and two names read as one word.
+- **F3**: the dissolved district boundaries carried dozens of rings a few millimetres across, pieces of a district
+  lying inside its neighbour.
+
+The layout check now also measures text set end to end. The names of F4 are placed by a rule that keeps each beside
+its own point, or ties it there with a line that crosses no other, and the script tries many orders of placing them
+and keeps the tightest arrangement. The six PNGs were looked at again after the last change;
+`50_gap/figures_looked_at.json` holds their SHA-256 and what was seen, and the last-but-three gate of the table holds
+that the PNGs on disk are those. A figure drawn again and differently fails that gate until it is looked at again.
+
+**Calls made in the run.**
+
+- **An ignore line for `figures/stage4/` was added to `.gitignore`**, as every other stage folder has one. The
+  instruction said not to edit that file to admit outputs; this line keeps them out. It is the owner's to take out.
+- **`matplotlib` is in stage 4's environment** to draw the figures, pinned in `requirements-stage4.txt`.
+- **F4 has a second panel**, the same comparison in the earlier period (C5), beside the headline's. Districts are
+  named where either share reaches a threshold the caption states; the caption lists those not named.
+- **F3 leaves the smallest rings of boundary undrawn and carries a scale bar.** The caption gives the threshold, how
+  many rings are left out, and the projection the bar is measured on. The units inside those rings keep their colour.
+- **F6 gives a panel to each unit of measurement**, so that no two units share an axis.
+- **The deck's headline rows carry more decimals than the documents print**; each column's name or the script's
+  docstring states its rounding.
+
 **What comes next.** Phase 8: the documents.
 """),
     (8, "docs", ["gates_phase8.csv"], [], """
@@ -228,24 +295,98 @@ def gate_table(path: Path) -> list[str]:
 
 
 def environment() -> list[str]:
-    before, after = GAP / "environment_before_stage4.txt", GAP / "environment_after_install.txt"
-    if not (before.exists() and after.exists()):
+    gates = GAP / "gates_environment.csv"
+    if not gates.exists():
         return []
-    read = lambda p: dict(l.strip().split("==", 1) for l in p.read_text().splitlines() if "==" in l)
-    b, a = read(before), read(after)
-    out = ["### The environment", "",
-           "`pip freeze` before the install of 10 October 2026 and after it (`50_gap/environment_before_stage4.txt`, "
-           "`50_gap/environment_after_install.txt`). Packages not listed did not change.", "",
-           "| package | before | after |", "|---|---|---|"]
-    for name in sorted(set(a) | set(b), key=str.lower):
-        if a.get(name) != b.get(name):
-            out.append(f"| {name} | {b.get(name, 'not installed')} | {a.get(name, 'removed')} |")
-    checks = GAP / "environment_verifiers_after_install.csv"
-    if checks.exists():
-        out += ["", "The verifiers that existed, run again after the install:", "",
-                "| verifier | its last line or its line of success |", "|---|---|"]
-        out += [f"| `{esc(x['verifier'])}` | {esc(x['result'])} |" for x in rows(checks)]
-    return out + [""]
+    out = ["### The environments", "",
+           "*The gate of `scripts/08_gap_environment.py` (`50_gap/gates_environment.csv`), run with the stage-4 "
+           "interpreter.*", ""] + gate_table(gates) + [""]
+    prov = json.loads((GAP / "gap.provenance.json").read_text(encoding="utf-8"))["steps"].get("08_gap_environment")
+    if prov:
+        e = prov["environment"]
+        out += [f"The stage-4 environment as that step found it (python {e['python']}; `{e['requirements_file']}`, sha256 "
+                f"`{e['requirements_sha256'][:16]}`): " + ", ".join(f"{k} {v}" for k, v in e["packages"].items()) + ".", ""]
+    return out
+
+
+def cells_that_differ(a: Path, b: Path) -> str:
+    """Two versions of a CSV, cell by cell: how many cells differ, or what else does (its columns, its number of rows)."""
+    ra, rb = rows(a), rows(b)
+    if not ra and not rb:
+        return "0"
+    if (list(ra[0].keys()) if ra else []) != (list(rb[0].keys()) if rb else []):
+        return "its columns"
+    if len(ra) != len(rb):
+        return f"its number of rows ({len(ra)} then, {len(rb)} now)"
+    return str(sum(1 for x, y in zip(ra, rb) for k in x if x[k] != y[k]))
+
+
+def corrections(prov: dict) -> list[str]:
+    """What the owner corrected on the evening of 10 October 2026, and each output of the stage as it was built before
+    the corrections set beside the same output as it is now: by its bytes, from the two provenance records, and, for a
+    table, cell by cell against the copy kept from the first build."""
+    kept = GAP / "before_the_corrections"
+    if not (GAP / "gates_environment.csv").exists():
+        return []
+    out = ["## The owner's corrections of 10 October 2026, after Phase 5", "", CORRECTIONS.strip(), ""]
+    if (kept / "gap.provenance.json").exists():
+        was = json.loads((kept / "gap.provenance.json").read_text(encoding="utf-8"))["steps"]
+        out += ["### Each output, built before the corrections and after", "",
+                "*The outputs of the first build are kept in `50_gap/before_the_corrections/` with their provenance record. "
+                "\"The same bytes\" compares the SHA-256 the two records give; for a table that is not the same, the last column "
+                "counts the cells that differ.*", "",
+                "| step | output | the same bytes as before the corrections | cells that differ |", "|---|---|---|---|"]
+        for step in sorted(set(was) | set(prov["steps"])):
+            a, b = was.get(step, {}).get("outputs", {}), prov["steps"].get(step, {}).get("outputs", {})
+            for name in sorted(set(a) | set(b)):
+                cells = ""
+                if name in a and name in b:
+                    same_bytes = a[name]["sha256"] == b[name]["sha256"]
+                    said = "yes" if same_bytes else "**no**"
+                    old = kept / Path(name).relative_to("50_gap")
+                    if not same_bytes and name.endswith(".csv") and old.exists():
+                        cells = cells_that_differ(old, ROOT / name)
+                else:
+                    said = "new: it was not written before" if name in b else "no longer written"
+                out.append(f"| `{step}` | `{name}` | {said} | {cells} |")
+        out.append("")
+    return out
+
+
+CORRECTIONS = """
+The owner corrected three things after Phase 5 had been committed and before the verifier was assembled. Each was
+applied before Phase 6, and the phases above are written up as they now stand.
+
+1. **Stage 4 gets an environment of its own.** The first hours of the run had installed the bootstrap's packages into
+   the repository's main environment and moved its `numpy` down. The main environment was put back to the list of
+   packages it had before, to the line, and `verify_r620.py`, `verify_layer.py` and `verify_decision.py` were run
+   there. Stage 4 now runs in an environment outside the repository; every builder stops unless it is run there; and
+   every table of the stage was built again in it.
+2. **`requirements-stage4.txt`**, at the root of the repository, pins exactly what that environment holds. The file
+   `requirements.txt`, committed with Phase 0, was taken out. `README.md` has a section on the two environments, and
+   every step's section of the provenance record lists the packages it ran with.
+3. **The forest villages PDF.** Its text layer is someone else's character recognition and is unverified. It is used
+   only if two checks hold (Phase 5, above); the first fails, and the step stops there.
+
+Two things were changed with the rebuild that the owner did not ask for, and both are listed in `docs/GAP.md` as
+proposals. The bracket of the bootstrap interval is now doubled as a whole (Phase 3, above). And the two totals of
+the comparison of intensities are blank in the summary of comparisons: thirty ratios added are a total of nothing.
+
+**What moved.** The table at the end of this section sets every output of the first build beside the same output
+now. The tables of figures are byte for byte what they were, with two exceptions the table counts cell by cell: the
+summary of comparisons (the two totals now blank) and the table of the panel models (the p at the outer end of the
+bracket, on the two sides whose bracket is now wider; no estimate, no interval and no p of a model moved). The other
+files that differ are the record and the gate table of the forest villages step, which follow the owner's rule, and
+files that carry the time they were written or the grids of the wider brackets.
+
+After the second loss of power the session's file tools and the network worked again. That is how the new
+environment could be installed, how one page of the PDF could be looked at, and how the figures could at last be
+looked at (Phase 7).
+
+The verifier's parts were being written by four agents when the machine lost power a second time. Each had finished
+its part and was running its last trials; none had reported. Their parts and working folders were on disk and were
+kept. Each part was then reviewed, attacked and brought up to date by a fresh agent (Phase 6).
+"""
 
 
 def inputs() -> list[str]:
@@ -266,6 +407,59 @@ def inputs() -> list[str]:
     return out + [""]
 
 
+def trials() -> list[str]:
+    p = GAP / "verify_gap_trials.json"
+    if not p.exists():
+        return []
+    t = json.loads(p.read_text(encoding="utf-8"))
+    out = ["### The deliberate errors", "",
+           f"*Run {t['run_utc']} by `scripts/verify_gap_trials.py` (`50_gap/verify_gap_trials.json`): {t['how']}.*", "",
+           f"The control, {t['control']['what']}: {t['control']['last_line']}.", "",
+           "| error planted | kind | table damaged | parts of the verifier run | checks failed, of those run | caught |",
+           "|---|---|---|---|---|---|"]
+    for x in t["trials"]:
+        out.append(f"| {esc(x['name'])} | {esc(x['kind'])} | {', '.join('`' + y + '`' for y in x['tables'])} | "
+                   f"{', '.join(x['parts_run'])} | {x['checks_failed']} of {x['checks_run']} | {'yes' if x['caught'] else 'NO'} |")
+    out += ["", f"*{sum(x['caught'] for x in t['trials'])} of {len(t['trials'])} errors caught; tables damaged: "
+            f"{len({y for x in t['trials'] for y in x['tables']})}.*", ""]
+    return out
+
+
+def figures() -> list[str]:
+    p = ROOT / "figures" / "stage4" / "figures.provenance.json"
+    if not p.exists():
+        return []
+    f = json.loads(p.read_text(encoding="utf-8"))
+    out = [f"### Files written by `{f['script']}` (run {f['run_utc']}; font {f['font']['font']})", ""]
+    out += [f"- `{name}` ({meta['bytes']:,} bytes, sha256 `{meta['sha256'][:16]}`)" for name, meta in f["outputs"].items()]
+    return out + [""]
+
+
+def results_changes() -> list[str]:
+    p = GAP / "results_md_changes.csv"
+    if not p.exists():
+        return []
+    r = rows(p)
+    out = ["### Figures of `docs/RESULTS.md` that changed when it was written again", "",
+           "*Its section 13.1 lists every figure in its text with the file it is read from. This is that list set "
+           "against the same list in the version of the commit before this run (`50_gap/results_md_changes.csv`, "
+           "written by `scripts/08_gap_closing_checks.py --phase 8`).*", ""]
+    for kind, title in (("changed", "Printed differently, old → new"), ("gone", "Gone"), ("added", "Added")):
+        some = [x for x in r if x["kind"] == kind]
+        out += [f"**{title}: {len(some)}.**", ""]
+        if not some:
+            continue
+        if kind == "changed":
+            out += ["| before | now | file | where in the file |", "|---|---|---|---|"]
+            out += [f"| {esc(x['as_printed_before'])} | {esc(x['as_printed_now'])} | {esc(x['file'])} | {esc(x['where_in_the_file'])} |" for x in some]
+        else:
+            col = "as_printed_before" if kind == "gone" else "as_printed_now"
+            out += ["| as printed | file | where in the file |", "|---|---|---|"]
+            out += [f"| {esc(x[col])} | {esc(x['file'])} | {esc(x['where_in_the_file'])} |" for x in some]
+        out.append("")
+    return out
+
+
 def commits() -> list[str]:
     r = subprocess.run(["git", "log", "--format=%h %s", "16b1efd..HEAD"], capture_output=True, text=True, cwd=ROOT)
     lines = [l for l in r.stdout.splitlines() if l.strip()]
@@ -277,10 +471,13 @@ def commits() -> list[str]:
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--through", type=int, metavar="N", help="stop the log after Phase N")
+    a = ap.parse_args()
     prov = json.loads((GAP / "gap.provenance.json").read_text(encoding="utf-8")) if (GAP / "gap.provenance.json").exists() \
         else {"steps": {}}
     written = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    done = [p for p in PHASES if all((GAP / g).exists() for g in p[2])]
+    done = [p for p in PHASES if all((GAP / g).exists() for g in p[2]) and (a.through is None or p[0] <= a.through)]
     doc = ["# Stage 4: the run log", "",
            f"*Written {written} by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the "
            "package versions are read from the files named beside them; the notes are typed and carry no figure of the "
@@ -307,20 +504,36 @@ def main() -> None:
             doc.append("")
         if number == 0:
             doc += environment() + inputs()
+        if number == 5:
+            doc += corrections(prov)
+        if number == 6:
+            doc += trials()
+        if number == 7:
+            doc += figures()
+        if number == 8:
+            doc += results_changes()
     doc += commits()
     doc += ["## To rebuild", "",
             "Each builder writes into `50_gap/` only and stops at the first gate that fails. In order:", "",
             "```",
-            ".venv/bin/python scripts/08_gap_inputs.py            # Phase 0",
-            ".venv/bin/python scripts/08_build_gap_districts.py   # Phase 2",
-            ".venv/bin/python scripts/08_build_gap_panel.py       # Phase 3",
-            ".venv/bin/python scripts/08_build_gap_units.py       # Phase 4",
-            ".venv/bin/python scripts/08_build_gap_rights.py      # Phase 5",
-            ".venv/bin/python scripts/verify_gap.py               # Phase 6",
-            ".venv/bin/python scripts/08_build_gap_deck_tables.py # Phase 7",
-            ".venv/bin/python scripts/make_stage4_figures.py      # Phase 7",
-            ".venv/bin/python scripts/write_gap.py                # Phase 8",
-            ".venv/bin/python scripts/write_stage4_run_log.py",
+            "python3.12 -m venv ~/.venvs/ictd-stage4      # once: stage 4's own environment (README.md section 0)",
+            "PY=~/.venvs/ictd-stage4/bin/python",
+            "$PY -m pip install --only-binary=:all: -r requirements-stage4.txt",
+            "$PY scripts/08_gap_environment.py        # the gate on the two environments",
+            "$PY scripts/08_gap_inputs.py             # Phase 0",
+            "$PY scripts/08_build_gap_districts.py    # Phase 2",
+            "$PY scripts/08_build_gap_panel.py        # Phase 3",
+            "$PY scripts/08_build_gap_units.py        # Phase 4",
+            "$PY scripts/08_build_gap_rights.py       # Phase 5",
+            "$PY scripts/verify_gap.py                # Phase 6",
+            "$PY scripts/verify_gap_trials.py         # Phase 6",
+            "$PY scripts/08_build_gap_deck_tables.py  # Phase 7",
+            "$PY scripts/make_stage4_figures.py       # Phase 7",
+            "$PY scripts/write_gap.py                 # Phase 8",
+            "$PY scripts/08_gap_closing_checks.py --phase 6   # and 7, and 8: the gates of the last three phases",
+            "$PY scripts/write_stage4_run_log.py",
+            ".venv/bin/python scripts/write_results.py            # Phase 8, in the main environment",
+            ".venv/bin/python scripts/write_decision_layer.py     # Phase 8, in the main environment",
             "```", "",
             "A script named above that does not exist yet belongs to a phase that has not been reached.", ""]
     OUT.write_text("\n".join(doc), encoding="utf-8")

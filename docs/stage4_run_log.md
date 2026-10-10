@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T16:17:59Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T18:37:42Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -24,10 +24,15 @@ in `20_degradation/corestack_by_unit.csv` for every unit. The code that classes 
 not a function of its own: it is one expression inside `main()` of `scripts/06_build_layer.py`, built on that file's
 helper `classify`.
 
-**The environment.** The repository had no requirements file; `requirements.txt` was written, pinned. Installing
-`numba`, which `wildboottest` needs, moved `numpy` down, because the newest `numba` with a wheel for this machine does
-not take the `numpy` that was installed. The verifiers that existed were run again after the install and gave the
-counts they gave before (the table under "The environment" below).
+**The environment.** Stage 4 runs in an environment of its own, outside the repository, pinned in
+`requirements-stage4.txt` to exactly what it holds (`README.md` section 0). Every builder stops unless it is run
+there. The repository's main environment is as the earlier stages left it. The gate on both is
+`scripts/08_gap_environment.py`; its table is under "The environments" below.
+
+**That is the owner's correction, not how the run began.** In the first hours the bootstrap's packages were installed
+into the main environment, which moved its `numpy` down, and a file `requirements.txt` was written and committed with
+this phase. The owner ruled both out on the evening of 10 October 2026. The section "The owner's corrections" below
+says what was undone and rebuilt.
 
 **What comes next.** Phase 1: the five leftovers of the last batch.
 
@@ -74,54 +79,44 @@ counts they gave before (the table under "The environment" below).
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T11:15:55Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T18:08:08Z)
 
-- `50_gap/inputs_listing.json` (18,145 bytes, sha256 `2d95552d9feebac5`)
+- `50_gap/inputs_listing.json` (18,145 bytes, sha256 `825ed1ac59aea15b`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
 
-### The environment
+### The environments
 
-`pip freeze` before the install of 10 October 2026 and after it (`50_gap/environment_before_stage4.txt`, `50_gap/environment_after_install.txt`). Packages not listed did not change.
+*The gate of `scripts/08_gap_environment.py` (`50_gap/gates_environment.csv`), run with the stage-4 interpreter.*
 
-| package | before | after |
-|---|---|---|
-| contourpy | not installed | 1.4.0 |
-| cycler | not installed | 0.12.1 |
-| fonttools | not installed | 4.66.1 |
-| formulaic | not installed | 1.2.2 |
-| interface_meta | not installed | 2.0.1 |
-| kiwisolver | not installed | 1.5.1 |
-| llvmlite | not installed | 0.45.1 |
-| matplotlib | not installed | 3.11.2 |
-| numba | not installed | 0.62.1 |
-| numpy | 2.5.3 | 2.3.5 |
-| patsy | not installed | 1.0.3 |
-| pillow | not installed | 12.3.0 |
-| statsmodels | not installed | 0.15.0 |
-| tabulate | not installed | 0.10.0 |
-| wildboottest | not installed | 0.3.2 |
-| wrapt | not installed | 2.5.0 |
+| gate | expected | found | pass |
+|---|---|---|---|
+| the interpreter running stage 4 holds exactly what requirements-stage4.txt pins (no package more, none fewer, no version different; pip itself apart) | yes: the 29 packages the file pins | yes: 29 packages held | yes |
+| the stage-4 environment is outside the repository | yes | yes | yes |
+| the stage-4 environment: wildboottest | 0.3.2 | 0.3.2 | yes |
+| the stage-4 environment: numba | 0.62.1 | 0.62.1 | yes |
+| the stage-4 environment: numpy | 2.3.x | 2.3.5 | yes |
+| the main environment: numpy is the version the provenance records of the earlier stages show (8 records read) | 2.5.3 (one version in every record) | 2.5.3 | yes |
+| the main environment's list of packages (pip freeze) against the list kept before stage 4 installed anything (50_gap/environment_before_stage4.txt) | the same, line for line (42 packages) | the same: 42 packages | yes |
+| packages stage 4 added that the main environment holds (numba, llvmlite, wildboottest, statsmodels, tabulate, matplotlib) | none | none | yes |
+| in the main environment, with numpy 2.5.3: scripts/verify_r620.py | it passes (it prints no count of checks: its line of success) | OK  1170 district rows reconcile to all 39 printed Total rows | yes |
+| in the main environment, with numpy 2.5.3: scripts/verify_layer.py | 92 of 92 checks passed | 92 of 92 checks passed | yes |
+| in the main environment, with numpy 2.5.3: scripts/verify_decision.py | every check | 62 of 62 checks passed | yes |
 
-The verifiers that existed, run again after the install:
+*11 of 11 gates passed (`50_gap/gates_environment.csv`).*
 
-| verifier | its last line or its line of success |
-|---|---|
-| `scripts/verify_r620.py` | OK  1170 district rows reconcile to all 39 printed Total rows |
-| `scripts/verify_agreement.py` | 41 of 41 checks passed; n = 11,468 units, 2,891 assessed at 100 ha, 2,423 in the headline population |
-| `scripts/verify_layer.py` | 92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays |
-| `scripts/verify_decision.py` | 61 of 61 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts |
+The stage-4 environment as that step found it (python 3.12.13; `requirements-stage4.txt`, sha256 `ce2ca3bda40374df`): certifi 2026.7.22, contourpy 1.4.0, cycler 0.12.1, fonttools 4.66.1, formulaic 1.2.2, geopandas 1.2.0, interface-meta 2.0.1, kiwisolver 1.5.1, llvmlite 0.45.1, matplotlib 3.11.2, narwhals 2.26.0, numba 0.62.1, numpy 2.3.5, packaging 26.3, pandas 3.0.6, patsy 1.0.3, pillow 12.3.0, pyogrio 0.13.0, pyparsing 3.3.3, pyproj 3.8.0, python-dateutil 2.9.0.post0, scipy 1.18.1, shapely 2.1.2, six 1.17.0, statsmodels 0.15.0, tabulate 0.10.0, typing-extensions 4.16.0, wildboottest 0.3.2, wrapt 2.5.0.
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-10T11:15:53Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-10T18:08:06Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
 - `00_raw/cfr_fra/odisha_fra_mpr_district_2025-12-31.csv` (6,289 bytes; 30 rows): `district`, `pc11_district_code`, `frcs_constituted`, `claims_filed_gs_ind_st`, `claims_filed_gs_ind_otfd`, `claims_filed_gs_comm_st`, `claims_filed_gs_comm_otfd`, `claims_filed_gs_total_st`, `claims_filed_gs_total_otfd`, `claims_gs_to_sdlc_ind_st`, `claims_gs_to_sdlc_ind_otfd`, `claims_gs_to_sdlc_comm_st`, `claims_gs_to_sdlc_comm_otfd`, `claims_gs_to_sdlc_total_st`, `claims_gs_to_sdlc_total_otfd`, `claims_sdlc_to_dlc_ind_st`, `claims_sdlc_to_dlc_ind_otfd`, `claims_sdlc_to_dlc_comm_st`, `claims_sdlc_to_dlc_comm_otfd`, `claims_sdlc_to_dlc_total_st`, `claims_sdlc_to_dlc_total_otfd`, `claims_approved_dlc_ind_st`, `claims_approved_dlc_ind_otfd`, `claims_approved_dlc_comm_st`, `claims_approved_dlc_comm_otfd`, `claims_approved_dlc_total_st`, `claims_approved_dlc_total_otfd`, `titles_distributed_ind_st`, `titles_distributed_ind_otfd`, `titles_distributed_comm_st`, `titles_distributed_comm_otfd`, `titles_distributed_total_st`, `titles_distributed_total_otfd`, `extent_ha_ind_st`, `extent_ha_ind_otfd`, `extent_ha_comm_st`, `extent_ha_comm_otfd`, `extent_ha_total_st`, `extent_ha_total_otfd`, `claims_rejected_ind_st`, `claims_rejected_ind_otfd`, `claims_rejected_comm_st`, `claims_rejected_comm_otfd`, `claims_rejected_total_st`, `claims_rejected_total_otfd`
 - `00_raw/cfr_fra/mota_fra_state_wise_2025-12-31.csv` (2,273 bytes; 21 rows): `state`, `claims_received_individual`, `claims_received_community`, `claims_received_total`, `titles_distributed_individual`, `titles_distributed_community`, `titles_distributed_total`, `extent_acres_individual`, `extent_acres_community`, `extent_acres_total`, `extent_ha_individual`, `extent_ha_community`, `extent_ha_total`
-- `00_raw/data_manifest.csv` (59,778 bytes; 92 rows): `item_id`, `group`, `priority`, `title`, `kind`, `ref`, `bytes`, `bytes_exact`, `dest`, `licence_or_terms`, `how_verified_2026_10_04`, `notes`
+- `00_raw/data_manifest.csv` (65,068 bytes; 96 rows): `item_id`, `group`, `priority`, `title`, `kind`, `ref`, `bytes`, `bytes_exact`, `dest`, `licence_or_terms`, `how_verified_2026_10_04`, `notes`
 - `10_units/units.gpkg` (48,369,664 bytes; 11,468 rows): `unit_id`, `pc11_district_code`, `pc11_subdistrict_code`, `n_villages`, `unit_name`, `unit_level`, `outside_village`, `area_ha`
 - `10_units/outside_village_district.csv` (536,828 bytes; 3,492 rows): `unit_id`, `unit_name`, `district_2001_label`, `subdistrict_2001_label`, `pc11_district_code`, `district`, `assigned_by`, `area_cover_share`, `area_majority_district_code`, `area_majority_district`, `area_majority_share_of_unit`, `area_second_district_code`, `area_second_share_of_unit`, `area_majority_agrees_with_assigned`, `ambiguous_by_area`, `neighbours_district_code`, `neighbours_district`, `neighbours_share`, `neighbours_second_district_code`, `neighbours_second_share`, `neighbours_n_districts`, `neighbours_by_code_district_code`, `neighbours_agree_with_assigned`, `label_district_share_in_collar`, `label_absent_from_collar`, `ambiguous_by_collar`, `ambiguous`, `ambiguous_basis`, `area_ha`
 - `20_degradation/hansen_loss_by_canopy_band_by_unit.csv` (4,675,831 bytes; 11,468 rows): `unit_id`, `unit_level`, `outside_village`, `area_ha_le10`, `area_ha_gt10le30`, `area_ha_gt30`, `loss_ha_le10`, `loss_ha_gt10le30`, `loss_ha_gt30`, `loss_ha_any_cover`, `area_ha_eq0`, `loss_ha_eq0`, `loss_ha_le10_2001`, `loss_ha_le10_2002`, `loss_ha_le10_2003`, `loss_ha_le10_2004`, `loss_ha_le10_2005`, `loss_ha_le10_2006`, `loss_ha_le10_2007`, `loss_ha_le10_2008`, `loss_ha_le10_2009`, `loss_ha_le10_2010`, `loss_ha_le10_2011`, `loss_ha_le10_2012`, `loss_ha_le10_2013`, `loss_ha_le10_2014`, `loss_ha_le10_2015`, `loss_ha_le10_2016`, `loss_ha_le10_2017`, `loss_ha_le10_2018`, `loss_ha_le10_2019`, `loss_ha_le10_2020`, `loss_ha_le10_2021`, `loss_ha_le10_2022`, `loss_ha_le10_2023`, `loss_ha_le10_2024`, `loss_ha_le10_2025`, `loss_ha_gt10le30_2001`, `loss_ha_gt10le30_2002`, `loss_ha_gt10le30_2003`, `loss_ha_gt10le30_2004`, `loss_ha_gt10le30_2005`, `loss_ha_gt10le30_2006`, `loss_ha_gt10le30_2007`, `loss_ha_gt10le30_2008`, `loss_ha_gt10le30_2009`, `loss_ha_gt10le30_2010`, `loss_ha_gt10le30_2011`, `loss_ha_gt10le30_2012`, `loss_ha_gt10le30_2013`, `loss_ha_gt10le30_2014`, `loss_ha_gt10le30_2015`, `loss_ha_gt10le30_2016`, `loss_ha_gt10le30_2017`, `loss_ha_gt10le30_2018`, `loss_ha_gt10le30_2019`, `loss_ha_gt10le30_2020`, `loss_ha_gt10le30_2021`, `loss_ha_gt10le30_2022`, `loss_ha_gt10le30_2023`, `loss_ha_gt10le30_2024`, `loss_ha_gt10le30_2025`, `loss_ha_gt30_2001`, `loss_ha_gt30_2002`, `loss_ha_gt30_2003`, `loss_ha_gt30_2004`, `loss_ha_gt30_2005`, `loss_ha_gt30_2006`, `loss_ha_gt30_2007`, `loss_ha_gt30_2008`, `loss_ha_gt30_2009`, `loss_ha_gt30_2010`, `loss_ha_gt30_2011`, `loss_ha_gt30_2012`, `loss_ha_gt30_2013`, `loss_ha_gt30_2014`, `loss_ha_gt30_2015`, `loss_ha_gt30_2016`, `loss_ha_gt30_2017`, `loss_ha_gt30_2018`, `loss_ha_gt30_2019`, `loss_ha_gt30_2020`, `loss_ha_gt30_2021`, `loss_ha_gt30_2022`, `loss_ha_gt30_2023`, `loss_ha_gt30_2024`, `loss_ha_gt30_2025`
@@ -134,7 +129,7 @@ The verifiers that existed, run again after the install:
 - `40_allocation/assets_district_fy.csv` (65,174 bytes; 579 rows): `district_file`, `district_property`, `pc11_district_code`, `fy_work_start`, `n_works`, `n_works_expenditure_na`, `expenditure_total`, `n_works_plantation_category`, `n_works_plantation_category_expenditure_na`, `expenditure_plantation_category`, `n_works_forestry_worktype`, `n_works_forestry_worktype_expenditure_na`, `expenditure_forestry_worktype`, `n_works_forest_named_worktype`, `n_works_forest_named_worktype_expenditure_na`, `expenditure_forest_named_worktype`, `n_works_water`, `n_works_water_expenditure_na`, `expenditure_water`, `n_works_category_unknown`, `persondays`, `n_works_persondays_reported`
 - `55_decision/condition_by_unit.csv` (7,275,979 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `dense_2000_ha`, `open_2000_ha`, `low_2000_ha`, `standing_dense_ha`, `standing_open_ha`, `standing_forest_ha`, `standing_row`, `dense_open_ratio`, `near_dense_open_boundary`, `loss_dense_ha_2018_2025`, `loss_open_ha_2018_2025`, `forest_loss_ha_2018_2025`, `loss_low_ha_2018_2025`, `loss_column_2018_2025`, `cell_2018_2025`, `order_in_district_cell_2018_2025`, `forest_at_window_start_ha_2018_2025`, `forest_loss_share_pct_2018_2025`, `forest_loss_share_blank_because_2018_2025`, `order_in_district_cell_by_share_2018_2025`, `loss_dense_ha_2001_2025`, `loss_open_ha_2001_2025`, `forest_loss_ha_2001_2025`, `loss_low_ha_2001_2025`, `loss_column_2001_2025`, `cell_2001_2025`, `order_in_district_cell_2001_2025`, `forest_at_window_start_ha_2001_2025`, `forest_loss_share_pct_2001_2025`, `forest_loss_share_blank_because_2001_2025`, `order_in_district_cell_by_share_2001_2025`, `loss_dense_ha_2017_2023`, `loss_open_ha_2017_2023`, `forest_loss_ha_2017_2023`, `loss_low_ha_2017_2023`, `loss_column_2017_2023`, `cell_2017_2023`, `order_in_district_cell_2017_2023`, `forest_at_window_start_ha_2017_2023`, `forest_loss_share_pct_2017_2023`, `forest_loss_share_blank_because_2017_2023`, `order_in_district_cell_by_share_2017_2023`, `loss_dense_ha_2021_2025`, `loss_open_ha_2021_2025`, `forest_loss_ha_2021_2025`, `loss_low_ha_2021_2025`, `loss_column_2021_2025`, `cell_2021_2025`, `order_in_district_cell_2021_2025`, `forest_at_window_start_ha_2021_2025`, `forest_loss_share_pct_2021_2025`, `forest_loss_share_blank_because_2021_2025`, `order_in_district_cell_by_share_2021_2025`, `tier_provisional_2018_2025`, `corroboration`, `corroboration_basis`, `corroboration_window`, `agreement_reference_ha`, `agreement_corestack_valued_ha`, `district_check`, `governance_prompt`
 - `55_decision/tiers.csv` (3,015 bytes; 6 rows): `tier`, `cell`, `tier_label`, `cell_name`, `standing_row`, `loss_column`, `what_the_name_rests_on`, `why_this_place_in_the_order`, `status`
-- `docs/DATA_NOTES.md` (15,524 bytes)
+- `docs/DATA_NOTES.md` (17,069 bytes)
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
 - `scripts/06_build_layer.py` (69,130 bytes)
@@ -291,12 +286,12 @@ will be written into `docs/GAP.md` by its writer.
 
 *30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
 
-### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T15:43:09Z)
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T18:10:47Z)
 
 - `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
 - `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
 - `50_gap/need_vs_allocation.csv` (38,574 bytes, sha256 `4145eb19ecb474d0`)
-- `50_gap/need_vs_allocation_summary.csv` (5,018 bytes, sha256 `4e46a9cf7dd18c51`)
+- `50_gap/need_vs_allocation_summary.csv` (5,000 bytes, sha256 `77831ac32e2c5717`)
 - `50_gap/marginalisation_split.csv` (7,305 bytes, sha256 `df523c940c65776f`)
 - `50_gap/what_more.csv` (12,125 bytes, sha256 `c70bc6eb0d75b804`)
 - `50_gap/gates_phase2.csv` (3,247 bytes, sha256 `984723269ebd05b0`)
@@ -317,8 +312,11 @@ by its writer; they are not repeated here.
   which cluster gets which weight for a given seed.
 - **The p of the wild cluster bootstrap does not fall steadily on every side.** In several models it settles at a
   level instead of going on down as the tested value moves away from the estimate, and in one model it climbs back
-  before falling again. The instruction's rule was applied as written: the bracket is doubled until p is below the
-  level at both ends, and the outermost crossing is reported. Every grid of p values is saved, not only those of the
+  before falling again. The instruction's rule is applied as written: the bracket is doubled, as a whole, until p is
+  below the level at both ends, and the outermost crossing is reported. **The first build did not do that**: it
+  doubled each side of the bracket on its own. The part of the verifier that was written from the definitions alone
+  reported the difference, the builder was changed, and the models were built again (the section on the owner's
+  corrections lists which files moved). Every grid of p values is saved, not only those of the
   two cases the instruction names, and three columns of the models table say, for each side, how many times p crossed
   the level, whether it climbed back, and where it stood at the end of the bracket.
 - **A warning from numpy** ("invalid value encountered in matmul") is printed during the bootstrap on this machine.
@@ -347,12 +345,12 @@ by its writer; they are not repeated here.
 
 *13 of 13 gates passed (`50_gap/gates_phase3.csv`).*
 
-### Files written by `scripts/08_build_gap_panel.py` (run 2026-10-10T16:05:10Z)
+### Files written by `scripts/08_build_gap_panel.py` (run 2026-10-10T18:24:03Z)
 
 - `50_gap/district_year_panel.csv` (59,379 bytes, sha256 `49012547ee8ec3f5`)
-- `50_gap/panel_models.csv` (5,072 bytes, sha256 `98d6c2f1cb5b4fba`)
-- `50_gap/panel_models.txt` (4,986 bytes, sha256 `81b33c5912c35fad`)
-- `50_gap/panel_models_wcb_grids.json` (21,684 bytes, sha256 `6e291fffc878fda7`)
+- `50_gap/panel_models.csv` (5,072 bytes, sha256 `a8c7ef7ef69aa7dd`)
+- `50_gap/panel_models.txt` (4,986 bytes, sha256 `7bb227cc3eb69d7a`)
+- `50_gap/panel_models_wcb_grids.json` (21,704 bytes, sha256 `9defe9bcfc11abaa`)
 - `50_gap/gates_phase3.csv` (1,629 bytes, sha256 `6d12e48b7d993518`)
 
 ## Phase 4: the historical companion, units within districts
@@ -392,11 +390,11 @@ about fifty calls.
 
 *8 of 8 gates passed (`50_gap/gates_phase4.csv`).*
 
-### Files written by `scripts/08_build_gap_units.py` (run 2026-10-10T16:17:23Z)
+### Files written by `scripts/08_build_gap_units.py` (run 2026-10-10T18:25:35Z)
 
 - `50_gap/unit_history.csv` (1,983,358 bytes, sha256 `6fe3a6f4a660f2b2`)
 - `50_gap/unit_history_models.csv` (6,920 bytes, sha256 `f2684839d7db5310`)
-- `50_gap/unit_history_models.txt` (6,823 bytes, sha256 `d6d7130125ba0e24`)
+- `50_gap/unit_history_models.txt` (6,823 bytes, sha256 `d5dbbde193f74211`)
 - `50_gap/unit_history_models_wcb_grids.json` (24,175 bytes, sha256 `a8429977eef4ef10`)
 - `50_gap/gates_phase4.csv` (1,167 bytes, sha256 `c71ad60715956d7f`)
 
@@ -406,17 +404,25 @@ about fifty calls.
 community extent beside need with the label the instruction gave, computed the two rank correlations, and set the
 state's figures beside Odisha's row of the national report, read from the registered table.
 
-**The forest villages list: stopped at the instruction's fourth step, and why.** The PDF was already on disk in
-`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again; the instruction named
-`00_raw/cfr_fra/`, where the tables made from fetched files live. It is registered with a new manifest row that gives
-its exact size and SHA-256; the row that lists its address is as it was. Opened for the first time, it is a scan:
-every page is one image, and the only text in the file is a layer made by the scanner's character recognition. The
-instruction's third step (parse a text layer) and fourth (do not recognise characters in a scan) both bear on such a
-file. The script took the narrower course: it recognised nothing itself, and put the layer that is there to one test
-before using it - the arithmetic of the summary page. The layer fails it (the gate table gives the counts), and no
-printed total can be read, so nothing was parsed, no table was put beside the PDF, and no count was added to
-`district_need.csv`. The file is not matched to units. A transcription by eye, checked against the totals the pages
-print, as was done for the national report's table, is the owner's to ask for.
+**The forest villages list: the owner's rule, and where the step stopped.** The PDF was already on disk in
+`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again. It is registered with
+a manifest row that gives its exact size and SHA-256; the row that lists its address is as it was. It is a scan:
+every page is one image, and the only text in the file is a layer made by someone else's character recognition. The
+owner ruled on the evening of 10 October 2026 that the layer is unverified and is used only if two checks hold: (a)
+that the district counts parsed from it equal every total and running serial number the file prints, exactly; (b)
+that at least five pages chosen at random, rendered upright and read by a reader, match the parsed rows. The script
+reads the layer as `pdftotext` gives it and makes six parts of check (a); the last gate of the table below gives in
+how many rows each part holds. **Check (a) fails.** By the rule the step stopped there: check (b) was not run, nothing
+was parsed into a table beside the PDF, and no count was added to `district_need.csv`. No character recognition was
+run. The file is not matched to units.
+
+**One page was looked at, and that is not check (b).** To see what kind of failure the layer's one bad row of the
+summary page is, that page was rendered and read once by the session. The note is in the record
+(`50_gap/forest_villages_pdf_record.json`) and in `docs/GAP.md`. A transcription of that page by eye, checked against
+the totals it carries, as was done for the national report's table, is the owner's to ask for.
+
+**The first version of this step**, committed with this phase before the owner's rule, tested only the arithmetic of
+the summary page. The rule replaced it.
 
 **What comes next.** Phase 6: independent verification (`scripts/verify_gap.py`).
 
@@ -428,25 +434,105 @@ print, as was done for the national report's table, is the owner's to ask for.
 | FRA community extent, state, ha (the gate of step 0) | 331568 | 331568 | yes |
 | districts with no community title distributed | 6 | 6: Bhadrak, Jagatsinghapur, Kendrapara, Khordha, Puri, Sundargarh | yes |
 | the two FRA reports of the same date differ (the README's 80 titles and 4,469 ha, here from the files) | 80 titles; 4469 ha | 80 titles; 4469 ha | yes |
+| the forest villages PDF is the registered file: a row of 00_raw/data_manifest.csv names it with its exact size and SHA-256 | one row | 1 row(s) | yes |
 | the forest villages PDF: pages, and pages that are one scanned image | every page one image | 64 pages, 64 of them one image | yes |
-| the forest villages PDF: rows of its summary page read from the text it carries, and rows whose two parts add to their total | 30 rows, all adding up, and a printed total | 25 rows read, 24 add up, printed total rows read: 0 | yes |
-| the forest villages PDF: district counts taken into district_need.csv (only if the text passes its own totals) | none unless it passes | none | yes |
+| the forest villages PDF: district counts taken from its text layer into district_need.csv (the owner's rule: only if checks (a) and (b) both hold) | none unless both hold | none: check (a) fails (a1 holds in 24 of 25; a2 holds in 0 of 1; a3 holds in 23 of 25; a4 holds in 22 of 25; a5 holds in 21 of 25; a6 holds in 18 of 25); check (b) not run | yes |
 
 *7 of 7 gates passed (`50_gap/gates_phase5.csv`).*
 
-### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T16:06:20Z)
+### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T18:11:24Z)
 
 - `50_gap/fra_by_district.csv` (4,568 bytes, sha256 `37cf178731fafc68`)
 - `50_gap/fra_summary.csv` (708 bytes, sha256 `cfbe515474ad9f4b`)
 - `50_gap/fra_two_reports.csv` (310 bytes, sha256 `8630d58c44690c10`)
 - `50_gap/forest_villages_text_layer_check.csv` (1,599 bytes, sha256 `dd77b52f5809ab48`)
-- `50_gap/forest_villages_pdf_record.json` (1,152 bytes, sha256 `31599d8811c1428b`)
-- `50_gap/gates_phase5.csv` (944 bytes, sha256 `f91d707b27aba717`)
+- `50_gap/forest_villages_districts_as_the_layer_reads_them.csv` (1,644 bytes, sha256 `357a86c94d2d2b63`)
+- `50_gap/forest_villages_pdf_record.json` (3,474 bytes, sha256 `299cc5135382f597`)
+- `50_gap/gates_phase5.csv` (1,060 bytes, sha256 `6f8c180006589206`)
+
+## The owner's corrections of 10 October 2026, after Phase 5
+
+The owner corrected three things after Phase 5 had been committed and before the verifier was assembled. Each was
+applied before Phase 6, and the phases above are written up as they now stand.
+
+1. **Stage 4 gets an environment of its own.** The first hours of the run had installed the bootstrap's packages into
+   the repository's main environment and moved its `numpy` down. The main environment was put back to the list of
+   packages it had before, to the line, and `verify_r620.py`, `verify_layer.py` and `verify_decision.py` were run
+   there. Stage 4 now runs in an environment outside the repository; every builder stops unless it is run there; and
+   every table of the stage was built again in it.
+2. **`requirements-stage4.txt`**, at the root of the repository, pins exactly what that environment holds. The file
+   `requirements.txt`, committed with Phase 0, was taken out. `README.md` has a section on the two environments, and
+   every step's section of the provenance record lists the packages it ran with.
+3. **The forest villages PDF.** Its text layer is someone else's character recognition and is unverified. It is used
+   only if two checks hold (Phase 5, above); the first fails, and the step stops there.
+
+Two things were changed with the rebuild that the owner did not ask for, and both are listed in `docs/GAP.md` as
+proposals. The bracket of the bootstrap interval is now doubled as a whole (Phase 3, above). And the two totals of
+the comparison of intensities are blank in the summary of comparisons: thirty ratios added are a total of nothing.
+
+**What moved.** The table at the end of this section sets every output of the first build beside the same output
+now. The tables of figures are byte for byte what they were, with two exceptions the table counts cell by cell: the
+summary of comparisons (the two totals now blank) and the table of the panel models (the p at the outer end of the
+bracket, on the two sides whose bracket is now wider; no estimate, no interval and no p of a model moved). The other
+files that differ are the record and the gate table of the forest villages step, which follow the owner's rule, and
+files that carry the time they were written or the grids of the wider brackets.
+
+After the second loss of power the session's file tools and the network worked again. That is how the new
+environment could be installed, how one page of the PDF could be looked at, and how the figures could at last be
+looked at (Phase 7).
+
+The verifier's parts were being written by four agents when the machine lost power a second time. Each had finished
+its part and was running its last trials; none had reported. Their parts and working folders were on disk and were
+kept. Each part was then reviewed, attacked and brought up to date by a fresh agent (Phase 6).
+
+### Each output, built before the corrections and after
+
+*The outputs of the first build are kept in `50_gap/before_the_corrections/` with their provenance record. "The same bytes" compares the SHA-256 the two records give; for a table that is not the same, the last column counts the cells that differ.*
+
+| step | output | the same bytes as before the corrections | cells that differ |
+|---|---|---|---|
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/districts_by_need.csv` | yes |  |
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/districts_by_need.md` | yes |  |
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/headline_rows.csv` | yes |  |
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/headline_rows.md` | yes |  |
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/marginalisation_split_c1.csv` | yes |  |
+| `08_build_gap_deck_tables` | `50_gap/deck_tables/marginalisation_split_c1.md` | yes |  |
+| `08_build_gap_districts` | `50_gap/district_allocation.csv` | yes |  |
+| `08_build_gap_districts` | `50_gap/district_need.csv` | yes |  |
+| `08_build_gap_districts` | `50_gap/gates_phase2.csv` | yes |  |
+| `08_build_gap_districts` | `50_gap/marginalisation_split.csv` | yes |  |
+| `08_build_gap_districts` | `50_gap/need_vs_allocation.csv` | yes |  |
+| `08_build_gap_districts` | `50_gap/need_vs_allocation_summary.csv` | **no** | 2 |
+| `08_build_gap_districts` | `50_gap/what_more.csv` | yes |  |
+| `08_build_gap_panel` | `50_gap/district_year_panel.csv` | yes |  |
+| `08_build_gap_panel` | `50_gap/gates_phase3.csv` | yes |  |
+| `08_build_gap_panel` | `50_gap/panel_models.csv` | **no** | 2 |
+| `08_build_gap_panel` | `50_gap/panel_models.txt` | **no** |  |
+| `08_build_gap_panel` | `50_gap/panel_models_wcb_grids.json` | **no** |  |
+| `08_build_gap_rights` | `50_gap/forest_villages_districts_as_the_layer_reads_them.csv` | new: it was not written before |  |
+| `08_build_gap_rights` | `50_gap/forest_villages_pdf_record.json` | **no** |  |
+| `08_build_gap_rights` | `50_gap/forest_villages_text_layer_check.csv` | yes |  |
+| `08_build_gap_rights` | `50_gap/fra_by_district.csv` | yes |  |
+| `08_build_gap_rights` | `50_gap/fra_summary.csv` | yes |  |
+| `08_build_gap_rights` | `50_gap/fra_two_reports.csv` | yes |  |
+| `08_build_gap_rights` | `50_gap/gates_phase5.csv` | **no** | 9 |
+| `08_build_gap_units` | `50_gap/gates_phase4.csv` | yes |  |
+| `08_build_gap_units` | `50_gap/unit_history.csv` | yes |  |
+| `08_build_gap_units` | `50_gap/unit_history_models.csv` | yes |  |
+| `08_build_gap_units` | `50_gap/unit_history_models.txt` | **no** |  |
+| `08_build_gap_units` | `50_gap/unit_history_models_wcb_grids.json` | yes |  |
+| `08_gap_environment` | `50_gap/environment_main_now.txt` | new: it was not written before |  |
+| `08_gap_environment` | `50_gap/gates_environment.csv` | new: it was not written before |  |
+| `08_gap_inputs` | `50_gap/district_crosswalk.csv` | yes |  |
+| `08_gap_inputs` | `50_gap/inputs_check.csv` | yes |  |
+| `08_gap_inputs` | `50_gap/inputs_listing.json` | **no** |  |
+| `08_gap_inputs` | `50_gap/unit_district.csv` | yes |  |
 
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `d9c5130` Stage 4, Phase 5: forest rights, at the level the data allow
 - `957f3aa` Stage 4, Phase 4: the historical companion - units within districts
 - `a0cde28` Stage 4, Phase 3: the district-year panel and its models
 - `ef868ae` Stage 4, Phase 2: the headline - need against allocation by district
@@ -458,16 +544,24 @@ print, as was done for the national report's table, is the owner's to ask for.
 Each builder writes into `50_gap/` only and stops at the first gate that fails. In order:
 
 ```
-.venv/bin/python scripts/08_gap_inputs.py            # Phase 0
-.venv/bin/python scripts/08_build_gap_districts.py   # Phase 2
-.venv/bin/python scripts/08_build_gap_panel.py       # Phase 3
-.venv/bin/python scripts/08_build_gap_units.py       # Phase 4
-.venv/bin/python scripts/08_build_gap_rights.py      # Phase 5
-.venv/bin/python scripts/verify_gap.py               # Phase 6
-.venv/bin/python scripts/08_build_gap_deck_tables.py # Phase 7
-.venv/bin/python scripts/make_stage4_figures.py      # Phase 7
-.venv/bin/python scripts/write_gap.py                # Phase 8
-.venv/bin/python scripts/write_stage4_run_log.py
+python3.12 -m venv ~/.venvs/ictd-stage4      # once: stage 4's own environment (README.md section 0)
+PY=~/.venvs/ictd-stage4/bin/python
+$PY -m pip install --only-binary=:all: -r requirements-stage4.txt
+$PY scripts/08_gap_environment.py        # the gate on the two environments
+$PY scripts/08_gap_inputs.py             # Phase 0
+$PY scripts/08_build_gap_districts.py    # Phase 2
+$PY scripts/08_build_gap_panel.py        # Phase 3
+$PY scripts/08_build_gap_units.py        # Phase 4
+$PY scripts/08_build_gap_rights.py       # Phase 5
+$PY scripts/verify_gap.py                # Phase 6
+$PY scripts/verify_gap_trials.py         # Phase 6
+$PY scripts/08_build_gap_deck_tables.py  # Phase 7
+$PY scripts/make_stage4_figures.py       # Phase 7
+$PY scripts/write_gap.py                 # Phase 8
+$PY scripts/08_gap_closing_checks.py --phase 6   # and 7, and 8: the gates of the last three phases
+$PY scripts/write_stage4_run_log.py
+.venv/bin/python scripts/write_results.py            # Phase 8, in the main environment
+.venv/bin/python scripts/write_decision_layer.py     # Phase 8, in the main environment
 ```
 
 A script named above that does not exist yet belongs to a phase that has not been reached.

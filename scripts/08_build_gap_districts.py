@@ -1,6 +1,6 @@
 """Stage 4, the headline: need and allocation by district, set beside one another. Writes into `50_gap/` only.
 
-    .venv/bin/python scripts/08_build_gap_districts.py
+    ~/.venvs/ictd-stage4/bin/python scripts/08_build_gap_districts.py
 
 The owner's question, in the supervisor's words: "determine which areas have seen forest degradation, are also
 marginalised, and have they seen good enough resource allocation in the past". Current allocation exists only by
@@ -96,7 +96,10 @@ need_vs_allocation.csv - long: one row per comparison and district
   requirement"). Shares, r and gap are blank for C12 (intensities) and B1 (a benchmark).
 
 need_vs_allocation_summary.csv - one row per comparison
-  n_districts, need_total, allocation_total, rho (Spearman, average ranks for ties), p_permutation (two-sided,
+  kind (comparison; intensity for C12; benchmark for B1. C7b is a comparison in kind, and what_it_asks says that it is
+  not one of those fixed beforehand), n_districts, need_total, allocation_total (the sums over the districts in the
+  comparison; blank for C12, whose need and allocation are ratios: thirty ratios added are a total of nothing),
+  rho (Spearman, average ranks for ties), p_permutation (two-sided,
   99,999 shuffles of allocation against need), ci95_lo, ci95_hi (percentile bootstrap over districts, 9,999 draws),
   the seeds, need_share_pct_where_r_below_0_5, need_share_pct_where_r_above_2, n_districts_r_below_0_5,
   n_districts_r_above_2, n_districts_need_zero, sum_positive_gaps_lakh, and the comparison's definition in words.
@@ -241,6 +244,7 @@ def terciles(codes: list[str], value: dict, labels: list[str]) -> dict:
 
 
 def main() -> None:
+    G.require_stage4_environment()
     gates: list[tuple] = []
     add = lambda gate, expected, found, ok: gates.append((gate, str(expected), str(found), bool(ok)))
     inputs = {k: G.IN[k] for k in ("r620_district", "r620_state", "condition_by_unit", "hansen_bands", "agreement_by_unit",
@@ -517,8 +521,8 @@ def main() -> None:
         st = G.spearman_with_inference([float(need[c]) for c in inn], [float(alloc[c]) for c in inn], s_perm, s_boot)
         srow = {"comparison": cid, "kind": kind, "need_is": need_words, "allocation_is": alloc_words, "what_it_asks": asks,
                 "n_districts": len(inn), "districts_left_out": "; ".join(name[c] for c in codes if c not in inn),
-                "need_total": q(tn, "0.000001") if kind == "intensity" else tn, "need_unit": need_unit,
-                "allocation_total": q(ta, "0.000001") if kind == "intensity" else ta, "allocation_unit": alloc_unit,
+                "need_total": None if kind == "intensity" else tn, "need_unit": need_unit,
+                "allocation_total": None if kind == "intensity" else ta, "allocation_unit": alloc_unit,
                 "rho": round(st["rho"], 6), "p_permutation": st["p_permutation"], "ci95_lo": round(st["ci95_lo"], 6), "ci95_hi": round(st["ci95_hi"], 6),
                 "n_permutations": st["n_permutations"], "n_bootstrap": st["n_bootstrap"], "n_bootstrap_undefined": st["n_bootstrap_undefined"],
                 "seed_permutation": s_perm, "seed_bootstrap": s_boot,
