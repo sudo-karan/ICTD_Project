@@ -132,6 +132,28 @@ will be written into `docs/GAP.md` by its writer.
 **What comes next.** Phase 3: the district-year panel (`scripts/08_build_gap_panel.py`).
 """),
     (3, "the district-year panel", ["gates_phase3.csv"], ["08_build_gap_panel"], """
+**What was done.** `scripts/08_build_gap_panel.py` wrote the panel of 30 districts by 13 financial years, with the
+part year flagged and kept out of every model, and fitted the seven models the instruction fixed, P1 the headline.
+The estimates are in `50_gap/panel_models.csv` and `50_gap/panel_models.txt`, and will be written into `docs/GAP.md`
+by its writer; they are not repeated here.
+
+**What the run met, each to be said in `docs/GAP.md`.**
+
+- **The two standard deviations the instruction quotes** are reproduced with n in the divisor; the gate row gives the
+  figure with n - 1 beside it. No expected value was changed.
+- **The bootstrap package cannot take clusters labelled with text**: its compiled loop stopped on the district codes
+  as text. The clusters are passed to it as whole numbers in the sorted order of the district codes, which also fixes
+  which cluster gets which weight for a given seed.
+- **The p of the wild cluster bootstrap does not fall steadily on every side.** In several models it settles at a
+  level instead of going on down as the tested value moves away from the estimate, and in one model it climbs back
+  before falling again. The instruction's rule was applied as written: the bracket is doubled until p is below the
+  level at both ends, and the outermost crossing is reported. Every grid of p values is saved, not only those of the
+  two cases the instruction names, and three columns of the models table say, for each side, how many times p crossed
+  the level, whether it climbed back, and where it stood at the end of the bracket.
+- **A warning from numpy** ("invalid value encountered in matmul") is printed during the bootstrap on this machine.
+  No p value on any grid is missing. The independent verifier of Phase 6 recomputes the p values with its own code.
+- **The run takes about nine minutes**: the package compiles its inner loop afresh at every call.
+
 **What comes next.** Phase 4: the historical companion, units within districts (`scripts/08_build_gap_units.py`).
 """),
     (4, "the historical companion, units within districts", ["gates_phase4.csv"], ["08_build_gap_units"], """

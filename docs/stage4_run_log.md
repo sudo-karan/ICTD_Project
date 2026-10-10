@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T15:43:48Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T16:05:39Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1, 2. The last is Phase 2, the headline, district need against district allocation. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2, 3. The last is Phase 3, the district-year panel. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -301,10 +301,65 @@ will be written into `docs/GAP.md` by its writer.
 - `50_gap/what_more.csv` (12,125 bytes, sha256 `c70bc6eb0d75b804`)
 - `50_gap/gates_phase2.csv` (3,247 bytes, sha256 `984723269ebd05b0`)
 
+## Phase 3: the district-year panel
+
+**What was done.** `scripts/08_build_gap_panel.py` wrote the panel of 30 districts by 13 financial years, with the
+part year flagged and kept out of every model, and fitted the seven models the instruction fixed, P1 the headline.
+The estimates are in `50_gap/panel_models.csv` and `50_gap/panel_models.txt`, and will be written into `docs/GAP.md`
+by its writer; they are not repeated here.
+
+**What the run met, each to be said in `docs/GAP.md`.**
+
+- **The two standard deviations the instruction quotes** are reproduced with n in the divisor; the gate row gives the
+  figure with n - 1 beside it. No expected value was changed.
+- **The bootstrap package cannot take clusters labelled with text**: its compiled loop stopped on the district codes
+  as text. The clusters are passed to it as whole numbers in the sorted order of the district codes, which also fixes
+  which cluster gets which weight for a given seed.
+- **The p of the wild cluster bootstrap does not fall steadily on every side.** In several models it settles at a
+  level instead of going on down as the tested value moves away from the estimate, and in one model it climbs back
+  before falling again. The instruction's rule was applied as written: the bracket is doubled until p is below the
+  level at both ends, and the outermost crossing is reported. Every grid of p values is saved, not only those of the
+  two cases the instruction names, and three columns of the models table say, for each side, how many times p crossed
+  the level, whether it climbed back, and where it stood at the end of the bracket.
+- **A warning from numpy** ("invalid value encountered in matmul") is printed during the bootstrap on this machine.
+  No p value on any grid is missing. The independent verifier of Phase 6 recomputes the p values with its own code.
+- **The run takes about nine minutes**: the package compiles its inner loop afresh at every call.
+
+**What comes next.** Phase 4: the historical companion, units within districts (`scripts/08_build_gap_units.py`).
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| rows of the panel (30 districts x 13 financial years) | 390 | 390 | yes |
+| district-years in the models (FY2014-15 to 2025-26) | 360 | 360 | yes |
+| the panel's sums by district, category and period against step 2's (district_allocation.csv): largest difference, lakh | 0 | 0 | yes |
+| plantation expenditure of the panel, pre, lakh | 151843.18 | 151843.18 | yes |
+| plantation expenditure of the panel, post, lakh | 13915.72 | 13915.72 | yes |
+| plantation expenditure of the panel, part_year, lakh | 110.58 | 110.58 | yes |
+| standard deviation of plantation's share of district expenditure across district-years, pre, percentage points (the owner's figure is reproduced with n in the divisor; with n - 1 it is the figure in brackets) | 11.25 | 11.25 (11.30) | yes |
+| standard deviation of plantation's share of district expenditure across district-years, post, percentage points (the owner's figure is reproduced with n in the divisor; with n - 1 it is the figure in brackets) | 1.78 | 1.78 (1.78) | yes |
+| forest standing at the start of 2018 (the panel's FY2019-20 rows) equals the decision table's forest at the start of the window 2018-2025, every district | yes | yes | yes |
+| forest loss of calendar years 2018 to 2025 in the panel (loss_ha_year_t), ha (within 1 of 90,028) | 90028 | 90028.4608 | yes |
+| models fitted, each on 360 district-years and 30 clusters | 7 | 7 | yes |
+| reported terms whose wild-bootstrap interval is bounded on both sides (reported, not a gate on a value) | reported | 8 of 8 | yes |
+| reported terms for which p fell steadily on both sides: one crossing of 0.05 a side and no climb back of more than 0.01 (reported, not a gate on a value) | reported | 6 of 8 | yes |
+
+*13 of 13 gates passed (`50_gap/gates_phase3.csv`).*
+
+### Files written by `scripts/08_build_gap_panel.py` (run 2026-10-10T16:05:10Z)
+
+- `50_gap/district_year_panel.csv` (59,379 bytes, sha256 `49012547ee8ec3f5`)
+- `50_gap/panel_models.csv` (5,072 bytes, sha256 `98d6c2f1cb5b4fba`)
+- `50_gap/panel_models.txt` (4,986 bytes, sha256 `81b33c5912c35fad`)
+- `50_gap/panel_models_wcb_grids.json` (21,684 bytes, sha256 `6e291fffc878fda7`)
+- `50_gap/gates_phase3.csv` (1,629 bytes, sha256 `6d12e48b7d993518`)
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `ef868ae` Stage 4, Phase 2: the headline - need against allocation by district
 - `2287f4c` Stage 4, Phase 1: the five leftovers of the batch of 9 October cleared
 - `c9bece2` Stage 4, Phase 0: inputs listed, the district crosswalk, a district for every unit, and the gates on what is built
 

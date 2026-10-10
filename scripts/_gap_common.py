@@ -334,9 +334,12 @@ def wcb_test(y, X, names, clusters, param: str, B: int, seed: int) -> tuple[floa
     from wildboottest.wildboottest import wildboottest
     exog = pd.DataFrame(np.asarray(X, float), columns=names)
     model = sm.OLS(pd.Series(np.asarray(y, float), name="y"), exog)
-    out = wildboottest(model, B=B, cluster=pd.Series(np.asarray(clusters)), param=param, weights_type="webb",
+    # The package compiles its inner loop and cannot take labels that are text: the clusters go in as whole numbers,
+    # 0, 1, 2, ... in the sorted order of their labels (the district codes), which fixes which cluster gets which weight.
+    codes = np.unique(np.asarray(clusters), return_inverse=True)[1].astype(np.int64)
+    out = wildboottest(model, B=B, cluster=pd.Series(codes), param=param, weights_type="webb",
                        impose_null=True, seed=seed, show=False)
-    return float(out["statistic"].iloc[0]), float(out["p-value"].iloc[0])
+    return float(np.ravel(out["statistic"].iloc[0])[0]), float(np.ravel(out["p-value"].iloc[0])[0])
 
 
 def wcb_interval(y, X, names, clusters, param: str, B: int, seed: int, estimate: float, se_cr1: float,
@@ -346,10 +349,13 @@ def wcb_interval(y, X, names, clusters, param: str, B: int, seed: int, estimate:
     H0: beta = b0 is tested by refitting with `y - b0 * x` (the same seed every time, so the same bootstrap weights).
     The bracket starts at the estimate +/- 4 CR1 standard errors and is doubled, at most `max_doublings` times, until p
     is below `level` at both ends. p is then read on `grid_points` equal steps from the estimate to each end; a side is
-    bisected, to within `tol_se` of a CR1 standard error, inside the OUTERMOST step in which p crosses `level`. If p
-    crosses more than once on a side, that is recorded (`monotone` false). If an end never gets below `level`, that
-    side is reported unbounded. The grid of p values is returned in every case, and the caller saves it when either
-    thing happened.
+    bisected, to within `tol_se` of a CR1 standard error, inside the OUTERMOST step in which p crosses `level`. If an
+    end never gets below `level`, that side is reported unbounded. For each side three things are returned about how p
+    behaved along the bracket, because the p of this bootstrap need not fall steadily: `crossings` (how many steps of
+    the grid cross `level`), `p_rises_again` (going outward, p climbs more than 0.01 above a value it had already
+    fallen to: it is not monotone beyond the jitter of the draws) and `p_at_end` (p at the outer end of the bracket,
+    which is where p settles when it stops falling). The grid of p values is returned in every case, and the caller
+    saves it in every case.
     """
     y = np.asarray(y, float)
     X = np.asarray(X, float)
@@ -375,15 +381,20 @@ def wcb_interval(y, X, names, clusters, param: str, B: int, seed: int, estimate:
         ps = [p_at(b) for b in steps]
         grids[side] = [{"b0": b, "p": p} for b, p in zip(steps, ps)]
         out[f"doublings_{side}"] = doublings
+        inside = [p >= level for p in ps]                       # True: b0 is not rejected
+        crossings = [k for k in range(grid_points) if inside[k] != inside[k + 1]]
+        lowest, rises = ps[0], False
+        for p in ps[1:]:                                        # going outward: does p climb back above where it had been?
+            rises = rises or p > lowest + 0.01
+            lowest = min(lowest, p)
+        out[f"crossings_{side}"] = len(crossings)
+        out[f"p_rises_again_{side}"] = rises
+        out[f"p_at_end_{side}"] = ps[-1]
         if p_at(end) >= level:
             out[f"ci95_{side}"] = None
             out[f"unbounded_{side}"] = True
-            out[f"monotone_{side}"] = None
             continue
         out[f"unbounded_{side}"] = False
-        inside = [p >= level for p in ps]                       # True: b0 is not rejected
-        crossings = [k for k in range(grid_points) if inside[k] != inside[k + 1]]
-        out[f"monotone_{side}"] = len(crossings) == 1
         k = max(crossings)                                      # the outermost crossing
         a, b = steps[k], steps[k + 1]                           # p(a) >= level > p(b)
         while abs(b - a) > tol_se * se_cr1:
