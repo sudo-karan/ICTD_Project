@@ -1,0 +1,67 @@
+# raw downloads — large, and reproducible from scripts/collect_data.py
+00_raw/mgnrega_assets/assets_geojson/
+00_raw/boundaries/
+00_raw/socioeconomic/
+*.gpkg
+*.geojson
+# (no rule here excludes csv files: the line below does nothing today and is kept only as a guard, should a *.csv rule ever be added)
+!00_raw/mis_reports/*.csv
+
+# stage outputs are derived
+10_units/
+20_degradation/
+30_need/
+40_allocation/
+50_gap/
+
+__pycache__/
+*.pyc
+.DS_Store
+
+# local environment and the DataMeet clone (a git repository of its own)
+.venv/
+indian_village_boundaries/
+.backup_before_rulings_2026-10-05/
+
+# --- added 7 Oct 2026 when the repository was first put under git ---
+# The three raw paths above are the folder names of 4 Oct; collect_data.py now writes the same downloads under
+# numbered folders, which the lines above no longer match. Everything it fetches stays out of git:
+00_raw/01_cfr_fra/
+00_raw/02_mgnrega/
+00_raw/03_socioeconomic/
+00_raw/04_boundaries/
+00_raw/docs/
+# The same rule for the one fetched file of 00_raw/05_forest_reference/ (decided 7 Oct 2026): the Global Forest Watch
+# workbook is a download with its URL, size and sha256 in data_manifest.csv, carries no stated licence, and
+# collect_data.py fetches it (kind http). The two ISFR text files beside it STAY tracked: they are page extracts made
+# here, a few KB each, and cannot be fetched as files.
+00_raw/05_forest_reference/gfw_IND.xlsx
+
+# session scratch: test outputs, logs, the replication's cache (several GB)
+.session_scratch_*/
+
+# the demo layer is a stage output like the others (the library it embeds is tracked under scripts/vendor/)
+60_layer/
+
+# logs of the unattended NIRv chain (scripts/run_nirv_chain.py)
+logs/
+
+# the Gazette PDFs of 00_raw/06_scheme/ (added 8 Oct 2026): fetched files, each with its URL, bytes and sha256 in the manifest.
+# The table and the transcription made from them here stay tracked, with the script that checks them.
+00_raw/06_scheme/*.pdf
+00_raw/06_scheme/*.html
+
+# the decision tables are a stage output like the others (added 8 Oct 2026)
+55_decision/
+
+# the provider pages registered on 9 Oct 2026 in 00_raw/05_forest_reference/ (the owner's ruling of that day): fetched files, each
+# with its URL, bytes and sha256 in the manifest. The extract made from two of them, provider_cautions.json, stays tracked with
+# the script that makes it, like the two ISFR extracts.
+00_raw/05_forest_reference/gfw_dataset_record_umd_tree_cover_loss_2026-10-08.json
+00_raw/05_forest_reference/gfw_terms_of_service_2026-10-08.html
+00_raw/05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json
+00_raw/05_forest_reference/resourcewatch_api_attribution_requirements_2026-10-08.html
+00_raw/05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html
+
+# the copy of the layer made to be passed on is a stage output like the others (added 9 Oct 2026)
+70_share/

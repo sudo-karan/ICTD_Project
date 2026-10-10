@@ -1,0 +1,472 @@
+# LIST OF PERMISSIBLE WORKS UNDER THE VB-G RAM G SCHEME - verbatim transcription of the English Table of S.O. 5448(E)
+#
+# Document : Ministry of Rural Development notification S.O. 5448(E), New Delhi, the 5th October, 2026
+#            Gazette of India, Extraordinary, Part II-Section 3-Sub-section (ii), No. 5238, Monday, October 5, 2026/Asvina 13, 1948
+#            Gazette ID CG-DL-E-05102026-276796; F. No. L-13060/03/2026-RE-VII-Part(2) (Computer No. 397950)
+# Source   : https://egazette.gov.in/WriteReadData/2026/276796.pdf
+#            (byte-identical copy: https://vbgramgmatt.dord.gov.in/VBGRAMG/Circulars/5Gazette_Notification%E2%80%93List_of_Permissible_Works_under_VB%E2%80%93GRAMG_Scheme.pdf)
+# File     : 1700498 bytes, sha256 ec89d3a85bf49f1a4218b897c1daca2b3ab86d71b42f8f52c2d9860b6e0279a4 (same hash on three downloads, 8 October 2026)
+# Pages    : 28-page PDF; Gazette page numbers equal PDF page numbers. Hindi version pp. 1-17 (not transcribed here).
+#            English notification and Table pp. 17-28: Category I pp. 17-21, Category II pp. 21-24, Category III pp. 24-27, Category IV pp. 27-28.
+# Retrieved: 2026-10-08 (UTC date of download); this file written 2026-10-08 09:24 UTC
+#
+# How transcribed
+#  - Words of columns (2) and (3) and of the headings: the PDF text layer (pdftotext -bbox-layout), assigned to table rows by the
+#    ruled lines of the rendered page (150 dpi), not by text heuristics. Every English page (17-28) was also read as an image.
+#  - Serial numbers: the digits of column (1) are NOT in the PDF text layer. They are written here by order of appearance (1..375)
+#    and were confirmed against the printed digits two ways: read on the rendered image of each page, and a glyph-outline check
+#    (pdftocairo -svg: 10 distinct digit outlines, one per digit, consistent with 1..375 on all 375 rows).
+#  - Also read from the page image because the text layer lacks them: the "8" of "S.O. 5448(E)", ", 2026" in the date line,
+#    the column numbers (1) (2) (3), and the Devanagari words inside the enabling paragraph.
+#  - Normalisation: a cell printed over two lines is joined with one space (a line ending in a hyphen is joined without a space:
+#    "agri-" + "value" -> "agri-value"); runs of spaces are collapsed to one. Nothing else is changed: capitalisation, punctuation
+#    and oddities are as printed (e.g. Sl. 12 has no "for ..." ending; Sl. 84 and 306 end with a full stop; Sl. 109 begins lower-case;
+#    Sl. 236 prints "-Andhra Pradesh"; "Category II— Core" has no space before the dash).
+#  - Row format below: serial number | work type | work name     (the three printed columns). Lines beginning "[page" are mine.
+#  - The table has NO other columns: no unit, cost, rate, land category, agency or eligibility column.
+#
+# Related instrument of the same day (not part of this table): S.O. 5447(E), 5 October 2026, Gazette ID CG-DL-E-05102026-276798,
+#  https://egazette.gov.in/WriteReadData/2026/276798.pdf (sha256 872919b40e03e0e8f924503f0e71dd19c79841fef93577b4cbc1724d9ce7e4cd),
+#  amends Schedule I para 4(2)(b)(A)(viii) of the Act: "Central Government" -> "Central Government and State Government".
+# ----------------------------------------------------------------------------------------------------------------------------
+
+[page 17]
+MINISTRY OF RURAL DEVELOPMENT
+NOTIFICATION
+New Delhi, the 5th October, 2026
+S.O. 5448(E).— In pursuance of paragraph 4 of the SCHEDULE I read with sub-section (3) of section 8 of the Viksit Bharat - Guarantee for Rozgar and Ajeevika Mission (Gramin): VB- G RAM G (विकसित भारत- जी राम जी) Act, 2025 (36 of 2025), the Central Government hereby notifies the following permissible works as specified in column (3) of the Table below, to be taken up under the Viksit Bharat—Guarantee for Rozgar and Ajeevika Mission (Gramin): VB—G RAM G Scheme, classified under the four thematic categories specified in sub-paragraph (2) of paragraph 4 of the said Schedule, namely:—
+
+Table
+LIST OF PERMISSIBLE WORKS UNDER THE VIKSIT BHARAT—GUARANTEE FOR ROZGAR AND AJEEVIKA MISSION (GRAMIN): VB—G RAM G SCHEME
+
+Serial number | Work type | Work name
+(1) | (2) | (3)
+
+Category I — Water Related Works (for Water security)
+(i) construction of canals, flood or diversion channels, check dams, gully plugs and underground dykes
+1 | Canals | Construction of main canal for community
+2 | Canals | Repair and maintenance of main canal for community
+3 | Canals | Construction of branch canal for community
+4 | Canals | Repair and maintenance of branch canal for community
+5 | Canals | Construction of major distributary canal for community
+[page 18]
+6 | Canals | Repair and maintenance of major distributary canal for community
+7 | Canals | Construction of minor distributary canal for community
+8 | Canals | Repair and maintenance of minor distributary canal for community
+9 | Canals | Lining of canal for community
+10 | Canals | Construction of water courses and field channels for community
+11 | Canals | Repair and maintenance of water courses and field channels for community
+12 | Canals | Rejuvenation of rivers, rivulets and nallahs
+13 | Flood or diversion channels | Construction of flood or diversion channel for community
+14 | Flood or diversion channels | Repair and maintenance of flood or diversion channel for community
+15 | Flood or diversion channels | Construction of flood diversion drain for community
+16 | Flood or diversion channels | Repair and maintenance of flood diversion drain for community
+17 | Flood or diversion channels | Construction of storm water drain for community
+18 | Flood or diversion channels | Repair and maintenance of storm water drain for community
+19 | Check dams | Construction of boulder check dam for individual
+20 | Check dams | Construction of boulder check dam for community
+21 | Check dams | Repair and maintenance of boulder check dam for community
+22 | Check dams | Construction of earthen check dam for individual
+23 | Check dams | Construction of earthen check dam for community
+24 | Check dams | Repair and maintenance of earthen check dam for community
+25 | Check dams | Construction of gabion check dam for individual
+26 | Check dams | Construction of gabion check dam for community
+27 | Check dams | Repair and maintenance of gabion check dam for community
+28 | Check dams | Construction of masonry check dam for individual
+29 | Check dams | Construction of masonry check dam for community
+30 | Check dams | Repair and maintenance of masonry check dam for community
+31 | Check dams | Construction of masonry check wall for community
+32 | Check dams | Repair and maintenance of masonry check wall for community
+33 | Gully plug | Construction of brushwood gully plug for community
+34 | Gully plug | Repair and maintenance of brushwood gully plug for community
+35 | Gully plug | Construction of earthen gully plug for individual
+36 | Gully plug | Construction of earthen gully plug for community
+37 | Gully plug | Repair and maintenance of earthen gully plug for community
+38 | Gully plug | Construction of stone boulder gully plug for individual
+39 | Gully plug | Construction of stone boulder gully plug for community
+40 | Gully plug | Repair and maintenance of stone boulder gully plug for community
+41 | Underground dyke | Construction of underground dyke for community
+42 | Underground dyke | Repair and maintenance of underground dyke for community
+[page 19]
+(ii) construction or rejuvenation of ponds, percolation tanks, recharge pits, recharge shafts, injection wells and associated water harvesting structures
+43 | Rejuvenation of ponds | Rejuvenation of pond for community
+44 | Rejuvenation of ponds | Rejuvenation of step well for community
+45 | Rejuvenation of ponds | Repair and maintenance of traditional water bodies for community
+46 | Percolation tanks | Construction of percolation tank for community
+47 | Percolation tanks | Repair and maintenance of percolation tank for community
+48 | Recharge pits | Construction of collection chamber for spring shed for community
+49 | Recharge pits | Repair and maintenance of collection chamber for spring shed for community
+50 | Recharge pits | Construction of filtration chamber for defunct borewell for community
+51 | Recharge pits | Repair and maintenance of filtration chamber in defunct borewell for community
+52 | Recharge pits | Construction of filtration pond with recharge shaft along escape channel for community
+53 | Recharge pits | Construction of recharge pit for individual
+54 | Recharge pits | Construction of recharge pit for community
+55 | Recharge pits | Repair and maintenance of recharge pit for community
+56 | Recharge pits | Construction of sand-filled groundwater recharge in borewell for individual
+57 | Recharge pits | Construction of sand-filled groundwater recharge in borewell for community
+58 | Recharge pits | Repair and maintenance of sand-filled groundwater recharge in borewell for community
+59 | Recharge pits | Construction of sand-filled groundwater recharge in dug well for individual
+60 | Recharge pits | Construction of sand-filled groundwater recharge in dug well for community
+61 | Recharge pits | Repair and maintenance of sand-filled groundwater recharge in dug well for community
+62 | Recharge shafts | Repair and maintenance of filtration pond with recharge shaft along escape channel for community
+63 | Recharge shafts | Construction of recharge shaft for individual
+64 | Recharge shafts | Construction of recharge shaft for community
+65 | Recharge shafts | Repair and maintenance of recharge shaft for community
+66 | Injection wells | Construction of injection well in channels for community
+67 | Injection wells | Repair and maintenance of injection well in channels for community
+68 | Injection wells | Construction of injection well in water bodies for community
+69 | Injection wells | Repair and maintenance of injection well in water bodies for community
+70 | Ponds | Construction of farm pond for individual
+71 | Ponds | Construction of tanka (water storage structure) for individual
+72 | Ponds | Construction of water harvesting pond for community
+73 | Ponds | Repair and maintenance of water harvesting pond for community
+74 | Ponds | Construction of ice stupas or artificial glaciers for water conservation and irrigation for community
+(iii) irrigation open wells, micro-irrigation channels and field water distribution systems
+75 | Irrigation well | Construction of irrigation well for individual
+76 | Irrigation well | Construction of irrigation well for community
+77 | Irrigation well | Repair and maintenance of irrigation well for community
+78 | Irrigation well | Construction of irrigation well for groups
+79 | Irrigation well | Repair and maintenance of irrigation well for groups
+[page 20]
+80 | Field water distribution system | Construction of drip irrigation channels for community
+81 | Field water distribution system | Construction of irrigation channels for field distribution for community
+82 | Field water distribution system | Repair and maintenance of irrigation channels for field distribution for community
+83 | Field water distribution system | Installation of sprinkler irrigation system for community
+84 | Field water distribution system | Renovation of field channels for community.
+85 | Field water distribution system | Construction of drip irrigation channels for individual
+86 | Field water distribution system | Installation of sprinkler irrigation system for individual
+(iv) reclamation of community waterlogged land
+87 | Reclamation of community waterlogged land | Development of waterlogged land for community
+88 | Reclamation of community waterlogged land | Construction of drainage works in waterlogged land for individual
+89 | Reclamation of community waterlogged land | Construction of drainage works in waterlogged land for community
+(v) afforestation and plantation works linked with soil and moisture conservation
+90 | Afforestation | Plantation in coastal area for community
+91 | Afforestation | Raising of bamboo plantation for community
+92 | Afforestation | Raising of cactus plantation for community
+93 | Afforestation | Raising of mangrove plantation for community
+94 | Afforestation | Construction of vegetable pandals or trellis for community
+95 | Afforestation | Construction of vegetable pandals or trellis for individuals
+96 | Afforestation | Raising of bamboo plantation for individual
+97 | Afforestation | Raising of cactus plantation for individual
+98 | Afforestation | Miyawaki plantation for ecological restoration post cyclone and other natural calamities for community
+99 | Plantation | Bio-drainage plantation for individual
+100 | Plantation | Bio-drainage plantation for community
+101 | Plantation | Plantation in institutions for community
+102 | Plantation | Avenue plantation for community
+103 | Plantation | Canal line plantation for community
+104 | Plantation | Block plantation of forestry trees in fields for individual
+105 | Plantation | Line plantation of forestry trees for community
+106 | Plantation | Along the coastline plantation of forestry trees for community
+107 | Plantation | Along the coast block plantation of forestry trees for community
+108 | Plantation | Wasteland block plantation of forestry trees for community
+109 | Plantation | line plantation of forestry trees for individual
+110 | Plantation | Block plantation of forestry trees in fields for community
+111 | Plantation | Agro forestry block plantation for individual
+112 | Plantation | Agro forestry block plantation for community
+113 | Plantation | Agro forestry block plantation in wastelands for community
+114 | Plantation | Raising of floriculture for community
+115 | Plantation | Raising of floriculture for individual
+116 | Plantation | Raising of rubber plantation for community
+117 | Plantation | Raising of rubber plantation for individual
+118 | Plantation | Raising of coconut plantation for community
+119 | Plantation | Raising of coconut plantation for individual
+120 | Plantation | Raising of broom plantation for community
+121 | Soil moisture conservation | Construction of continuous contour trench for community
+122 | Soil moisture conservation | Construction of staggered contour trench for individual
+123 | Soil moisture conservation | Construction of staggered contour trench for community
+[page 21]
+124 | Soil moisture conservation | Soil and moisture conservation trenches in horticulture plantation fields in community
+125 | Soil moisture conservation | Soil and moisture conservation trenches in horticulture plantation fields in individuals
+(vi) rooftop rainwater harvesting and other decentralised recharge systems
+126 | Rainwater harvesting structure | Construction of rooftop rainwater harvesting structure for individual
+127 | Rainwater harvesting structure | Construction of rooftop rainwater harvesting structure for community
+128 | Rainwater harvesting structure | Repair and maintenance of rooftop rainwater harvesting structure for community
+
+Category II— Core Rural Infrastructure
+(i) construction or upgradation of rural roads, culverts, cross drainage structures and village connectivity facilities
+129 | Roads | Construction of bitumen road for community
+130 | Roads | Repair and maintenance of bitumen road for community
+131 | Roads | Construction of cement concrete road for community
+132 | Roads | Repair and maintenance of cement concrete road for community
+133 | Roads | Construction of interlocking paver block road for community
+134 | Roads | Repair and maintenance of interlocking paver block road for community
+135 | Roads | Construction of kharanja road for community
+136 | Roads | Repair and maintenance of kharanja road for community
+137 | Roads | Construction of Water Bound Macadam road for community
+138 | Roads | Repair and maintenance of Water Bound Macadam road for community
+139 | Roads | Construction of gravel or mitti murram road for community
+140 | Roads | Construction of farm roads for community
+141 | Culverts | Construction of culvert for community
+142 | Culverts | Repair and maintenance of culvert for community
+143 | Cross drainage structures | Construction of cross drainage structure for community
+144 | Cross drainage structures | Repair and maintenance of cross drainage structure for community
+145 | Other village connectivity facilities | Construction of rural foot over pathway for community
+146 | Other village connectivity facilities | Repair and maintenance of rural foot over pathway for community
+147 | Other village connectivity facilities | Construction of (stone or bricks or cement concrete) footpath for community
+(ii) construction of gram panchayat bhawans, anganwadi centres, rural libraries and other public buildings
+148 | Gram Panchayat bhawan | Construction of gram panchayat building for community
+149 | Gram Panchayat bhawan | Repair and maintenance of gram panchayat building for community
+150 | Anganwadi center building | Construction of Anganwadi centre building for community
+151 | Anganwadi center building | Repair and maintenance of Anganwadi centre building for community
+152 | Rural library | Construction of rural library building for community
+153 | Rural library | Repair and maintenance of rural library building for community
+154 | Other public buildings | Repair and maintenance of boundary wall for Government institutions for community
+155 | Other public buildings | Construction of marriage or community hall for community
+156 | Other public buildings | Repair and maintenance of marriage or community hall for community
+[page 22]
+157 | Other public buildings | Construction of rural health centre for community
+158 | Other public buildings | Repair and maintenance of rural health centre for community
+159 | Other public buildings | Construction of veterinary health centre for community
+160 | Other public buildings | Repair and maintenance of veterinary health centre for community
+(iii) construction of school infrastructure, including kitchen sheds, additional classrooms, laboratories, compound walls and playgrounds
+161 | School infrastructure | Repair and maintenance of toilet for Government school for community
+162 | School infrastructure | Construction of Government school building for community
+163 | School infrastructure | Construction of toilet for Government school for community
+164 | Kitchen shed | Construction of kitchen shed for Government school for community
+165 | Kitchen shed | Repair and maintenance of kitchen shed for Government school for community
+166 | Additional class rooms | Construction of additional classroom for Government school for community
+167 | Additional class rooms | Repair and maintenance of additional classroom for Government school for community
+168 | Laboratories | Construction of laboratory for Government school for community
+169 | Laboratories | Repair and maintenance of laboratory for Government school for community
+170 | Government School compound wall | Construction of compound wall for Government school for community
+171 | Government School compound wall | Repair and maintenance of compound wall for Government school for community
+172 | Play ground | Construction of playground for Government school for community
+173 | Play ground | Repair and maintenance of playground for Government school for community
+(iv) crematoria and community infrastructure
+174 | Crematorium | Construction of crematorium for community
+175 | Crematorium | Repair and maintenance of crematorium for community
+176 | Crematorium | Construction of graveyard for community
+177 | Crematorium | Repair and maintenance of graveyard for community
+(v) solid and liquid waste management assets, including stabilising ponds, community sanitary complexes, and waste segregation and collection centres
+178 | Solid and liquid waste management | Construction of artificial wetland for waste water management for community
+179 | Solid and liquid waste management | Repair and maintenance of artificial wetland for waste water management for community
+180 | Solid and liquid waste management | Construction of soak pit for individual
+181 | Solid and liquid waste management | Construction of soak pit for community
+182 | Solid and liquid waste management | Construction of soakage channel for community
+183 | Solid and liquid waste management | Construction of liquid waste chamber for individual
+184 | Solid and liquid waste management | Construction of vertical greywater treatment unit for community
+185 | Solid and liquid waste management | Construction of horizontal greywater treatment unit for community
+186 | Solid and liquid waste management | Construction of masonry greywater drain for community
+187 | Solid and liquid waste management | Repair and maintenance of masonry greywater drain for community
+188 | Solid and liquid waste management | Construction of aggregate filled magic drain for community
+[page 23]
+189 | Toilets | Construction of anganwadi toilet for community
+190 | Toilets | Repair and maintenance of anganwadi toilet for community
+191 | Toilets | Construction of individual household latrine for individual
+192 | Stabilising ponds | Construction of 3 or 5 pond for grey water management for community
+193 | Community sanitary complexes | Construction of community sanitary complex for community
+194 | Community sanitary complexes | Repair and maintenance of community sanitary complex for community
+195 | Waste segregation and collection centres | Construction of recycling plant (waste to wealth) for community
+196 | Waste segregation and collection centres | Repair and maintenance of recycling plant for community
+197 | Waste segregation and collection centres | Construction of compost collection pit for community
+198 | Waste segregation and collection centres | Construction of segregation shed for community
+199 | Waste segregation and collection centres | Repair and maintenance of segregation shed for community
+200 | Waste segregation and collection centres | Construction of bio-fertilizer storage units for community
+(vi) installation of solar lighting systems and other renewable rural energy infrastructure
+201 | Solar lighting system | Installation of solar street light for community
+202 | Other renewable rural energy infrastructure | Construction of biogas plant for individual
+203 | Other renewable rural energy infrastructure | Construction of biogas plant for community
+(vii) village parking areas, transport sheds and other common rural amenities
+204 | Village parking areas | Construction of parking shed for community
+205 | Village parking areas | Repair and maintenance of parking shed for community
+206 | Transport sheds | Construction of rural bus stand for community
+207 | Transport sheds | Repair and maintenance of rural bus stand for community
+208 | Other common rural amenities | Construction of boundary wall for Government institutions for community
+209 | Other common rural amenities | Construction of rural park for community
+210 | Other common rural amenities | Repair and maintenance of rural park for community
+211 | Other common rural amenities | Construction of sitting chaupal or pandal for community
+212 | Other common rural amenities | Repair and maintenance of sitting chaupal or pandal for community
+213 | Other common rural amenities | Construction of cement concrete or paver block flooring in community institutions for community
+214 | Other common rural amenities | Construction of cattle or animal trough for community
+215 | Other common rural amenities | Repair and maintenance of cattle or animal trough for community
+216 | Other common rural amenities | Construction of seed bank for community
+217 | Other common rural amenities | Construction of drinking water kiosk for community
+218 | Other common rural amenities | Construction of multipurpose (emergency evacuation and relief) shelters in border area
+219 | Other common rural amenities | Construction of multipurpose youth centres for community
+[page 24]
+220 | Other common rural amenities | Construction of eco hut near eco trail or Amrit Sarovar or viewpoints or natural tracks for community
+221 | Other common rural amenities | Installation of guard rail along steep roads for community
+222 | Other common rural amenities | Construction of customer service center for community
+223 | Other common rural amenities | Construction of multipurpose ghat for community
+224 | Other common rural amenities | Construction of stairs and ramps for Divyangjan in Government buildings
+225 | Other common rural amenities | Construction of Government school hostel for community
+(viii) rural housing works permissible under the schemes of the Central and State Government, including those permitted under the Pradhan Mantri Awas Yojana—Gramin
+226 | Pradhan Mantri Awas Yojana house | Construction of Pradhan Mantri Awas Yojana-Gramin house for individual
+227 | State scheme houses | Construction of State scheme house for individual - Telangana state
+228 | State scheme houses | Construction of State scheme house for individual - Karnataka
+229 | State scheme houses | Construction of State scheme house for individual - Bihar
+230 | State scheme houses | Construction of State scheme house for individual - Kerala
+231 | State scheme houses | Construction of State scheme house for individual - Uttar Pradesh
+232 | State scheme houses | Construction of State scheme house for individual - Jharkhand
+233 | State scheme houses | Construction of State scheme house for individual - Chhattisgarh
+234 | State scheme houses | Construction of State scheme house for individual - Odisha
+235 | State scheme houses | Construction of State scheme house for individual - Maharashtra
+236 | State scheme houses | Construction of State scheme house for individual -Andhra Pradesh
+237 | State scheme houses | Construction of State scheme house for individual - West Bengal
+(ix) repair and maintenance of works created under the Jal Jeevan Mission for ensuring water supply
+238 | Jal Jeevan Mission | Repair and maintenance of storage structure for water supply project for community
+239 | Jal Jeevan Mission | Repair and maintenance of distribution structure water supply project for community
+
+Category III — Livelihood-related Infrastructure
+(i) construction of training-cum-skill development centres and work sheds for livelihood activities
+240 | Skill development centres | Construction of training and skill development centre building for community
+241 | Skill development centres | Repair and maintenance of training and skill development centre building for community
+242 | Work shed or building for Self Help Groups | Construction of workshed for Self Help Groups for community
+243 | Work shed or building for Self Help Groups | Repair and maintenance of workshed for Self Help Groups for community
+244 | Work shed or building for Self Help Groups | Construction of self-help entrepreneur mart for community
+245 | Work shed or building for Self Help Groups | Construction of mushroom cultivation work shed for community
+246 | Work shed or building for Self Help Groups | Construction of shed for rural artisan for community
+247 | Work shed or building for Self Help Groups | Construction of sericulture shed for individual
+[page 25]
+248 | Work shed or building for Self Help Groups | Construction of sericulture shed for community
+(ii) rural haats or weekly markets and other market infrastructure
+249 | Village or rural haat | Construction of rural haat building for community
+250 | Village or rural haat | Repair and maintenance of rural haat building for community
+251 | Village or rural haat | Construction of market yard for community
+252 | Village or rural haat | Repair and maintenance of market yard for community
+(iii) food grain storage buildings, agricultural produce storage structures, cold storage units and other agri-value chain infrastructure
+253 | Food grain storage structure | Construction of food grain storage building for community
+254 | Food grain storage structure | Repair and maintenance of food grain storage building for community
+255 | Agri produce storage structure | Construction of agricultural produce storage building for community
+256 | Agri produce storage structure | Construction of fodder storage shed for community
+257 | Agri produce storage structure | Repair and maintenance of agricultural produce storage building for community
+258 | Cold storage unit | Construction of cold storage unit for community
+259 | Cold storage unit | Repair and maintenance of cold storage unit for community
+260 | Cold storage unit | Construction of underground cold storage unit for community
+261 | Other agri-value chain infrastructure | Construction of Azolla tank for individual
+262 | Other agri-value chain infrastructure | Construction of multi-purpose agriculture platform for community
+263 | Other agri-value chain infrastructure | Raised platform for paddy for community
+(iv) buildings for Self Help Groups and federation-level institutions
+264 | Work shed or building for Self Help Groups | Construction of Self Help Groups building for community
+265 | Work shed or building for Self Help Groups | Repair and maintenance Self Help Groups building for community
+266 | Federation level institution | Construction of cluster-level federation building for community
+267 | Federation level institution | Repair and maintenance federation building for community
+(v) compost structures, including vermicompost and NADEP units
+268 | Compost structures | Construction of Berkeley compost pit for community
+269 | Compost structures | Construction of Berkeley compost pit for individual
+270 | Compost structures | Construction of compost pit for community
+271 | Compost structures | Construction of NADEP compost pit for community
+272 | Compost structures | Construction of NADEP compost pit for individual
+273 | Compost structures | Construction of NADEP compost pit for groups
+274 | Compost structures | Construction of compost pit for individual
+275 | Compost structures | Construction of vermicompost structure for community
+276 | Compost structures | Construction of vermicompost structure for individual
+277 | Compost structures | Construction of vermicompost structure for groups
+(vi) development of silvipasture grasslands, dairy infrastructure and shelters for cattle, goats, pigs, poultry and other livestock
+278 | Silvipasture grasslands | Raising of fodder cultivation for community
+279 | Silvipasture grasslands | Raising of fodder cultivation for individual
+280 | Dairy infrastructure | Construction of milk collection centre for community
+281 | Dairy infrastructure | Repair and maintenance of milk collection centre for community
+282 | Livestock shelter | Construction of cattle shelter for community
+283 | Livestock shelter | Construction of cattle shelter for individual
+284 | Livestock shelter | Repair and maintenance of cattle shelter for community
+285 | Livestock shelter | Construction of goat shelter for community
+[page 26]
+286 | Livestock shelter | Construction of goat shelter for individual
+287 | Livestock shelter | Repair and maintenance of goat shelter for community
+288 | Livestock shelter | Construction of piggery shed for community
+289 | Livestock shelter | Construction of piggery shed for individual
+290 | Livestock shelter | Repair and maintenance of piggery shed for community
+291 | Livestock shelter | Construction of poultry shelter for community
+292 | Livestock shelter | Construction of poultry shelter for individual
+293 | Livestock shelter | Repair and maintenance of poultry shelter for community
+(vii) fisheries-related infrastructure, including fish drying yards
+294 | Fish drying yard | Construction of fish drying yard for community
+295 | Fisheries-related infrastructure | Construction of aquaculture structure for shrimp farming for community
+296 | Fisheries-related infrastructure | Repair and maintenance of aquaculture structure for shrimp farming for community
+297 | Fisheries-related infrastructure | Construction of aquaculture structure for fish farming for community
+298 | Fisheries-related infrastructure | Repair and maintenance of aquaculture structure for fish farming for community
+299 | Fisheries-related infrastructure | Construction of aquaculture structure for crab farming for community
+300 | Fisheries-related infrastructure | Repair and maintenance of aquaculture structure for crab farming for community
+301 | Fisheries-related infrastructure | Construction of fishery pond for community
+302 | Fisheries-related infrastructure | Repair and maintenance of fishery pond for community
+303 | Fisheries-related infrastructure | Construction of aquaculture structure for pearl farming for individual
+304 | Fisheries-related infrastructure | Construction of aquaculture structure for pearl farming for community
+(viii) raising of nurseries and production of building material
+305 | Nursery or plantation | Construction of poly-house for community
+306 | Nursery or plantation | Construction of poly-house for individuals.
+307 | Nursery or plantation | Tea plantation in community wasteland for community
+308 | Nursery or plantation | Tea plantation in wasteland for individual
+309 | Nursery or plantation | Coffee plantation in community wasteland for community
+310 | Nursery or plantation | Coffee plantation in wasteland for individual
+311 | Nursery or plantation | Raising of nursery for community
+312 | Nursery or plantation | Block plantation of horticulture trees in fields for individual
+313 | Nursery or plantation | Line plantation of horticulture trees for community
+314 | Nursery or plantation | Along the coastline plantation of horticulture trees for community
+315 | Nursery or plantation | Along the coast block plantation of horticulture trees for community
+316 | Nursery or plantation | Wasteland block plantation of horticulture trees for community
+317 | Nursery or plantation | Line plantation of horticulture trees for individuals
+318 | Nursery or plantation | Block plantation of horticulture trees in fields for community
+319 | Nursery or plantation | Block plantation of sericulture trees in fields for individual
+320 | Nursery or plantation | Along the coast block plantation of sericulture trees for community
+321 | Nursery or plantation | Wasteland block plantation of sericulture trees for community
+322 | Nursery or plantation | Block plantation of sericulture trees in fields for community
+323 | Nursery or plantation | Block plantation of medicinal trees in fields for individual
+324 | Nursery or plantation | Along the coast block plantation of medicinal trees for community
+325 | Nursery or plantation | Wasteland block plantation of medicinal trees for community
+326 | Nursery or plantation | Block plantation of medicinal trees in fields for community
+327 | Nursery or plantation | Raising of nutri garden or kitchen garden for community
+328 | Building material | Production of building material for community
+(ix) integrated projects promoting circular and cyclical economy models, as may be approved by the Central Government
+329 | Processing unit | Construction of mini flour mill processing unit for community
+[page 27]
+330 | Processing unit | Construction of cashew processing unit for community
+331 | Processing unit | Construction of oilseed processing unit for community
+332 | Processing unit | Construction of integrated agro processing unit (cleaning or grading or packaging) for community
+333 | Processing unit | Construction of forest produce processing unit for community
+334 | Processing unit | Construction of handloom processing unit for community
+335 | Processing unit | Construction of hot press biodegradable processing unit (plates or bowls) for community
+336 | Processing unit | Construction of bamboo craft processing unit for community
+337 | Processing unit | Construction of other processing unit for community
+
+Category IV — Special works to mitigate Extreme Weather Events and Disaster Preparedness
+(i) construction of cyclone shelters, flood shelters and multipurpose disaster resilient structures
+338 | Cyclone shelter | Construction of cyclone shelter for community
+339 | Cyclone shelter | Repair and maintenance of cyclone shelters for community
+340 | Flood shelters | Construction of flood relief shelter for community
+341 | Flood shelters | Repair and maintenance of flood relief shelter for community
+(ii) construction of diversion channels, embankments and other disaster-mitigation works
+342 | Embankment | Construction of embankment for community
+343 | Embankment | Strengthening of embankment for community
+344 | Embankment | Construction of earthen spur for community
+345 | Embankment | Repair and maintenance of earthen spur for community
+346 | Embankment | Construction of gabion spur for community
+347 | Embankment | Repair and maintenance of gabion spur for community
+348 | Embankment | Construction of stone spur for community
+349 | Embankment | Repair and maintenance of stone spur for community
+350 | Embankment | Construction of reinforced cement concrete retaining wall or embankment for individual
+351 | Other disaster-mitigation works | Construction of flood protection wall for community
+352 | Other disaster-mitigation works | Repair and maintenance of flood protection wall for community
+353 | Other disaster-mitigation works | Construction of masonry bund for individual
+354 | Other disaster-mitigation works | Construction of level bench terrace for community
+355 | Other disaster-mitigation works | Construction of level bench terrace for individual
+356 | Other disaster-mitigation works | Construction of upland bench terrace for community
+357 | Other disaster-mitigation works | Construction of upland bench terrace for individual
+358 | Retaining wall | Construction of earthen retaining wall for community
+359 | Retaining wall | Repair and maintenance of earthen retaining wall for community
+360 | Retaining wall | Construction of stone or gabion retaining wall for community
+361 | Retaining wall | Repair and maintenance of stone or gabion retaining wall for community
+362 | Retaining wall | Construction of masonry retaining wall for community
+363 | Retaining wall | Repair and maintenance of masonry retaining wall for community
+364 | Retaining wall | Construction of reinforced cement concrete retaining wall for community
+365 | Retaining wall | Repair and maintenance of reinforced cement concrete retaining wall for community
+(iii) stabilising ponds and water structures for flood management
+366 | Stabilising ponds | Construction of stabilisation pond for community
+367 | Stabilising ponds | Repair and maintenance of stabilisation pond for community
+(iv) post-disaster rehabilitation, restoration and repair of rural roads and community assets
+368 | Post disaster restoration works | Post-disaster restoration of rural roads for community
+369 | Post disaster restoration works | Post-disaster restoration of other community assets for community
+370 | Post disaster restoration works | Post-disaster restoration of community building assets for community
+[page 28]
+(v) windbreak and shelterbelt plantations;
+371 | Windbreak or shelterbelt plantation | Shelterbelt plantation for community
+(vi) forest fire management works, including firebreaks, fuel buffer zones and allied measures
+372 | Forest fire management works | Raising of firebreak hedges for community
+373 | Forest fire management works | Construction of forest fire line for community
+374 | Forest fire management works | Raising of fuel buffer zone for community
+375 | Allied measures - forest | Construction of animal protection trenches for community
+
+[F. No. L-13060/03/2026-RE-VII-Part(2) (Computer No. 397950)]
+ROHINI R. BHAJIBHAKARE, Jt. Secy.
+
+# END. Items: 375 (Category I 128, Category II 111, Category III 98, Category IV 38).

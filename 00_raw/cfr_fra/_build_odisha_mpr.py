@@ -1,0 +1,117 @@
+# Parses the district-wise table of Odisha's FRA Monthly Progress Report (as on 31-12-2025).
+# Source PDF: https://stsc.odisha.gov.in/sites/default/files/2026-04/FRA_MPR-Dec-2025.pdf
+# Text was extracted with pdf.js in a browser on 2026-10-04; rows below are that extraction, verbatim.
+import csv, sys
+
+P1 = """Bargarh 370 1179 2076 1238 1422 0 3498 1238 1735 937 272 0 2007 937 1163 0 272 0 1435 0
+Jharsuguda 371 331 8369 3733 445 0 8814 3733 6557 2842 2 0 6559 2842 2742 0 2 0 2744 0
+Sambalpur 372 1224 26875 8095 1674 0 28549 8095 25272 7884 358 0 25630 7884 15584 6 358 0 15942 6
+Debagarh 373 671 10451 3530 708 0 11159 3530 10099 3530 185 0 10284 3530 7685 0 48 0 7733 0
+Sundargarh 374 1691 35671 7276 2654 0 38325 7276 27904 4024 486 0 28390 4024 25887 555 486 0 26373 555
+Kendujhar 375 2047 72069 6925 1748 0 73817 6925 61794 1053 513 0 62307 1053 60114 0 513 0 60627 0
+Mayurbhanj 376 4795 86426 4009 3588 0 90014 4009 62691 0 1434 0 64125 0 55958 0 1434 0 57392 0
+Baleshwar 377 2691 5592 218 580 0 6172 218 4893 218 235 0 5128 218 4893 218 170 0 5063 218
+Bhadrak 378 1248 204 1268 0 774 204 2042 204 0 0 24 204 24 204 0 0 24 204 24
+Kendrapara 379 1626 341 3721 145 0 486 3721 341 2909 145 0 486 2909 321 0 0 0 321 0
+Jagatsinghapur 380 1230 47 2 62 0 109 2 47 1 0 0 47 1 47 0 0 0 47 0
+Cuttack 381 1857 4012 2003 46 0 4058 2003 2631 0 2 0 2633 0 1874 0 2 0 1876 0
+Jajapur 382 1571 11325 2274 174 0 11499 2274 10397 0 26 0 10423 0 10176 0 26 0 10202 0
+Dhenkanal 383 1013 12125 509 1290 0 13415 509 10508 509 1290 0 11798 509 10508 509 1290 0 11798 509
+Anugul 384 1632 6045 2315 1544 0 7589 2315 7310 83 1508 0 8818 83 3341 83 1508 0 4849 83
+Nayagarh 385 1516 4202 100 425 0 4627 100 4202 100 318 0 4520 100 3939 0 318 0 4257 0
+Khordha 386 1355 3501 128 50 0 3551 128 985 0 0 0 985 0 985 0 0 0 985 0
+Puri 387 1613 0 1169 0 2 0 1171 0 1169 0 0 0 1169 0 0 0 0 0 0
+Ganjam 388 2831 10110 2967 200 0 10310 2967 6508 2967 34 0 6542 2967 6615 0 34 0 6649 0
+Gajapati 389 1449 50875 1960 1816 0 52691 1960 36197 0 200 0 36397 0 36197 0 200 0 36397 0
+Kandhamal 390 2415 81241 9082 5584 0 86825 9082 58425 0 4442 0 62867 0 57918 0 4442 0 62360 0
+Baudh 391 1164 3077 1263 1242 0 4319 1263 2521 1007 245 0 2766 1007 2521 1007 245 0 2766 1007
+Subarnapur 392 826 1570 624 528 0 2098 624 1105 624 6 0 1111 624 675 0 6 0 681 0
+Balangir 393 1763 5431 3606 1698 0 7129 3606 4072 3294 16 0 4088 3294 4072 3294 12 0 4084 3294
+Nuapada 394 658 25386 20524 842 0 26228 20524 15053 11500 114 0 15167 11500 7699 0 114 0 7813 0
+Kalahandi 395 2068 16848 349 2311 0 19159 349 11802 349 569 0 12371 349 11496 0 569 0 12065 0
+Rayagada 396 2570 29151 216 2353 0 31504 216 29151 180 365 0 29516 180 29110 180 365 0 29475 180
+Nabarangapur 397 872 53899 0 1058 0 54957 0 44564 0 138 0 44702 0 44564 0 138 0 44702 0
+Koraput 398 1890 32935 2717 937 0 33872 2717 32935 2717 269 0 33204 2717 32935 2717 269 0 33204 2717
+Malkangiri 399 964 38592 2891 919 0 39511 2891 38572 1922 669 0 39241 1922 38530 459 563 0 39093 459"""
+P1_TOTAL = "48760 638446 94712 36043 776 674489 95488 518475 49819 13841 24 532316 49843 477753 9028 13384 24 491137 9052"
+
+P2 = """Bargarh 1163 0 272 0 1435 0 1163 0 270 0 1433 0 839 0 6939 0 7778 0 417 1215 0 0 417 1215
+Jharsuguda 2725 0 2 0 2727 0 2714 0 2 0 2716 0 984 0 2 0 986 0 3714 2841 6 0 3720 2841
+Sambalpur 15568 6 358 0 15926 6 15528 6 178 0 15706 6 8009 4 9125 0 17134 4 7356 7497 86 0 7442 7497
+Debagarh 7515 0 48 0 7563 0 7469 0 44 0 7513 0 3581 0 6122 0 9703 0 1798 3350 0 0 1798 3350
+Sundargarh 24928 555 486 0 25414 555 22919 0 0 0 22919 0 11919 0 0 0 11919 0 9094 7226 0 0 9094 7226
+Kendujhar 60114 0 513 0 60627 0 59906 0 511 0 60417 0 18891 0 9124 0 28015 0 8768 6502 39 0 8807 6502
+Mayurbhanj 55920 0 1434 0 57354 0 54913 0 1086 0 55999 0 14782 0 64857 0 79639 0 4946 3783 0 0 4946 3783
+Baleshwar 3907 0 170 0 4077 0 3861 0 110 0 3971 0 585 0 21039 0 21624 0 960 218 156 0 1116 218
+Bhadrak 204 0 0 24 204 24 204 0 0 0 204 0 5 0 0 0 5 0 0 0 0 0 0 0
+Kendrapara 321 0 0 0 321 0 321 0 0 0 321 0 186 0 0 0 186 0 0 2545 145 0 145 2545
+Jagatsinghapur 47 0 0 0 47 0 47 0 0 0 47 0 13 0 0 0 13 0 0 2 0 0 0 2
+Cuttack 1874 0 2 0 1876 0 1749 0 2 0 1751 0 520 0 2 0 522 0 2032 1551 2 0 2034 1551
+Jajapur 10176 0 26 0 10202 0 10176 0 4 0 10180 0 964 0 4 0 968 0 513 2274 0 0 513 2274
+Dhenkanal 10063 1 1290 0 11353 1 9986 1 293 0 10279 1 4918 0 17082 0 22000 0 331 508 0 0 331 508
+Anugul 2712 83 1508 0 4220 83 2712 83 116 0 2828 83 610 63 2850 0 3460 63 3333 2232 0 0 3333 2232
+Nayagarh 3868 0 318 0 4186 0 3868 0 290 0 4158 0 2491 0 29779 0 32270 0 6 100 0 0 6 100
+Khordha 985 0 0 0 985 0 985 0 0 0 985 0 393 0 0 0 393 0 1147 95 0 0 1147 95
+Puri 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1169 0 0 0 1169
+Ganjam 6528 0 24 0 6552 0 6508 0 24 0 6532 0 5743 0 53 0 5796 0 3346 2967 10 0 3356 2967
+Gajapati 36197 0 200 0 36397 0 35707 0 112 0 35819 0 27427 0 3587 0 31014 0 14625 1960 0 0 14625 1960
+Kandhamal 57818 0 4442 0 62260 0 57818 0 4442 0 62260 0 35405 0 2308 0 37713 0 1050 1365 0 0 1050 1365
+Baudh 1943 0 245 0 2188 0 1943 0 173 0 2116 0 1241 0 1403 0 2645 0 578 1007 0 0 578 1007
+Subarnapur 639 0 6 0 645 0 639 0 6 0 645 0 406 0 158 0 565 0 432 624 0 0 432 624
+Balangir 3065 0 12 0 3077 0 3063 0 12 0 3075 0 3290 0 1961 0 5251 0 1007 3294 82 0 1089 3294
+Nuapada 7699 0 114 0 7813 0 7699 0 94 0 7793 0 8316 0 1743 0 10059 0 6771 11183 51 0 6822 11183
+Kalahandi 11489 0 569 0 12058 0 11173 0 483 0 11656 0 6943 0 26341 0 33284 0 309 349 0 0 309 349
+Rayagada 29079 180 365 0 29444 180 28164 84 365 0 28529 84 17788 20 11383 0 29171 20 41 0 0 0 41 0
+Nabarangapur 44564 0 138 0 44702 0 44564 0 82 0 44646 0 40122 0 2440 0 42562 0 0 0 0 0 0 0
+Koraput 31218 0 269 0 31487 0 31218 0 255 0 31473 0 20234 0 14884 0 35118 0 1638 2717 6 0 1644 2717
+Malkangiri 37470 459 563 0 38033 459 36861 452 478 0 37339 452 36971 276 98382 0 135353 276 544 2432 0 0 544 2432"""
+P2_TOTAL = "469799 1284 13374 24 483173 1308 463878 626 9432 0 473310 626 273577 363 331568 0 605144 363 74756 71006 583 0 75339 71006"
+
+SUB = ["ind_st","ind_otfd","comm_st","comm_otfd","total_st","total_otfd"]
+G1 = ["claims_filed_gs","claims_gs_to_sdlc","claims_sdlc_to_dlc"]
+G2 = ["claims_approved_dlc","titles_distributed","extent_ha","claims_rejected"]
+cols1 = [f"{g}_{s}" for g in G1 for s in SUB]
+cols2 = [f"{g}_{s}" for g in G2 for s in SUB]
+
+rows = {}
+for line in P1.splitlines():
+    t = line.split(); name = t[0]; nums = list(map(int, t[1:]))
+    assert len(nums) == 20, (name, len(nums))
+    rows[name] = {"district": name, "pc11_district_code": nums[0], "frcs_constituted": nums[1], **dict(zip(cols1, nums[2:]))}
+for line in P2.splitlines():
+    t = line.split(); name = t[0]; nums = list(map(int, t[1:]))
+    assert len(nums) == 24, (name, len(nums))
+    rows[name].update(dict(zip(cols2, nums)))
+assert len(rows) == 30
+
+# --- integrity checks against the PDF's own TOTAL rows ---
+t1 = list(map(int, P1_TOTAL.split())); t2 = list(map(int, P2_TOTAL.split()))
+bad = []
+for c, tv in zip(["frcs_constituted"] + cols1, t1):
+    s = sum(r[c] for r in rows.values())
+    if s != tv: bad.append((c, s, tv))
+for c, tv in zip(cols2, t2):
+    s = sum(r[c] for r in rows.values())
+    if s != tv: bad.append((c, s, tv))
+# internal row consistency: total = individual + community
+rowbad = []
+for r in rows.values():
+    for g in G1 + G2:
+        for k in ("st", "otfd"):
+            if r[f"{g}_ind_{k}"] + r[f"{g}_comm_{k}"] != r[f"{g}_total_{k}"]:
+                rowbad.append((r["district"], g, k, r[f"{g}_ind_{k}"], r[f"{g}_comm_{k}"], r[f"{g}_total_{k}"]))
+print("column sums that differ from the PDF TOTAL row:", bad if bad else "none")
+print("rows where individual + community != total (as printed in the PDF):", len(rowbad))
+for x in rowbad: print("   ", x)
+
+hdr = ["district", "pc11_district_code", "frcs_constituted"] + cols1 + cols2
+with open("odisha_fra_mpr_district_2025-12-31.csv", "w", newline="") as fh:
+    w = csv.DictWriter(fh, fieldnames=hdr); w.writeheader()
+    for r in sorted(rows.values(), key=lambda r: r["pc11_district_code"]): w.writerow(r)
+print("wrote odisha_fra_mpr_district_2025-12-31.csv", len(rows), "rows,", len(hdr), "cols")
+tot_t = sum(r["titles_distributed_comm_st"] + r["titles_distributed_comm_otfd"] for r in rows.values())
+tot_a = sum(r["extent_ha_comm_st"] + r["extent_ha_comm_otfd"] for r in rows.values())
+print("community titles distributed:", tot_t, "| community extent (ha):", tot_a)
+top = sorted(rows.values(), key=lambda r: -(r["extent_ha_comm_st"]))[:8]
+for r in top: print(f"   {r['district']:<14} titles={r['titles_distributed_comm_st']:>5}  ha={r['extent_ha_comm_st']:>7}")
+print("districts with 0 community titles distributed:", [r["district"] for r in rows.values() if r["titles_distributed_comm_st"] + r["titles_distributed_comm_otfd"] == 0])
