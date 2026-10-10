@@ -1,6 +1,6 @@
 # Results: the state of the pipeline, and every headline number with its caveat
 
-*Written 2026-10-10T22:33:10Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
+*Written 2026-10-10T23:05:39Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
 from the file named for it in the appendix (§13), and each conclusion drawn from figures was tested against them before
 it was written. The figures change only when the files do.*
 
@@ -476,7 +476,7 @@ for discussion with people who know the places. It is not a verdict on any place
   WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine), with events made in script: 53 of 53, and for 29
   units 1,276 of 1,276. `docs/LAYER.md` lists each action and what happened.
 - **Not opened in the Safari application on this build.** That check was left out of this build's checks, and their
-  record gives the reason: "the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell". The last run of `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application), was on
+  record gives the reason: "the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started". The last run of `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application), was on
   the layer built 2026-10-08T22:42:59Z, not the one on disk: there the page was driven by its address alone and its text read
   back, nothing was clicked, 48 of 48 addresses showed what they should (every layer, every minimum of
   forest, the search, the two text panels), and for the same 29 units 1,265 of 1,265 values the
@@ -614,7 +614,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T22:33:10Z | this run | the UTC time at which this script ran |
+| 2026-10-10T23:05:39Z | this run | the UTC time at which this script ran |
 | 2026-10-05T20:11:19Z | `10_units/units.provenance.json` | key `run_utc` |
 | 2026-10-05T20:44:23Z | `20_degradation/hansen.provenance.json` | key `run_utc` |
 | 2026-10-05T21:40:02Z | `20_degradation/corestack.provenance.json` | key `run_utc` |
@@ -843,7 +843,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 29 | `60_layer/exercise_webkit.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_equal` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_compared` |
-| the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
+| the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
 | Safari 27.0 (the application) | `60_layer/exercise_safari.json` | key `summary` → `browser` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_as_expected` |
@@ -941,10 +941,10 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `50_gap/need_vs_allocation_summary.csv` | 5,000 | `77831ac32e2c5717` | - |
 | `50_gap/panel_models.csv` | 5,072 | `a8c7ef7ef69aa7dd` | - |
 | `50_gap/unit_history_models.csv` | 6,920 | `f2684839d7db5310` | - |
-| `60_layer/decision_runs.json` | 5,712 | `652a4083b557d2d5` | - |
-| `60_layer/exercise_chrome.json` | 26,807 | `a4ecf3b563655739` | 2026-10-09T04:13:56Z |
+| `60_layer/decision_runs.json` | 6,283 | `ec5e567f36c3eb86` | - |
+| `60_layer/exercise_chrome.json` | 26,823 | `67ea8be4deefc1eb` | 2026-10-10T22:45:57Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
+| `60_layer/exercise_webkit.json` | 27,314 | `4f73f836d6ee40ea` | 2026-10-10T22:54:10Z |
 | `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
 
 ### 13.4 Statements tested before they were written
@@ -1055,7 +1055,7 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*272 figures and 10 tables (330 cells) from 38 files; 64 statements tested; 32 totals compared. Written 2026-10-10T22:33:10Z by `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*272 figures and 10 tables (330 cells) from 38 files; 64 statements tested; 32 totals compared. Written 2026-10-10T23:05:39Z by `scripts/write_results.py` (sha256 `b918073042879cfc`).*
 
 ## 14. Stage 4: need against allocation
 

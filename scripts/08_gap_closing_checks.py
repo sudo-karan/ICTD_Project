@@ -31,6 +31,13 @@ Phase 7  for each of F1 to F6: the PNG (300 dpi), the SVG, the CSV of what is pl
 Phase 8  `docs/GAP.md` has the sections the owner listed; the words of cause appear only where it says what cannot be
          shown; `docs/RESULTS.md` changed only where he said it might; the manifest only gained rows; the README has the
          specification as built and keeps the original; and every verifier passes once more.
+
+         What the owner said might change in `docs/RESULTS.md`: the four places he named, and figures that refresh
+         when the script reads today's files ("§10 and the appendix at least ... That is expected. List every figure
+         that changed, old → new"). The gate holds that a figure printed differently is the time of writing or is read
+         from a record of the browser checks (`60_layer/decision_runs.json`, `60_layer/exercise_*.json`), and that a
+         line of the text outside the four places differs only in such figures; every one is listed in
+         `50_gap/results_md_changes.csv`.
 """
 from __future__ import annotations
 
@@ -141,6 +148,19 @@ def results_changes(was: str, now: str) -> tuple[list[dict], list[str], list[str
     ops = difflib.SequenceMatcher(None, body_was, body_now, autojunk=False).get_opcodes()
     gone_body = [l for tag, i1, i2, _, _ in ops if tag in ("replace", "delete") for l in body_was[i1:i2]]
     return rows, gone_body, [l for l in body_now if l not in set(body_was)]
+
+
+REFRESH = ("this run", "`60_layer/decision_runs.json`", "`60_layer/exercise_")      # figures that refresh when the script reads today's files
+
+
+def only_refreshed(line: str, pairs: list[tuple[str, str]], body_now: set[str]) -> bool:
+    """Whether a line of the old text, with every figure that is printed differently now put in its new form, is a line
+    of the text now: the line then differs in those figures and in nothing else."""
+    new = line
+    for old_v, new_v in sorted(pairs, key=lambda x: -len(x[0])):
+        if old_v and old_v in new:
+            new = new.replace(old_v, new_v)
+    return new != line and new in body_now
 
 
 def verifiers(add) -> None:
@@ -271,18 +291,24 @@ def phase8(add) -> None:
         heads_now[:len(heads_was)] == heads_was and len(heads_now) == len(heads_was) + 1 and heads_now[-1].startswith("## 14."))
     changes, gone_body, new_body = results_changes(was, res)
     G.write_rows(G.OUT / "results_md_changes.csv", changes, ["kind", "as_printed_before", "as_printed_now", "file", "where_in_the_file"])
-    stray = [l for l in gone_body if not any(l.startswith(s) for s in RESULTS_LINES_THAT_MAY_CHANGE)]
-    add(f"docs/RESULTS.md above its section 13, against commit {BEFORE_THIS_RUN}: lines gone or changed, and those of them outside the places the owner named (the time of writing, "
-        "section 1's sentences on stage 4, the stage table's row, section 11's bullet)", "none outside them",
-        f"{len(gone_body)} lines gone or changed; outside the places named: {len(stray)}" + (": " + " | ".join(s[:80] for s in stray[:3]) if stray else ""), not stray)
     changed = [c for c in changes if c["kind"] == "changed"]
     gone = [c for c in changes if c["kind"] == "gone"]
+    pairs = [(c["as_printed_before"], c["as_printed_now"]) for c in changed if c["file"].startswith(REFRESH)]
+    named = [l for l in gone_body if any(l.startswith(s) for s in RESULTS_LINES_THAT_MAY_CHANGE)]
+    refreshed = [l for l in gone_body if l not in named and only_refreshed(l, pairs, set(res.split("\n## 13. ", 1)[0].splitlines()))]
+    stray = [l for l in gone_body if l not in named and l not in refreshed]
+    add(f"docs/RESULTS.md above its section 13, against commit {BEFORE_THIS_RUN}: lines gone or changed; those in the places the owner named (the time of writing, section 1's sentences on stage 4, "
+        "the stage table's row, section 11's bullet); those that differ only in a figure that refreshed (below); and any other", "no other",
+        f"{len(gone_body)} lines gone or changed: {len(named)} in the places named, {len(refreshed)} with only a refreshed figure, {len(stray)} other" + (": " + " | ".join(s[:80] for s in stray[:3]) if stray else ""),
+        not stray)
     not_stage4 = [c for c in changes if c["kind"] == "added" and not (c["file"].startswith("`50_gap/") or c["file"] == "`scripts/verify_gap.py`")]
-    only_time = all(c["file"] == "this run" for c in changed)
-    add(f"docs/RESULTS.md, the figures of its section 13.1 against commit {BEFORE_THIS_RUN} (written to 50_gap/results_md_changes.csv): printed differently; gone; added, and those added that are not read from 50_gap/ or from its verifier",
-        "printed differently: the time of writing and no other; gone: 0; added: stage 4's only",
-        f"printed differently: {len(changed)} (" + "; ".join(f"{c['as_printed_before']} -> {c['as_printed_now']}" for c in changed[:4]) + f"); gone: {len(gone)}; added: {len([c for c in changes if c['kind'] == 'added'])}, not stage 4's: {len(not_stage4)}",
-        only_time and not gone and not not_stage4)
+    not_refresh = [c for c in changed if not c["file"].startswith(REFRESH)]
+    add(f"docs/RESULTS.md, the figures of its section 13.1 against commit {BEFORE_THIS_RUN} (written to 50_gap/results_md_changes.csv): printed differently, and those of them that are neither the time of "
+        "writing nor read from a record of the browser checks, which the owner expected to refresh; gone; added, and those added that are not read from 50_gap/ or from its verifier",
+        "printed differently: none but the time of writing and the browser checks' records; gone: 0; added: stage 4's only",
+        f"printed differently: {len(changed)}, of them neither: {len(not_refresh)}" + (" (" + "; ".join(f"{c['as_printed_before']} -> {c['as_printed_now']}" for c in not_refresh[:3]) + ")" if not_refresh else "")
+        + f"; gone: {len(gone)}; added: {len([c for c in changes if c['kind'] == 'added'])}, not stage 4's: {len(not_stage4)}",
+        not not_refresh and not gone and not not_stage4)
     add("docs/RESULTS.md no longer says the fourth stage is not built", "yes", "yes" if "That fourth stage is not built" not in res and "**not built**" not in res.split("## 2.")[0] else "no",
         "That fourth stage is not built" not in res and "**not built**" not in res.split("## 2.")[0])
     now_m = G.IN["manifest"].read_bytes()

@@ -1,6 +1,6 @@
 # Stage 4: forest condition, need and allocation, compared
 
-*Written 2026-10-10T22:26:13Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
+*Written 2026-10-10T23:17:45Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
 the file named for it in the last section, and each conclusion drawn from figures was tested against them before it was
 written. The figures change only when the files do.*
 
@@ -647,9 +647,10 @@ land came to be scrub.
   method, which has changed over the years: "For example, in 2015, the integration of Landsat 8 satellite data and updates to the loss detection algorithm from UMD resulted in better capturing of small-scale loss." The open
   band's rise after 2018 may be on the ground or in the producers' method; that is not established
   (`docs/DECISION_LAYER.md` §18), and P6 is there for that reason.
-- **The need on outside-village land.** 52.8 per cent of N1 lies on land outside any revenue village. That
-  land lies in no panchayat unit of the layer, and the census has no row for it: every column of marginalisation
-  here is silent about the land where most of the loss is.
+- **The need on outside-village land.** 52.8 per cent of N1 lies on land outside any revenue village. No
+  panchayat plan reaches it: that is the owner's sentence, and what the tables show of it is that the land lies in
+  no panchayat unit of the layer. The census has no row for it: every column of marginalisation here is silent
+  about the land where most of the loss is.
 - **A requirement.** The gap is the same money distributed by need; not a requirement.
 - **A cost.** Nothing can be costed until a sourced rate is supplied. The VGPP rate is not in `00_raw/`. One possible
   source is the district schedule of rates that CLART uses; it is not in `00_raw/` either.
@@ -775,7 +776,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T22:26:13Z | this run | the UTC time at which this script ran |
+| 2026-10-10T23:17:45Z | this run | the UTC time at which this script ran |
 | 2026-10-10T20:20:22Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
 | 30 | `50_gap/district_need.csv` | rows counted by this script: its rows |
 | 11,468 | `50_gap/district_need.csv` | worked out by this script from its rows: `n_units` summed |
@@ -1137,10 +1138,10 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `70_share/odisha_forest_decision_layer/index.html` | 205,691 | `508144e070577a5e` | - |
 | `70_share/share.provenance.json` | 3,871 | `4678936032348686` | - |
 | `docs/DATA_NOTES.md` | 17,554 | `a8d4cb646aab38a1` | - |
-| `docs/DECISION_LAYER.md` | 242,412 | `c5f8ede9fb9834db` | - |
-| `docs/LAYER.md` | 69,984 | `f969ede637126f61` | - |
+| `docs/DECISION_LAYER.md` | 242,836 | `6d55c0c9137362c7` | - |
+| `docs/LAYER.md` | 69,860 | `030a6f59b6306700` | - |
 | `docs/NEED.md` | 19,029 | `de30a2951f052f54` | - |
-| `docs/stage4_run_log.md` | 116,146 | `21486546e8754013` | - |
+| `docs/stage4_run_log.md` | 141,169 | `b2f235a062833792` | - |
 | `figures/stage4/F1_state_report.png` | 169,399 | `c4e238215e532a6b` | - |
 | `figures/stage4/F2_outside_village_asymmetry.png` | 93,303 | `f033aeabd3b3efed` | - |
 | `figures/stage4/F3_map_of_cells.png` | 1,167,578 | `e4ccf36206922a92` | - |
@@ -1292,4 +1293,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a design constant written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum; the name of a comparison, a model, a measure of need or a figure; the name of a kind of standard error. Everything else that is a number came from a file.
 
-*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-10T22:26:13Z by `scripts/write_gap.py` (sha256 `ddd34bdb88be766c`), with the reading functions of `scripts/write_results.py` (sha256 `bce405e5a69249d8`).*
+*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-10T23:17:45Z by `scripts/write_gap.py` (sha256 `059ac9988190d532`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*

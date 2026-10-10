@@ -376,7 +376,7 @@ in `30_need/need_by_unit.csv` and in the analysis. The builder fails if one of t
 A map that renders is not a map that is correct. It was checked three ways: every unit by script; every control in two
 browser engines; and, in the Safari application itself, every state that can be reached through the address.
 
-**The Safari application was not opened on this build.** The runner's record of this build names that check as left out and gives the reason: "the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell". What §8.3 reports is the last run of it, on the layer built 2026-10-08T22:42:59Z; the two browser engines below were run on this build.
+**The Safari application was not opened on this build.** The runner's record of this build names that check as left out and gives the reason: "the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started". What §8.3 reports is the last run of it, on the layer built 2026-10-08T22:42:59Z; the two browser engines below were run on this build.
 
 
 **Every unit, by script.** `scripts/verify_layer.py` rebuilds every displayed field of every unit from the stage tables
@@ -394,7 +394,7 @@ this document is not written unless they are.
 |---|---|---|
 | browser | Chrome/154.0.8037.99 | WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) |
 | how the events were made | real mouse and keyboard events sent through Chrome's DevTools protocol to a separate, headless Chrome | events dispatched inside the page (a control's own click(); mouse, wheel and key events built in script), in a WKWebView that lies off the screen |
-| run | 2026-10-09T04:13:56Z | 2026-10-09T04:18:45Z |
+| run | 2026-10-10T22:45:57Z | 2026-10-10T22:54:10Z |
 | actions that did what they should | 53 of 53 | 53 of 53 |
 | units clicked on the map | 29 | 29 |
 | displayed values equal to the stage tables | 1,276 of 1,276 | 1,276 of 1,276 |
@@ -405,7 +405,7 @@ this document is not written unless they are.
 
 | | control | what was done | what the page then showed |
 |---|---|---|---|
-| 1 | page | opened file://<repository>/60_layer/index.html in Chrome/154.0.8037.99 | ready in 5.5 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 1 | page | opened file://<repository>/60_layer/index.html in Chrome/154.0.8037.99 | ready in 3.4 s; files loaded: ['data.js', 'index.html']; script errors: none |
 | 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
 | 3 | layer switcher | clicked the radio button 'Area under forests' at (26, 326) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
 | 4 | layer switcher | clicked the radio button 'Tree cover loss 2001-2025 (Hansen)' at (26, 354) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=hansen_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
@@ -463,7 +463,7 @@ this document is not written unless they are.
 
 | | control | what was done | what the page then showed |
 |---|---|---|---|
-| 1 | page | opened file://<repository>/60_layer/index.html in WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | ready in 2.0 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 1 | page | opened file://<repository>/60_layer/index.html in WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | ready in 2.2 s; files loaded: ['data.js', 'index.html']; script errors: none |
 | 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
 | 3 | layer switcher | sent a click to the radio button 'Area under forests' at (22, 321) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
 | 4 | layer switcher | sent a click to the radio button 'Tree cover loss 2001-2025 (Hansen)' at (22, 347) | it became the checked layer; the legend's title and its 8 classes with their counts became this layer's; the address reads '#layer=hansen_loss&floor=100'; unit 132731 (class 'Up to 1 %') is drawn #ffeda0, the class colour #ffeda0 |
@@ -523,7 +523,7 @@ this document is not written unless they are.
 new window, then changes the window's address — the parts listed in §1 — and after each change reads back the
 window's title and the text the page shows. **Nothing is clicked**: running script in a page of Safari from outside
 needs a Safari setting that is the owner's to change. So this shows that the page loads, runs and shows the right text
-in Safari, for every layer, every minimum, the same 29 units, the search and the two text panels. **Not run on the build this document describes (2026-10-09T04:08:22Z): the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell. What follows is the record of its last run.** Run 2026-10-08T22:53:16Z, on the layer built 2026-10-08T22:42:59Z:
+in Safari, for every layer, every minimum, the same 29 units, the search and the two text panels. **Not run on the build this document describes (2026-10-09T04:08:22Z): the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started. What follows is the record of its last run.** Run 2026-10-08T22:53:16Z, on the layer built 2026-10-08T22:42:59Z:
 **48 of 48 addresses showed what they should, and 1,265 of 1,265 values the units' panels should show
 were in the page's text, in the panel's order** (a value that is blank for a unit is not counted). Log:
 `60_layer/exercise_safari.json`.
@@ -739,4 +739,4 @@ neither; the page asked the network for nothing, and with the overlay's box tick
 **Its checks.** `scripts/verify_decision.py`: 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts. `scripts/exercise_decision.py`: in Chrome
 53 of 53 steps did what they should, in WebKit
 47 of 47, both on this build. The Safari
-application: not run on this build (the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell); `docs/DECISION_LAYER.md` §16 says what its last run, on an earlier build, showed.
+application: not run on this build (the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started); `docs/DECISION_LAYER.md` §16 says what its last run, on an earlier build, showed.

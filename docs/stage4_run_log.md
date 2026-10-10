@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T22:40:00Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T23:17:44Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -20,7 +20,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 | 3 | finish Phase 6 | done |
 | 4 | Phase 7 | done |
 | 5 | Phase 8, with the additions to the account of the stage | done |
-| 6 | the decision view in WebKit, with the machine awake | not yet |
+| 6 | the decision view in WebKit, with the machine awake | done |
 
 ### Step 0: publish the shared copy to GitHub Pages
 
@@ -237,8 +237,9 @@ do. These were changed, and where a statement had no test, one was written:
   the text now says so;
 - the paragraph of readings the run cannot test stated what rotational clearing does; it now only names the
   readings;
-- outside-village land was said to be reached by no panchayat plan; the tables show that it lies in no panchayat
-  unit of the layer, and the text now says that;
+- outside-village land is reached by no panchayat plan: that sentence is the owner's, from his instruction of
+  10 October, and it is kept and marked as his. Beside it the text now says what the tables show of it: the land
+  lies in no panchayat unit of the layer;
 - what the plantation category takes in is now said as `README.md` has it, with the pointer;
 - the count of gates named the steps wrongly;
 - the verifier was said to recompute every figure of every table, here and in two places of `docs/RESULTS.md` and
@@ -284,6 +285,47 @@ Files compared or listed: 53; byte for byte the same: 48. Every file that differ
 | `gates_step3.csv` | gate table | 5 cell(s): row 1, gate: 'tables of figures in both buil' then, 'tables of figures in both buil' now; row 1, found: 'none (of 23 tables compared)' then, 'none (of 22 tables compared)' now; row 3, expected: '23 of 23' then, '22 of 22' now | a gate table: see the gate on the gates below |
 | `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
 | `rebuild_step3_differences.csv` | list of differences | its number of rows: 48 then, 51 now | a list this script writes: it differs when a comparison is made again |
+
+### Step 6: the decision view in WebKit, with the machine awake
+
+`scripts/run_decision_checks.py` was run with the two checks in the Safari application left out, on mains power, the
+machine kept awake, and nothing else running beside it. Its record (`60_layer/decision_runs.json`, not in git) is now
+of the verifier as it stands. **WebKit did not stall.** Every check passed on its last run. One needed a second run:
+the exercise of the layer's first view in WebKit, where one action of the first run did not take. A drag of the map,
+made by script, left the map where it was; the second run passed every action. That check had needed a second run
+once before, on 8 October. The Safari application was not started: the record names the two checks that were not
+run and gives the reason. The table below is the record.
+
+**What followed from it.** The three documents written from those records were written again: `docs/RESULTS.md`,
+`docs/LAYER.md` and `docs/DECISION_LAYER.md`. In `docs/RESULTS.md` the figures read from the records refreshed; each
+is listed, old beside new, under Phase 8 below. `docs/GAP.md` was written again too, for one sentence (Step 5
+above: the owner's sentence on outside-village land), and it was written last. Its last section gives the size and
+SHA-256 of every file it read, among them the two documents on the layer and this log. In the commit of Step 5 it
+had been written before those three, and so gave the size and SHA-256 of their earlier versions; no figure of its
+text was affected. It now gives them as they are, and "To rebuild", at the end of this log, says to write it last.
+
+**A gate was changed after it had passed, and this is that change.** The owner's instruction of 10 October says of
+`docs/RESULTS.md` that figures other than those he named may refresh when the script reads the files of the day,
+that this is expected, and that each is to be listed. The gate of Phase 8 on that document had allowed no figure to
+differ but the time of writing, which held until this step. It now also allows a figure read from a record of the
+browser checks, and a line of the text that differs only in such figures. It fails, as before, on any other figure
+and on any other line. No other gate, expected value or tolerance was changed.
+
+*`60_layer/decision_runs.json`: started 2026-10-10T22:41:56Z, ended 2026-10-10T23:02:56Z; the layer it checked was built 2026-10-09T04:08:22Z; one check at a time.*
+
+| check | run | started | exit status | its last line | lines that failed |
+|---|---|---|---|---|---|
+| verify_layer | 1 | 2026-10-10T22:41:56Z | 0 | 92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays | none |
+| verify_decision | 1 | 2026-10-10T22:42:04Z | 0 | 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts | none |
+| exercise_layer in Chrome | 1 | 2026-10-10T22:42:13Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_layer in WebKit | 1 | 2026-10-10T22:45:59Z | 1 | 52 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | FAIL  [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) -> its centre moved from 20.205 N 84.440 E to 20.205 N 84.440 E, and the unit that was open stayed open |
+| exercise_layer in WebKit | 2 | 2026-10-10T22:50:07Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_decision in Chrome | 1 | 2026-10-10T22:54:12Z | 0 | 53 of 53 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+| exercise_decision in WebKit | 1 | 2026-10-10T22:58:40Z | 0 | 47 of 47 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+
+Not run in this pass: exercise_layer_safari, as written ("the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started"); exercise_decision_safari, by address ("the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started").
+
+*Every check passed on its last run: yes; on its first run: no.*
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -1263,8 +1305,8 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 | docs/GAP.md carries the label: the size of the fall, measured by the scheme's own earlier share; not a measure of need; the earlier years are a frozen 2020 snapshot | yes | yes | yes |
 | docs/DECISION_LAYER.md no longer says stage 4 is not built, and points to docs/GAP.md | yes | yes | yes |
 | docs/RESULTS.md: the headings it had are all there, in their order and with their numbers, and one section is appended after the last | yes | 26 headings then, 27 now; the first 26 unchanged: yes; added: ## 14. Stage 4: need against allocation | yes |
-| docs/RESULTS.md above its section 13, against commit 16b1efd: lines gone or changed, and those of them outside the places the owner named (the time of writing, section 1's sentences on stage 4, the stage table's row, section 11's bullet) | none outside them | 7 lines gone or changed; outside the places named: 0 | yes |
-| docs/RESULTS.md, the figures of its section 13.1 against commit 16b1efd (written to 50_gap/results_md_changes.csv): printed differently; gone; added, and those added that are not read from 50_gap/ or from its verifier | printed differently: the time of writing and no other; gone: 0; added: stage 4's only | printed differently: 1 (2026-10-09T05:37:27Z -> 2026-10-10T22:33:10Z); gone: 0; added: 26, not stage 4's: 0 | yes |
+| docs/RESULTS.md above its section 13, against commit 16b1efd: lines gone or changed; those in the places the owner named (the time of writing, section 1's sentences on stage 4, the stage table's row, section 11's bullet); those that differ only in a figure that refreshed (below); and any other | no other | 8 lines gone or changed: 7 in the places named, 1 with only a refreshed figure, 0 other | yes |
+| docs/RESULTS.md, the figures of its section 13.1 against commit 16b1efd (written to 50_gap/results_md_changes.csv): printed differently, and those of them that are neither the time of writing nor read from a record of the browser checks, which the owner expected to refresh; gone; added, and those added that are not read from 50_gap/ or from its verifier | printed differently: none but the time of writing and the browser checks' records; gone: 0; added: stage 4's only | printed differently: 2, of them neither: 0; gone: 0; added: 26, not stage 4's: 0 | yes |
 | docs/RESULTS.md no longer says the fourth stage is not built | yes | yes | yes |
 | 00_raw/data_manifest.csv against commit 16b1efd: rows then and now, and every earlier byte as it was | rows added, none changed | 92 then, 97 now; earlier bytes unchanged: yes | yes |
 | files of 00_raw/ that existed at commit 16b1efd and are changed or gone, the manifest apart | none | none | yes |
@@ -1287,11 +1329,12 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Its section 13.1 lists every figure in its text with the file it is read from. This is that list set against the same list in the version of the commit before this run (`50_gap/results_md_changes.csv`, written by `scripts/08_gap_closing_checks.py --phase 8`).*
 
-**Printed differently, old → new: 1.**
+**Printed differently, old → new: 2.**
 
 | before | now | file | where in the file |
 |---|---|---|---|
-| 2026-10-09T05:37:27Z | 2026-10-10T22:33:10Z | this run | the UTC time at which this script ran |
+| 2026-10-09T05:37:27Z | 2026-10-10T23:05:39Z | this run | the UTC time at which this script ran |
+| the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell | the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
 
 **Gone: 0.**
 
@@ -1330,6 +1373,7 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `ae35f9b` Handoff of 11 October, Step 5: Phase 8 - docs/GAP.md, with the owner's additions and a reading of every sentence against its rows
 - `db644c0` Handoff of 11 October, Step 4: Phase 7 - the six figures and the three deck tables, made again from the tables the verifier checked
 - `780b81c` Handoff of 11 October, Step 3: Phase 6 - the independent verifier, its one round of review, and 42 planted errors caught
 - `22a480a` Handoff of 11 October, Step 2: Phase 5b - the need read against the Forest Survey's own district figures
@@ -1371,3 +1415,5 @@ $PY scripts/write_stage4_run_log.py
 ```
 
 A script named above that does not exist yet belongs to a phase that has not been reached.
+
+`scripts/write_gap.py` is run once more after the last of these. The last section of `docs/GAP.md` records the size and SHA-256 of every file it read, and three of them are written after it: `docs/DECISION_LAYER.md`, `docs/LAYER.md` and this log. `docs/LAYER.md` is written by a working script of the sessions that made the layer, `.session_scratch_2026-10-05/make_layer_md.py`, which is not in git.

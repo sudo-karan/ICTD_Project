@@ -1139,9 +1139,10 @@ land came to be scrub.
   method, which has changed over the years: "{caut_method}" The open
   band's rise after 2018 may be on the ground or in the producers' method; that is not established
   (`docs/DECISION_LAYER.md` §18), and P6 is there for that reason.
-- **The need on outside-village land.** {n1_out_pct} per cent of N1 lies on land outside any revenue village. That
-  land lies in no panchayat unit of the layer, and the census has no row for it: every column of marginalisation
-  here is silent about the land where most of the loss is.
+- **The need on outside-village land.** {n1_out_pct} per cent of N1 lies on land outside any revenue village. No
+  panchayat plan reaches it: that is the owner's sentence, and what the tables show of it is that the land lies in
+  no panchayat unit of the layer. The census has no row for it: every column of marginalisation here is silent
+  about the land where most of the loss is.
 - **A requirement.** The gap is the same money distributed by need; not a requirement.
 - **A cost.** Nothing can be costed until a sourced rate is supplied. The VGPP rate is not in `00_raw/`. One possible
   source is the district schedule of rates that CLART uses; it is not in `00_raw/` either.

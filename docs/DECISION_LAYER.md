@@ -1,6 +1,6 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-10T22:35:00Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+*Written 2026-10-10T23:09:20Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
 file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
 
 ## 1. What this is
@@ -1028,19 +1028,18 @@ application. What follows says which check was applied to what.
 
 **How the checks were run.** By `scripts/run_decision_checks.py`, one after another and never two at once, on the
 build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). In
-this pass it ran 6 checks, and 6 passed on their first run. The runs of each browser check are
+this pass it ran 6 checks, and 5 passed on their first run. The runs of each browser check are
 given with it below.
 
-**The pass on record is that of 9 October 2026, and the verifier has gained a check since.** In that pass
-`scripts/verify_decision.py` gave "61 of 61 checks passed". The check added on 10 October 2026 (§17.3) is in the run this script
-made of the verifier as it wrote the document, which gave "62 of 62 checks passed". A second pass was started on
-10 October 2026 so that the runner's record would be of the verifier as it now is. It could not be finished:
-5 of its 6 checks passed, the verifier with its new check among them, and the check of the
-decision view in WebKit did not run to its end. The machine had gone into standby on a flat battery during the pass,
-and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote down
-"RuntimeError: the WebKit driver ended". The layer is the build the pass of 9 October 2026 was made on, so that pass's records were put back as
-they were, and the unfinished record is kept with the session's working files. The layer itself, and every check of
-it in a browser, are as they stood on 9 October 2026.
+**The pass on record was started 2026-10-10T22:41:56Z (UTC), and it is of the verifier as it now is.** In it
+`scripts/verify_decision.py` gave "62 of 62 checks passed", which is what the run this script made of the verifier as it wrote
+the document gave: "62 of 62 checks passed". The check added on 10 October 2026 (§17.3) is therefore in the pass. An earlier
+pass, started 2026-10-10T11:29:27Z (UTC) for the same purpose, could not be finished: 5 of its 6
+checks passed, the verifier with its new check among them, and the check of the decision view in WebKit did not run
+to its end. The machine had gone into standby on a flat battery during that pass, and afterwards the off-screen
+WebKit view stopped answering; the run was stopped by hand, and the runner wrote down "RuntimeError: the WebKit driver ended". That record
+is kept with the session's working files. The pass on record was made on mains power with the machine kept awake,
+on the same build of the layer, and in it the check of the decision view in WebKit ran to its end and passed.
 
 **The regression gate: the existing views.**
 
@@ -1050,10 +1049,10 @@ it in a browser, are as they stood on 9 October 2026.
   should; 29 units clicked on the map; 1,276 of 1,276 displayed values equal the stage tables.
   Runs made of it on this build: 1; runs that passed: 1.
 - `scripts/exercise_layer.py`, unchanged, in WebKit (WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine)): 53 of 53 actions; 29
-  units; 1,276 of 1,276 values. Runs made of it on this build: 1; runs that passed every step:
-  1; steps that failed in any run: none.
+  units; 1,276 of 1,276 values. Runs made of it on this build: 2; runs that passed every step:
+  1; steps that failed in any run: [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script).
 - **`scripts/exercise_layer_safari.py`, unchanged, in the Safari application: NOT RUN on this build.** The runner's
-  record names it as left out and gives the reason: "the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell". Its last record, still in `60_layer/`, is of the run
+  record names it as left out and gives the reason: "the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started". Its last record, still in `60_layer/`, is of the run
   of 2026-10-08T22:53:16Z on the layer built 2026-10-08T22:42:59Z, the build the owner ruled on: 48 addresses showed what they
   should and 1,265 values of the units' panels were in the page's text. So **the Safari third of the regression
   gate is not shown for the build described here.** What can be said without it: that script reads the existing
@@ -1318,7 +1317,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T22:35:00Z | this run | the UTC time at which this script ran |
+| 2026-10-10T23:09:20Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
 | 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
@@ -1588,9 +1587,10 @@ This section is the script's own record of what it read. Paths are relative to t
 | 29 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `ambiguities_reported` |
 | 67 | `55_decision/condition_by_unit.csv` | its columns: their number |
 | 6 | `60_layer/decision_runs.json` | key `checks`: their number |
-| 6 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
-| 9 October 2026 | `60_layer/decision_runs.json` | key `started_utc`, as a date |
-| 61 of 61 checks passed | `60_layer/decision_runs.json` | key `checks`: the first clause of the last line of the run of `verify_decision` in that pass |
+| 5 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
+| 2026-10-10T22:41:56Z | `60_layer/decision_runs.json` | key `started_utc` |
+| 62 of 62 checks passed | `60_layer/decision_runs.json` | key `checks`: the first clause of the last line of the run of `verify_decision` in that pass |
+| 2026-10-10T11:29:27Z | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `started_utc` |
 | 5 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: the checks whose last run passed |
 | 6 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: their number |
 | RuntimeError: the WebKit driver ended | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: what the last run of that check said |
@@ -1604,10 +1604,10 @@ This section is the script's own record of what it read. Paths are relative to t
 | 53 | `60_layer/exercise_webkit.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_webkit.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_compared` |
-| 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
+| 2 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_layer in WebKit' |
-| none | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit' |
-| the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
+| [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit' |
+| the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
 | 2026-10-08T22:53:16Z | `60_layer/exercise_safari.json` | key `summary` → `run_utc` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_tried` |
@@ -1776,13 +1776,13 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `55_decision/work_rows_naming_forest.csv` | 2,055 | `a1c52ae8265c0c5c` | - |
 | `55_decision/work_types.csv` | 5,133 | `f6d27c0a66b4100a` | - |
 | `60_layer/data.js` | 22,260,285 | `c0224a1627682b2a` | - |
-| `60_layer/decision_runs.json` | 5,712 | `652a4083b557d2d5` | - |
-| `60_layer/exercise_chrome.json` | 26,807 | `a4ecf3b563655739` | 2026-10-09T04:13:56Z |
-| `60_layer/exercise_decision_chrome.json` | 51,675 | `5e7a51628b8337a1` | 2026-10-09T04:23:54Z |
+| `60_layer/decision_runs.json` | 6,283 | `ec5e567f36c3eb86` | - |
+| `60_layer/exercise_chrome.json` | 26,823 | `67ea8be4deefc1eb` | 2026-10-10T22:45:57Z |
+| `60_layer/exercise_decision_chrome.json` | 51,691 | `79b6595a09b1dbb3` | 2026-10-10T22:58:37Z |
 | `60_layer/exercise_decision_safari.json` | 59,230 | `4e0185fff677500e` | 2026-10-08T23:04:30Z |
-| `60_layer/exercise_decision_webkit.json` | 49,658 | `67cb27e124ecef92` | 2026-10-09T04:28:48Z |
+| `60_layer/exercise_decision_webkit.json` | 49,674 | `6276c97084b8f642` | 2026-10-10T23:02:53Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
+| `60_layer/exercise_webkit.json` | 27,314 | `4f73f836d6ee40ea` | 2026-10-10T22:54:10Z |
 | `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
 | `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
 | `70_share/exercise_share_chrome.json` | 5,063 | `01798797082efcbd` | 2026-10-10T22:16:08Z |
@@ -2023,10 +2023,11 @@ Each of these is something the text says in words. The script tested it against 
 - the last run of the check 'exercise_layer in WebKit' on this build passed
 - the last run of the check 'exercise_decision in Chrome' on this build passed
 - the last run of the check 'exercise_decision in WebKit' on this build passed
-- the kept record of the pass of 10 October 2026 is of the layer on disk, was started after the pass on record, and is marked unfinished
+- the kept record of the pass that could not be finished is of the layer on disk, was started before the pass on record, and is marked unfinished
 - in the unfinished pass every check but the one of the decision view in WebKit passed on its last run, the verifier among them
 - in the unfinished pass the verifier gave the count this script's own run of it gave
-- the pass on record was made with the verifier as it stood before it gained a check: its count differs from this run's
+- the pass on record was made with the verifier as it now is: its count is the count of this script's own run of it
+- in the pass on record the check of the decision view in WebKit, which the earlier pass could not finish, ran to its end and passed
 - the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the unchanged script passed
 - the record gives one reason for leaving out both Safari checks
 - on an earlier build, the run of the unchanged WebKit exercise that failed a step was the first made of it, and the step was the map drag
@@ -2202,4 +2203,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*356 figures and 22 tables (699 cells) from 75 files; 240 statements tested; 153 totals compared. Written 2026-10-10T22:35:00Z by `scripts/write_decision_layer.py` (sha256 `1e986d2889c602c8`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*357 figures and 22 tables (699 cells) from 75 files; 241 statements tested; 153 totals compared. Written 2026-10-10T23:09:20Z by `scripts/write_decision_layer.py` (sha256 `6f2e4a749fc683da`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*

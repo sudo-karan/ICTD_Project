@@ -630,8 +630,9 @@ do. These were changed, and where a statement had no test, one was written:
   the text now says so;
 - the paragraph of readings the run cannot test stated what rotational clearing does; it now only names the
   readings;
-- outside-village land was said to be reached by no panchayat plan; the tables show that it lies in no panchayat
-  unit of the layer, and the text now says that;
+- outside-village land is reached by no panchayat plan: that sentence is the owner's, from his instruction of
+  10 October, and it is kept and marked as his. Beside it the text now says what the tables show of it: the land
+  lies in no panchayat unit of the layer;
 - what the plantation category takes in is now said as `README.md` has it, with the pointer;
 - the count of gates named the steps wrongly;
 - the verifier was said to recompute every figure of every table, here and in two places of `docs/RESULTS.md` and
@@ -656,7 +657,30 @@ that panchayat planning can reach; where open forest could regenerate; the old g
   prompt of 10 October gave it, and the new section quotes it as his note of 11 October records it. Each is left as
   its source has it.
 """),
-    (6, "the decision view in WebKit, with the machine awake", False, ""),
+    (6, "the decision view in WebKit, with the machine awake", True, """
+`scripts/run_decision_checks.py` was run with the two checks in the Safari application left out, on mains power, the
+machine kept awake, and nothing else running beside it. Its record (`60_layer/decision_runs.json`, not in git) is now
+of the verifier as it stands. **WebKit did not stall.** Every check passed on its last run. One needed a second run:
+the exercise of the layer's first view in WebKit, where one action of the first run did not take. A drag of the map,
+made by script, left the map where it was; the second run passed every action. That check had needed a second run
+once before, on 8 October. The Safari application was not started: the record names the two checks that were not
+run and gives the reason. The table below is the record.
+
+**What followed from it.** The three documents written from those records were written again: `docs/RESULTS.md`,
+`docs/LAYER.md` and `docs/DECISION_LAYER.md`. In `docs/RESULTS.md` the figures read from the records refreshed; each
+is listed, old beside new, under Phase 8 below. `docs/GAP.md` was written again too, for one sentence (Step 5
+above: the owner's sentence on outside-village land), and it was written last. Its last section gives the size and
+SHA-256 of every file it read, among them the two documents on the layer and this log. In the commit of Step 5 it
+had been written before those three, and so gave the size and SHA-256 of their earlier versions; no figure of its
+text was affected. It now gives them as they are, and "To rebuild", at the end of this log, says to write it last.
+
+**A gate was changed after it had passed, and this is that change.** The owner's instruction of 10 October says of
+`docs/RESULTS.md` that figures other than those he named may refresh when the script reads the files of the day,
+that this is expected, and that each is to be listed. The gate of Phase 8 on that document had allowed no figure to
+differ but the time of writing, which held until this step. It now also allows a figure read from a record of the
+browser checks, and a line of the text that differs only in such figures. It fails, as before, on any other figure
+and on any other line. No other gate, expected value or tolerance was changed.
+"""),
 ]
 
 
@@ -672,6 +696,23 @@ def publication() -> list[str]:
            "| check | expected | found | pass |", "|---|---|---|---|"]
     out += [f"| {esc(x['check'])} | {esc(x['expected'])} | {esc(x['found'])} | {'yes' if x['pass'] else 'NO'} |" for x in c["checks"]]
     return out + ["", "*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*", ""]
+
+
+def browser_runs() -> list[str]:
+    """Step 6: the runner's own record of the checks of the layer, every run of each."""
+    p = ROOT / "60_layer" / "decision_runs.json"
+    if not p.exists():
+        return []
+    d = json.loads(p.read_text(encoding="utf-8"))
+    out = [f"*`60_layer/decision_runs.json`: started {d['started_utc']}, ended {d['ended_utc']}; the layer it checked was built {d['layer_run_utc']}; one check at a time.*", "",
+           "| check | run | started | exit status | its last line | lines that failed |", "|---|---|---|---|---|---|"]
+    for c in d["checks"]:
+        for r in c["runs"]:
+            out.append(f"| {esc(c['check'])} | {r['run']} | {r['started_utc']} | {r['exit']} | {esc(r['last_line'])} | {esc('; '.join(r['failed_lines']) or 'none')} |")
+    out += ["", "Not run in this pass: " + "; ".join(f"{x['check']} (\"{x['why']}\")" for x in d["checks_not_run_in_this_pass"]) + ".", "",
+            f"*Every check passed on its last run: {'yes' if d['every_check_passed_on_its_last_run'] else 'NO'}; on its first run: "
+            f"{'yes' if d['every_check_passed_on_its_first_run'] else 'no'}.*", ""]
+    return out
 
 
 def handoff() -> list[str]:
@@ -694,6 +735,8 @@ def handoff() -> list[str]:
                 out += forest_survey()
             if n == 5:
                 out += rebuild("step5")
+            if n == 6:
+                out += browser_runs()
     return out
 
 
@@ -1004,7 +1047,11 @@ def main() -> None:
             ".venv/bin/python scripts/write_results.py            # Phase 8, in the main environment",
             ".venv/bin/python scripts/write_decision_layer.py     # Phase 8, in the main environment",
             "```", "",
-            "A script named above that does not exist yet belongs to a phase that has not been reached.", ""]
+            "A script named above that does not exist yet belongs to a phase that has not been reached.", "",
+            "`scripts/write_gap.py` is run once more after the last of these. The last section of `docs/GAP.md` records the size and "
+            "SHA-256 of every file it read, and three of them are written after it: `docs/DECISION_LAYER.md`, `docs/LAYER.md` and this "
+            "log. `docs/LAYER.md` is written by a working script of the sessions that made the layer, "
+            "`.session_scratch_2026-10-05/make_layer_md.py`, which is not in git.", ""]
     OUT.write_text("\n".join(doc), encoding="utf-8")
     print(f"wrote {OUT.relative_to(ROOT)}: {len(done)} phase(s), {len(doc)} lines")
 

@@ -1855,14 +1855,17 @@ to carry the window, the export button is off.
     e_xc, e_wk, e_dc, e_dw = runs_of("exercise_layer in Chrome", "xc"), runs_of("exercise_layer in WebKit", "wk"), runs_of("exercise_decision in Chrome", "dcr"), runs_of("exercise_decision in WebKit", "dwr")
     show("first_try", V(sum(1 for x in checks_run.values() if x["runs"][0]["exit"] == 0), RUNS, "key `checks`: the checks whose first run passed"), n0)
     show("n_checks", V(len(checks_run), RUNS, "key `checks`: their number"), n0)
-    # The runner's pass and the verifier as it now is (10 October 2026): the pass on record was made before verify_decision.py gained a check, and a second
-    # pass, started so that the record would be of the verifier on disk, could not be finished. Both are said, from the two records.
+    # The runner's pass and the verifier as it now is. verify_decision.py gained a check on 10 October 2026. A pass started that day, so that the record
+    # would be of the verifier on disk, could not be finished; the pass on record (11 October 2026, by the owner's handoff of that day) was made after it
+    # and ran to its end. Both are said, from the two records. If the pass on record is ever again OLDER than the unfinished one, this paragraph is not
+    # true of it and the script stops: the text for that state is in the version of this script at commit ae35f9b.
     show("runner_vd", V(checks_run["verify_decision"]["runs"][-1]["last_line"].split(";")[0], RUNS, "key `checks`: the first clause of the last line of the run of `verify_decision` in that pass"), txt)
-    show("runner_day", V(time.strftime("%d %B %Y", time.strptime(key(RUNS, "started_utc").v, "%Y-%m-%dT%H:%M:%SZ")).lstrip("0"), RUNS, "key `started_utc`, as a date"), txt)
+    show("runner_start", key(RUNS, "started_utc"), txt)
     UNFIN = SCRATCH + "/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json"
     unfin = {x["check"]: x for x in key(UNFIN, "checks").v}
-    hold(key(UNFIN, "unfinished").v is True and key(UNFIN, "layer_run_utc").v == run_l.v and key(UNFIN, "started_utc").v > key(RUNS, "started_utc").v,
-         "the kept record of the pass of 10 October 2026 is of the layer on disk, was started after the pass on record, and is marked unfinished")
+    show("unfin_start", key(UNFIN, "started_utc"), txt)
+    hold(key(UNFIN, "unfinished").v is True and key(UNFIN, "layer_run_utc").v == run_l.v and key(UNFIN, "started_utc").v < key(RUNS, "started_utc").v,
+         "the kept record of the pass that could not be finished is of the layer on disk, was started before the pass on record, and is marked unfinished")
     done_ = [k_ for k_, x in unfin.items() if x["runs"] and x["runs"][-1]["exit"] == 0]
     not_done = [k_ for k_ in unfin if k_ not in done_]
     show("unfin_passed", V(len(done_), UNFIN, "key `checks`: the checks whose last run passed"), n0)
@@ -1871,7 +1874,9 @@ to carry the window, the export button is off.
     show("unfin_error", V(unfin[not_done[0]]["runs"][-1].get("last_line") or unfin[not_done[0]]["runs"][-1].get("error") or "", UNFIN, "key `checks`: what the last run of that check said"), txt)
     hold(not a.draft and unfin["verify_decision"]["runs"][-1]["last_line"].split(";")[0] == W.FIG["v_decision"]["text"] if not a.draft else True,
          "in the unfinished pass the verifier gave the count this script's own run of it gave")
-    hold(W.FIG["runner_vd"]["text"] != W.FIG["v_decision"]["text"] if not a.draft else True, "the pass on record was made with the verifier as it stood before it gained a check: its count differs from this run's")
+    hold(W.FIG["runner_vd"]["text"] == W.FIG["v_decision"]["text"] if not a.draft else True, "the pass on record was made with the verifier as it now is: its count is the count of this script's own run of it")
+    hold(checks_run["exercise_decision in WebKit"]["last_run_passed"] is True and checks_run["exercise_decision in WebKit"]["runs"][-1]["exit"] == 0,
+         "in the pass on record the check of the decision view in WebKit, which the earlier pass could not finish, ran to its end and passed")
     failed_wk = [l for r_ in e_wk["runs"] for l in r_["failed_lines"]]
     show("wk_failed_steps", V("none" if not failed_wk else "; ".join(sorted({l.split("->")[0].replace("FAIL", "").strip() for l in failed_wk})), RUNS, "key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit'"), txt)
 
@@ -2055,16 +2060,15 @@ build described here; it writes down every run it makes, a failed one included (
 this pass it ran {n_checks} checks, and {first_try} passed on their first run. The runs of each browser check are
 given with it below.
 
-**The pass on record is that of {runner_day}, and the verifier has gained a check since.** In that pass
-`scripts/verify_decision.py` gave "{runner_vd}". The check added on 10 October 2026 (§17.3) is in the run this script
-made of the verifier as it wrote the document, which gave "{v_decision}". A second pass was started on
-10 October 2026 so that the runner's record would be of the verifier as it now is. It could not be finished:
-{unfin_passed} of its {unfin_of} checks passed, the verifier with its new check among them, and the check of the
-decision view in WebKit did not run to its end. The machine had gone into standby on a flat battery during the pass,
-and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote down
-"{unfin_error}". The layer is the build the pass of {runner_day} was made on, so that pass's records were put back as
-they were, and the unfinished record is kept with the session's working files. The layer itself, and every check of
-it in a browser, are as they stood on {runner_day}.
+**The pass on record was started {runner_start} (UTC), and it is of the verifier as it now is.** In it
+`scripts/verify_decision.py` gave "{runner_vd}", which is what the run this script made of the verifier as it wrote
+the document gave: "{v_decision}". The check added on 10 October 2026 (§17.3) is therefore in the pass. An earlier
+pass, started {unfin_start} (UTC) for the same purpose, could not be finished: {unfin_passed} of its {unfin_of}
+checks passed, the verifier with its new check among them, and the check of the decision view in WebKit did not run
+to its end. The machine had gone into standby on a flat battery during that pass, and afterwards the off-screen
+WebKit view stopped answering; the run was stopped by hand, and the runner wrote down "{unfin_error}". That record
+is kept with the session's working files. The pass on record was made on mains power with the machine kept awake,
+on the same build of the layer, and in it the check of the decision view in WebKit ran to its end and passed.
 
 **The regression gate: the existing views.**
 
