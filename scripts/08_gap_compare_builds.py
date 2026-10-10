@@ -34,7 +34,7 @@ import _gap_common as G  # noqa: E402
 GATE_TABLES = ("gates_", "inputs_check.csv")
 # Why a file may differ between two builds that give the same figures. A key is the start of a file's name.
 WHY = {
-    "gap.provenance.json": "every step was run again: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output",
+    "gap.provenance.json": "a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output",
     "inputs_listing.json": "the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew",
     "panel_models.txt": "its first line carries the time it was written",
     "unit_history_models.txt": "its first line carries the time it was written",

@@ -1,31 +1,12 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T20:43:48Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T22:18:33Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1, 2, 3, 4, 5. The last is Phase 5, forest rights, at the level the data allow. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2, 3, 4, 5, 6. The last is Phase 6, independent verification. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
-
-**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026**, and taken up again
-the same day under his handoff (the next section). Phases 0 to 5 and the owner's corrections are committed. What was
-not, at the stop:
-
-- **Phase 6, the verifier, is not finished.** `scripts/verify_gap.py` does not exist yet. Its parts are written and
-  every one runs on the tables, but the review of each part by a second agent was stopped part-way, so no reviewer
-  has reported; and one check of the part on the inputs fails for a reason that is the builder's: the listing of
-  inputs says it holds every input the stage reads and leaves out the files that three of the steps read on their own.
-  That is to be put right in the builder, and the tables built again, before the verifier is assembled, run and
-  tried against the deliberate errors.
-- **Phase 7 is ready and not committed**: the six figures and the three deck tables are made, their gates pass, and
-  every image has been looked at.
-- **Phase 8 is prepared and not run**: the writers of `docs/GAP.md` and of the new section of `docs/RESULTS.md` pass
-  their dry runs; neither document has been written.
-
-The scripts of those three phases are in the working tree, uncommitted. The working detail a fresh session needs
-(where the verifier's parts are kept, the state of each at the stop, the order of what is left) is in
-`.session_scratch_2026-10-05/IN_FLIGHT.md`, which is not in git.
 
 ## The owner's handoff of 11 October 2026
 
@@ -36,7 +17,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 | 0 | publish the shared copy to GitHub Pages | done |
 | 1 | fix the input listing and rebuild | done |
 | 2 | Phase 5b: the need read against the Forest Survey's own figures | done |
-| 3 | finish Phase 6 | not yet |
+| 3 | finish Phase 6 | done |
 | 4 | Phase 7 | not yet |
 | 5 | Phase 8, with the additions to the account of the stage | not yet |
 | 6 | the decision view in WebKit, with the machine awake | not yet |
@@ -173,7 +154,7 @@ The verifier's part on this step and the deliberate errors against it come with 
 
 *15 of 15 gates passed (`50_gap/gates_phase5b.csv`).*
 
-Files written by `scripts/08_build_gap_fsi.py` (run 2026-10-10T20:43:00Z):
+Files written by `scripts/08_build_gap_fsi.py` (run 2026-10-10T21:47:51Z):
 
 - `50_gap/fsi_district_check.csv` (4,676 bytes, sha256 `bf01bd9e191dcb8c`)
 - `50_gap/fsi_summary.csv` (2,210 bytes, sha256 `2f2e621f9e30fc1d`)
@@ -187,6 +168,34 @@ Files written by `scripts/08_build_gap_fsi.py` (run 2026-10-10T20:43:00Z):
 | b | N1 of 2018-2025 (ha) against the Forest Survey's scrub (km2) | 0.813247 | 0.59774 to 0.917498 | 0.00001 | no |
 | c | N1 per 100 ha of forest at the start of 2018 against the Forest Survey's change as a per cent of its forest cover | -0.212041 | -0.541393 to 0.195843 | 0.25816 | yes |
 | d | N1 per 100 ha of forest at the start of 2018 against the Forest Survey's scrub as a per cent of its forest cover | 0.578661 | 0.266942 to 0.789925 | 0.00094 | yes |
+
+### Step 3: finish Phase 6
+
+The verifier's parts had their one round of review, and the reader across all parts reported. `scripts/verify_gap.py`
+was then assembled from the parts, after holding that no top-level name is defined in two of them. Its last line is
+the count of its checks, and every check passes on the tables. `scripts/verify_gap_trials.py` planted its errors,
+Step 2's among them, and the verifier caught every one. The gate on the shared copy was run again in Chrome, and the
+closing checks of Phase 6 passed. What the reviewers found, what was changed, the trials and the comparison of the
+rebuild are written up under Phase 6 below.
+
+**Calls made in this step.**
+
+- **Three builders were changed in their written definitions**, and one of them also in what it writes: the gate on
+  the environments now writes the main environment's list of packages in the order `pip freeze` prints it. The
+  reviewers had found that the definitions did not hold of the tables. The three steps were run again; no table of
+  figures moved.
+- **The session changed the verifier after the round**, in the pieces Phase 6 names: its description and three check
+  names reworded, one check added, one tightened. The ruling allows one round, so no agent reviewed those changes;
+  each changed check has a planted error of its own, and both are caught.
+- **A planted error counts as caught only on a check of content.** Before the verifier runs on a damaged copy, the
+  copy's provenance record is given the size and SHA-256 of the damaged table, as a builder with the fault would
+  have recorded it; a stale digest then catches nothing.
+- **The owner's expected values, typed into the parts, were held by hand** against his prompt of 10 October and his
+  handoff of 11 October: every number and name typed for them is found there. No file of the repository carries
+  them for a check to read.
+- **The record of the round is kept outside git**, in `50_gap/verify_gap_reviews.json`, with a copy beside the
+  working notes: every agent's report in its own words, with the readings it assumed and what its part does not
+  cover. This log gives the counts and a summary.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -724,10 +733,283 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 | `08_gap_inputs` | `50_gap/inputs_listing.json` | **no** |  |
 | `08_gap_inputs` | `50_gap/unit_district.csv` | yes |  |
 
+## Phase 6: independent verification
+
+**What was done.** `scripts/verify_gap.py` recomputes the figures of the tables the stage's steps write into
+`50_gap/`, from the inputs, and compares. It imports nothing from the builders and shares no code with them. It is one script made of ten parts, one
+for each group of tables; its last line is the count of checks that passed. `scripts/verify_gap_trials.py` plants
+deliberate errors, one at a time, in copies of the tables outside the repository and runs the verifier on each copy.
+The gate table below holds that every verifier of the project passes, that the verifier passes on an untouched copy,
+and that every planted error is caught.
+
+**Who wrote the parts.** Seven parts were each written by an agent that was given the builders' docstrings and was
+not allowed to open the builders: the inputs, the districts, the comparisons, the panel, the unit models, forest
+rights, and the Forest Survey's figures. Three parts compare a file with the file it is derived from (the two
+environments, the deck tables, the text files of the models); they were written by the session that wrote the
+builders.
+
+**The review: one round, as the owner ruled.** Two earlier rounds had been cut off, the first when the machine lost
+power and the second when the owner asked the run to stop; what those agents had left in the part files was kept, and
+was where this round began. In this round one agent reviewed each of the first six parts, one reviewed the three
+small parts together, and the agent that wrote the Forest Survey part tried it itself: no second agent reviewed that
+part. Each began from the part as it stood, planted errors of the kinds a builder makes, one at a time, in fresh
+copies of the tables, mended the checks that let one through, and reported its disagreements with the tables, the
+readings it had to assume, what its part does not cover, and the errors it planted. The table under "The review
+round" gives each agent's counts. One more agent then read across all ten parts for columns that no check reads.
+
+**No figure disagrees.** Every figure of every table was reproduced from the definitions. The three disagreements in
+the table below are all about words in a builder's definition that did not hold of what the builder writes, and the
+writer of the Forest Survey part reported three more of the same kind as observations. All were put right in the
+builders, which is where the fault lay:
+
+- **The gate on the environments** said that the main environment's list of packages was, line for line, the list
+  kept before stage 4 installed anything, and that the file it writes is `pip freeze` as found. The script had
+  sorted the list before writing it, so two lines stood in the other order: the same packages at the same versions,
+  in another order. It now keeps the order printed and compares line by line.
+- **The same gate's definition** said it reads the provenance records of the earlier stages in four folders. It
+  reads the records the stage lists among its inputs. Those folders hold two more records that carry a version, of
+  builds the stage does not read. The definition now says which records are read; the verifier reads every record,
+  those two included, and all show one version.
+- **The deck tables' definition** said that each column's name states its rounding. The rounding is stated in the
+  definition's list of columns; the names carry none.
+- **The Forest Survey step's definition** called one cell "one sentence" where it holds a short text of three; did
+  not say that a statistic is written as a number, so that a final zero is not printed; and listed one gate fewer
+  than the step writes.
+
+The three steps were run again and every output set against a copy of the build kept from before
+(`50_gap/before_step3/`): no table of figures moved. The comparison is under "The rebuild after the review".
+
+**Planted errors that the part concerned did not catch.** The table gives them as the difference between planted
+and caught; all are the part on the inputs', and its reviewer left each as it was and said so:
+
+- a number written without its final zeros: the part compares numbers as numbers, and no figure differs;
+- the rows of the crosswalk in another order: no definition gives their order;
+- a run time moved by an hour, still in the right form: there is nothing to hold a time against;
+- one step recorded under the SHA-256 of another step's script: the part on the inputs holds only the form of that
+  field. The part on the environments holds every step's script and shared module against the files on disk, so the
+  assembled verifier does catch it, and it is one of the trials below.
+
+**What the reader across all parts found.** By reading every part, and not by trial: every column of the tables
+the steps write is read by at least one check, and no figure column is unread; the label columns are held by key
+words only; no name is defined in two pieces of the script. What no check reads sits in the provenance record: its
+top-level description, the sentences of prose a step records about itself, and, for some of the steps, whether the
+files a step lists as written or as read are all that its definition names. The reader named six descriptions or
+check names that claim more than the code tests:
+
+- the script's own first line said it recomputes every figure of every table in the folder. Files that no step
+  writes are read by no part, the deck tables and the text files are held against other outputs, and labels are
+  held by key words. The description now says so;
+- a check name of the part on the inputs said the hashes of the scripts are held nowhere; the part on the
+  environments holds them. The name now says that;
+- two check names of the panel part: one credited the part on the inputs with holding fields of which it holds
+  only the form, the other named two files of which it reads no cell. Both now say what is done;
+- a check name of the deck part said no cell goes unread while the words on each interval were read for a few
+  phrases only: closed by the check added to that part (below);
+- the checks that hold the owner's expected values and spelling rules say they hold them "as he wrote" them. The
+  values are typed into the parts; no file of the repository carries his instruction for a check to read. That
+  cannot be mended in the script. The session held them by hand: every number and every name typed for them in the
+  parts is found in his prompt of 10 October or in his handoff of 11 October.
+
+**What the session changed after the round**, with no agent to review it. The pieces concerned are named, with
+their SHA-256 before and after, under "The review round".
+
+- The head of the script: the description as above; who wrote each part; and that a permutation p and a bootstrap
+  interval of a rank correlation are held twice, with the verifier's own draws to a stated tolerance, and drawn
+  again with the recorded seeds to the digit. Two reviewers and the writer of the Forest Survey part added that
+  second check, each on one stated reading of how the random generator is called, which the definitions do not
+  give.
+- The words of the three check names above, in the parts on the inputs and the panel. No test was changed in
+  either part.
+- The deck part gained one check: the words that describe each interval are held as whole cells, with the number of
+  clusters and the bootstrap's weights taken from the model's own row. The reviewer of that part had found those
+  words unread and left them, having reached its limit of planted errors.
+- The environment part's check on the two lists of packages now holds their order too, as the corrected builder
+  writes it.
+
+Each of the two changed checks has a planted error of its own among the trials below, and each is caught.
+
+**The planted errors.** A trial counts as caught only if a check of content fails. A builder with the fault would
+have recorded the table it wrote, so before the verifier runs, the copy's provenance record is given the size and
+SHA-256 of the damaged table; a stale digest then catches nothing. The trials that run the part on the inputs are
+the exception: that part holds the record against the repository's own files, which a copy never changes. Five
+trials were added in this step to those written earlier: one for each of the two checks the session changed, one
+that writes a package of stage 4 into the main environment's list, one that records a step under another step's
+script, and one in which the record of the forest villages PDF and its copy in the provenance record both say the
+owner's first check holds, so that only the rule itself can tell.
+
+**What the verifier does not hold.** In brief, from the reviewers' lists; each agent's own list, and every reading
+it assumed, is in `50_gap/verify_gap_reviews.json` (not in git; a copy is kept beside the working notes).
+
+- **Words.** The free prose of labels, notes and reasons is held by key words, which each check names; a label that
+  is wrong in some other way would pass.
+- **Order and print.** The order of rows and of columns where no definition gives one; and how many decimals a cell
+  prints where cells are compared as numbers.
+- **Times.** The time a step records: its form only. There is nothing to hold a time against.
+- **Readings the definitions do not give.** How the random generator is called, for the checks that draw again with
+  the recorded seeds; which point of the last bracket of the bisection is reported as an end of an interval; what
+  the grids' count of tests counts. Each is stated in the name of the check that rests on it.
+- **Branches no table reaches.** An interval with an unbounded side, a bracket doubled more than once, a blank
+  denominator: the parts carry them, and they were tried on made-up tables only.
+- **The package.** The bootstrap package is called at some of the points of each inversion; the rest are held by
+  the parts' own arithmetic with the package's weights, which agrees with the package where both are computed.
+- **What lies outside the repository.** Whether the registered text of the Forest Survey's pages is a faithful
+  extract of the report; the owner's second check of the forest villages PDF, which needs pages read by a reader.
+- **The main environment as it is now.** The verifier does not open it; the gate table of this phase runs the three
+  earlier verifiers there instead.
+- **Derived files.** The parts on the deck tables and the text files hold a derived file against its source; a
+  figure wrong in both alike is the source part's to catch.
+
+**For the owner to rule.**
+
+- **One input is in no listing.** The list of packages kept before stage 4 installed anything
+  (`50_gap/environment_before_stage4.txt`) is read by the gate on the environments, is written by no step, and is
+  not in the listing of inputs, which leaves out the stage's own folder. The verifier lets that one file through by
+  name. If the listing should hold it, the shared module's list gains one entry and every step is run again.
+- **One gate of Phase 2 cannot tell two readings apart.** It is printed to one decimal, and at that precision a
+  work with no start year counted as started early gives the same figure. The district table's own columns do tell
+  them apart, and the verifier holds those exactly.
+- **The seeded checks** rest on a reading of the generator's calls. If nothing should rest on a reading the
+  definitions do not give, those checks can be taken out and the tolerance checks stand alone.
+
+**What comes next.** Phase 7: figures and tables for the paper and the deck.
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| scripts/verify_r620.py (it prints no count of checks: its line of success) | it passes | OK  1170 district rows reconcile to all 39 printed Total rows | yes |
+| scripts/verify_layer.py | 92 of 92 checks passed | 92 of 92 checks passed | yes |
+| scripts/verify_decision.py | every check | 62 of 62 checks passed | yes |
+| scripts/verify_gap.py | every check | 338 of 338 checks passed | yes |
+| the gate on the shared copy (scripts/exercise_share.py, in Chrome): its record, run 2026-10-10T22:16:08Z, and whether it is of the files on disk | every step, and yes | 8 of 8 steps; yes | yes |
+| the deliberate errors were tried with the verifier that is on disk | yes | yes | yes |
+| the control: the verifier, every part, on an untouched copy of the tables | passes | 338 of 338 checks passed | yes |
+| deliberate errors planted in copies of the tables, and caught | at least 15, every one caught | 42 of 42 | yes |
+| tables of 50_gap/ in which no error was planted (apart: the gate tables, the list of what changed in docs/RESULTS.md, and the lists of what differs between two builds) | none | none (of 23) | yes |
+| the five kinds of error the owner named are among them | a swapped district code; a part-year leak into a sum; a shifted lag; a wrong denominator; a dropped East Coast exclusion | a swapped district code; a part-year leak into a sum; a shifted lag; a wrong denominator; a dropped East Coast exclusion | yes |
+| the one round of review: parts of the verifier, and those of them that are in one agent's report and in no other | 10 of 10 | 10 of 10 | yes |
+| the review round: every check of every part passed on the real tables as its agent left the part | every one | inputs: 39 of 39; districts: 65 of 65; comparisons: 35 of 35; rights: 42 of 42; panel: 40 of 40; units: 44 of 44; environment+deck+texts: 32 of 32; fsi: 40 of 40 | yes |
+| the review round: the reader across all parts reported, and names it found defined in two pieces of the script | reported; none | reported; none | yes |
+| the record of the review round is of the verifier that is on disk | yes | yes | yes |
+| the rebuild that followed the review (three builders' definitions corrected): its gates, and the tables of figures that are byte for byte what they were | every gate; every table | 5 of 5 gates; 23 of 23 | yes |
+
+*15 of 15 gates passed (`50_gap/gates_phase6.csv`).*
+
+### The review round
+
+*From `50_gap/verify_gap_reviews.json` (written 2026-10-10T22:07:19Z): each agent's own report, as the journal of the round holds it. "Checks" are those of the part as the agent left it, run on the real tables.*
+
+| agent | part | what it did | checks passed | errors planted | caught by the part as left | disagreements | readings assumed | things listed as not covered | weak checks found and mended |
+|---|---|---|---|---|---|---|---|---|---|
+| review:inputs | inputs | reviewed the part as it stood, tried it with planted errors and fixed what it found | 39 of 39 | 27 | 23 | 0 | 13 | 10 | 3 |
+| review:districts | districts | reviewed the part as it stood, tried it with planted errors and fixed what it found | 65 of 65 | 26 | 26 | 0 | 16 | 10 | 3 |
+| review:comparisons | comparisons | reviewed the part as it stood, tried it with planted errors and fixed what it found | 35 of 35 | 28 | 28 | 0 | 17 | 9 | 2 |
+| review:rights | rights | reviewed the part as it stood, tried it with planted errors and fixed what it found | 42 of 42 | 30 | 30 | 0 | 13 | 10 | 6 |
+| review:panel | panel | reviewed the part as it stood, tried it with planted errors and fixed what it found | 40 of 40 | 25 | 25 | 0 | 13 | 9 | 2 |
+| review:units | units | reviewed the part as it stood, tried it with planted errors and fixed what it found | 44 of 44 | 25 | 25 | 0 | 15 | 8 | 3 |
+| review:small | environment, deck, texts | reviewed the part as it stood, tried it with planted errors and fixed what it found | 32 of 32 | 25 | 25 | 3 | 15 | 12 | 14 |
+| write:fsi | fsi | wrote the part from the definitions and tried it with planted errors; no second agent reviewed it | 40 of 40 | 27 | 27 | 0 | 15 | 7 | 6 |
+
+*8 agents reported; 337 of 337 checks passed; 209 of 213 planted errors caught by the parts as the agents left them; 3 disagreements, 117 readings assumed, 75 things listed as not covered, 39 weak checks found and mended. Parts written by agents: inputs, districts, comparisons, panel, units, rights, fsi; by the session: environment, deck, texts.*
+
+**The reader across all parts reported**: 20 columns or keys that no check reads or that a check reads only in part, 6 checks whose name claims more than the code tests, and 0 names defined in two pieces of the script.
+
+**Pieces of the script changed after the round, by the session: 5 of 12.** `scripts/verify_gap.py` (sha256 `85e9a1e9fbbc35c6`) is the pieces below, joined.
+
+| piece | sha256 as the round left it | sha256 as assembled | changed after the round |
+|---|---|---|---|
+| `vg_head.py` | `07cfb73e6bdfe17e` | `2a53f40c395c9628` | **yes** |
+| `part_environment.py` | `a16d996a2c8d0baa` | `ed846e6d69129ef5` | **yes** |
+| `part_inputs.py` | `334d2fe3aa9b9460` | `ca61703ac30e1c93` | **yes** |
+| `part_districts.py` | `b17f32a06c344d69` | `b17f32a06c344d69` | no |
+| `part_comparisons.py` | `27b37057bb3e3388` | `27b37057bb3e3388` | no |
+| `part_panel.py` | `b88f989fb7bff18f` | `303b877a44ea7312` | **yes** |
+| `part_units.py` | `177555af33431dc8` | `177555af33431dc8` | no |
+| `part_rights.py` | `7062ea0e4d447178` | `7062ea0e4d447178` | no |
+| `part_fsi.py` | `5949fd6513bf3e1e` | `5949fd6513bf3e1e` | no |
+| `part_deck.py` | `6da2f78fdb397929` | `f18df3cee2e4368a` | **yes** |
+| `part_texts.py` | `144a5546cd4ba204` | `144a5546cd4ba204` | no |
+| `vg_tail.py` | `1eb1d68a4aa45a3c` | `1eb1d68a4aa45a3c` | no |
+
+### The deliberate errors
+
+*Run 2026-10-10T22:07:07Z by `scripts/verify_gap_trials.py` (`50_gap/verify_gap_trials.json`): each error is planted in a copy of 50_gap/ outside the repository, and the copy's provenance record is given the bytes and SHA-256 of the damaged table (except where the part `inputs` is run, which holds the record against the repository's files); the verifier is run on the copy with --tables; caught = exit status 1 and at least one failed check whose words name no SHA-256 (any failed check, where the error is planted in the provenance record itself).*
+
+The control, the verifier, every part, on an untouched copy: 338 of 338 checks passed.
+
+| error planted | kind | table damaged | parts of the verifier run | checks failed, of those run | of them, naming no digest | caught |
+|---|---|---|---|---|---|---|
+| the census codes of two districts swapped in the crosswalk | a swapped district code | `district_crosswalk.csv` | inputs | 4 of 39 | 4 | yes |
+| one unit put in a neighbouring district | a unit in the wrong district | `unit_district.csv` | inputs | 3 of 39 | 3 | yes |
+| the found value of a gate altered by a hundredth | a figure altered | `inputs_check.csv` | inputs | 1 of 39 | 1 | yes |
+| the need of two districts exchanged (their codes swapped in the table of need) | a swapped district code | `district_need.csv` | districts | 23 of 65 | 23 | yes |
+| N1 taken over every unit, the loss under the minimum included | a need without its cell filter | `district_need.csv` | districts | 3 of 65 | 3 | yes |
+| FY2026-27 added into post-period plantation money | a part-year leak into a sum | `district_allocation.csv` | districts | 3 of 65 | 3 | yes |
+| works with no start year counted as started by FY2017-18 | a missing start year counted as early | `district_allocation.csv` | districts | 3 of 65 | 3 | yes |
+| C1's need shares taken over all forest loss, not over N1 | a wrong denominator | `need_vs_allocation.csv` | comparisons | 2 of 35 | 2 | yes |
+| C7 computed with every district kept | a dropped East Coast exclusion | `need_vs_allocation.csv`, `need_vs_allocation_summary.csv` | comparisons | 11 of 35 | 11 | yes |
+| Pearson's correlation written where C1's rho belongs | another statistic under the same name | `need_vs_allocation_summary.csv` | comparisons | 1 of 35 | 1 | yes |
+| the gaps of C1 added without their sign | a sum of the wrong terms | `need_vs_allocation_summary.csv` | comparisons | 1 of 35 | 1 | yes |
+| one district counted in another Scheduled Tribe class | a district in the wrong class | `marginalisation_split.csv` | comparisons | 3 of 35 | 3 | yes |
+| the size of the fall worked out from the share rounded to two decimals | a rounded ratio used where the exact one belongs | `what_more.csv` | comparisons | 1 of 35 | 1 | yes |
+| the panel's loss of the year before replaced by the loss of the same year | a shifted lag | `district_year_panel.csv` | panel | 2 of 40 | 2 | yes |
+| the part year flagged as a model year of the post period | a part-year leak into a sum | `district_year_panel.csv` | panel | 1 of 40 | 1 | yes |
+| P2's estimate reported as P1 | a model under another's name | `panel_models.csv` | panel | 3 of 40 | 3 | yes |
+| P1's interval replaced by the estimate plus and minus 1.96 CR1 standard errors | an interval from another method | `panel_models.csv` | panel | 4 of 40 | 4 | yes |
+| the prior loss share taken over forest at the start of the window, not the forest of 2000 | a wrong denominator | `unit_history.csv` | units | 1 of 44 | 1 | yes |
+| the exposure set to zero for twenty exposed units of the headline sample | an exposure miscoded | `unit_history.csv` | units | 1 of 44 | 1 | yes |
+| H7's estimate and count of exposed units reported as H1 | a model under another's name | `unit_history_models.csv` | units | 4 of 44 | 4 | yes |
+| H4 fitted with the East Coast districts kept (H1's figures under H4's name) | a dropped East Coast exclusion | `unit_history_models.csv` | units | 12 of 44 | 12 | yes |
+| the community titles and extent of two districts exchanged | a swapped district code | `fra_by_district.csv` | rights | 1 of 42 | 1 | yes |
+| R1's figures reported as R2 | another statistic under the same name | `fra_summary.csv` | rights | 6 of 42 | 6 | yes |
+| the national report's community extent given in acres | a wrong unit | `fra_two_reports.csv` | rights | 1 of 42 | 1 | yes |
+| the deck table's pre-period and post-period shares exchanged | columns exchanged | `deck_tables/districts_by_need.csv` | deck | 2 of 11 | 2 | yes |
+| a share of the deck's split rounded down instead of half up | a rounding rule broken | `deck_tables/marginalisation_split_c1.csv` | deck | 2 of 11 | 2 | yes |
+| the deck's interval for P1 replaced by the estimate plus and minus 1.96 CR1 standard errors | an interval from another method | `deck_tables/headline_rows.csv` | deck | 2 of 11 | 2 | yes |
+| P1's interval in the text file of the panel models replaced by the estimate plus and minus 1.96 CR1 standard errors | an interval from another method | `panel_models.txt` | texts | 1 of 8 | 1 | yes |
+| H4's counts of units, exposed units and districts in the text file of the unit models replaced by H1's | a model under another's name | `unit_history_models.txt` | texts | 1 of 8 | 1 | yes |
+| the provenance record says the unit models were built with the main environment's numpy | a step run in the wrong environment | `gap.provenance.json` | environment | 1 of 14 | 0 | yes |
+| a district's rows read from the forest villages PDF set to the count its page prints, as if the layer had every row | a count altered to pass a check | `forest_villages_districts_as_the_layer_reads_them.csv` | rights | 2 of 42 | 2 | yes |
+| the row of the PDF's summary page that does not add up given the total that would make it | a figure altered | `forest_villages_text_layer_check.csv` | rights | 3 of 42 | 3 | yes |
+| the record of the forest villages PDF says the owner's check (a) holds | a check reported as passed | `forest_villages_pdf_record.json` | rights | 5 of 42 | 5 | yes |
+| the record of the forest villages PDF and its copy in the provenance record both say the owner's check (a) holds | a check reported as passed | `forest_villages_pdf_record.json`, `gap.provenance.json` | rights | 4 of 42 | 4 | yes |
+| the Forest Survey's rows of two districts exchanged, as a wrong match of names would put them | a swapped district code | `fsi_district_check.csv` | fsi | 4 of 40 | 4 | yes |
+| the Forest Survey's scrub taken as a per cent of the district's area, not of its forest cover | a wrong denominator | `fsi_district_check.csv` | fsi | 1 of 40 | 1 | yes |
+| the Forest Survey's change in forest cover with its sign lost | a sign lost | `fsi_district_check.csv` | fsi | 2 of 40 | 2 | yes |
+| the correlation of N1 with the Forest Survey's change reported where the size-free one belongs | another statistic under the same name | `fsi_summary.csv` | fsi | 4 of 40 | 4 | yes |
+| the main environment's list of packages written sorted as whole lines, not in the order pip freeze prints | an order not kept | `environment_main_now.txt` | environment | 1 of 14 | 1 | yes |
+| numba written into the main environment's list of packages | a package stage 4 added, in the main environment | `environment_main_now.txt` | environment | 1 of 14 | 1 | yes |
+| the first step recorded with the SHA-256 of another step's script | a step recorded as built by other code | `gap.provenance.json` | environment | 1 of 14 | 0 | yes |
+| the deck's intervals for P1 and H1 said to be made with Rademacher weights | a method misnamed | `deck_tables/headline_rows.csv`, `deck_tables/headline_rows.md` | deck | 1 of 11 | 1 | yes |
+
+*42 of 42 errors caught; tables damaged: 29.*
+
+### The rebuild after the review
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_step3/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 23 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 23 of 23 | 23 of 23 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the build now that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_step3.csv`).*
+
+Files compared or listed: 48; byte for byte the same: 46. Every file that differs, is new or is gone (`50_gap/rebuild_step3_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `environment_main_now.txt` | text | 2 line(s) of 42: line 10 first | the main environment's list of packages as found at the run |
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_deck_tables: run_utc, script_sha256; 08_build_gap_fsi: run_utc, script_sha256; 08_gap_environment: outputs, run_utc, script_sha256 | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `22a480a` Handoff of 11 October, Step 2: Phase 5b - the need read against the Forest Survey's own district figures
 - `74480bf` Handoff of 11 October, Step 1: the listing of inputs holds every input any step reads; rebuilt, and no table of figures moved
 - `db8ddb2` Handoff of 11 October, Step 0: the shared copy published, and the check of the live site
 - `825898d` Stage 4: the run log, with where the run stopped (Phase 6 in progress)

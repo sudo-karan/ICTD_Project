@@ -56,14 +56,17 @@ and bootstrap seed base + 950 + k)
   d   n1_per_100_ha_of_forest_at_window_start   against  fsi_scrub_pct_of_forest_cover
   columns: id, what, x, y, size_free (no for a and b; yes for c and d, in which both sides are divided by the district's
   own forest), n_districts, rho (6 decimals), p_permutation, ci95_lo, ci95_hi (6 decimals), n_permutations,
-  n_bootstrap, n_bootstrap_undefined, seed_permutation, seed_bootstrap, and `the_two_sources`: one sentence, on every
-  row, on what each source measures and that they are not the same quantity.
+  n_bootstrap, n_bootstrap_undefined, seed_permutation, seed_bootstrap, and `the_two_sources`: the same short text on
+  every row, which says what each source measures and that they are not the same quantity. rho, p and the interval's
+  ends are written as numbers rounded to those decimals (p to 5), as Phase 2 writes them: a final zero is not printed
+  (`0.59774` is 0.597740) and the smallest p there can be, one in a hundred thousand, is written `1e-05`.
 
 gates_phase5b.csv (`gate`, `expected`, `found`, `pass`), and this step's section of `gap.provenance.json`. The gates:
 30 rows, matched one to one; the five spelling rules and no others; each of the seven columns that can be added, summed
 over the 30 districts, equals the table's printed Grand Total row and the figure the owner gave for it, exactly; every
 row's three density classes add to its total; every printed per cent is 100 x total / calculated area to two
-decimals, the Grand Total's too; the state's N1 here is the one `district_need.csv` gives.
+decimals, the Grand Total's too; the state's N1 here is the one `district_need.csv` gives; and all four rank
+correlations were computed.
 """
 from __future__ import annotations
 

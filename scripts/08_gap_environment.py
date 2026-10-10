@@ -14,17 +14,19 @@ This script is run with the stage-4 interpreter. It holds, and stops at the firs
      version different (`pip` itself apart, as in `pip freeze`);
   2. that environment is outside the repository;
   3. the versions the owner named: `wildboottest` 0.3.2, `numba` 0.62.1, `numpy` 2.3.x;
-  4. the main environment's `numpy` is the one version the provenance records of the earlier stages show
-     (`20_degradation/`, `30_need/`, `40_allocation/`, `55_decision/`);
-  5. the main environment's list of packages is, line for line, the list kept before stage 4 installed anything
-     (`50_gap/environment_before_stage4.txt`), where that list is on disk;
+  4. the main environment's `numpy` is the one version shown by the provenance records of the earlier stages that
+     stage 4 lists among its inputs: eight records, in `20_degradation/`, `30_need/`, `40_allocation/` and
+     `55_decision/` (those folders hold two more records with a `numpy` version, of builds stage 4 does not read; this
+     script does not read them);
+  5. the main environment's list of packages, in the order `pip freeze` prints it, is line for line the list kept
+     before stage 4 installed anything (`50_gap/environment_before_stage4.txt`), where that list is on disk;
   6. in the main environment `verify_r620.py` passes, `verify_layer.py` passes 92 of 92 and `verify_decision.py` passes
      every check: nothing moved.
 
 The main interpreter is `.venv/bin/python` of the repository, or the one named in the variable `ICTD_MAIN_PYTHON`.
 
 Writes `gates_environment.csv` (`gate`, `expected`, `found`, `pass`), `environment_main_now.txt` (the main
-environment's `pip freeze` as this script found it) and the section `08_gap_environment` of `gap.provenance.json`,
+environment's `pip freeze` as this script found it, in the order printed) and the section `08_gap_environment` of `gap.provenance.json`,
 whose `environment` lists every package of the stage-4 environment with its version.
 """
 from __future__ import annotations
@@ -99,13 +101,15 @@ def main() -> None:
     freeze = main_run("-m", "pip", "freeze")
     if freeze.returncode != 0:
         G.stop("the main environment's pip freeze failed: " + freeze.stderr.strip()[-200:])
-    now = sorted(l.strip() for l in freeze.stdout.splitlines() if l.strip())
+    now = [l.strip() for l in freeze.stdout.splitlines() if l.strip()]            # in the order printed: the kept list is in that order too
     (G.OUT / "environment_main_now.txt").write_text("\n".join(now) + "\n", encoding="utf-8")
     if BEFORE.exists():
-        before = sorted(l.strip() for l in BEFORE.read_text(encoding="utf-8").splitlines() if l.strip())
+        before = [l.strip() for l in BEFORE.read_text(encoding="utf-8").splitlines() if l.strip()]
         changed = sorted(set(before) ^ set(now))
+        if not changed and before != now:                                           # the same packages, in another order
+            changed = [f"line {i + 1}: {b} then, {n} now" for i, (b, n) in enumerate(zip(before, now)) if b != n]
         add("the main environment's list of packages (pip freeze) against the list kept before stage 4 installed anything (50_gap/environment_before_stage4.txt)",
-            f"the same, line for line ({len(before)} packages)", f"{'the same' if not changed else 'DIFFERENT'}: {len(now)} packages" + ("; " + "; ".join(changed[:6]) if changed else ""), not changed)
+            f"the same, line for line ({len(before)} packages)", f"{'the same' if before == now else 'DIFFERENT'}: {len(now)} packages" + ("; " + "; ".join(changed[:6]) if changed else ""), before == now)
     else:
         add("the main environment's list of packages against the list kept before stage 4 (50_gap/environment_before_stage4.txt)", "not held: that list is not on disk",
             f"not compared; the main environment holds {len(now)} packages (50_gap/environment_main_now.txt)", True)

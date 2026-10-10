@@ -9,7 +9,7 @@ phase even where a later phase's files are already on disk.
 No figure in the log is typed. The gate tables are the gate files of `50_gap/` as the builders wrote them
 (`inputs_check.csv` and `gates_*.csv`: `gate`, `expected`, `found`, `pass`); the lists of files are read from
 `50_gap/gap.provenance.json` (the figures' from `figures/stage4/figures.provenance.json`); the list of inputs and
-their columns from `50_gap/inputs_listing.json`; the package versions and the gate on the two environments from `50_gap/gates_environment.csv` and the provenance record; the deliberate errors from `50_gap/verify_gap_trials.json`; the figures of `docs/RESULTS.md` that changed
+their columns from `50_gap/inputs_listing.json`; the package versions and the gate on the two environments from `50_gap/gates_environment.csv` and the provenance record; the deliberate errors from `50_gap/verify_gap_trials.json`; the counts of the review of the verifier's parts from `50_gap/verify_gap_reviews.json`; the figures of `docs/RESULTS.md` that changed
 from `50_gap/results_md_changes.csv`. What is typed is the notes below: what a phase was
 for, what was decided in it, and where to pick up. The notes carry no figure of the analysis.
 
@@ -218,6 +218,142 @@ the summary page. The rule replaced it.
 **What comes next.** Phase 6: independent verification (`scripts/verify_gap.py`).
 """),
     (6, "independent verification", ["gates_phase6.csv"], [], """
+**What was done.** `scripts/verify_gap.py` recomputes the figures of the tables the stage's steps write into
+`50_gap/`, from the inputs, and compares. It imports nothing from the builders and shares no code with them. It is one script made of ten parts, one
+for each group of tables; its last line is the count of checks that passed. `scripts/verify_gap_trials.py` plants
+deliberate errors, one at a time, in copies of the tables outside the repository and runs the verifier on each copy.
+The gate table below holds that every verifier of the project passes, that the verifier passes on an untouched copy,
+and that every planted error is caught.
+
+**Who wrote the parts.** Seven parts were each written by an agent that was given the builders' docstrings and was
+not allowed to open the builders: the inputs, the districts, the comparisons, the panel, the unit models, forest
+rights, and the Forest Survey's figures. Three parts compare a file with the file it is derived from (the two
+environments, the deck tables, the text files of the models); they were written by the session that wrote the
+builders.
+
+**The review: one round, as the owner ruled.** Two earlier rounds had been cut off, the first when the machine lost
+power and the second when the owner asked the run to stop; what those agents had left in the part files was kept, and
+was where this round began. In this round one agent reviewed each of the first six parts, one reviewed the three
+small parts together, and the agent that wrote the Forest Survey part tried it itself: no second agent reviewed that
+part. Each began from the part as it stood, planted errors of the kinds a builder makes, one at a time, in fresh
+copies of the tables, mended the checks that let one through, and reported its disagreements with the tables, the
+readings it had to assume, what its part does not cover, and the errors it planted. The table under "The review
+round" gives each agent's counts. One more agent then read across all ten parts for columns that no check reads.
+
+**No figure disagrees.** Every figure of every table was reproduced from the definitions. The three disagreements in
+the table below are all about words in a builder's definition that did not hold of what the builder writes, and the
+writer of the Forest Survey part reported three more of the same kind as observations. All were put right in the
+builders, which is where the fault lay:
+
+- **The gate on the environments** said that the main environment's list of packages was, line for line, the list
+  kept before stage 4 installed anything, and that the file it writes is `pip freeze` as found. The script had
+  sorted the list before writing it, so two lines stood in the other order: the same packages at the same versions,
+  in another order. It now keeps the order printed and compares line by line.
+- **The same gate's definition** said it reads the provenance records of the earlier stages in four folders. It
+  reads the records the stage lists among its inputs. Those folders hold two more records that carry a version, of
+  builds the stage does not read. The definition now says which records are read; the verifier reads every record,
+  those two included, and all show one version.
+- **The deck tables' definition** said that each column's name states its rounding. The rounding is stated in the
+  definition's list of columns; the names carry none.
+- **The Forest Survey step's definition** called one cell "one sentence" where it holds a short text of three; did
+  not say that a statistic is written as a number, so that a final zero is not printed; and listed one gate fewer
+  than the step writes.
+
+The three steps were run again and every output set against a copy of the build kept from before
+(`50_gap/before_step3/`): no table of figures moved. The comparison is under "The rebuild after the review".
+
+**Planted errors that the part concerned did not catch.** The table gives them as the difference between planted
+and caught; all are the part on the inputs', and its reviewer left each as it was and said so:
+
+- a number written without its final zeros: the part compares numbers as numbers, and no figure differs;
+- the rows of the crosswalk in another order: no definition gives their order;
+- a run time moved by an hour, still in the right form: there is nothing to hold a time against;
+- one step recorded under the SHA-256 of another step's script: the part on the inputs holds only the form of that
+  field. The part on the environments holds every step's script and shared module against the files on disk, so the
+  assembled verifier does catch it, and it is one of the trials below.
+
+**What the reader across all parts found.** By reading every part, and not by trial: every column of the tables
+the steps write is read by at least one check, and no figure column is unread; the label columns are held by key
+words only; no name is defined in two pieces of the script. What no check reads sits in the provenance record: its
+top-level description, the sentences of prose a step records about itself, and, for some of the steps, whether the
+files a step lists as written or as read are all that its definition names. The reader named six descriptions or
+check names that claim more than the code tests:
+
+- the script's own first line said it recomputes every figure of every table in the folder. Files that no step
+  writes are read by no part, the deck tables and the text files are held against other outputs, and labels are
+  held by key words. The description now says so;
+- a check name of the part on the inputs said the hashes of the scripts are held nowhere; the part on the
+  environments holds them. The name now says that;
+- two check names of the panel part: one credited the part on the inputs with holding fields of which it holds
+  only the form, the other named two files of which it reads no cell. Both now say what is done;
+- a check name of the deck part said no cell goes unread while the words on each interval were read for a few
+  phrases only: closed by the check added to that part (below);
+- the checks that hold the owner's expected values and spelling rules say they hold them "as he wrote" them. The
+  values are typed into the parts; no file of the repository carries his instruction for a check to read. That
+  cannot be mended in the script. The session held them by hand: every number and every name typed for them in the
+  parts is found in his prompt of 10 October or in his handoff of 11 October.
+
+**What the session changed after the round**, with no agent to review it. The pieces concerned are named, with
+their SHA-256 before and after, under "The review round".
+
+- The head of the script: the description as above; who wrote each part; and that a permutation p and a bootstrap
+  interval of a rank correlation are held twice, with the verifier's own draws to a stated tolerance, and drawn
+  again with the recorded seeds to the digit. Two reviewers and the writer of the Forest Survey part added that
+  second check, each on one stated reading of how the random generator is called, which the definitions do not
+  give.
+- The words of the three check names above, in the parts on the inputs and the panel. No test was changed in
+  either part.
+- The deck part gained one check: the words that describe each interval are held as whole cells, with the number of
+  clusters and the bootstrap's weights taken from the model's own row. The reviewer of that part had found those
+  words unread and left them, having reached its limit of planted errors.
+- The environment part's check on the two lists of packages now holds their order too, as the corrected builder
+  writes it.
+
+Each of the two changed checks has a planted error of its own among the trials below, and each is caught.
+
+**The planted errors.** A trial counts as caught only if a check of content fails. A builder with the fault would
+have recorded the table it wrote, so before the verifier runs, the copy's provenance record is given the size and
+SHA-256 of the damaged table; a stale digest then catches nothing. The trials that run the part on the inputs are
+the exception: that part holds the record against the repository's own files, which a copy never changes. Five
+trials were added in this step to those written earlier: one for each of the two checks the session changed, one
+that writes a package of stage 4 into the main environment's list, one that records a step under another step's
+script, and one in which the record of the forest villages PDF and its copy in the provenance record both say the
+owner's first check holds, so that only the rule itself can tell.
+
+**What the verifier does not hold.** In brief, from the reviewers' lists; each agent's own list, and every reading
+it assumed, is in `50_gap/verify_gap_reviews.json` (not in git; a copy is kept beside the working notes).
+
+- **Words.** The free prose of labels, notes and reasons is held by key words, which each check names; a label that
+  is wrong in some other way would pass.
+- **Order and print.** The order of rows and of columns where no definition gives one; and how many decimals a cell
+  prints where cells are compared as numbers.
+- **Times.** The time a step records: its form only. There is nothing to hold a time against.
+- **Readings the definitions do not give.** How the random generator is called, for the checks that draw again with
+  the recorded seeds; which point of the last bracket of the bisection is reported as an end of an interval; what
+  the grids' count of tests counts. Each is stated in the name of the check that rests on it.
+- **Branches no table reaches.** An interval with an unbounded side, a bracket doubled more than once, a blank
+  denominator: the parts carry them, and they were tried on made-up tables only.
+- **The package.** The bootstrap package is called at some of the points of each inversion; the rest are held by
+  the parts' own arithmetic with the package's weights, which agrees with the package where both are computed.
+- **What lies outside the repository.** Whether the registered text of the Forest Survey's pages is a faithful
+  extract of the report; the owner's second check of the forest villages PDF, which needs pages read by a reader.
+- **The main environment as it is now.** The verifier does not open it; the gate table of this phase runs the three
+  earlier verifiers there instead.
+- **Derived files.** The parts on the deck tables and the text files hold a derived file against its source; a
+  figure wrong in both alike is the source part's to catch.
+
+**For the owner to rule.**
+
+- **One input is in no listing.** The list of packages kept before stage 4 installed anything
+  (`50_gap/environment_before_stage4.txt`) is read by the gate on the environments, is written by no step, and is
+  not in the listing of inputs, which leaves out the stage's own folder. The verifier lets that one file through by
+  name. If the listing should hold it, the shared module's list gains one entry and every step is run again.
+- **One gate of Phase 2 cannot tell two readings apart.** It is printed to one decimal, and at that precision a
+  work with no start year counted as started early gives the same figure. The district table's own columns do tell
+  them apart, and the verifier holds those exactly.
+- **The seeded checks** rest on a reading of the generator's calls. If nothing should rest on a reading the
+  definitions do not give, those checks can be taken out and the tolerance checks stand alone.
+
 **What comes next.** Phase 7: figures and tables for the paper and the deck.
 """),
     (7, "figures and tables for the paper and the deck", ["gates_phase7.csv"], ["08_build_gap_deck_tables"], """
@@ -421,7 +557,33 @@ table first.
 
 The verifier's part on this step and the deliberate errors against it come with Step 3.
 """),
-    (3, "finish Phase 6", False, ""),
+    (3, "finish Phase 6", True, """
+The verifier's parts had their one round of review, and the reader across all parts reported. `scripts/verify_gap.py`
+was then assembled from the parts, after holding that no top-level name is defined in two of them. Its last line is
+the count of its checks, and every check passes on the tables. `scripts/verify_gap_trials.py` planted its errors,
+Step 2's among them, and the verifier caught every one. The gate on the shared copy was run again in Chrome, and the
+closing checks of Phase 6 passed. What the reviewers found, what was changed, the trials and the comparison of the
+rebuild are written up under Phase 6 below.
+
+**Calls made in this step.**
+
+- **Three builders were changed in their written definitions**, and one of them also in what it writes: the gate on
+  the environments now writes the main environment's list of packages in the order `pip freeze` prints it. The
+  reviewers had found that the definitions did not hold of the tables. The three steps were run again; no table of
+  figures moved.
+- **The session changed the verifier after the round**, in the pieces Phase 6 names: its description and three check
+  names reworded, one check added, one tightened. The ruling allows one round, so no agent reviewed those changes;
+  each changed check has a planted error of its own, and both are caught.
+- **A planted error counts as caught only on a check of content.** Before the verifier runs on a damaged copy, the
+  copy's provenance record is given the size and SHA-256 of the damaged table, as a builder with the fault would
+  have recorded it; a stale digest then catches nothing.
+- **The owner's expected values, typed into the parts, were held by hand** against his prompt of 10 October and his
+  handoff of 11 October: every number and name typed for them is found there. No file of the repository carries
+  them for a check to read.
+- **The record of the round is kept outside git**, in `50_gap/verify_gap_reviews.json`, with a copy beside the
+  working notes: every agent's report in its own words, with the readings it assumed and what its part does not
+  cover. This log gives the counts and a summary.
+"""),
     (4, "Phase 7", False, ""),
     (5, "Phase 8, with the additions to the account of the stage", False, ""),
     (6, "the decision view in WebKit, with the machine awake", False, ""),
@@ -610,14 +772,47 @@ def trials() -> list[str]:
     out = ["### The deliberate errors", "",
            f"*Run {t['run_utc']} by `scripts/verify_gap_trials.py` (`50_gap/verify_gap_trials.json`): {t['how']}.*", "",
            f"The control, {t['control']['what']}: {t['control']['last_line']}.", "",
-           "| error planted | kind | table damaged | parts of the verifier run | checks failed, of those run | caught |",
-           "|---|---|---|---|---|---|"]
+           "| error planted | kind | table damaged | parts of the verifier run | checks failed, of those run | of them, naming no digest | caught |",
+           "|---|---|---|---|---|---|---|"]
     for x in t["trials"]:
         out.append(f"| {esc(x['name'])} | {esc(x['kind'])} | {', '.join('`' + y + '`' for y in x['tables'])} | "
-                   f"{', '.join(x['parts_run'])} | {x['checks_failed']} of {x['checks_run']} | {'yes' if x['caught'] else 'NO'} |")
+                   f"{', '.join(x['parts_run'])} | {x['checks_failed']} of {x['checks_run']} | {x['checks_failed_that_name_no_digest']} | {'yes' if x['caught'] else 'NO'} |")
     out += ["", f"*{sum(x['caught'] for x in t['trials'])} of {len(t['trials'])} errors caught; tables damaged: "
             f"{len({y for x in t['trials'] for y in x['tables']})}.*", ""]
     return out
+
+
+def reviews() -> list[str]:
+    """The one review round of the verifier's parts, from the record made of the agents' own reports."""
+    p = GAP / "verify_gap_reviews.json"
+    if not p.exists():
+        return []
+    v = json.loads(p.read_text(encoding="utf-8"))
+    t = v["totals"]
+    out = ["### The review round", "",
+           f"*From `50_gap/verify_gap_reviews.json` (written {v['written_utc']}): each agent's own report, as the journal of the round holds it. "
+           "\"Checks\" are those of the part as the agent left it, run on the real tables.*", "",
+           "| agent | part | what it did | checks passed | errors planted | caught by the part as left | disagreements | readings assumed | things listed as not covered | weak checks found and mended |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
+    for r in v["reports"]:
+        out.append(f"| {esc(r['agent'])} | {', '.join(r['parts'])} | {esc(r['role'])} | {r['checks_passed']} of {r['checks']} | {r['errors_planted']} | {r['errors_caught']} | "
+                   f"{len(r['disagreements'])} | {len(r['assumptions'])} | {len(r['uncovered'])} | {len(r['weak_checks_found_and_fixed'])} |")
+    out += ["", f"*{t['agents_that_reported_on_a_part']} agents reported; {t['checks_passed']} of {t['checks']} checks passed; {t['errors_caught']} of {t['errors_planted']} planted errors "
+            f"caught by the parts as the agents left them; {t['disagreements']} disagreements, {t['assumptions']} readings assumed, {t['uncovered']} things listed as not covered, "
+            f"{t['weak_checks_found_and_fixed']} weak checks found and mended. Parts written by agents: {', '.join(v['parts_written_by_agents'])}; by the session: "
+            f"{', '.join(v['parts_written_by_the_session'])}.*", ""]
+    rd = v.get("reader")
+    if v["reader_reported"] and rd:
+        out += [f"**The reader across all parts reported**: {len(rd['uncovered'])} columns or keys that no check reads or that a check reads only in part, "
+                f"{len(rd['names_that_claim_more_than_the_code_tests'])} checks whose name claims more than the code tests, and "
+                f"{len(rd['names_defined_in_two_parts'])} names defined in two pieces of the script.", ""]
+    else:
+        out += ["**The reader across all parts did not report.**", ""]
+    changed = v["pieces_changed_after_the_round"]
+    out += [f"**Pieces of the script changed after the round, by the session: {len(changed)} of {len(v['pieces'])}.** `{v['verifier']}` (sha256 `{v['verifier_sha256'][:16]}`) is the "
+            "pieces below, joined.", "", "| piece | sha256 as the round left it | sha256 as assembled | changed after the round |", "|---|---|---|---|"]
+    out += [f"| `{n}` | `{x['sha256_as_the_round_left_it'][:16]}` | `{x['sha256_as_assembled'][:16]}` | {'**yes**' if x['changed_after_the_round'] else 'no'} |" for n, x in v["pieces"].items()]
+    return out + [""]
 
 
 def figures() -> list[str]:
@@ -705,7 +900,10 @@ def main() -> None:
         if number == 5:
             doc += corrections(prov)
         if number == 6:
-            doc += trials()
+            doc += reviews() + trials()
+            after = rebuild("step3")
+            if after:
+                doc += ["### The rebuild after the review", ""] + after
         if number == 7:
             doc += figures()
         if number == 8:
