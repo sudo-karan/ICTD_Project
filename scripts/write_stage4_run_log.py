@@ -157,9 +157,43 @@ by its writer; they are not repeated here.
 **What comes next.** Phase 4: the historical companion, units within districts (`scripts/08_build_gap_units.py`).
 """),
     (4, "the historical companion, units within districts", ["gates_phase4.csv"], ["08_build_gap_units"], """
+**What was done.** `scripts/08_build_gap_units.py` wrote the unit history table, one row for every unit with the
+flags of the samples it is in, and fitted the nine models the instruction fixed, H1 the headline, with the inference
+of Phase 3. The estimates are in `50_gap/unit_history_models.csv` and `.txt`; they are not repeated here.
+
+**Calls made in the run, each listed in `docs/GAP.md` as a proposal.**
+
+- **H9 was run.** The instruction said to run it only if stage 1 carries the downward share for each unit. No table
+  carries the share as a column; `20_degradation/corestack_by_unit.csv` carries, for every unit, the hectares of the
+  degradation class and of the improvement class on land with canopy above ten per cent in 2000, and the share is one
+  division of the two. It was formed for the units where the two are not both zero. If the owner reads his condition
+  to the letter, H9 is the row to drop.
+- **The floors are read on the hectares as the table carries them**, to four decimals. A gate holds that no unit lies
+  in the last half hundredth below a floor, so the figure as the map prints it would give the same samples.
+- **A unit with no row in the allocation table by year** has no works and counts as not exposed.
+
+**The run takes about an hour**: the bootstrap package compiles its inner loop at every call, and each interval takes
+about fifty calls.
+
 **What comes next.** Phase 5: forest rights (`scripts/08_build_gap_rights.py`).
 """),
     (5, "forest rights, at the level the data allow", ["gates_phase5.csv"], ["08_build_gap_rights"], """
+**What was done.** `scripts/08_build_gap_rights.py` joined the state's forest-rights report to the districts, set the
+community extent beside need with the label the instruction gave, computed the two rank correlations, and set the
+state's figures beside Odisha's row of the national report, read from the registered table.
+
+**The forest villages list: stopped at the instruction's fourth step, and why.** The PDF was already on disk in
+`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again; the instruction named
+`00_raw/cfr_fra/`, where the tables made from fetched files live. It is registered with a new manifest row that gives
+its exact size and SHA-256; the row that lists its address is as it was. Opened for the first time, it is a scan:
+every page is one image, and the only text in the file is a layer made by the scanner's character recognition. The
+instruction's third step (parse a text layer) and fourth (do not recognise characters in a scan) both bear on such a
+file. The script took the narrower course: it recognised nothing itself, and put the layer that is there to one test
+before using it - the arithmetic of the summary page. The layer fails it (the gate table gives the counts), and no
+printed total can be read, so nothing was parsed, no table was put beside the PDF, and no count was added to
+`district_need.csv`. The file is not matched to units. A transcription by eye, checked against the totals the pages
+print, as was done for the national report's table, is the owner's to ask for.
+
 **What comes next.** Phase 6: independent verification (`scripts/verify_gap.py`).
 """),
     (6, "independent verification", ["gates_phase6.csv"], [], """

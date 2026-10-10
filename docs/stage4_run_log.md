@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T16:05:39Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T16:17:45Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1, 2, 3. The last is Phase 3, the district-year panel. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2, 3, 4, 5. The last is Phase 5, forest rights, at the level the data allow. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -355,10 +355,99 @@ by its writer; they are not repeated here.
 - `50_gap/panel_models_wcb_grids.json` (21,684 bytes, sha256 `6e291fffc878fda7`)
 - `50_gap/gates_phase3.csv` (1,629 bytes, sha256 `6d12e48b7d993518`)
 
+## Phase 4: the historical companion, units within districts
+
+**What was done.** `scripts/08_build_gap_units.py` wrote the unit history table, one row for every unit with the
+flags of the samples it is in, and fitted the nine models the instruction fixed, H1 the headline, with the inference
+of Phase 3. The estimates are in `50_gap/unit_history_models.csv` and `.txt`; they are not repeated here.
+
+**Calls made in the run, each listed in `docs/GAP.md` as a proposal.**
+
+- **H9 was run.** The instruction said to run it only if stage 1 carries the downward share for each unit. No table
+  carries the share as a column; `20_degradation/corestack_by_unit.csv` carries, for every unit, the hectares of the
+  degradation class and of the improvement class on land with canopy above ten per cent in 2000, and the share is one
+  division of the two. It was formed for the units where the two are not both zero. If the owner reads his condition
+  to the letter, H9 is the row to drop.
+- **The floors are read on the hectares as the table carries them**, to four decimals. A gate holds that no unit lies
+  in the last half hundredth below a floor, so the figure as the map prints it would give the same samples.
+- **A unit with no row in the allocation table by year** has no works and counts as not exposed.
+
+**The run takes about an hour**: the bootstrap package compiles its inner loop at every call, and each interval takes
+about fifty calls.
+
+**What comes next.** Phase 5: forest rights (`scripts/08_build_gap_rights.py`).
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| units in the table | 11468 | 11468 | yes |
+| units whose dense and open bands at the start of 2018, taken from the yearly columns, do not add to the decision table's forest at the start of the window | 0 | 0 | yes |
+| units whose forest at the start of 2018 is within half a hundredth of a hectare below a floor (100 / 50 / 10 ha), where the floor read on the figure as printed to two decimals would differ from the floor read on four | 0 / 0 / 0 | 0 / 0 / 0 | yes |
+| forest-named expenditure on works started by FY2017-18, summed over units, against step 2's sum over districts, rupees | 1346269467.11 | 1346269467.11 | yes |
+| H1's sample has no unit with a blank outcome: every unit with 100 ha or more at the start has a share | yes | yes | yes |
+| models fitted (H9 among them: 20_degradation carries the two classes' hectares for every unit, from which the downward share is formed) | 9 | 9 | yes |
+| models whose wild-bootstrap interval is bounded on both sides (reported, not a gate on a value) | reported | 9 of 9 | yes |
+| models for which p fell steadily on both sides: one crossing of 0.05 a side and no climb back of more than 0.01 (reported, not a gate on a value) | reported | 9 of 9 | yes |
+
+*8 of 8 gates passed (`50_gap/gates_phase4.csv`).*
+
+### Files written by `scripts/08_build_gap_units.py` (run 2026-10-10T16:17:23Z)
+
+- `50_gap/unit_history.csv` (1,983,358 bytes, sha256 `6fe3a6f4a660f2b2`)
+- `50_gap/unit_history_models.csv` (6,920 bytes, sha256 `f2684839d7db5310`)
+- `50_gap/unit_history_models.txt` (6,823 bytes, sha256 `d6d7130125ba0e24`)
+- `50_gap/unit_history_models_wcb_grids.json` (24,175 bytes, sha256 `a8429977eef4ef10`)
+- `50_gap/gates_phase4.csv` (1,167 bytes, sha256 `c71ad60715956d7f`)
+
+## Phase 5: forest rights, at the level the data allow
+
+**What was done.** `scripts/08_build_gap_rights.py` joined the state's forest-rights report to the districts, set the
+community extent beside need with the label the instruction gave, computed the two rank correlations, and set the
+state's figures beside Odisha's row of the national report, read from the registered table.
+
+**The forest villages list: stopped at the instruction's fourth step, and why.** The PDF was already on disk in
+`00_raw/01_cfr_fra/`, where the fetch of 4 October 2026 put it, so it was not downloaded again; the instruction named
+`00_raw/cfr_fra/`, where the tables made from fetched files live. It is registered with a new manifest row that gives
+its exact size and SHA-256; the row that lists its address is as it was. Opened for the first time, it is a scan:
+every page is one image, and the only text in the file is a layer made by the scanner's character recognition. The
+instruction's third step (parse a text layer) and fourth (do not recognise characters in a scan) both bear on such a
+file. The script took the narrower course: it recognised nothing itself, and put the layer that is there to one test
+before using it - the arithmetic of the summary page. The layer fails it (the gate table gives the counts), and no
+printed total can be read, so nothing was parsed, no table was put beside the PDF, and no count was added to
+`district_need.csv`. The file is not matched to units. A transcription by eye, checked against the totals the pages
+print, as was done for the national report's table, is the owner's to ask for.
+
+**What comes next.** Phase 6: independent verification (`scripts/verify_gap.py`).
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| FRA community titles distributed, state (the gate of step 0) | 9432 | 9432 | yes |
+| FRA community extent, state, ha (the gate of step 0) | 331568 | 331568 | yes |
+| districts with no community title distributed | 6 | 6: Bhadrak, Jagatsinghapur, Kendrapara, Khordha, Puri, Sundargarh | yes |
+| the two FRA reports of the same date differ (the README's 80 titles and 4,469 ha, here from the files) | 80 titles; 4469 ha | 80 titles; 4469 ha | yes |
+| the forest villages PDF: pages, and pages that are one scanned image | every page one image | 64 pages, 64 of them one image | yes |
+| the forest villages PDF: rows of its summary page read from the text it carries, and rows whose two parts add to their total | 30 rows, all adding up, and a printed total | 25 rows read, 24 add up, printed total rows read: 0 | yes |
+| the forest villages PDF: district counts taken into district_need.csv (only if the text passes its own totals) | none unless it passes | none | yes |
+
+*7 of 7 gates passed (`50_gap/gates_phase5.csv`).*
+
+### Files written by `scripts/08_build_gap_rights.py` (run 2026-10-10T16:06:20Z)
+
+- `50_gap/fra_by_district.csv` (4,568 bytes, sha256 `37cf178731fafc68`)
+- `50_gap/fra_summary.csv` (708 bytes, sha256 `cfbe515474ad9f4b`)
+- `50_gap/fra_two_reports.csv` (310 bytes, sha256 `8630d58c44690c10`)
+- `50_gap/forest_villages_text_layer_check.csv` (1,599 bytes, sha256 `dd77b52f5809ab48`)
+- `50_gap/forest_villages_pdf_record.json` (1,152 bytes, sha256 `31599d8811c1428b`)
+- `50_gap/gates_phase5.csv` (944 bytes, sha256 `f91d707b27aba717`)
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `a0cde28` Stage 4, Phase 3: the district-year panel and its models
 - `ef868ae` Stage 4, Phase 2: the headline - need against allocation by district
 - `2287f4c` Stage 4, Phase 1: the five leftovers of the batch of 9 October cleared
 - `c9bece2` Stage 4, Phase 0: inputs listed, the district crosswalk, a district for every unit, and the gates on what is built
