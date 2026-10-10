@@ -393,7 +393,34 @@ are records that carry a time or a hash, the listing itself, and the two text fi
 is the time they were written; the table below gives each, with what differs and why. The verifier's part on the
 inputs, whose one failing check was this finding, passes every check on the rebuilt listing.
 """),
-    (2, "Phase 5b: the need read against the Forest Survey's own figures", False, ""),
+    (2, "Phase 5b: the need read against the Forest Survey's own figures", True, """
+`scripts/08_build_gap_fsi.py` (new, stage-4 environment) reads the table of forest cover by district in the Forest
+Survey of India's report of 2023 from the registered text of its pages, which was already in `00_raw/` with a
+manifest row and was not changed. It matches the table's thirty rows to the census districts, five of them by the
+owner's spelling rule and no other; holds every column that can be added against the table's own printed total and
+against the figure the owner gave for it; and sets, beside each district's N1, the Survey's forest cover, its change
+with respect to the assessment of 2021, and its scrub. Four rank correlations are computed as in Phase 2, with fixed
+seeds that the table and the provenance record carry.
+
+**What the step does not say.** The two sources measure different things: Hansen records gross, stand-replacing loss
+year by year; the Survey reports the net change in forest cover between two assessments, and the area of scrub. They
+are not the same quantity and neither can be subtracted from the other. The step names no reason for either figure.
+The reading of the four correlations is written into `docs/GAP.md` in Step 5, each statement tested against the
+table first.
+
+**Calls made in the run.**
+
+- **The table keeps all eight numbers of each row**, not only those the comparison uses, so that each column's sum
+  can be held against the printed total and the verifier can check the reading of the whole row.
+- **The two per cents are taken on the Survey's own forest cover of 2023**: scrub over forest cover, and the change
+  over forest cover.
+- **The correlations have a table of their own**, `50_gap/fsi_summary.csv`, with a column that says whether size is
+  taken out of both sides.
+- **Two checks of the table against itself were added to the owner's**: that the three density classes of every row
+  add to its total, and that every printed per cent is the total over the calculated area.
+
+The verifier's part on this step and the deliberate errors against it come with Step 3.
+"""),
     (3, "finish Phase 6", False, ""),
     (4, "Phase 7", False, ""),
     (5, "Phase 8, with the additions to the account of the stage", False, ""),
@@ -455,9 +482,14 @@ def forest_survey() -> list[str]:
     gates, summ = GAP / "gates_phase5b.csv", GAP / "fsi_summary.csv"
     if not (gates.exists() and summ.exists()):
         return []
-    out = ["**Gates of Phase 5b.**", ""] + gate_table(gates) + ["", "**The four rank correlations** (`50_gap/fsi_summary.csv`; 30 districts in each):", "",
-           "| id | what | Spearman's rho | 95 % bootstrap interval | permutation p | size taken out of both sides |", "|---|---|---|---|---|---|"]
-    out += [f"| {x['id']} | {esc(x['what'])} | {x['rho']} | {x['ci95_lo']} to {x['ci95_hi']} | {x['p_permutation']} | {x['size_free']} |" for x in rows(summ)]
+    out = ["**Gates of Phase 5b.**", ""] + gate_table(gates) + [""]
+    sec = (json.loads((GAP / "gap.provenance.json").read_text(encoding="utf-8"))["steps"]).get("08_build_gap_fsi")
+    if sec:
+        out += [f"Files written by `{sec['script']}` (run {sec['run_utc']}):", ""]
+        out += [f"- `{name}` ({meta['bytes']:,} bytes, sha256 `{meta['sha256'][:16]}`)" for name, meta in sec["outputs"].items()] + [""]
+    out += ["**The four rank correlations** (`50_gap/fsi_summary.csv`; 30 districts in each):", "",
+           "| id | what | Spearman's rho | 95 % bootstrap interval | permutation p (five decimals) | size taken out of both sides |", "|---|---|---|---|---|---|"]
+    out += [f"| {x['id']} | {esc(x['what'])} | {x['rho']} | {x['ci95_lo']} to {x['ci95_hi']} | {float(x['p_permutation']):.5f} | {x['size_free']} |" for x in rows(summ)]
     return out + [""]
 
 
@@ -691,6 +723,7 @@ def main() -> None:
             "$PY scripts/08_build_gap_panel.py        # Phase 3",
             "$PY scripts/08_build_gap_units.py        # Phase 4",
             "$PY scripts/08_build_gap_rights.py       # Phase 5",
+            "$PY scripts/08_build_gap_fsi.py          # Phase 5b",
             "$PY scripts/verify_gap.py                # Phase 6",
             "$PY scripts/verify_gap_trials.py         # Phase 6",
             "$PY scripts/08_build_gap_deck_tables.py  # Phase 7",

@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T20:42:11Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T20:43:48Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -35,7 +35,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 |---|---|---|
 | 0 | publish the shared copy to GitHub Pages | done |
 | 1 | fix the input listing and rebuild | done |
-| 2 | Phase 5b: the need read against the Forest Survey's own figures | not yet |
+| 2 | Phase 5b: the need read against the Forest Survey's own figures | done |
 | 3 | finish Phase 6 | not yet |
 | 4 | Phase 7 | not yet |
 | 5 | Phase 8, with the additions to the account of the stage | not yet |
@@ -121,6 +121,72 @@ Files compared or listed: 43; byte for byte the same: 38. Every file that differ
 | `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 21 then, 34 now) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
 | `panel_models.txt` | text | 1 line(s) of 29: line 1 first | its first line carries the time it was written |
 | `unit_history_models.txt` | text | 1 line(s) of 51: line 1 first | its first line carries the time it was written |
+
+### Step 2: Phase 5b: the need read against the Forest Survey's own figures
+
+`scripts/08_build_gap_fsi.py` (new, stage-4 environment) reads the table of forest cover by district in the Forest
+Survey of India's report of 2023 from the registered text of its pages, which was already in `00_raw/` with a
+manifest row and was not changed. It matches the table's thirty rows to the census districts, five of them by the
+owner's spelling rule and no other; holds every column that can be added against the table's own printed total and
+against the figure the owner gave for it; and sets, beside each district's N1, the Survey's forest cover, its change
+with respect to the assessment of 2021, and its scrub. Four rank correlations are computed as in Phase 2, with fixed
+seeds that the table and the provenance record carry.
+
+**What the step does not say.** The two sources measure different things: Hansen records gross, stand-replacing loss
+year by year; the Survey reports the net change in forest cover between two assessments, and the area of scrub. They
+are not the same quantity and neither can be subtracted from the other. The step names no reason for either figure.
+The reading of the four correlations is written into `docs/GAP.md` in Step 5, each statement tested against the
+table first.
+
+**Calls made in the run.**
+
+- **The table keeps all eight numbers of each row**, not only those the comparison uses, so that each column's sum
+  can be held against the printed total and the verifier can check the reading of the whole row.
+- **The two per cents are taken on the Survey's own forest cover of 2023**: scrub over forest cover, and the change
+  over forest cover.
+- **The correlations have a table of their own**, `50_gap/fsi_summary.csv`, with a column that says whether size is
+  taken out of both sides.
+- **Two checks of the table against itself were added to the owner's**: that the three density classes of every row
+  add to its total, and that every printed per cent is the total over the calculated area.
+
+The verifier's part on this step and the deliberate errors against it come with Step 3.
+
+**Gates of Phase 5b.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| district rows read under Table 10.20.3 of the Forest Survey's report | 30 | 30 | yes |
+| names of the table that are not a census name of the repository: the owner's five and no others | Angul, Baleswar, Deogarh, Jagatsinghpur, Nabarangpur | Angul, Baleswar, Deogarh, Jagatsinghpur, Nabarangpur | yes |
+| the table's rows against the 30 census districts: matched one to one | 30, each code once | 30, each code once: yes | yes |
+| the five spelling rules, as the owner gave them: Angul 384, Baleswar 377, Deogarh 373, Jagatsinghpur 380, Nabarangpur 397 | each name on its code | Deogarh 373; Baleswar 377; Jagatsinghpur 380; Angul 384; Nabarangpur 397 | yes |
+| fsi_calculated_area_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 155707 | sum 155707; printed 155707 | yes |
+| fsi_very_dense_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 7224.42 | sum 7224.42; printed 7224.42 | yes |
+| fsi_moderately_dense_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 21065.55 | sum 21065.55; printed 21065.55 | yes |
+| fsi_open_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 24143.59 | sum 24143.59; printed 24143.59 | yes |
+| fsi_forest_cover_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 52433.56 | sum 52433.56; printed 52433.56 | yes |
+| fsi_change_wrt_2021_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 151.89 | sum 151.89; printed 151.89 | yes |
+| fsi_scrub_km2: the 30 districts summed, the table's printed Grand Total, and the figure the owner gave for it | 4632.68 | sum 4632.68; printed 4632.68 | yes |
+| districts whose very dense, moderately dense and open forest add to their total forest cover | 30 of 30 | 30 of 30 | yes |
+| districts whose printed per cent is 100 x total forest cover / calculated area, to two decimals; and the Grand Total's | 30 of 30; and yes | 30 of 30; yes | yes |
+| N1 of the state in this table against the table of districts (hectares) | 89657.2513 | 89657.2513 | yes |
+| rank correlations computed (N1 against change and against scrub; and the same two with size taken out of both sides) | 4 | 4 | yes |
+
+*15 of 15 gates passed (`50_gap/gates_phase5b.csv`).*
+
+Files written by `scripts/08_build_gap_fsi.py` (run 2026-10-10T20:43:00Z):
+
+- `50_gap/fsi_district_check.csv` (4,676 bytes, sha256 `bf01bd9e191dcb8c`)
+- `50_gap/fsi_summary.csv` (2,210 bytes, sha256 `2f2e621f9e30fc1d`)
+- `50_gap/gates_phase5b.csv` (2,270 bytes, sha256 `abacddb86066d298`)
+
+**The four rank correlations** (`50_gap/fsi_summary.csv`; 30 districts in each):
+
+| id | what | Spearman's rho | 95 % bootstrap interval | permutation p (five decimals) | size taken out of both sides |
+|---|---|---|---|---|---|
+| a | N1 of 2018-2025 (ha) against the Forest Survey's change in forest cover with respect to 2021 (km2) | -0.197325 | -0.539069 to 0.216689 | 0.29484 | no |
+| b | N1 of 2018-2025 (ha) against the Forest Survey's scrub (km2) | 0.813247 | 0.59774 to 0.917498 | 0.00001 | no |
+| c | N1 per 100 ha of forest at the start of 2018 against the Forest Survey's change as a per cent of its forest cover | -0.212041 | -0.541393 to 0.195843 | 0.25816 | yes |
+| d | N1 per 100 ha of forest at the start of 2018 against the Forest Survey's scrub as a per cent of its forest cover | 0.578661 | 0.266942 to 0.789925 | 0.00094 | yes |
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -631,6 +697,9 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 | `08_build_gap_districts` | `50_gap/need_vs_allocation.csv` | yes |  |
 | `08_build_gap_districts` | `50_gap/need_vs_allocation_summary.csv` | **no** | 2 |
 | `08_build_gap_districts` | `50_gap/what_more.csv` | yes |  |
+| `08_build_gap_fsi` | `50_gap/fsi_district_check.csv` | new: it was not written before |  |
+| `08_build_gap_fsi` | `50_gap/fsi_summary.csv` | new: it was not written before |  |
+| `08_build_gap_fsi` | `50_gap/gates_phase5b.csv` | new: it was not written before |  |
 | `08_build_gap_panel` | `50_gap/district_year_panel.csv` | yes |  |
 | `08_build_gap_panel` | `50_gap/gates_phase3.csv` | yes |  |
 | `08_build_gap_panel` | `50_gap/panel_models.csv` | **no** | 2 |
@@ -659,6 +728,7 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `74480bf` Handoff of 11 October, Step 1: the listing of inputs holds every input any step reads; rebuilt, and no table of figures moved
 - `db8ddb2` Handoff of 11 October, Step 0: the shared copy published, and the check of the live site
 - `825898d` Stage 4: the run log, with where the run stopped (Phase 6 in progress)
 - `b80a6c3` Stage 4, the owner's corrections of 10 October: its own environment, requirements-stage4.txt, the forest villages list under his two checks
@@ -683,6 +753,7 @@ $PY scripts/08_build_gap_districts.py    # Phase 2
 $PY scripts/08_build_gap_panel.py        # Phase 3
 $PY scripts/08_build_gap_units.py        # Phase 4
 $PY scripts/08_build_gap_rights.py       # Phase 5
+$PY scripts/08_build_gap_fsi.py          # Phase 5b
 $PY scripts/verify_gap.py                # Phase 6
 $PY scripts/verify_gap_trials.py         # Phase 6
 $PY scripts/08_build_gap_deck_tables.py  # Phase 7
