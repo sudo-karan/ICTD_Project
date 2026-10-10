@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T16:17:45Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T16:17:59Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -447,6 +447,7 @@ print, as was done for the national report's table, is the owner's to ask for.
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `957f3aa` Stage 4, Phase 4: the historical companion - units within districts
 - `a0cde28` Stage 4, Phase 3: the district-year panel and its models
 - `ef868ae` Stage 4, Phase 2: the headline - need against allocation by district
 - `2287f4c` Stage 4, Phase 1: the five leftovers of the batch of 9 October cleared
