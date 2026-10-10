@@ -65,3 +65,9 @@ logs/
 
 # the copy of the layer made to be passed on is a stage output like the others (added 9 Oct 2026)
 70_share/
+
+# two more provider pages registered on 10 Oct 2026 in 00_raw/05_forest_reference/ (the owner's instruction of that day), like the five of
+# 9 Oct: fetched files, each with its URL, bytes and sha256 in the manifest. The extract made from them, provider_cautions_2026-10-10.json,
+# stays tracked with the script that makes it.
+00_raw/05_forest_reference/gfw_developer_help_page_2026-10-08.html
+00_raw/05_forest_reference/gfw_api_key_guide_2026-10-08.html

@@ -361,7 +361,8 @@ in `30_need/need_by_unit.csv` and in the analysis. The builder fails if one of t
   it may be shared, with attribution, under the same licence. The panel says so.
 - The Aggregate Development Index's documentation says SHRUG's keys were used to link 2001 and 2011 villages. The
   2011 index shown is computed from Census 2011 rows, and it is kept; if the owner reads the licence more strictly,
-  dropping `adi_2011` is one line in `06_build_layer.py`.
+  dropping `adi_2011` is one line in `06_build_layer.py`. Since 10 October 2026 the copy that is passed on (§11) leaves
+  the index out; this folder keeps it.
 
 - **Added with the decision view (§11).** The optional overlay draws tiles from Global Forest Watch (World Resources Institute); the data in them is
   Hansen/UMD Global Forest Change v1.13, CC BY 4.0, and two points of the provider's terms of use (https://globalnaturewatch.org/terms/) are unresolved, which
@@ -659,8 +660,9 @@ after the fixes:
 - The paper this layer borrows its vocabulary from reports that in one of its pilot blocks, Angul, in this state, the
   community did not favour mapping inequity (Commons Connect, ICTD 2024, p. 18). The Scheduled Tribe share and
   development index layers are of that kind. Whether they belong in what is shown is the Foundation's call.
-- Nothing here says why a unit lost forest or was passed over for work. Stage 4, not built, is where that is argued.
-- **The copy to send is `70_share/`, not this folder** (§11): the same two files without `overlay.js`, with a README.
+- Nothing here says why a unit lost forest or was passed over for work. Stage 4, the comparison of forest condition, need and allocation, was being built when this was written (`50_gap/`); it will describe where money went relative to where forest was lost and will not argue why either.
+- **The copy to send is `70_share/odisha_forest_decision_layer/`, not this folder** (§11): the same two files without
+  `overlay.js` and, since 10 October 2026, without the development index of 2011, with a README.
   Terms for passing it on are not yet agreed.
 
 ## 10. To rebuild
@@ -723,14 +725,18 @@ provider's terms are unresolved and are the owner's: Two points, both the projec
 **The Gazette's list.** Each cell's work-type field cites rows of Ministry of Rural Development notification S.O. 5448(E), 5 October 2026; Gazette of India, Extraordinary, Part II, Section 3(ii), No. 5238; Gazette ID CG-DL-E-05102026-276796: 375 works, registered in
 `00_raw/06_scheme/`. Which rows bear on which cell is a proposal, for the Foundation.
 
-**The copy made to be passed on, `70_share/`.** `scripts/07_build_share.py` (run 2026-10-09T04:08:59Z) copies `index.html`
-and `data.js` of the layer built 2026-10-09T04:08:22Z byte for byte, leaves `overlay.js` out, adds a README and makes
-a zip of 6.02 MB. `scripts/exercise_share.py` opened the copy from disk in
-Chrome/154.0.8037.99 (2026-10-09T04:34:32Z): 6 of 6 steps did what
-they should; the page asked the network for nothing, and with the overlay's box ticked the control said
+**The copy made to be passed on, `70_share/odisha_forest_decision_layer/`.** `scripts/07_build_share.py` (run
+2026-10-10T11:20:41Z) writes `index.html` and `data.js` of the layer built 2026-10-09T04:08:22Z there without the
+development index of 2011 - its layer, its value in the row of each of 11,468 units, its line of the panel, its
+column of the ranked list, its row of the sources - and otherwise as they are; it leaves `overlay.js` out, adds a
+README and makes a zip of 6.00 MB beside the folder. This folder, `60_layer/`, keeps the index.
+Until 10 October 2026 the copy's two files were this folder's byte for byte. `scripts/exercise_share.py` opened the
+copy from disk in Chrome/154.0.8037.99 (2026-10-10T11:21:02Z): 8 of 8 steps did what
+they should. It holds the copy's two files against this folder's under that rule and finds the index named in
+neither; the page asked the network for nothing, and with the overlay's box ticked the control said
 "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before."
 
-**Its checks.** `scripts/verify_decision.py`: 61 of 61 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts. `scripts/exercise_decision.py`: in Chrome
+**Its checks.** `scripts/verify_decision.py`: 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts. `scripts/exercise_decision.py`: in Chrome
 53 of 53 steps did what they should, in WebKit
 47 of 47, both on this build. The Safari
 application: not run on this build (the owner's instruction of 9 October 2026 for the batch that applies his rulings: no run in the Safari application, since no unit changes cell); `docs/DECISION_LAYER.md` §16 says what its last run, on an earlier build, showed.

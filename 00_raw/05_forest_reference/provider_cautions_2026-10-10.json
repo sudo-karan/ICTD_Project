@@ -1,0 +1,144 @@
+{
+ "script": "00_raw/05_forest_reference/_build_provider_cautions_2026-10-10.py",
+ "run_utc": "2026-10-10T11:19:43Z",
+ "inputs": [
+  {
+   "path": "00_raw/05_forest_reference/gfw_developer_help_page_2026-10-08.html",
+   "bytes": 2427052,
+   "sha256": "ad50f515ac6703c5c92564f93dccfedb7025ec8c103517bf945f234c8379aeb6",
+   "source_url": "https://www.globalforestwatch.org/help/developers/",
+   "fetched_utc": "2026-10-08T12:31:13Z"
+  },
+  {
+   "path": "00_raw/05_forest_reference/gfw_api_key_guide_2026-10-08.html",
+   "bytes": 2165712,
+   "sha256": "9a1057979c6fe095d16369d4dc2be225c55d3330d23f8039b9c1f5704b0c6d66",
+   "source_url": "https://www.globalforestwatch.org/help/developers/guides/create-and-use-an-api-key/",
+   "fetched_utc": "2026-10-08T12:31:13Z"
+  }
+ ],
+ "what_this_is": "Sentences of two pages of Global Forest Watch (World Resources Institute), registered on 10 October 2026: its developer help page and its guide to API keys. Each page carries the provider's whole help text. This file adds to provider_cautions.json of 9 October 2026, which is not changed; where the two repeat a figure (the errors of commission and omission), this file's sentence is the help text's and that file's is the dataset record's",
+ "how_a_page_is_read": "the page source with the escapes \\u003c, \\u003e, \\u0026, \\n and \\\" turned into their characters, HTML entities turned into characters, tags taken out, and runs of spaces and non-breaking spaces made one space; the quotation marks are the page's own",
+ "cautions_about_the_data": [
+  {
+   "name": "accuracy_varies",
+   "text": "The accuracy of the data displayed on GNW is variable across datasets, and through space and time.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "errors_of_commission_and_omission",
+   "text": "In summary, the authors evaluated the overall prevalence of false positives (commission errors) in the original dataset at 13%, and the prevalence of false negatives (omission errors) at 12%, though the accuracy varies by biome and thus may be higher or lower in any particular location.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "sub_tropical_areas",
+   "text": "Specifically, sub-tropical areas have the lowest accuracies (around 20% for commission and omission errors).",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "smallholder_landscapes",
+   "text": "The model often misses disturbances in smallholder landscapes, resulting in lower accuracy of the data in locations such as sub-Saharan Africa, where this type of disturbance is more common.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "method_changed_in_2015",
+   "text": "For example, in 2015, the integration of Landsat 8 satellite data and updates to the loss detection algorithm from UMD resulted in better capturing of small-scale loss.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "tree_cover_is_not_forest",
+   "text": "Accordingly, “tree cover” and “forest” should not be used interchangeably.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  },
+  {
+   "name": "loss_is_not_deforestation",
+   "text": "“Tree cover loss” refers to the removal or mortality of tree cover and can be due to a variety of factors, including mechanical harvesting, fire, disease or storm damage. As such, “loss” does not equate to deforestation.",
+   "stands_in": [
+    "the provider's developer help page",
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    2,
+    2
+   ]
+  }
+ ],
+ "on_api_keys": [
+  {
+   "name": "some_endpoints_require_a_key",
+   "text": "Some endpoints require users to include an API key with their request",
+   "stands_in": [
+    "the provider's developer help page"
+   ],
+   "times_in_each_page": [
+    10
+   ]
+  },
+  {
+   "name": "most_requests_need_a_key",
+   "text": "To make most requests to the GFW Data API using third-party applications (e.g., scripts or websites), you need an API key.",
+   "stands_in": [
+    "the provider's guide to API keys"
+   ],
+   "times_in_each_page": [
+    5
+   ]
+  }
+ ],
+ "stated_in_the_sentences": {
+  "false_positives_pct": "13",
+  "false_negatives_pct": "12",
+  "sub_tropical_commission_and_omission_pct_about": "20",
+  "year_the_method_changed": "2015"
+ },
+ "checks_passed": {
+  "pages_are_the_registered_files": 2,
+  "sentences_found_word_for_word": 9
+ },
+ "not_checked": [
+  "that the pages still say this today: they were fetched on 8 October 2026",
+  "whether the tile service is among the endpoints the sentences about API keys speak of: nothing read says"
+ ]
+}

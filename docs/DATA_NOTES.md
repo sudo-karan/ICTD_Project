@@ -158,10 +158,12 @@ included. Three things follow that the owner should know before the layer is sen
 now has a second way of reading its measurements, two more sources, and a copy made to be passed on. What the owner
 should know before anything is sent:
 
-- **The copy to send is `70_share/`, not `60_layer/`.** `scripts/07_build_share.py` copies the layer's `index.html` and
-  `data.js` byte for byte, leaves out `overlay.js`, adds a README, and zips the folder. The page in the copy asks the
-  network for nothing: its box "Site-level overlay" says the overlay's file is not beside the page.
-  `scripts/exercise_share.py` opens the copy in Chrome and checks that.
+- **The copy to send is `70_share/odisha_forest_decision_layer/`, not `60_layer/`.** `scripts/07_build_share.py` writes
+  the layer's `index.html` and `data.js` there, leaves out `overlay.js`, adds a README, and zips the folder (the zip
+  lies beside it in `70_share/`). Until 10 October 2026 the two files were the layer's byte for byte; since then the
+  development index of 2011 is taken out of them (next point but three). The page in the copy asks the network for
+  nothing: its box "Site-level overlay" says the overlay's file is not beside the page. `scripts/exercise_share.py`
+  opens the copy in Chrome and checks that.
 - **The tile provider.** In `60_layer/` the decision view can lay Hansen's loss over the map as tiles from Global Forest
   Watch (World Resources Institute). It is off unless ticked, and its code is the one file left out of the copy. Two
   points of the provider's terms are unresolved, and they are the owner's: the terms ask that each request to an API
@@ -169,23 +171,34 @@ should know before anything is sent:
   written for another of the provider's services. Five of the provider's pages are registered in
   `00_raw/05_forest_reference/` (manifest rows `gfw_dataset_record_umd_tree_cover_loss`,
   `umd_global_forest_change_v1_13_page`, `gfw_terms_of_service_page`,
-  `resourcewatch_api_attribution_requirements_page`, `gfw_tile_cache_api_reference_openapi`); they are fetched files
-  and are not in git or in anything sent.
+  `resourcewatch_api_attribution_requirements_page`, `gfw_tile_cache_api_reference_openapi`), and since
+  10 October 2026 two more, the two the note on those unresolved points also quotes (`gfw_developer_help_page`,
+  `gfw_api_key_guide_page`); they are fetched files and are not in git or in anything sent.
 - **The provider's cautions about the data are quoted in the layer** whether or not the overlay is there: short
   quotations from the provider's record of the dataset, kept in `00_raw/05_forest_reference/provider_cautions.json`
-  with their source. The data itself is CC BY 4.0.
+  with their source. The data itself is CC BY 4.0. The two pages registered on 10 October 2026 carry the provider's
+  help text, and in it cautions the first extract does not have (accuracy lowest in sub-tropical areas; small-holder
+  disturbance often missed; the detection method changed in 2015). They are kept, word for word, in a second, dated
+  file beside the first, `provider_cautions_2026-10-10.json`; the first is committed and was not edited.
 - **The Gazette's list of permissible works.** The decision view names rows of the list notified as S.O. 5448(E) of 5
   October 2026 (`00_raw/06_scheme/`, five manifest rows). It quotes work names and serial numbers. No licence is
   stated for the Gazette; the manifest records what the eGazette site says of it. The PDFs and the Ministry's press
   release are fetched files and are not in git or in anything sent; the table made from the list is.
 - **`adi_2011` and the exported list.** By the owner's ruling of 9 October 2026 the development index is no longer a
   column of the list a user can export from the decision view, because that file is the one that gets passed on. It
-  is still in the interactive view, as a layer and as a column of the list on the page, and therefore in `70_share/`.
-  The judgement above stands for the view: a stricter reading of SHRUG's terms would take it out of the layer too.
+  is still in the interactive view of `60_layer/`, as a layer and as a column of the list on the page. **Since
+  10 October 2026 it is no longer in the copy that is passed on** (`70_share/odisha_forest_decision_layer/`): the
+  script that builds the copy takes out the field and everything that displays it, the gate on the copy fails if the
+  index's id or name is found in the copy's two files, and the copy's README says the index is not in it. No file
+  that is passed on now carries `adi_2011` for a unit. This was a call made with the instruction that opened stage 4
+  and can be reversed (`docs/DECISION_LAYER.md` §17.3). The judgement above stands for the view in `60_layer/`: a
+  stricter reading of SHRUG's terms would take it out of the layer too. District-level results that stage 4 builds
+  from the index (`docs/GAP.md`) are analysis, not the column; wherever they appear they carry the index's source and
+  licence as the layer's own list of sources gives them.
 - **Scheduled Tribe share in a list that is passed on** is the Foundation's call (`docs/DECISION_LAYER.md` §17). It
   is in the exported list.
-- **Terms for passing the copy on are not yet agreed.** The README inside `70_share/` says so and asks that the copy
-  not be passed on or published until they are.
+- **Terms for passing the copy on are not yet agreed.** The README inside `70_share/odisha_forest_decision_layer/`
+  says so and asks that the copy not be passed on or published until they are.
 
 Not decided here: whether the layer may be passed on by the Foundation to others, and under what statement.
 

@@ -113,9 +113,9 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 .
 ├── README.md                  this brief
 ├── 00_raw/                    downloaded or verified inputs — a file here at a commit is never edited; a new input adds files and manifest rows
-│   ├── data_manifest.csv      92 rows: id/url, exact bytes, licence, how verified
-│   ├── 05_forest_reference/   Global Forest Watch workbook and ISFR 2023 extracts that stage 1 reconciles to; since 9 Oct 2026 also five
-│   │                          pages of the providers of Hansen's data and the extract of their cautions (6 manifest rows)
+│   ├── data_manifest.csv      one row for every input: id/url, exact bytes, licence, how verified (rows are added, never changed)
+│   ├── 05_forest_reference/   Global Forest Watch workbook and ISFR 2023 extracts that stage 1 reconciles to; since 9 and 10 Oct 2026 also
+│   │                          pages of the providers of Hansen's data and two dated extracts of what they say (each with its manifest row)
 │   ├── 06_scheme/             the notified list of permissible works, S.O. 5448(E) of 5 Oct 2026: PDFs, transcription, table, check (5 manifest rows)
 │   ├── cfr_fra/
 │   ├── mis_reports/           the four .xls originals plus their parsed CSVs
@@ -127,7 +127,8 @@ Everything in `00_raw/` was checked on 4–5 October 2026. Each file's provenanc
 ├── 50_gap/                    stage 4 output
 ├── 55_decision/               the decision tables: every unit in one of six cells, for four windows of years (git-ignored; rebuilt by a script)
 ├── 60_layer/                  the demo layer: one offline HTML map and its data file (git-ignored; rebuilt by a script)
-├── 70_share/                  a copy of the layer made to be passed on: the same two files without the map overlay, a README, a zip (git-ignored)
+├── 70_share/                  the copy of the layer made to be passed on, in `70_share/odisha_forest_decision_layer/`: the layer's two files
+│                              without the map overlay and without the development index of 2011, a README; a zip beside it (git-ignored)
 ├── logs/                      run logs of the NIRv chain (git-ignored)
 ├── scripts/                   one script per step; vendor/ holds the one library the layer embeds
 ├── figures/
@@ -186,8 +187,8 @@ transformation writes into a numbered folder. That is what makes the methods sec
 | `exercise_decision.py` | the decision view's check in a browser (`chrome`, `webkit`): every new control, units of all six cells opened on the map, two exported lists checked field by field, the overlay online, offline and failing. |
 | `exercise_decision_safari.py` | the decision view in the Safari application, by address, with the unchanged Safari script's routine and one function replaced. Not part of the regression gate. |
 | `run_decision_checks.py` | runs both verifiers and the browser checks one at a time and writes down every run, a failed one included (`60_layer/decision_runs.json`). |
-| `07_build_share.py` | the copy made to be passed on, `70_share/`: the layer's two files byte for byte, without `overlay.js`, a README (how to open it, what it is and is not, credits, that terms for passing it on are not yet agreed) and a zip. |
-| `exercise_share.py` | the gate on that copy: opened from disk in Chrome, its overlay control says its file is not beside the page and the page asks the network for nothing. |
+| `07_build_share.py` | the copy made to be passed on, `70_share/odisha_forest_decision_layer/`: the layer's two files without `overlay.js` and, since 10 October 2026, without the development index of 2011 (`adi_2011` and everything that displays it; `60_layer/` keeps it), a README (how to open it, what it is and is not, what is left out, credits, that terms for passing it on are not yet agreed) and a zip beside the folder. |
+| `exercise_share.py` | the gate on that copy: its two files held against `60_layer/`'s under the rule "the layer's without the development index and nothing else", the index's id and names looked for in both, and the copy opened from disk in Chrome - its overlay control says its file is not beside the page, the page asks the network for nothing, and the ranked list, a unit's panel, the list of layers and the two text panels show the index nowhere. |
 | `write_decision_layer.py` | writes `docs/DECISION_LAYER.md` with the reading functions and the gates of `write_results.py`: no figure is typed. |
 
 ---
@@ -450,26 +451,28 @@ households, received ₹*X* against an expected ₹*Y*, shortfall ₹*Z*".
 | In | `10_units/units.gpkg`, `outside_village_district.csv`; `20_degradation/degradation_by_unit.csv`, `corestack_by_unit_bands.csv`, `agreement_by_unit.csv`; `30_need/need_by_unit.csv`; `40_allocation/allocation_by_unit.csv`; `scripts/layer_template.html`; `scripts/vendor/leaflet-1.9.4/` |
 | Out | `60_layer/index.html` and `60_layer/data.js` — the map; `layer_by_unit.csv` — every value the map shows, one row per unit; `layer.provenance.json` |
 
-One HTML file and one data file, 19.8 MB together (5.5 MB zipped). **It opens from disk by double-click, makes no
-network request, and has no map tiles behind it**: Leaflet 1.9.4 is inside the HTML file. All 11,468 units are
-drawn; outside-village units are hatched. `docs/LAYER.md` is the full account. What must not be lost:
+One HTML file and one data file. **It opens from disk by double-click, makes no network request, and has no map tiles
+behind it**: Leaflet 1.9.4 is inside the HTML file. All 11,468 units are drawn; outside-village units are hatched.
+`docs/LAYER.md` is the full account. **The layer's sizes and the counts of its checks are not quoted here**: this
+section once carried those of 7 October 2026 after the layer had been rebuilt. They are in `docs/LAYER.md` (§1 the
+files and their sizes, §4 the shapes, §8 the checks) and, for the decision view, in `docs/DECISION_LAYER.md` (§16),
+both written from the build that is on disk. What must not be lost:
 
 - **Every number shown is a cell of a stage table**, formatted in Python. The page computes nothing. `scripts/verify_layer.py`
-  rebuilds every displayed field of every unit from the stage tables (92 of 92 checks passed), and `scripts/exercise_layer.py`
-  works every control of the page in Chrome and in WebKit and compares 29 units clicked on the map, field by field, with
-  the stage tables (1,276 of 1,276 values equal in each).
+  rebuilds every displayed field of every unit from the stage tables, and `scripts/exercise_layer.py` works every
+  control of the page in Chrome and in WebKit and compares units clicked on the map, field by field, with the stage
+  tables. How many checks, units and values, and that all passed: `docs/LAYER.md` §8.
 - **Honest colour.** A unit with too little forest for a rate to mean anything is drawn in a flat grey class,
   *insufficient forest to assess*, not on the colour scale; the floor is 100 ha by default (the ruled floor), with 50 ha and 1 ha as the other
   setting. Outside-village units on a need measure read *no census data for this land*, never blank or zero.
-- **Geometry is simplified at 30 m** (shared boundaries kept shared): 2,447,144 vertices to 1,232,815. Total area changes by
-  -0.00001 per cent; a unit's by a median of 0.022 per cent, 0.39 at the 95th percentile, 18.2 at most; 120 units
-  change by more than 5 per cent, the largest of them 71.1 ha. **Areas shown are the stage tables', not the
-  drawn shapes'.**
+- **Geometry is simplified at 30 m** (shared boundaries kept shared). How many vertices that leaves, and the error in
+  area it introduces overall and unit by unit, are in `docs/LAYER.md` §4. **Areas shown are the stage tables', not
+  the drawn shapes'.**
 - **SHRUG-derived columns are left out** (the poverty rate): SHRUG is CC BY-NC-SA 4.0. They stay in `30_need/`.
   The unit shapes derive from DataMeet's village boundaries and carry the ODbL.
 - **Not run by any other stage.** Rebuild with `.venv/bin/python scripts/06_build_layer.py`, then `scripts/verify_layer.py`.
 
-### The decision view — `55_decision/`, a view in `60_layer/`, and the copy in `70_share/` (8 and 9 October 2026)
+### The decision view — `55_decision/`, a view in `60_layer/`, and the copy in `70_share/odisha_forest_decision_layer/` (8 to 10 October 2026)
 
 The owner reads the supervisor's request as one for a decision layer: something a planner opens to see where forest
 work is warranted. It is added beside the measurements and replaces none of them. `docs/DECISION_LAYER.md` is the full
@@ -484,8 +487,9 @@ account; the figures are there and are not repeated here. What must not be lost:
 - **The work-type field of a cell cites rows of the notified list of permissible works** by serial number. Which rows
   bear on which cell is a proposal, for the Foundation.
 - **The map overlay is the one thing that can ask the network for anything**, it is off unless ticked, and its code is
-  a third file. **The copy to pass on is `70_share/`, which leaves that file out.** Terms for passing it on are not
-  yet agreed.
+  a third file. **The copy to pass on is `70_share/odisha_forest_decision_layer/`** (a zip of it lies beside it),
+  **which leaves that file out** and, since 10 October 2026, the development index of 2011 as well: no file that is
+  passed on carries `adi_2011` for a unit, while `60_layer/` keeps it. Terms for passing it on are not yet agreed.
 - **Rebuild** with `scripts/05_build_decision.py`, `scripts/05_check_rename.py`, `scripts/06_build_layer.py`,
   `scripts/run_decision_checks.py`, `scripts/07_build_share.py`, `scripts/exercise_share.py`, then
   `scripts/write_decision_layer.py`.

@@ -1,6 +1,6 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-09T05:45:06Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+*Written 2026-10-10T15:39:32Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
 file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
 
 ## 1. What this is
@@ -34,10 +34,12 @@ This document describes that layer. Four things about it come first.
 Neither threshold is the 100 ha floor of the agreement statistics. That floor stays what it was, for the purpose
 it was set for, and the decision view does not use it.
 
-Stage 4, the argument about why forest was lost or work withheld, is not built. Nothing here stands in for it.
+Stage 4, the comparison of forest condition, need and allocation, was being built in `50_gap/` when this was written,
+as the owner specified it on 10 October 2026; its account, `docs/GAP.md`, was not written yet. Nothing here stands in
+for it.
 
 The two verifiers were run by this script as it wrote the document: `scripts/verify_layer.py`, unchanged, gave
-"92 of 92 checks passed"; `scripts/verify_decision.py`, new, gave "61 of 61 checks passed".
+"92 of 92 checks passed"; `scripts/verify_decision.py` gave "62 of 62 checks passed".
 
 ## 2. Why a unit and not a pixel
 
@@ -235,10 +237,12 @@ Of forest sites with ten to twenty-five hectares standing, 5 per cent have "some
 thousand or more, 85 per cent: 101 of 119 units in the state. In 22 of the
 30 districts the unit with the most standing forest is in a cell with loss. A cell with loss therefore says
 little about a large unit's rate of loss: 349 of the units in "Closed forest, loss recorded - find the cause first" lost under one per cent
-of their standing forest in the window, and 50 lost under a tenth of one per cent. The unit of that cell
-with the most forest, kuchilaghati (132731), Mayurbhanj, has 55,114 ha standing and lost 35.77 ha. And the other way:
-76 forest-site units lost more than two per cent of their forest in the window and are in a cell
-without loss, because that came to less than 1 ha. A unit's panel shows the hectares, so a reader can see which
+of the forest they had at the start of the window, and 48 lost under a tenth of one per cent of it. The
+unit of that cell with the most forest, kuchilaghati (132731), Mayurbhanj, has 55,114 ha standing and lost 35.77 ha. And the
+other way: 74 forest-site units lost more than two per cent of the forest they had at the start of the
+window and are in a cell without loss, because that came to less than 1 ha. All three are counted on the share a
+unit's panel prints (§5.4), whose denominator is the forest at the start of the window; until 10 October 2026 this
+paragraph counted them against standing forest. A unit's panel shows the hectares, so a reader can see which
 kind of unit is in front of them; the cell alone does not say. The recurrence that speaks for the loss minimum is
 also mostly a matter of large units: among forest sites of ten to twenty-five hectares that lost 1 ha or more in
 the first half of the window, 50 per cent (n = 32) did so again in the second. The owner's
@@ -352,8 +356,8 @@ How the share falls across the cells, in the default window:
 
 Read against §5.1: 349 of the units in "Closed forest, loss recorded - find the cause first" lost under one per cent of the forest they had
 at the start of the window, and 74 forest sites in a cell with little or no loss recorded lost over two
-per cent of theirs. (§5.1 counts the same two things against standing forest, which is the forest at the start less
-the loss of the window; the counts differ by the units that sit between the two denominators.) The unit of that cell
+per cent of theirs. (§5.1 gives the same two counts: since 10 October 2026 it counts on this share too, and no longer
+against standing forest, which is the forest at the start less the loss of the window.) The unit of that cell
 with the most forest, kuchilaghati (132731), Mayurbhanj, had 55,150 ha at the start of the window and lost 0.06 per cent of it.
 
 **A second order in the ranked list.** Within a tier the list is ordered by hectares lost, as before and as it
@@ -436,8 +440,8 @@ Why, in figures read from the files:
 
 - **"Under pressure" mostly meant large.** 349 of the 1,295 units of that cell lost under one per cent of
   the forest they had at the start of the window. The one with the most forest, kuchilaghati (132731), Mayurbhanj, has 55,114 ha
-  standing and lost 35.77 ha. And 76 forest sites that lost over two per cent of their standing
-  forest are in cells without loss, because that came to less than 1 ha (§5.1, §5.4).
+  standing and lost 35.77 ha. And 74 forest sites that lost over two per cent of the forest they
+  had at the start of the window are in cells without loss, because that came to less than 1 ha (§5.1, §5.4).
 - **"Intact" was contradicted.** Of the 671 units of that cell that the comparison with CoRE Stack
   covers, 157 are flagged by CoRE Stack for degradation (19 of them under the East Coast model, where
   that flag is itself unreliable, §11). The 1,040 units of the cell carry 176 ha of forest loss in the
@@ -627,9 +631,11 @@ loss in the window, and that loss as a share of the forest at the window's start
   One judgement recorded earlier carries over: the development index of 2011 is kept in the layer on the reading, set
   out in `docs/DATA_NOTES.md`, that it is computed from census rows; a stricter reading of SHRUG's terms would remove
   it. **By the owner's ruling of 9 October 2026 it is no longer a column of the exported list**, which is the file that
-  gets passed on; it stays in the interactive view, as a layer of its own and as a column of the list on the page.
-  The copy of the layer made to be passed on (§14) is that interactive view, so the index is in it; the exported file
-  is not. Whether Scheduled Tribe share belongs in a list that is passed on is still the Foundation's call.
+  gets passed on; it stays in the interactive view of `60_layer/`, as a layer of its own and as a column of the list
+  on the page. **Since 10 October 2026 it is also left out of the copy made to be passed on**
+  (`70_share/odisha_forest_decision_layer/`, §14): no file that is passed on carries the index for a unit. That was a
+  call of the instruction that opened stage 4, and it is reversible (§17.3). Whether Scheduled Tribe share belongs in
+  a list that is passed on is still the Foundation's call.
 
 ## 11. Corroboration: what the existing comparison already says
 
@@ -883,7 +889,10 @@ the provider's record of the dataset, its terms of service, the attribution page
 of the tile service, and the University of Maryland's page for the version of the data used here. They are fetched
 files and are not in git.
 The registered files are byte for byte the copies read on 8 October 2026. The developer page and the guide to API
-keys, which the note on the unresolved terms also quotes, are still only with the session's working files. This
+keys, which the note on the unresolved terms also quotes, were registered beside them on 10 October 2026, from the
+same fetch: 2 more rows of the manifest. (The overlay's own registration, written into the layer on
+9 October 2026, still says they are only with the session's working files; it is part of the layer's build and was
+not rewritten.) This
 script looked in 5 of the copies for 13 of the sentences the overlay's registration quotes, whole or
 by their distinguishing words, and stops if one is missing. It did not look for every quotation.
 
@@ -893,16 +902,28 @@ University's page - and the four percentages those sentences state. It is made a
 and it is in git. The layer's About text quotes the cautions from that file and no longer from the overlay's
 registration, so they stay whether or not the overlay is shipped (§18 gives them).
 
-**A copy without the overlay.** `scripts/07_build_share.py` writes `70_share/`: a folder with the layer's `index.html`
-and `data.js`, byte for byte, and a README; no `overlay.js`; and a zip of that folder beside it (6.0 MB).
-The README says how to open the copy, what it is and is not, that the map overlay is not in it, whose data it draws
-on (12 rows, read from the layer's own list of sources) and that terms for passing it on are not yet
-agreed. The page in the copy is the same page, so its box "Site-level overlay" is still there. `scripts/exercise_share.py`
-opened the copy from disk in Chrome (Chrome/154.0.8037.99): 6 of 6 steps did what they should. The
-two files are byte for byte the layer's; the page loaded those two files and asked the network for nothing; with the
-box ticked the control said "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before.", the box was unticked again and no tile was drawn. The browser logged once
-that a file was not found, which is the point of the copy; nothing else was logged. One thing the owner should know:
-the copy is the interactive view, so the layer of the development index of 2011 is in it (§10).
+**A copy without the overlay, and since 10 October 2026 without the development index.** `scripts/07_build_share.py`
+writes `70_share/odisha_forest_decision_layer/`: a folder with the layer's `index.html` and `data.js` and a README; no
+`overlay.js`; and a zip of that folder beside it, `70_share/odisha_forest_decision_layer.zip` (6.0 MB). The
+two files are the layer's with the development index of 2011 taken out and nothing else: its layer, its value in
+every unit's row, its line in a unit's panel, its column of the ranked list, its row of the sources, and the places of
+the About text that speak of it (11,468 units' values; the copy's `data.js` is 194,058 bytes
+shorter than the layer's). The script first writes the layer's `data.js` out again untouched and stops unless that
+gives back the layer's own bytes, so what was not taken out is the layer's. The README says how to open the copy,
+what it is and is not, that the map overlay and the development index are not in it, whose data it draws on
+(11 rows, read from the copy's own list of sources) and that terms for passing it on are not yet agreed.
+The page in the copy is the layer's page less the one cell of the ranked list that printed the index, so its box
+"Site-level overlay" is still there. `scripts/exercise_share.py` opened the copy from disk in Chrome
+(Chrome/154.0.8037.99): 8 of 8 steps did what they should. It holds the two files against
+`60_layer/`'s under that rule, written out a second time in the gate; it looks for the index's id and its names on
+the page in both files and finds none; the page loaded those two files and asked the network for nothing; with the
+box ticked the control said "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before.", the box was unticked again and no tile was drawn; and with a district
+ranked and one of its units opened, the list, the panel, the list of layers and the two text panels showed the index
+nowhere, and no empty or shifted cell where it had been. The browser logged once that a file was not found, which is
+the point of the copy; nothing else was logged. **Which checks of the copy changed, and why:** until 10 October 2026
+the script and the gate each held the copy's two files byte for byte against `60_layer/`'s; that comparison cannot
+hold once the index is out, and each now holds them against the layer's files under the rule above. `60_layer/` is
+unchanged and keeps the index (§10).
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew 12 tiles of
 12 asked for, from the registered host and no other (one address asked for: `https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&end_year=2025`), with the
@@ -985,7 +1006,7 @@ application. What follows says which check was applied to what.
   67 columns. **The 16 columns added on 9 October 2026 were not replicated**: the forest at the
   start of each window, the share, the reason for a blank share and the order by share. They are rebuilt by the
   verifier below, once. The record of the replication is a working file of the session, not a stage output (§20).
-- *`scripts/verify_decision.py`*, which shares no code with the builders: "61 of 61 checks passed". It re-adds every hectare
+- *`scripts/verify_decision.py`*, which shares no code with the builders: "62 of 62 checks passed". It re-adds every hectare
   from stage 1's yearly columns, re-derives every cell from the printed hectares, every unit's district from
   `10_units/`, the order of every list from those, and every count and share of the layer's About text with its
   statements of the thresholds, the windows and the tier order; it holds the tier order and the six names against the
@@ -999,6 +1020,17 @@ application. What follows says which check was applied to what.
 build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). In
 this pass it ran 6 checks, and 6 passed on their first run. The runs of each browser check are
 given with it below.
+
+**The pass on record is that of 9 October 2026, and the verifier has gained a check since.** In that pass
+`scripts/verify_decision.py` gave "61 of 61 checks passed". The check added on 10 October 2026 (§17.3) is in the run this script
+made of the verifier as it wrote the document, which gave "62 of 62 checks passed". A second pass was started on
+10 October 2026 so that the runner's record would be of the verifier as it now is. It could not be finished:
+5 of its 6 checks passed, the verifier with its new check among them, and the check of the
+decision view in WebKit did not run to its end. The machine had gone into standby on a flat battery during the pass,
+and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote down
+"RuntimeError: the WebKit driver ended". The layer is the build the pass of 9 October 2026 was made on, so that pass's records were put back as
+they were, and the unfinished record is kept with the session's working files. The layer itself, and every check of
+it in a browser, are as they stood on 9 October 2026.
 
 **The regression gate: the existing views.**
 
@@ -1030,15 +1062,15 @@ given with it below.
 
 | file that existed before | lines added | lines removed |
 |---|---|---|
-| `.gitignore` | 20 | 0 |
-| `00_raw/data_manifest.csv` | 11 | 0 |
+| `.gitignore` | 26 | 0 |
+| `00_raw/data_manifest.csv` | 14 | 0 |
 | `scripts/06_build_layer.py` | 16 | 0 |
 | `scripts/layer_template.html` | 311 | 0 |
 
   *The lines added to `.gitignore` keep fetched files and stage outputs out of git; those added to the manifest are
   the rows of §13 and §14.* The only other files that existed then and are modified are documents the owner ordered
   brought up to date on 9 October 2026: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`; and the script that writes one of them. **`scripts/write_results.py`
-  was changed, by the owner's choice of 9 October 2026, in one rule** (38 lines added, 8 removed since that
+  was changed, by the owner's choice of 9 October 2026, in one rule** (42 lines added, 8 removed since that
   commit): it refused to write `docs/RESULTS.md` unless the record of the check in the Safari application was of the
   layer on disk; it now allows that record to be of an earlier build when the runner's record of this build names the
   check as left out with a reason, and then says so in the text. Its rule for the Chrome and WebKit records is
@@ -1073,8 +1105,9 @@ given with it below.
   657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
   build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-09T04:34:32Z, opened `70_share/`'s copy from disk
-in Chrome: 6 of 6 steps did what they should (§14).
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T11:21:02Z, opened the copy in
+`70_share/odisha_forest_decision_layer/` from disk in Chrome: 8 of 8 steps did what they
+should (§14).
 
 **The fragility of the Safari and WebKit checks: recorded, and by the owner's ruling not chased.** On the layer built
 2026-10-08T13:02:50Z, 3 runs of the unchanged WebKit exercise were made and in 1, the first, one step
@@ -1140,7 +1173,8 @@ he asked.
 **Changed by the rulings, and done in this build.**
 
 - **Five cells renamed, labels only** (§7), because with a flat minimum of 1 ha the first names over-claimed:
-  349 units of the cell then called "under pressure" lost under one per cent of their forest, and
+  349 units of the cell then called "under pressure" lost under one per cent of the forest they had at the
+  start of the window, and
   157 units of the cell then called "intact" are flagged by CoRE Stack. No unit changed cell: 45,872
   assignments held by the gate.
 - **Loss as a share, beside the cell and not in it** (§5.4), with a second order within a tier, by share lost.
@@ -1148,12 +1182,14 @@ he asked.
   5,660 units in the default window.
 - **"Lower bound" taken out** (§3) of the layer, the tables' record and this document, and replaced by the owner's
   words; the reason is kept in §3 and §18.
-- **The export** (§15, §10): the development index of 2011 removed from it and kept in the interactive view; the
-  forest at the start of the window and the share added; 32 columns.
+- **The export** (§15, §10): the development index of 2011 removed from it and kept in the interactive view (of
+  `60_layer/`; the copy that is passed on lost it too on 10 October 2026, §17.3); the forest at the start of the
+  window and the share added; 32 columns.
 - **The provider's cautions given a home of their own** (§14): 5 of the provider's pages registered in
   `00_raw/` with manifest rows, and the cautions quoted in the layer's About text from the dataset record whether or
   not the overlay is shipped.
-- **A copy of the layer without the overlay**, `70_share/`, with a README and a zip (§14).
+- **A copy of the layer without the overlay**, `70_share/odisha_forest_decision_layer/`, with a README, and a zip
+  of it beside it (§14).
 - **The standing rule on `00_raw/`**, reworded in `CLAUDE.md` as he gave it: files in `00_raw/` at a commit are never
   edited; registering a new input adds files and manifest rows. Under it the files this stage put into `00_raw/` on
   8 October 2026, which were rewritten in place before they were committed, were not touched again: this build added
@@ -1174,6 +1210,25 @@ Until these are settled a tier is a starting point for a conversation with the F
 Two things are open that are not the Foundation's and that the owner knows of: the two points of the tile provider's
 terms (§14), which is why the copy made to be passed on has no overlay; and the terms on which that copy may be
 passed on, which are not yet agreed and which its README says are not.
+
+### 17.3 Changed on 10 October 2026, with the instruction that opened stage 4
+
+These were not rulings on a list put to the owner. They came with his instruction of 10 October 2026 for the next
+stage, and the first is recorded here as a call of that instruction that he can reverse.
+
+- **The development index of 2011 is left out of the copy that is passed on** (§10, §14). The exported list lost the
+  index on 9 October 2026 because that file is passed on; the copy in `70_share/odisha_forest_decision_layer/` is
+  passed on too, and its `data.js` still carried `adi_2011` for every unit. The script that builds the copy now takes
+  the field out, with everything that displays it; the gate on the copy looks for the index's id and names in the
+  copy's two files and fails if it finds one; the copy's README says the index is not in it. `60_layer/` keeps the
+  index. **Reversible:** the change is confined to `scripts/07_build_share.py` and its gate,
+  `scripts/exercise_share.py`; no stage table, no cell and nothing in `60_layer/` was touched. Putting those two
+  scripts back as they stood on 9 October 2026 and running them gives back the copy of that day; this document's own
+  check of the copy (§14) would go back with them.
+- **The three counts of §5.1 are on the share the panel prints** (§5.1, §5.4, §7): its denominator is the forest at
+  the start of the window, not standing forest. `scripts/verify_decision.py` works the three out from stage 1's
+  yearly columns, holds them against the table's column, and this script holds its own count against the verifier's.
+- **Two more of the provider's pages are registered** (§14): its developer page and its guide to API keys.
 
 ## 18. What this does not show
 
@@ -1253,7 +1308,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-09T05:45:06Z | this run | the UTC time at which this script ran |
+| 2026-10-10T15:39:32Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
 | 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
@@ -1264,7 +1319,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1 | `55_decision/decision.provenance.json` | key `thresholds` → `loss_min_ha` |
 | 100 | `60_layer/layer.provenance.json` | key `default_floor_ha` |
 | 92 of 92 checks passed | `scripts/verify_layer.py` | its exit status and last line, run by this script as it wrote the document |
-| 61 of 61 checks passed | `scripts/verify_decision.py` | its exit status and last line, run by this script as it wrote the document |
+| 62 of 62 checks passed | `scripts/verify_decision.py` | its exit status and last line, run by this script as it wrote the document |
 | 67 | `55_decision/decision.provenance.json` | key `tables` → `condition_by_unit.csv` → `columns` |
 | UMD/hansen/global_forest_change_2025_v1_13 | `20_degradation/hansen.provenance.json` | key `inputs`: the Earth Engine dataset it names |
 | the forest of 2000 with no loss recorded since; not a measure of tree cover today | `55_decision/decision.provenance.json` | key `definitions` → `standing`: its closing words |
@@ -1320,13 +1375,13 @@ This section is the script's own record of what it read. Paths are relative to t
 | 119 | `55_decision/condition_threshold_evidence.csv` | column `n`; row where `key` is 'some_loss_share_5000' |
 | 22 | `55_decision/condition_by_unit.csv` | districts whose row with the largest `standing_forest_ha` has a `cell_2018_2025` with loss |
 | 30 | `55_decision/condition_cells_by_district.csv` | column `district`: the number of distinct districts |
-| 349 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_under_1pct' |
+| 349 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_loss and whose `forest_loss_share_pct_2018_2025` is under 1 |
 | Closed forest, loss recorded - find the cause first | `55_decision/tiers.csv` | column `cell_name`; row where `cell` is 'dense_loss' |
-| 50 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_under_01pct' |
+| 48 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_loss and whose `forest_loss_share_pct_2018_2025` is under 0.1 |
 | kuchilaghati (132731), Mayurbhanj | `55_decision/condition_by_unit.csv` | the row with the largest `standing_forest_ha` among those whose `cell_2018_2025` is dense_loss: its name, id and district |
 | 55,114 | `55_decision/condition_by_unit.csv` | `standing_forest_ha` of that row |
 | 35.77 | `55_decision/condition_by_unit.csv` | `forest_loss_ha_2018_2025` of that row |
-| 76 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'none_cell_over_2pct' |
+| 74 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `cell_2018_2025` is dense_none or open_none and whose `forest_loss_share_pct_2018_2025` is over 2 |
 | 50 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'recur_size_10' |
 | 32 | `55_decision/condition_threshold_evidence.csv` | column `n`; row where `key` is 'recur_size_10' |
 | 99.63 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'share_standing_10' |
@@ -1353,8 +1408,6 @@ This section is the script's own record of what it read. Paths are relative to t
 | 5,808 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_a_share` |
 | 5,660 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share` |
 | 22 | `55_decision/decision.provenance.json` | key `counts` → `loss_as_a_share` → `2018_2025` → `units_with_no_share_in_a_cell_with_loss` |
-| 349 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'dense_loss_share_under_1pct' |
-| 74 | `55_decision/condition_threshold_evidence.csv` | column `value`; row where `key` is 'none_cell_share_over_2pct' |
 | 55,150 | `55_decision/condition_by_unit.csv` | column `forest_at_window_start_ha_2018_2025` of the same row |
 | 0.06 | `55_decision/condition_by_unit.csv` | column `forest_loss_share_pct_2018_2025` of the row with the largest `standing_forest_ha` among those whose `cell_2018_2025` is dense_loss |
 | 1,653 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows in a cell with loss whose `order_in_district_cell_by_share_2018_2025` is not their `order_in_district_cell_2018_2025` |
@@ -1480,13 +1533,16 @@ This section is the script's own record of what it read. Paths are relative to t
 | Two independent searches and an adversarial verifier read the provider's reference, dataset record and terms on 8 Oct 2026; tiles over central Odisha were fe... | `scripts/layer_overlay.json` | key `verified_how` |
 | Two points, both the project owner's to decide; one note to gfw@wri.org could settle both. (1) API keys. The terms read 'each request to an API must include ... | `scripts/layer_overlay.json` | key `terms_unresolved` |
 | 5 | `00_raw/data_manifest.csv` | the rows of the provider's pages registered on 9 October 2026: their number |
+| 2 | `00_raw/data_manifest.csv` | the rows of the provider's pages registered on 10 October 2026: their number |
 | 5 | this run | the kept copies of the provider's pages that this script read |
 | 13 | `scripts/layer_overlay.json` | the sentences this script looked for in the kept copies of the provider's pages |
 | 13 | `00_raw/05_forest_reference/provider_cautions.json` | key `checks_passed` → `sentences_found_word_for_word` |
 | 6.0 | `70_share/share.provenance.json` | key `the_copy` → `zip` → `bytes` |
-| 12 | `70_share/share.provenance.json` | key `checks_passed` → `credits_read_from_the_layers_own_sources` |
+| 11,468 | `70_share/share.provenance.json` | key `development_index_left_out` → `unit_rows_from_which_the_value_was_taken` |
+| 194,058 | `70_share/share.provenance.json` | key `development_index_left_out` → `bytes_shorter_than_the_layers` → `data.js` |
+| 11 | `70_share/share.provenance.json` | key `checks_passed` → `credits_read_from_the_layers_own_sources` |
 | Chrome/154.0.8037.99 | `70_share/exercise_share_chrome.json` | key `browser` |
-| 6 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
+| 8 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
 | The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before. | `70_share/exercise_share_chrome.json` | key `summary` → `what_the_control_said_when_ticked` |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
@@ -1519,6 +1575,11 @@ This section is the script's own record of what it read. Paths are relative to t
 | 67 | `55_decision/condition_by_unit.csv` | its columns: their number |
 | 6 | `60_layer/decision_runs.json` | key `checks`: their number |
 | 6 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
+| 9 October 2026 | `60_layer/decision_runs.json` | key `started_utc`, as a date |
+| 61 of 61 checks passed | `60_layer/decision_runs.json` | key `checks`: the first clause of the last line of the run of `verify_decision` in that pass |
+| 5 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: the checks whose last run passed |
+| 6 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: their number |
+| RuntimeError: the WebKit driver ended | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: what the last run of that check said |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
 | 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_chrome.json` | key `summary` → `units_clicked` |
@@ -1548,7 +1609,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 13 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
 | `44890a1` | `git` | the commit this batch started from |
 | `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md` | `git diff --name-status 44890a1` | the documents among the files modified |
-| 38 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
+| 42 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
 | 8 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
 | 53 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps` |
 | 6 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps_that_are_statements_and_not_actions` |
@@ -1572,7 +1633,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
-| 2026-10-09T04:34:32Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-10T11:21:02Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
 | 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
 | 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
 | 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
@@ -1651,6 +1712,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | 6,680 | `6eec553b95fa0587` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | 5,032 | `61eeeb47e485e682` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | 9,187 | `8d52b25a4496ad2c` | - |
+| `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | 6,230 | `8308830d5aa72e67` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/apikey.html` *(working file)* | 2,165,712 | `9a1057979c6fe095` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/attribution.html` *(working file)* | 110,355 | `b2b412bcaf9f2fc8` | - |
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/dataset.json` *(working file)* | 7,467 | `d6fda9a9023de671` | - |
@@ -1660,7 +1722,9 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `.session_scratch_2026-10-05/overlay_pages_2026-10-08/umd_v1_13_download.html` *(working file)* | 71,893 | `4b2d38f20e6cb6df` | - |
 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | 2,453 | `766935d525b3d3a1` | - |
 | `.session_scratch_2026-10-05/schedule_extract_trials_2026-10-09.json` *(working file)* | 11,344 | `7cc40b7344845767` | 2026-10-08T22:34:43Z |
+| `00_raw/05_forest_reference/gfw_api_key_guide_2026-10-08.html` | 2,165,712 | `9a1057979c6fe095` | - |
 | `00_raw/05_forest_reference/gfw_dataset_record_umd_tree_cover_loss_2026-10-08.json` | 7,467 | `d6fda9a9023de671` | - |
+| `00_raw/05_forest_reference/gfw_developer_help_page_2026-10-08.html` | 2,427,052 | `ad50f515ac6703c5` | - |
 | `00_raw/05_forest_reference/gfw_terms_of_service_2026-10-08.html` | 91,265 | `edb7dcf50ddcfba4` | - |
 | `00_raw/05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json` | 415,519 | `75e41eafb31af361` | - |
 | `00_raw/05_forest_reference/isfr2023_vol1_pdf_pages_4_10_14_26_63_76_81.txt` | 23,670 | `c40f12b61de9ddd3` | - |
@@ -1670,7 +1734,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `00_raw/06_scheme/_build_schedule_extract.py` | 18,778 | `2363f4bea9466063` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | 92,751 | `ac7e642dd1d0e040` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.provenance.json` | 2,772 | `293d82fe6f6665f4` | 2026-10-08T22:32:57Z |
-| `00_raw/data_manifest.csv` | 59,778 | `dca7f65d41e3b274` | - |
+| `00_raw/data_manifest.csv` | 63,477 | `f226e3a64f7fd66c` | - |
 | `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c` | - |
 | `20_degradation/agreement.provenance.json` | 10,756 | `0c0182e3a357255c` | 2026-10-07T10:08:15Z |
 | `20_degradation/agreement_by_zone.csv` | 1,995 | `df07ed89f94db597` | - |
@@ -1707,12 +1771,15 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
 | `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
 | `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
-| `70_share/exercise_share_chrome.json` | 3,497 | `2dccab23cee1e737` | 2026-10-09T04:34:32Z |
-| `70_share/share.provenance.json` | 2,251 | `896527eda72c5501` | 2026-10-09T04:08:59Z |
+| `70_share/exercise_share_chrome.json` | 5,063 | `644a365ce17504c9` | 2026-10-10T11:21:02Z |
+| `70_share/odisha_forest_decision_layer/README.txt` | 7,367 | `788c48e23ce51af9` | - |
+| `70_share/odisha_forest_decision_layer/data.js` | 22,066,227 | `4df21a9f2c43845a` | - |
+| `70_share/odisha_forest_decision_layer/index.html` | 205,691 | `508144e070577a5e` | - |
+| `70_share/share.provenance.json` | 3,740 | `ba7e4d5d732f1caf` | 2026-10-10T11:20:41Z |
 | `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
 | `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
 | `scripts/run_decision_checks.py` | 9,681 | `48a395deca2576e3` | - |
-| `scripts/write_results.py` | 105,942 | `50f98f23f30e9685` | - |
+| `scripts/write_results.py` | 106,125 | `c4137b6ce5a2e9b8` | - |
 
 ### 20.4 Statements tested before they were written
 
@@ -1724,7 +1791,7 @@ Each of these is something the text says in words. The script tested it against 
 - the layer's About text quotes the provider's two cautions word for word from the registered record
 - the gate on the renaming was run on the decision table that is on disk: every unit's cell in every window matches through the owner's list of names, and every column the table had is unchanged
 - the layer in `60_layer/` was built from the decision table that is in `55_decision/`
-- stage 4 is not built: `50_gap/` holds no output
+- stage 4 is being built: `50_gap/` holds the check of its inputs, and its account, `docs/GAP.md`, is not written yet
 - every unit has a cell in every window: no cell of the four cell columns is blank
 - neither threshold of the decision view is the floor of the agreement test
 - most of the loss on the lowest band is on land with no canopy at all in 2000
@@ -1765,6 +1832,8 @@ Each of these is something the text says in words. The script tested it against 
 - in 2017_2023 no share is above a hundred
 - in 2021_2025 a share is blank exactly where the table gives the reason in words, and the reason is one sentence
 - in 2021_2025 no share is above a hundred
+- the units that lost under a tenth of one per cent are among those that lost under one per cent
+- `scripts/verify_decision.py` printed the three counts of §5.1 as it worked them out from stage 1's yearly columns
 - in the cells without loss the order by share is the order by standing hectares, unit for unit
 - one ratio, and only one, is the flag carried in the table: the smaller within a fifth of the larger
 - the owner's list takes the old name of the cell open_loss to the name it has now
@@ -1897,8 +1966,11 @@ Each of these is something the text says in words. The script tested it against 
 - the registered page `05_forest_reference/resourcewatch_api_attribution_requirements_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
 - the registered page `05_forest_reference/gfw_tile_cache_api_reference_openapi_2026-10-08.json` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
 - the registered page `05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/gfw_developer_help_page_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
+- the registered page `05_forest_reference/gfw_api_key_guide_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
 - the extract of the provider's cautions is the file its manifest row describes, it was made from the two registered pages that are on disk, and the layer's record says the About text reads the cautions from it
-- the copy in `70_share/` is of the layer that is in `60_layer/`, its two files are byte for byte the layer's, it holds a README and no other file, and the check that opened it in Chrome was made on that copy and passed every step
+- the copy in `70_share/odisha_forest_decision_layer/` was made from the layer that is in `60_layer/`; its two files are the layer's without the development index of 2011, which neither names; its three files are the ones its record describes and it holds no other; and the check that opened it in Chrome was made on those files and passed every step
+- the field left out of the copy is `adi_2011`, its value was taken from the row of every unit, and `60_layer/data.js` still has it
 - what the copy's control said when ticked is the layer's own sentence for a file that is not beside the page
 - an exported row carries district, unit id, unit type, window, tier label, tier definition, the tier order in use and whether it was changed, what orders units within a tier, the six hectare figures, corroboration with its window, the outside-village flag and the build time
 - the export has the same columns in WebKit as in Chrome, and in the second list as in the first
@@ -1934,6 +2006,10 @@ Each of these is something the text says in words. The script tested it against 
 - the last run of the check 'exercise_layer in WebKit' on this build passed
 - the last run of the check 'exercise_decision in Chrome' on this build passed
 - the last run of the check 'exercise_decision in WebKit' on this build passed
+- the kept record of the pass of 10 October 2026 is of the layer on disk, was started after the pass on record, and is marked unfinished
+- in the unfinished pass every check but the one of the decision view in WebKit passed on its last run, the verifier among them
+- in the unfinished pass the verifier gave the count this script's own run of it gave
+- the pass on record was made with the verifier as it stood before it gained a check: its count differs from this run's
 - the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the unchanged script passed
 - the record gives one reason for leaving out both Safari checks
 - on an earlier build, the run of the unchanged WebKit exercise that failed a step was the first made of it, and the step was the map drag
@@ -2025,6 +2101,11 @@ Each of these is something the text says in words. The script tested it against 
 - units with no share in 2017_2023: in the run record and blank in the table
 - units with a share and without one in 2021_2025, and the units
 - units with no share in 2021_2025: in the run record and blank in the table
+- units of the cell of closed forest with loss whose share prints under one per cent: counted here on the column and in the build's evidence table
+- forest sites in a cell without loss whose share prints over two per cent: counted here on the column and in the build's evidence table
+- units that lost under one per cent, in the cell of closed forest with loss: counted here on the column `forest_loss_share_pct_2018_2025` and worked out by `scripts/verify_decision.py` from stage 1's yearly columns
+- units that lost under a tenth of one per cent, in that cell: counted here on the column `forest_loss_share_pct_2018_2025` and worked out by `scripts/verify_decision.py` from stage 1's yearly columns
+- units that lost over two per cent, forest sites in a cell without loss: counted here on the column `forest_loss_share_pct_2018_2025` and worked out by `scripts/verify_decision.py` from stage 1's yearly columns
 - units of the cell of closed forest with loss whose share prints under one per cent: in the evidence table and in the share table
 - units near the boundary in the boundary table and in the run record
 - units near the boundary in the boundary table and counted in the decision table
@@ -2103,4 +2184,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*346 figures and 22 tables (699 cells) from 67 files; 229 statements tested; 148 totals compared. Written 2026-10-09T05:45:06Z by `scripts/write_decision_layer.py` (sha256 `2166f13bc66bcb83`), with the reading functions of `scripts/write_results.py` (sha256 `50f98f23f30e9685`).*
+*352 figures and 22 tables (699 cells) from 73 files; 238 statements tested; 153 totals compared. Written 2026-10-10T15:39:32Z by `scripts/write_decision_layer.py` (sha256 `3ecf5cbf963e7007`), with the reading functions of `scripts/write_results.py` (sha256 `c4137b6ce5a2e9b8`).*

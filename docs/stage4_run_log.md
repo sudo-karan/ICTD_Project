@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T11:15:55Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T15:40:56Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0. The last is Phase 0, inputs, crosswalk, gates. Every gate of every phase listed passed.
+Phases written up below: 0, 1. The last is Phase 1, the five leftovers. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -138,6 +138,95 @@ The verifiers that existed, run again after the install:
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
 - `scripts/06_build_layer.py` (69,130 bytes)
+
+## Phase 1: the five leftovers
+
+**What was done.** Each row of the gate table names the leftover it belongs to.
+
+- **L1.** The three counts of `docs/DECISION_LAYER.md` section 5.1 are counted on the share a unit's panel prints
+  (the column `forest_loss_share_pct` of the default window, whose denominator is the forest at the start of the
+  window), there and where they are repeated (sections 5.4, 7 and 17). The change is in `scripts/write_decision_layer.py`,
+  which now counts them on the column itself. `scripts/verify_decision.py` gained one check: it works the three out from
+  stage 1's yearly columns and holds them against the column; the writer holds its own counts against the line that check
+  prints. The old and the new value of each are in the gate table.
+- **L2.** `scripts/07_build_share.py` writes the copy without the development index of 2011: the field and everything
+  that displays it. `60_layer/` keeps it. **Which checks of the copy changed, and why:** the builder and the gate
+  (`scripts/exercise_share.py`) each held the copy's two files byte for byte against `60_layer/`'s; that cannot hold once
+  the index is out, so each now holds them against the layer's files under the rule "the layer's without the index and
+  nothing else". The gate gained three checks: the index's id and names are in neither file of the copy; the README says
+  the index is not in the copy; and, in the browser, a ranked list, a unit's panel, the list of layers and the two text
+  panels show it nowhere. Section 17.3 of `docs/DECISION_LAYER.md` records the call as reversible.
+- **L3.** The README's layer section no longer quotes sizes or check counts; it points to `docs/LAYER.md` and
+  `docs/DECISION_LAYER.md`. Two counts of the README's layout that had also gone stale (rows of the manifest) were
+  reworded so that they carry no count.
+- **L4.** The provider's developer page and its guide to API keys are registered from the fetch of 8 October 2026 that
+  saved the five pages registered on 9 October: a saved copy each, a manifest row each, kept out of git like the five.
+  Both pages carry the provider's whole help text, and in it cautions about the data that the first extract does not
+  have; they are kept word for word in a new dated file beside `provider_cautions.json`, made and checked by a script
+  beside it. `provider_cautions.json` was not edited.
+- **L5.** `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md` and `docs/DECISION_LAYER.md` give the copy's real path.
+  `docs/RESULTS.md` does not mention the copy.
+
+**A second pass of the browser checks was started and could not be finished.** The layer was not rebuilt, but the
+decision verifier changed, so `scripts/run_decision_checks.py --leave-out safari` was started to bring the runner's
+record up to the verifier on disk. The Safari application was not started. During the pass the machine went into
+standby on a flat battery. After it woke, both verifiers and the checks in Chrome passed and the check of the layer in
+WebKit passed on its second run, but the check of the decision view in WebKit stalled twice: the off-screen WebKit
+view stopped answering, and it was stopped by hand. The records of the pass of 9 October 2026 were put back as they
+were (the layer is the build they were made on), and the unfinished record is kept with the session's working files.
+`docs/DECISION_LAYER.md` section 16 says this, with the counts of both passes. **For the owner:** the runner's record
+is therefore of the verifier as it stood before it gained its new check; a pass on a machine that is awake and in use
+would bring it up to date.
+
+**Not changed, and why.** `scripts/layer_overlay.json` still says that the two pages are only with the session's working
+files. It is an input of the layer's build, and rewriting it would call for a rebuild of the layer and a new pass of
+every check; `docs/DECISION_LAYER.md` section 14 says where the pages are now. `docs/RESULTS.md` was not regenerated in
+this phase: it does not mention the copy, and its writer is changed in Phase 8.
+
+**A note on the session after the standby.** From then on the editor's file tools refused every call, a write to the
+session's own scratch folder included, while the shell worked; name lookups on the network failed and the system
+would not grant a request to stay awake. That state has been met in this project before. Files were written through
+the shell from then on, and nothing that needs the network was attempted; the report to the owner says so.
+
+**What comes next.** Phase 2: district need against district allocation (`scripts/08_build_gap_districts.py`).
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| L1 old value, against standing forest (the version the owner last read): units of the find-the-cause cell that lost under 1 per cent | 349 | 349 | yes |
+| L1 old value, against standing forest (the version the owner last read): units of that cell that lost under a tenth of one per cent | 50 | 50 | yes |
+| L1 old value, against standing forest (the version the owner last read): forest-site units in a no-loss cell that lost over 2 per cent | 76 | 76 | yes |
+| L1 new value, on the column forest_loss_share_pct_2018_2025: forest-site units in a no-loss cell that lost over 2 per cent (the owner's figure against window start) | 74 | 74 | yes |
+| L1 old -> new: units of the find-the-cause cell that lost under 1 per cent | the new value is the count on the column | 349 -> 349 | yes |
+| L1 old -> new: units of that cell that lost under a tenth of one per cent | the new value is the count on the column | 50 -> 48 | yes |
+| L1 old -> new: forest-site units in a no-loss cell that lost over 2 per cent | the new value is the count on the column | 76 -> 74 | yes |
+| L1: the three counts docs/DECISION_LAYER.md section 5.1 prints | 349 / 48 / 74 | 349 / 48 / 74 | yes |
+| L1: the repeats of those counts in sections 7 and 17 of the document (over 2 per cent; under 1 per cent) | 74; 349 | 74; 349 | yes |
+| L1: figures the document's writer still reads from the counts made on standing forest | none | none | yes |
+| L2: times the index's id (adi_2011) or its display labels occur in the shared copy's data.js / index.html | 0 / 0 | 0 / 0 | yes |
+| L2: 60_layer/data.js still carries adi_2011 and the index's label | yes | yes | yes |
+| L2: the shared copy's README says the development index is not in this copy | yes | yes | yes |
+| L2: section 17 of docs/DECISION_LAYER.md records the call as reversible | yes | yes | yes |
+| L3: figures of 7 October 2026 still typed in the README (19.8 MB; 5.5 MB; 92 of 92; 1,276 of 1,276; 2,447,144; 1,232,815) | none | none | yes |
+| L3: the README's layer section points to docs/LAYER.md and docs/DECISION_LAYER.md for them | yes | yes | yes |
+| L4: the two provider pages registered - a saved copy with the bytes and SHA-256 its manifest row gives | 2 of 2 | 2 of 2 | yes |
+| L4: the manifest against commit 16b1efd - rows then, rows now, and whether every earlier byte is as it was | rows added, none changed | 92 then, 95 now, earlier bytes unchanged: yes | yes |
+| L4: a dated file of what the pages say stands beside provider_cautions.json, which is as committed | yes | provider_cautions_2026-10-10.json; provider_cautions.json unchanged: yes | yes |
+| L5: documents that mention 70_share and do not give the path 70_share/odisha_forest_decision_layer/ | none | none (of 4: README.md, docs/DATA_NOTES.md, docs/DECISION_LAYER.md, docs/LAYER.md) | yes |
+| scripts/verify_layer.py, unchanged | 92 of 92 checks passed | 92 of 92 checks passed | yes |
+| scripts/verify_layer.py is as it was at commit 16b1efd | yes | yes | yes |
+| scripts/verify_decision.py: every check passes (the count is new: one check was added) | all | 62 of 62 checks passed | yes |
+| the gate on the shared copy (scripts/exercise_share.py, in Chrome): steps that did what they should, the new ones included; its record is of the files on disk | all, and yes | 8 of 8; yes | yes |
+| deliberate errors tried against the checks added in this phase (the verifier's new check, the writer's hold on the three counts, the gate on the shared copy), and caught | all | 15 of 15 | yes |
+
+*25 of 25 gates passed (`50_gap/gates_phase1.csv`).*
+
+## Commits of this run, newest first
+
+*Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
+
+- `c9bece2` Stage 4, Phase 0: inputs listed, the district crosswalk, a district for every unit, and the gates on what is built
 
 ## To rebuild
 

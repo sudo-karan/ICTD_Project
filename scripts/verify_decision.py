@@ -472,6 +472,18 @@ want = {
                                                                            and "declares no key scheme and the service returns every tile without one" in ov_cfg["terms_unresolved"]),
 }
 check(f"each of the {len(want)} sentences of the About text that carries a count or a share says the figure worked out here from stage 1's tables", all(want.values()), "NOT AS WORKED OUT HERE: " + "; ".join(k for k, v in want.items() if not v) if not all(want.values()) else "")
+# The three counts that section 5.1 of docs/DECISION_LAYER.md gives (since 10 October 2026 on the share the panel prints, whose denominator is the forest at the
+# start of the window): units of the cell of closed forest with loss that lost under 1 % and under 0.1 % of it, and forest sites in a cell without loss that lost
+# over 2 %. Worked out here from stage 1's yearly columns (S1), and counted again on the decision table's own column. The document's writer reads the line this prints.
+share_col = {u: (Decimal(T[u][f"forest_loss_share_pct_{dw}"]) if T[u][f"forest_loss_share_pct_{dw}"] != "" else None) for u in ids}
+three = lambda sh: (sum(1 for u in dl if sh(u) is not None and sh(u) < 1), sum(1 for u in dl if sh(u) is not None and sh(u) < Decimal("0.1")),
+                    sum(1 for u in site if base[u].endswith("_none") and sh(u) is not None and sh(u) > 2))
+worked, on_column = three(lambda u: S1[u]["share"][dw]), three(lambda u: share_col[u])
+check(f"three counts on the loss share - units of {dense_name} that lost under 1 % and under 0.1 % of the forest they had at the start of the window, and forest sites in a cell with little or "
+      f"no loss recorded that lost over 2 % of it - are the same worked out here from stage 1's yearly columns and counted on the column forest_loss_share_pct_{dw} of the decision table "
+      "(docs/DECISION_LAYER.md is not read here: its writer holds the counts of its section 5.1 against the figures this line prints)",
+      worked == on_column and worked[1] <= worked[0] <= len(dl),
+      f"counts on the share: under 1 %: {worked[0]:,}; under 0.1 %: {worked[1]:,}; over 2 % in a cell without loss: {worked[2]:,}" + ("" if worked == on_column else f"; ON THE COLUMN: {on_column}"))
 STANDING_IS = "the forest of 2000 with no loss recorded since; not a measure of tree cover today"                # the owner's wording of 9 October 2026
 check("the About text says the thresholds were ruled on by the owner on 9 October 2026 as proposed, the tiers are provisional, standing forest is 'the forest of 2000 with no loss recorded since; not a measure of tree cover today', "
       "that there is no score, and what orders the units within a tier; the build's record gives the thresholds the same standing",

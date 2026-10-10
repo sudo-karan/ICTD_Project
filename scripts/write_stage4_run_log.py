@@ -51,7 +51,52 @@ counts they gave before (the table under "The environment" below).
 **What comes next.** Phase 1: the five leftovers of the last batch.
 """),
     (1, "the five leftovers", ["gates_phase1.csv"], [], """
-**What was done.** See the gate table: each row names the leftover it belongs to.
+**What was done.** Each row of the gate table names the leftover it belongs to.
+
+- **L1.** The three counts of `docs/DECISION_LAYER.md` section 5.1 are counted on the share a unit's panel prints
+  (the column `forest_loss_share_pct` of the default window, whose denominator is the forest at the start of the
+  window), there and where they are repeated (sections 5.4, 7 and 17). The change is in `scripts/write_decision_layer.py`,
+  which now counts them on the column itself. `scripts/verify_decision.py` gained one check: it works the three out from
+  stage 1's yearly columns and holds them against the column; the writer holds its own counts against the line that check
+  prints. The old and the new value of each are in the gate table.
+- **L2.** `scripts/07_build_share.py` writes the copy without the development index of 2011: the field and everything
+  that displays it. `60_layer/` keeps it. **Which checks of the copy changed, and why:** the builder and the gate
+  (`scripts/exercise_share.py`) each held the copy's two files byte for byte against `60_layer/`'s; that cannot hold once
+  the index is out, so each now holds them against the layer's files under the rule "the layer's without the index and
+  nothing else". The gate gained three checks: the index's id and names are in neither file of the copy; the README says
+  the index is not in the copy; and, in the browser, a ranked list, a unit's panel, the list of layers and the two text
+  panels show it nowhere. Section 17.3 of `docs/DECISION_LAYER.md` records the call as reversible.
+- **L3.** The README's layer section no longer quotes sizes or check counts; it points to `docs/LAYER.md` and
+  `docs/DECISION_LAYER.md`. Two counts of the README's layout that had also gone stale (rows of the manifest) were
+  reworded so that they carry no count.
+- **L4.** The provider's developer page and its guide to API keys are registered from the fetch of 8 October 2026 that
+  saved the five pages registered on 9 October: a saved copy each, a manifest row each, kept out of git like the five.
+  Both pages carry the provider's whole help text, and in it cautions about the data that the first extract does not
+  have; they are kept word for word in a new dated file beside `provider_cautions.json`, made and checked by a script
+  beside it. `provider_cautions.json` was not edited.
+- **L5.** `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md` and `docs/DECISION_LAYER.md` give the copy's real path.
+  `docs/RESULTS.md` does not mention the copy.
+
+**A second pass of the browser checks was started and could not be finished.** The layer was not rebuilt, but the
+decision verifier changed, so `scripts/run_decision_checks.py --leave-out safari` was started to bring the runner's
+record up to the verifier on disk. The Safari application was not started. During the pass the machine went into
+standby on a flat battery. After it woke, both verifiers and the checks in Chrome passed and the check of the layer in
+WebKit passed on its second run, but the check of the decision view in WebKit stalled twice: the off-screen WebKit
+view stopped answering, and it was stopped by hand. The records of the pass of 9 October 2026 were put back as they
+were (the layer is the build they were made on), and the unfinished record is kept with the session's working files.
+`docs/DECISION_LAYER.md` section 16 says this, with the counts of both passes. **For the owner:** the runner's record
+is therefore of the verifier as it stood before it gained its new check; a pass on a machine that is awake and in use
+would bring it up to date.
+
+**Not changed, and why.** `scripts/layer_overlay.json` still says that the two pages are only with the session's working
+files. It is an input of the layer's build, and rewriting it would call for a rebuild of the layer and a new pass of
+every check; `docs/DECISION_LAYER.md` section 14 says where the pages are now. `docs/RESULTS.md` was not regenerated in
+this phase: it does not mention the copy, and its writer is changed in Phase 8.
+
+**A note on the session after the standby.** From then on the editor's file tools refused every call, a write to the
+session's own scratch folder included, while the shell worked; name lookups on the network failed and the system
+would not grant a request to stay awake. That state has been met in this project before. Files were written through
+the shell from then on, and nothing that needs the network was attempted; the report to the owner says so.
 
 **What comes next.** Phase 2: district need against district allocation (`scripts/08_build_gap_districts.py`).
 """),

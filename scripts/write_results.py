@@ -246,10 +246,14 @@ def table(name, head, rows):
     TABLES[name] = {"md": "\n".join(out), "src": src, "cells": sum(1 for r in rows for x in r if not isinstance(x, str))}
 
 
+VERIFIER_OUTPUT = {}                           # what each verifier printed, for a writer that holds a figure of its own against a line of it
+
+
 def verifier(script, draft):
     if draft:
         return V("not run for this draft", f"scripts/{script}", "not run")
     r = subprocess.run([sys.executable, str(ROOT / "scripts" / script)], capture_output=True, text=True, cwd=ROOT)
+    VERIFIER_OUTPUT[script] = r.stdout
     lines = [l for l in r.stdout.strip().splitlines() if l.strip()]
     last = lines[-1] if lines else ""
     if r.returncode != 0:
