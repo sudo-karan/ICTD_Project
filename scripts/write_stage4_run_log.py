@@ -400,8 +400,8 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 - **F3 leaves the smallest rings of boundary undrawn and carries a scale bar.** The caption gives the threshold, how
   many rings are left out, and the projection the bar is measured on. The units inside those rings keep their colour.
 - **F6 gives a panel to each unit of measurement**, so that no two units share an axis.
-- **The deck's headline rows carry more decimals than the documents print**; each column's name or the script's
-  docstring states its rounding.
+- **The deck's headline rows carry more decimals than the documents print**; the script's docstring states the
+  rounding of each column.
 
 **What comes next.** Phase 8: the documents.
 """),
@@ -584,7 +584,13 @@ rebuild are written up under Phase 6 below.
   working notes: every agent's report in its own words, with the readings it assumed and what its part does not
   cover. This log gives the counts and a summary.
 """),
-    (4, "Phase 7", False, ""),
+    (4, "Phase 7", True, """
+The three deck tables and the six figures were made again, after the verifier had passed, from the tables it checked.
+The six images are byte for byte the images that were opened and looked at on 10 October 2026, so none had to be
+looked at again, and the record of that look stands. No figure was added. The gates of Phase 7 pass; they are under
+Phase 7 below, with the notes on how the figure rules are held and what was changed after the figures were first
+looked at.
+"""),
     (5, "Phase 8, with the additions to the account of the stage", False, ""),
     (6, "the decision view in WebKit, with the machine awake", False, ""),
 ]

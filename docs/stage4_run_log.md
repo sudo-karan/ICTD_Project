@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T22:18:33Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T22:20:33Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1, 2, 3, 4, 5, 6. The last is Phase 6, independent verification. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2, 3, 4, 5, 6, 7. The last is Phase 7, figures and tables for the paper and the deck. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -18,7 +18,7 @@ The run was taken up again on 11 October 2026 under a note from the owner (`.ses
 | 1 | fix the input listing and rebuild | done |
 | 2 | Phase 5b: the need read against the Forest Survey's own figures | done |
 | 3 | finish Phase 6 | done |
-| 4 | Phase 7 | not yet |
+| 4 | Phase 7 | done |
 | 5 | Phase 8, with the additions to the account of the stage | not yet |
 | 6 | the decision view in WebKit, with the machine awake | not yet |
 
@@ -196,6 +196,14 @@ rebuild are written up under Phase 6 below.
 - **The record of the round is kept outside git**, in `50_gap/verify_gap_reviews.json`, with a copy beside the
   working notes: every agent's report in its own words, with the readings it assumed and what its part does not
   cover. This log gives the counts and a summary.
+
+### Step 4: Phase 7
+
+The three deck tables and the six figures were made again, after the verifier had passed, from the tables it checked.
+The six images are byte for byte the images that were opened and looked at on 10 October 2026, so none had to be
+looked at again, and the record of that look stands. No figure was added. The gates of Phase 7 pass; they are under
+Phase 7 below, with the notes on how the figure rules are held and what was changed after the figures were first
+looked at.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -1005,10 +1013,115 @@ Files compared or listed: 48; byte for byte the same: 46. Every file that differ
 | `environment_main_now.txt` | text | 2 line(s) of 42: line 10 first | the main environment's list of packages as found at the run |
 | `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_deck_tables: run_utc, script_sha256; 08_build_gap_fsi: run_utc, script_sha256; 08_gap_environment: outputs, run_utc, script_sha256 | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
 
+## Phase 7: figures and tables for the paper and the deck
+
+**What was done.** `scripts/make_stage4_figures.py` drew the six figures the instruction lists into `figures/stage4/`:
+each as a PNG at the resolution asked, an SVG, the CSV of exactly what is plotted, and a caption that gives n and the
+source files. `scripts/08_build_gap_deck_tables.py` cut the three tables for the deck from the stage's tables into
+`50_gap/deck_tables/`, each as CSV and as markdown. Both were first run while the verifier's parts were being written,
+and both were run again after the verifier of Phase 6 had passed, so the figures and the deck tables on disk are of
+the tables it checked.
+
+**How the figure rules are held.** The gate table below gives, for each figure, what a script can measure: its four
+files; the resolution of the PNG; that no pixel is coloured (the map apart, whose palette is one chosen to be told
+apart with colour-blind vision and whose classes are named in its legend); that no title is inside the image; and that
+the script's own layout check found no text on text, no two pieces of text set end to end with less than a word's
+space between them, no label on another point's marker and no leader line through a label. The font is the first of
+Calibri, Carlito and matplotlib's default that the machine has; the gate table says which was found. One claim to a
+figure, units in the axis titles and n on every panel are held by how the script draws them and by its captions; no
+gate measures them.
+
+**The figures were looked at, after a first round in which they could not be.** When they were first drawn the
+session's file tools refused every call (Phase 1) and no image could be opened; the first captions said so. After the
+second loss of power the tools worked again, and each of the six PNGs was opened and looked at. Three faults were
+seen that the script's layout check had passed, and were put right:
+
+- **F1**: the two axis titles ran end to end up the page and read as one.
+- **F4**: two district names stood beside each other's points, each with its line running to its own, so that the
+  figure seemed to name the two points the wrong way round; and two names read as one word.
+- **F3**: the dissolved district boundaries carried dozens of rings a few millimetres across, pieces of a district
+  lying inside its neighbour.
+
+The layout check now also measures text set end to end. The names of F4 are placed by a rule that keeps each beside
+its own point, or ties it there with a line that crosses no other, and the script tries many orders of placing them
+and keeps the tightest arrangement. The six PNGs were looked at again after the last change;
+`50_gap/figures_looked_at.json` holds their SHA-256 and what was seen, and the last-but-three gate of the table holds
+that the PNGs on disk are those. A figure drawn again and differently fails that gate until it is looked at again.
+
+**Calls made in the run.**
+
+- **An ignore line for `figures/stage4/` was added to `.gitignore`**, as every other stage folder has one. The
+  instruction said not to edit that file to admit outputs; this line keeps them out. It is the owner's to take out.
+- **`matplotlib` is in stage 4's environment** to draw the figures, pinned in `requirements-stage4.txt`.
+- **F4 has a second panel**, the same comparison in the earlier period (C5), beside the headline's. Districts are
+  named where either share reaches a threshold the caption states; the caption lists those not named.
+- **F3 leaves the smallest rings of boundary undrawn and carries a scale bar.** The caption gives the threshold, how
+  many rings are left out, and the projection the bar is measured on. The units inside those rings keep their colour.
+- **F6 gives a panel to each unit of measurement**, so that no two units share an axis.
+- **The deck's headline rows carry more decimals than the documents print**; the script's docstring states the
+  rounding of each column.
+
+**What comes next.** Phase 8: the documents.
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| the font of the figures (Calibri if installed, else Carlito, else matplotlib's default) | recorded | Carlito | yes |
+| F1_state_report: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; no coloured pixel; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 13 rows plotted; coloured pixels 0.00 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| F2_outside_village_asymmetry: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; no coloured pixel; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 10 rows plotted; coloured pixels 0.00 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| F3_map_of_cells: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; a palette of colours, the one figure allowed them; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 11468 rows plotted; coloured pixels 20.86 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| F4_need_share_against_money_share: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; no coloured pixel; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 60 rows plotted; coloured pixels 0.00 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| F5_need_and_money_by_marginalisation: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; no coloured pixel; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 7 rows plotted; coloured pixels 0.00 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| F6_estimates_with_wild_bootstrap_intervals: its four files; PNG at 300 dpi; a caption with n and the source files; rows of what is plotted; no coloured pixel; no text on text and none set end to end with less than a word's space, by the script's layout check; no title inside the image | all of it | files 4 of 4; 300 dpi; 17 rows plotted; coloured pixels 0.00 %; text on text 0; text end to end 0; labels on another's marker 0; titles inside 0 | yes |
+| the six PNGs on disk are the six recorded as looked at (50_gap/figures_looked_at.json, recorded 2026-10-10T18:38:40Z) | 6 of 6 | 6 of 6 | yes |
+| the three deck tables, each as .csv and .md | 3 | 3 | yes |
+| the deck's table of districts: rows, sorted by N1 from the largest | 30, sorted | 30, sorted | yes |
+| files of figures/stage4/ and 50_gap/ that are in git (stage outputs stay out of it) | none | none | yes |
+
+*11 of 11 gates passed (`50_gap/gates_phase7.csv`).*
+
+### Files written by `scripts/08_build_gap_deck_tables.py` (run 2026-10-10T22:19:08Z)
+
+- `50_gap/deck_tables/districts_by_need.csv` (9,590 bytes, sha256 `9beef3660717087a`)
+- `50_gap/deck_tables/districts_by_need.md` (10,320 bytes, sha256 `26d300b016511a6c`)
+- `50_gap/deck_tables/marginalisation_split_c1.csv` (2,298 bytes, sha256 `c57983821fffe3c5`)
+- `50_gap/deck_tables/marginalisation_split_c1.md` (2,472 bytes, sha256 `f7c891f5fbabff6d`)
+- `50_gap/deck_tables/headline_rows.csv` (1,564 bytes, sha256 `703c30a3b971de57`)
+- `50_gap/deck_tables/headline_rows.md` (1,690 bytes, sha256 `f5d3223efa954e13`)
+
+### Files written by `scripts/make_stage4_figures.py` (run 2026-10-10T22:20:09Z; font Carlito)
+
+- `figures/stage4/F1_state_report.caption.txt` (1,233 bytes, sha256 `1550c7f5692faab2`)
+- `figures/stage4/F1_state_report.csv` (612 bytes, sha256 `8632837563937a2f`)
+- `figures/stage4/F1_state_report.png` (169,399 bytes, sha256 `c4e238215e532a6b`)
+- `figures/stage4/F1_state_report.svg` (82,579 bytes, sha256 `496a6f6efed131ce`)
+- `figures/stage4/F2_outside_village_asymmetry.caption.txt` (1,332 bytes, sha256 `37cc16bff1479705`)
+- `figures/stage4/F2_outside_village_asymmetry.csv` (1,387 bytes, sha256 `dd1047331884549d`)
+- `figures/stage4/F2_outside_village_asymmetry.png` (93,303 bytes, sha256 `f033aeabd3b3efed`)
+- `figures/stage4/F2_outside_village_asymmetry.svg` (62,339 bytes, sha256 `86e436cdebeadfa5`)
+- `figures/stage4/F3_map_of_cells.caption.txt` (1,953 bytes, sha256 `18b66d3784cc1756`)
+- `figures/stage4/F3_map_of_cells.csv` (995,807 bytes, sha256 `059e714041450f21`)
+- `figures/stage4/F3_map_of_cells.png` (1,167,578 bytes, sha256 `e4ccf36206922a92`)
+- `figures/stage4/F3_map_of_cells.svg` (1,728,920 bytes, sha256 `163f79f62231d248`)
+- `figures/stage4/F4_need_share_against_money_share.caption.txt` (1,994 bytes, sha256 `aa6cca89cd821763`)
+- `figures/stage4/F4_need_share_against_money_share.csv` (2,097 bytes, sha256 `d59aa3e085bd2abf`)
+- `figures/stage4/F4_need_share_against_money_share.png` (210,719 bytes, sha256 `bba9e11543356f59`)
+- `figures/stage4/F4_need_share_against_money_share.svg` (110,822 bytes, sha256 `bb0c5738f0c1ef90`)
+- `figures/stage4/F5_need_and_money_by_marginalisation.caption.txt` (1,509 bytes, sha256 `3053de72f98c423a`)
+- `figures/stage4/F5_need_and_money_by_marginalisation.csv` (373 bytes, sha256 `851c8e61028879ae`)
+- `figures/stage4/F5_need_and_money_by_marginalisation.png` (158,318 bytes, sha256 `896b2330113b87c2`)
+- `figures/stage4/F5_need_and_money_by_marginalisation.svg` (90,275 bytes, sha256 `d6054fd4c8ef6c27`)
+- `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.caption.txt` (2,054 bytes, sha256 `057040ef4cba1200`)
+- `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.csv` (3,688 bytes, sha256 `a4d17aa16844fbd5`)
+- `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.png` (363,743 bytes, sha256 `55bc528befd1ed74`)
+- `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.svg` (173,697 bytes, sha256 `a25a6b053af495fe`)
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `780b81c` Handoff of 11 October, Step 3: Phase 6 - the independent verifier, its one round of review, and 42 planted errors caught
 - `22a480a` Handoff of 11 October, Step 2: Phase 5b - the need read against the Forest Survey's own district figures
 - `74480bf` Handoff of 11 October, Step 1: the listing of inputs holds every input any step reads; rebuilt, and no table of figures moved
 - `db8ddb2` Handoff of 11 October, Step 0: the shared copy published, and the check of the live site

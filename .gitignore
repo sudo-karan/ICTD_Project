@@ -71,3 +71,7 @@ logs/
 # stays tracked with the script that makes it.
 00_raw/05_forest_reference/gfw_developer_help_page_2026-10-08.html
 00_raw/05_forest_reference/gfw_api_key_guide_2026-10-08.html
+
+# the stage-4 figures are a stage output like the others (added 10 Oct 2026): rebuilt by scripts/make_stage4_figures.py.
+# figures/.gitkeep stays tracked.
+figures/stage4/
