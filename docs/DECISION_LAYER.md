@@ -1,6 +1,6 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-10T15:39:32Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+*Written 2026-10-10T20:13:52Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
 file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
 
 ## 1. What this is
@@ -911,7 +911,7 @@ the About text that speak of it (11,468 units' values; the copy's `data.js` is 1
 shorter than the layer's). The script first writes the layer's `data.js` out again untouched and stops unless that
 gives back the layer's own bytes, so what was not taken out is the layer's. The README says how to open the copy,
 what it is and is not, that the map overlay and the development index are not in it, whose data it draws on
-(11 rows, read from the copy's own list of sources) and that terms for passing it on are not yet agreed.
+(11 rows, read from the copy's own list of sources) and where the copy is published.
 The page in the copy is the layer's page less the one cell of the ranked list that printed the index, so its box
 "Site-level overlay" is still there. `scripts/exercise_share.py` opened the copy from disk in Chrome
 (Chrome/154.0.8037.99): 8 of 8 steps did what they should. It holds the two files against
@@ -924,6 +924,16 @@ the point of the copy; nothing else was logged. **Which checks of the copy chang
 the script and the gate each held the copy's two files byte for byte against `60_layer/`'s; that comparison cannot
 hold once the index is out, and each now holds them against the layer's files under the rule above. `60_layer/` is
 unchanged and keeps the index (§10).
+
+**The copy is published.** On 11 October 2026 the owner decided to publish it, without a password, at
+https://sudo-karan.github.io/ICTD_Project/: GitHub Pages, from the branch `gh-pages` of the public repository (commit `907d0f905b33`), which
+holds the copy's three files and an empty `.nojekyll` and no other file of the repository. Until that day the copy's
+README said that terms for passing it on were not yet agreed and asked that it not be published; it now gives the
+address, and says that each source keeps its own licence. `scripts/check_pages_live.py` fetched the three files from
+the site and opened it in Chrome (2026-10-10T20:09:31Z): 9 of 9 checks passed. The bytes the site
+serves are the build's; the map draws every unit; the page logs no script error; and every request goes to the
+site's own host. The browser's own request for an icon, which the site does not have, is refused, and the check
+records it.
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew 12 tiles of
 12 asked for, from the registered host and no other (one address asked for: `https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&end_year=2025`), with the
@@ -1062,20 +1072,20 @@ it in a browser, are as they stood on 9 October 2026.
 
 | file that existed before | lines added | lines removed |
 |---|---|---|
-| `.gitignore` | 26 | 0 |
-| `00_raw/data_manifest.csv` | 14 | 0 |
+| `.gitignore` | 30 | 0 |
+| `00_raw/data_manifest.csv` | 15 | 0 |
 | `scripts/06_build_layer.py` | 16 | 0 |
 | `scripts/layer_template.html` | 311 | 0 |
 
   *The lines added to `.gitignore` keep fetched files and stage outputs out of git; those added to the manifest are
   the rows of §13 and §14.* The only other files that existed then and are modified are documents the owner ordered
   brought up to date on 9 October 2026: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`; and the script that writes one of them. **`scripts/write_results.py`
-  was changed, by the owner's choice of 9 October 2026, in one rule** (42 lines added, 8 removed since that
-  commit): it refused to write `docs/RESULTS.md` unless the record of the check in the Safari application was of the
-  layer on disk; it now allows that record to be of an earlier build when the runner's record of this build names the
-  check as left out with a reason, and then says so in the text. Its rule for the Chrome and WebKit records is
-  unchanged. The unchanged check scripts that were run are as committed (the runner's record says so of each); and no
-  file of `10_units/` to `50_gap/` was written.
+  was changed, by the owner's choice of 9 October 2026, in one rule**: it refused to write `docs/RESULTS.md` unless
+  the record of the check in the Safari application was of the layer on disk; it now allows that record to be of an
+  earlier build when the runner's record of this build names the check as left out with a reason, and then says so in
+  the text. Its rule for the Chrome and WebKit records is unchanged. Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each verifier with the interpreter of its stage. With both changes the script has 134 lines added and 20 removed since that commit. The unchanged check scripts
+  that were run are as committed (the runner's record says so of each); and the decision view's build wrote no file
+  of `10_units/` to `40_allocation/`. `50_gap/` is the fourth stage's and was built after it (`docs/GAP.md`).
 - **What did change for an existing view**, and the owner accepted (§17): a heading and one line, the decision view's
   switch, stand above the list of layers; and every unit's panel ends with the block "why this tier". The decision
   view's other controls stay folded away, its radio button is a group of its own so that the keyboard moves through
@@ -1105,7 +1115,7 @@ it in a browser, are as they stood on 9 October 2026.
   657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
   build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T11:21:02Z, opened the copy in
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T20:06:00Z, opened the copy in
 `70_share/odisha_forest_decision_layer/` from disk in Chrome: 8 of 8 steps did what they
 should (§14).
 
@@ -1207,9 +1217,9 @@ he asked.
 - **Whether Scheduled Tribe share appears in a list they pass on** (§10).
 
 Until these are settled a tier is a starting point for a conversation with the Foundation and not a recommendation.
-Two things are open that are not the Foundation's and that the owner knows of: the two points of the tile provider's
-terms (§14), which is why the copy made to be passed on has no overlay; and the terms on which that copy may be
-passed on, which are not yet agreed and which its README says are not.
+One thing is open that is not the Foundation's and that the owner knows of: the two points of the tile provider's
+terms (§14), which is why the copy made to be passed on has no overlay. The terms on which that copy is passed on
+were open until 11 October 2026, when the owner decided to publish it (§14); its README says so.
 
 ### 17.3 Changed on 10 October 2026, with the instruction that opened stage 4
 
@@ -1308,7 +1318,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T15:39:32Z | this run | the UTC time at which this script ran |
+| 2026-10-10T20:13:52Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
 | 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
@@ -1544,6 +1554,10 @@ This section is the script's own record of what it read. Paths are relative to t
 | Chrome/154.0.8037.99 | `70_share/exercise_share_chrome.json` | key `browser` |
 | 8 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
 | The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before. | `70_share/exercise_share_chrome.json` | key `summary` → `what_the_control_said_when_ticked` |
+| https://sudo-karan.github.io/ICTD_Project/ | `70_share/pages_publication.json` | key `address` |
+| 907d0f905b33 | `70_share/pages_publication.json` | key `gh_pages_commit_when_checked`, its first twelve characters |
+| 2026-10-10T20:09:31Z | `70_share/pages_live_check.json` | key `run_utc` |
+| 9 | `70_share/pages_live_check.json` | key `checks_made` |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
 | https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&en... | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → `0` → `one_tile_address` |
@@ -1609,8 +1623,8 @@ This section is the script's own record of what it read. Paths are relative to t
 | 13 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
 | `44890a1` | `git` | the commit this batch started from |
 | `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md` | `git diff --name-status 44890a1` | the documents among the files modified |
-| 42 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
-| 8 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
+| 134 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
+| 20 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
 | 53 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps` |
 | 6 | `60_layer/exercise_decision_chrome.json` | key `summary` → `steps_that_are_statements_and_not_actions` |
 | 3 | `60_layer/exercise_decision_chrome.json` | key `summary` → `tier_arrows_pressed` |
@@ -1633,7 +1647,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
-| 2026-10-10T11:21:02Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-10T20:06:00Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
 | 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
 | 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
 | 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
@@ -1734,7 +1748,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `00_raw/06_scheme/_build_schedule_extract.py` | 18,778 | `2363f4bea9466063` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | 92,751 | `ac7e642dd1d0e040` | - |
 | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.provenance.json` | 2,772 | `293d82fe6f6665f4` | 2026-10-08T22:32:57Z |
-| `00_raw/data_manifest.csv` | 63,477 | `f226e3a64f7fd66c` | - |
+| `00_raw/data_manifest.csv` | 65,068 | `41c3a73134d17efd` | - |
 | `10_units/outside_village_district.csv` | 536,828 | `763630369d3a544c` | - |
 | `20_degradation/agreement.provenance.json` | 10,756 | `0c0182e3a357255c` | 2026-10-07T10:08:15Z |
 | `20_degradation/agreement_by_zone.csv` | 1,995 | `df07ed89f94db597` | - |
@@ -1771,15 +1785,17 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `60_layer/exercise_webkit.json` | 27,298 | `8d51b15504dcac7e` | 2026-10-09T04:18:45Z |
 | `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
 | `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
-| `70_share/exercise_share_chrome.json` | 5,063 | `644a365ce17504c9` | 2026-10-10T11:21:02Z |
-| `70_share/odisha_forest_decision_layer/README.txt` | 7,367 | `788c48e23ce51af9` | - |
+| `70_share/exercise_share_chrome.json` | 5,063 | `57a1648cec28d615` | 2026-10-10T20:06:00Z |
+| `70_share/odisha_forest_decision_layer/README.txt` | 7,390 | `8cf3242e8c5978ad` | - |
 | `70_share/odisha_forest_decision_layer/data.js` | 22,066,227 | `4df21a9f2c43845a` | - |
 | `70_share/odisha_forest_decision_layer/index.html` | 205,691 | `508144e070577a5e` | - |
-| `70_share/share.provenance.json` | 3,740 | `ba7e4d5d732f1caf` | 2026-10-10T11:20:41Z |
+| `70_share/pages_live_check.json` | 4,511 | `151685df83b61163` | 2026-10-10T20:09:31Z |
+| `70_share/pages_publication.json` | 1,179 | `4f3655a396a1be8d` | - |
+| `70_share/share.provenance.json` | 3,871 | `4678936032348686` | 2026-10-10T20:05:42Z |
 | `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
 | `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
 | `scripts/run_decision_checks.py` | 9,681 | `48a395deca2576e3` | - |
-| `scripts/write_results.py` | 106,125 | `c4137b6ce5a2e9b8` | - |
+| `scripts/write_results.py` | 113,096 | `b7dc015b0d85537a` | - |
 
 ### 20.4 Statements tested before they were written
 
@@ -1972,6 +1988,7 @@ Each of these is something the text says in words. The script tested it against 
 - the copy in `70_share/odisha_forest_decision_layer/` was made from the layer that is in `60_layer/`; its two files are the layer's without the development index of 2011, which neither names; its three files are the ones its record describes and it holds no other; and the check that opened it in Chrome was made on those files and passed every step
 - the field left out of the copy is `adi_2011`, its value was taken from the row of every unit, and `60_layer/data.js` still has it
 - what the copy's control said when ticked is the layer's own sentence for a file that is not beside the page
+- the copy on disk is the one the public site serves: the check of the live site passed every check on this build, the three files it fetched are byte for byte those on disk, and the copy's README gives the site's address and no longer says that terms are not agreed
 - an exported row carries district, unit id, unit type, window, tier label, tier definition, the tier order in use and whether it was changed, what orders units within a tier, the six hectare figures, corroboration with its window, the outside-village flag and the build time
 - the export has the same columns in WebKit as in Chrome, and in the second list as in the first
 - in Chrome the exported file was saved by the browser, read back from disk, and equal to the text the page made (export)
@@ -2018,7 +2035,8 @@ Each of these is something the text says in words. The script tested it against 
 - the map library embedded in the page ignores a mouse-down on a map that still marks a zoom as under way
 - the four tracked files that existed before and were changed have lines added and none removed
 - of the files that existed before the decision view, the only ones modified are the four of code and data that were added to, documents the owner ordered brought up to date, and the script that writes one of those documents; none is deleted or renamed
-- if the results script is changed, the change is the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged
+- if the results script is changed, it carries the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged
+- what is said of the results script's later changes follows the script on disk: whether it has the fourth stage's section and chooses an interpreter for each verifier
 - the three unchanged scripts of the regression gate that were run are as committed
 - no file of `00_raw/` that is in the last commit was edited: the manifest, if it differs from that commit, has rows appended to it and every committed byte in place
 - every stage table the layer of 7 October 2026 was built from goes into today's layer with the same sha256
@@ -2184,4 +2202,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*352 figures and 22 tables (699 cells) from 73 files; 238 statements tested; 153 totals compared. Written 2026-10-10T15:39:32Z by `scripts/write_decision_layer.py` (sha256 `3ecf5cbf963e7007`), with the reading functions of `scripts/write_results.py` (sha256 `c4137b6ce5a2e9b8`).*
+*356 figures and 22 tables (699 cells) from 75 files; 240 statements tested; 153 totals compared. Written 2026-10-10T20:13:52Z by `scripts/write_decision_layer.py` (sha256 `1e986d2889c602c8`), with the reading functions of `scripts/write_results.py` (sha256 `b7dc015b0d85537a`).*

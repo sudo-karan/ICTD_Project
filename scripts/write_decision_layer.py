@@ -113,6 +113,7 @@ def main():
     SH = "55_decision/condition_share.csv"
     GATE = "55_decision/rename_gate.json"
     SHARE_REC, SHARE_EX = "70_share/share.provenance.json", "70_share/exercise_share_chrome.json"
+    SITE, SITE_CHECK = "70_share/pages_publication.json", "70_share/pages_live_check.json"   # the copy as published by the owner (11 October 2026), and the check of the live site
     PAGE_DATA = W.use("60_layer/data.js").read_text(encoding="utf-8")
     LAYER_DATA = json.loads(PAGE_DATA[PAGE_DATA.index("{"):PAGE_DATA.rindex("}") + 1])
     ABOUT_PLAIN = " ".join(re.sub(r"<[^>]+>", "", LAYER_DATA["about_html"]).split())
@@ -1614,7 +1615,7 @@ the About text that speak of it ({share_cut_values} units' values; the copy's `d
 shorter than the layer's). The script first writes the layer's `data.js` out again untouched and stops unless that
 gives back the layer's own bytes, so what was not taken out is the layer's. The README says how to open the copy,
 what it is and is not, that the map overlay and the development index are not in it, whose data it draws on
-({share_credits} rows, read from the copy's own list of sources) and that terms for passing it on are not yet agreed.
+({share_credits} rows, read from the copy's own list of sources) and where the copy is published.
 The page in the copy is the layer's page less the one cell of the ranked list that printed the index, so its box
 "Site-level overlay" is still there. `scripts/exercise_share.py` opened the copy from disk in Chrome
 ({share_browser}): {share_steps} of {share_steps} steps did what they should. It holds the two files against
@@ -1627,6 +1628,16 @@ the point of the copy; nothing else was logged. **Which checks of the copy chang
 the script and the gate each held the copy's two files byte for byte against `60_layer/`'s; that comparison cannot
 hold once the index is out, and each now holds them against the layer's files under the rule above. `60_layer/` is
 unchanged and keeps the index (§10).
+
+**The copy is published.** On 11 October 2026 the owner decided to publish it, without a password, at
+{pages_address}: GitHub Pages, from the branch `gh-pages` of the public repository (commit `{pages_commit}`), which
+holds the copy's three files and an empty `.nojekyll` and no other file of the repository. Until that day the copy's
+README said that terms for passing it on were not yet agreed and asked that it not be published; it now gives the
+address, and says that each source keeps its own licence. `scripts/check_pages_live.py` fetched the three files from
+the site and opened it in Chrome ({pages_checked}): {pages_checks} of {pages_checks} checks passed. The bytes the site
+serves are the build's; the map draws every unit; the page logs no script error; and every request goes to the
+site's own host. The browser's own request for an icon, which the site does not have, is refused, and the check
+records it.
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew {ov_drawn_chrome} tiles of
 {ov_asked_chrome} asked for, from the registered host and no other (one address asked for: `{ov_example}`), with the
@@ -1679,6 +1690,16 @@ Chrome's alone (§16).
     show("share_browser", key(SHARE_EX, "browser"), txt)
     show("share_zip_mb", key(SHARE_REC, "the_copy/zip/bytes"), W.mb)
     show("share_credits", key(SHARE_REC, "checks_passed/credits_read_from_the_layers_own_sources"), n0)
+    show("pages_address", key(SITE, "address"), txt)
+    show("pages_commit", V(key(SITE, "gh_pages_commit_when_checked").v[:12], SITE, "key `gh_pages_commit_when_checked`, its first twelve characters"), txt)
+    show("pages_checks", key(SITE_CHECK, "checks_made"), n0)
+    show("pages_checked", key(SITE_CHECK, "run_utc"), txt)
+    hold(key(SITE_CHECK, "passed").v is True and key(SITE_CHECK, "checks_passed").v == key(SITE_CHECK, "checks_made").v
+         and key(SITE_CHECK, "copy_run_utc").v == key(SHARE_REC, "run_utc").v and key(SITE, "live_check/run_utc").v == key(SITE_CHECK, "run_utc").v
+         and all(f_["as_recorded"] and f_["sha256"] == W.sha256(W.use(f"70_share/odisha_forest_decision_layer/{f_['file']}")) for f_ in key(SITE_CHECK, "files_as_served").v)
+         and key(SITE, "address").v in W.use("70_share/odisha_forest_decision_layer/README.txt").read_text(encoding="utf-8")
+         and "not yet agreed" not in W.use("70_share/odisha_forest_decision_layer/README.txt").read_text(encoding="utf-8"),
+         "the copy on disk is the one the public site serves: the check of the live site passed every check on this build, the three files it fetched are byte for byte those on disk, and the copy's README gives the site's address and no longer says that terms are not agreed")
 
     # ==== 15. where the window is named; the export ================================================================================================
     ecols = key(EDC, "summary/export/columns").v
@@ -1957,7 +1978,12 @@ to carry the window, the export button is off.
     show("rs_removed", V(int(rs_num[1]) if rs_changed else 0, GIT_RS, "lines removed"), n0)
     rs_text = W.use(RESULTS_SCRIPT).read_text(encoding="utf-8")
     hold((not rs_changed) or ("with ONE EXCEPTION" in rs_text and "checks_not_run_in_this_pass" in rs_text and "The Chrome and WebKit records must still be of the build on disk: that rule is unchanged." in rs_text),
-         "if the results script is changed, the change is the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged")
+         "if the results script is changed, it carries the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged")
+    rs_stage4 = "## 14. Stage 4: need against allocation" in rs_text and "def interpreter_for(script)" in rs_text
+    rs_since = ("Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each "
+                "verifier with the interpreter of its stage. With both changes the script has {rs_added} lines added and {rs_removed} removed since that commit."
+                if rs_stage4 else "The script has {rs_added} lines added and {rs_removed} removed since that commit.")
+    hold(rs_stage4 == ("fourth stage has changed" in rs_since), "what is said of the results script's later changes follows the script on disk: whether it has the fourth stage's section and chooses an interpreter for each verifier")
     hold(all(checks_run[k_]["file_is_as_committed"] is True for k_ in ("verify_layer", "exercise_layer in Chrome", "exercise_layer in WebKit")), "the three unchanged scripts of the regression gate that were run are as committed")
     docs_changed = [d_ for d_ in DOCS_ORDERED if d_ in changed]
     raw_changed = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-status", "HEAD", "--", "00_raw"], capture_output=True, text=True).stdout.split("\n")
@@ -2062,12 +2088,12 @@ it in a browser, are as they stood on {runner_day}.
   *The lines added to `.gitignore` keep fetched files and stage outputs out of git; those added to the manifest are
   the rows of §13 and §14.* The only other files that existed then and are modified are documents the owner ordered
   brought up to date on 9 October 2026: {docs_changed}; and the script that writes one of them. **`scripts/write_results.py`
-  was changed, by the owner's choice of 9 October 2026, in one rule** ({rs_added} lines added, {rs_removed} removed since that
-  commit): it refused to write `docs/RESULTS.md` unless the record of the check in the Safari application was of the
-  layer on disk; it now allows that record to be of an earlier build when the runner's record of this build names the
-  check as left out with a reason, and then says so in the text. Its rule for the Chrome and WebKit records is
-  unchanged. The unchanged check scripts that were run are as committed (the runner's record says so of each); and no
-  file of `10_units/` to `50_gap/` was written.
+  was changed, by the owner's choice of 9 October 2026, in one rule**: it refused to write `docs/RESULTS.md` unless
+  the record of the check in the Safari application was of the layer on disk; it now allows that record to be of an
+  earlier build when the runner's record of this build names the check as left out with a reason, and then says so in
+  the text. Its rule for the Chrome and WebKit records is unchanged. """ + rs_since + """ The unchanged check scripts
+  that were run are as committed (the runner's record says so of each); and the decision view's build wrote no file
+  of `10_units/` to `40_allocation/`. `50_gap/` is the fourth stage's and was built after it (`docs/GAP.md`).
 - **What did change for an existing view**, and the owner accepted (§17): a heading and one line, the decision view's
   switch, stand above the list of layers; and every unit's panel ends with the block "why this tier". The decision
   view's other controls stay folded away, its radio button is a group of its own so that the keyboard moves through
@@ -2204,9 +2230,9 @@ he asked.
 - **Whether Scheduled Tribe share appears in a list they pass on** (§10).
 
 Until these are settled a tier is a starting point for a conversation with the Foundation and not a recommendation.
-Two things are open that are not the Foundation's and that the owner knows of: the two points of the tile provider's
-terms (§14), which is why the copy made to be passed on has no overlay; and the terms on which that copy may be
-passed on, which are not yet agreed and which its README says are not.
+One thing is open that is not the Foundation's and that the owner knows of: the two points of the tile provider's
+terms (§14), which is why the copy made to be passed on has no overlay. The terms on which that copy is passed on
+were open until 11 October 2026, when the owner decided to publish it (§14); its README says so.
 
 ### 17.3 Changed on 10 October 2026, with the instruction that opened stage 4
 

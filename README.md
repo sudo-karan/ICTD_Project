@@ -221,6 +221,7 @@ transformation writes into a numbered folder. That is what makes the methods sec
 | `run_decision_checks.py` | runs both verifiers and the browser checks one at a time and writes down every run, a failed one included (`60_layer/decision_runs.json`). |
 | `07_build_share.py` | the copy made to be passed on, `70_share/odisha_forest_decision_layer/`: the layer's two files without `overlay.js` and, since 10 October 2026, without the development index of 2011 (`adi_2011` and everything that displays it; `60_layer/` keeps it), a README (how to open it, what it is and is not, what is left out, credits, that terms for passing it on are not yet agreed) and a zip beside the folder. |
 | `exercise_share.py` | the gate on that copy: its two files held against `60_layer/`'s under the rule "the layer's without the development index and nothing else", the index's id and names looked for in both, and the copy opened from disk in Chrome - its overlay control says its file is not beside the page, the page asks the network for nothing, and the ranked list, a unit's panel, the list of layers and the two text panels show the index nowhere. |
+| `check_pages_live.py` | check; publishes nothing. The copy as the owner publishes it (https://sudo-karan.github.io/ICTD_Project/, since 11 October 2026): the three files the site serves against the build's bytes and SHA-256, and the page opened in headless Chrome (every unit drawn, no script error, every request to the site's own host). Writes `70_share/pages_live_check.json` and `70_share/pages_publication.json` |
 | `write_decision_layer.py` | writes `docs/DECISION_LAYER.md` with the reading functions and the gates of `write_results.py`: no figure is typed. |
 
 ---
@@ -521,7 +522,8 @@ account; the figures are there and are not repeated here. What must not be lost:
 - **The map overlay is the one thing that can ask the network for anything**, it is off unless ticked, and its code is
   a third file. **The copy to pass on is `70_share/odisha_forest_decision_layer/`** (a zip of it lies beside it),
   **which leaves that file out** and, since 10 October 2026, the development index of 2011 as well: no file that is
-  passed on carries `adi_2011` for a unit, while `60_layer/` keeps it. Terms for passing it on are not yet agreed.
+  passed on carries `adi_2011` for a unit, while `60_layer/` keeps it. Since 11 October 2026 the owner publishes that
+  copy at https://sudo-karan.github.io/ICTD_Project/ (`scripts/check_pages_live.py` checks the live site against the build).
 - **Rebuild** with `scripts/05_build_decision.py`, `scripts/05_check_rename.py`, `scripts/06_build_layer.py`,
   `scripts/run_decision_checks.py`, `scripts/07_build_share.py`, `scripts/exercise_share.py`, then
   `scripts/write_decision_layer.py`.

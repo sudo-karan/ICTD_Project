@@ -33,8 +33,11 @@ Out     70_share/ and nowhere else:
         run's record is not among the files passed on.)
 
 README.txt says how to open the copy, what it is and is not, that the map overlay is not in it, whose data it draws on
-(the rows of the layer's own "Sources and licences", read from data.js, not typed here), and that terms for passing it on
-are not yet agreed. Every figure in it is read from data.js.
+(the rows of the layer's own "Sources and licences", read from data.js, not typed here), and how it is passed on: since
+11 October 2026 the copy is published by the project owner at `PUBLISHED_AT`, each source under its own licence. (Until
+that day the README said that terms for passing the copy on were not yet agreed and asked that it not be passed on or
+published; the owner decided to publish it, and that paragraph was reworded in the words he approved.) Every figure in it
+is read from data.js.
 
 What is checked here, and the run stops (nothing left in place) if one fails:
   - the two files in 60_layer/ are the ones the layer's run record describes (sha256);
@@ -56,6 +59,8 @@ SRC, OUT = ROOT / "60_layer", ROOT / "70_share"
 NAME = "odisha_forest_decision_layer"
 sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
 wrap = lambda s, width=96: "\n".join(__import__("textwrap").wrap(s, width))
+PUBLISHED_AT = "https://sudo-karan.github.io/ICTD_Project/"   # where the owner publishes the copy (his decision of 11 October 2026)
+PUBLISHED_ON = "11 October 2026"
 
 
 def stop(m):
@@ -197,8 +202,8 @@ def main():
                                                            "and as a column of the ranked list. The index is left out of this copy on purpose, with its value for every unit: no file that is passed on "
                                                            "carries it. Apart from that, and from the map overlay's file, the copy's two files are the layer's own."),
         "CREDITS AND LICENCES (the rows of the page's own 'Sources and licences')\n" + "\n".join(wrap(f"- {a}: {b}. Licence or terms: {c}") for a, b, c in credits),
-        "PASSING IT ON\n" + wrap("Terms for passing this copy on are not yet agreed. Please do not pass it on or publish it until they are. The unit boundaries in data.js are a database derived from "
-                                 "DataMeet's and are under the Open Database Licence (ODbL 1.0); the other credits are above."),
+        "PASSING IT ON\n" + wrap(f"This copy is published by the project owner at {PUBLISHED_AT} ({PUBLISHED_ON}). Each source keeps its own licence, listed above; the unit boundaries in data.js are a "
+                                 "database derived from DataMeet's and are under the Open Database Licence (ODbL 1.0)."),
         "THIS COPY\n" + f"Made {started} (UTC) by scripts/07_build_share.py from the layer built {L['run_utc']}: that layer's two files without the development index.\n"
         + "\n".join(f"  {f}  {len(made[f]):,} bytes  sha256 {hashlib.sha256(made[f]).hexdigest()}" for f in ("index.html", "data.js")),
     ]) + "\n"
@@ -253,7 +258,7 @@ def main():
                                                  bytes_shorter_than_the_layers={f: len(full[f].encode("utf-8")) - len(made[f]) for f in ("index.html", "data.js")}),
               "left_out_on_purpose": {"file": "60_layer/overlay.js", "why": "two points of the tile provider's terms of use are unresolved (docs/DECISION_LAYER.md); the copy that is passed on asks the network for nothing"},
               "what_the_page_says_when_the_overlay_is_ticked_in_the_copy": DV["overlay"]["missing"],
-              "terms_for_passing_it_on": "not yet agreed; the README says so",
+              "terms_for_passing_it_on": f"published by the project owner at {PUBLISHED_AT} (his decision of {PUBLISHED_ON}); each source keeps its own licence; the README says so",
               "not_checked_here": "that a browser opens the copy, shows that message and asks the network for nothing: scripts/exercise_share.py"}
     (TMP / "share.provenance.json").write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     for old in (OUT / NAME, OUT / (NAME + ".zip"), OUT / "share.provenance.json"):

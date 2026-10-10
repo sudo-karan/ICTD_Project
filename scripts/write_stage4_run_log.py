@@ -352,6 +352,71 @@ def cells_that_differ(a: Path, b: Path) -> str:
     return str(sum(1 for x, y in zip(ra, rb) for k in x if x[k] != y[k]))
 
 
+# The owner's handoff of 11 October 2026 set seven steps, 0 to 6. A step is listed as done here once its commit is made;
+# the list is typed, and is the one place to change when a step closes.
+HANDOFF_STEPS = [
+    (0, "publish the shared copy to GitHub Pages", True, """
+The copy of the layer that is made to be passed on is published, by the owner's decision, at the address below. It was
+pushed by his own script to the branch `gh-pages` of the public repository: the copy's three files and an empty
+`.nojekyll`, built as a commit in a temporary folder. No branch of this repository was pushed.
+
+**One thing was put to the owner before the push, and changed by his answer.** The copy's README ended by saying that
+terms for passing the copy on were not yet agreed, and asked that it not be passed on or published. He chose to have
+that paragraph reworded, in words he approved, before publishing: it now gives the site's address and says that each
+source keeps its own licence. `scripts/07_build_share.py` was changed in that paragraph and in nothing else the copy
+carries; the copy was built again (its `index.html` and `data.js` are byte for byte what they were); the gate on the
+copy was run again in Chrome and passed every step; then his script was run.
+
+GitHub had switched Pages on by itself when the branch arrived, with the branch as its source; the source was set
+again as instructed. `scripts/check_pages_live.py` (new, main environment) then checked the live site: the table
+below. The browser asks every site for an icon by itself and this site has none; that request is refused, the
+browser logs it, and the check holds that this is the only line in the browser's log. No script error was logged.
+
+The documents that said the terms were not yet agreed were brought up to date in the same commit:
+`docs/DATA_NOTES.md`, `README.md`, and, through their writers, `docs/DECISION_LAYER.md` and `docs/LAYER.md`. Two
+sentences of `docs/DECISION_LAYER.md` that the fourth stage had overtaken were corrected with them: how
+`scripts/write_results.py` has changed since the decision view was built, and which stage folders that build wrote.
+"""),
+    (1, "fix the input listing and rebuild", False, ""),
+    (2, "Phase 5b: the need read against the Forest Survey's own figures", False, ""),
+    (3, "finish Phase 6", False, ""),
+    (4, "Phase 7", False, ""),
+    (5, "Phase 8, with the additions to the account of the stage", False, ""),
+    (6, "the decision view in WebKit, with the machine awake", False, ""),
+]
+
+
+def publication() -> list[str]:
+    """Step 0 of the handoff, from the two records of the published copy."""
+    pub, chk = ROOT / "70_share" / "pages_publication.json", ROOT / "70_share" / "pages_live_check.json"
+    if not (pub.exists() and chk.exists()):
+        return []
+    p, c = json.loads(pub.read_text(encoding="utf-8")), json.loads(chk.read_text(encoding="utf-8"))
+    out = [f"- the site: {p['address']}", f"- the commit at the head of `{p['branch']}` when it was checked: `{p['gh_pages_commit_when_checked']}`",
+           f"- the copy: built {p['copy_built_utc']} from the layer built {p['layer_built_utc']}",
+           f"- the check of the live site (`scripts/check_pages_live.py`, run {c['run_utc']}): {c['checks_passed']} of {c['checks_made']} checks passed", "",
+           "| check | expected | found | pass |", "|---|---|---|---|"]
+    out += [f"| {esc(x['check'])} | {esc(x['expected'])} | {esc(x['found'])} | {'yes' if x['pass'] else 'NO'} |" for x in c["checks"]]
+    return out + ["", "*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*", ""]
+
+
+def handoff() -> list[str]:
+    out = ["## The owner's handoff of 11 October 2026", "",
+           "The run was taken up again on 11 October 2026 under a note from the owner "
+           "(`.session_scratch_2026-10-05/handoff/2026-10-11_finish_stage4.md`, not in git). It ruled on what was open "
+           "(one round of review of the verifier's parts and no more; `docs/LAYER.md` to be written again; H9 stays, as a "
+           "sensitivity; `scripts/layer_overlay.json` stays as it is) and set seven steps. Each ends in a commit.", "",
+           "| step | what | state |", "|---|---|---|"]
+    out += [f"| {n} | {what} | {'done' if done else 'not yet'} |" for n, what, done, _ in HANDOFF_STEPS]
+    out.append("")
+    for n, what, done, notes in HANDOFF_STEPS:
+        if done and notes.strip():
+            out += [f"### Step {n}: {what}", "", notes.strip(), ""]
+            if n == 0:
+                out += publication()
+    return out
+
+
 def corrections(prov: dict) -> list[str]:
     """What the owner corrected on the evening of 10 October 2026, and each output of the stage as it was built before
     the corrections set beside the same output as it is now: by its bytes, from the two provenance records, and, for a
@@ -386,8 +451,9 @@ def corrections(prov: dict) -> list[str]:
 
 # Shown at the head of the log for as long as Phase 6 has no gate table. It is typed, and carries no figure of the analysis.
 STOPPED_IN_PHASE_6 = """
-**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026.** Phases 0 to 5 and
-the owner's corrections are committed. What is not:
+**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026**, and taken up again
+the same day under his handoff (the next section). Phases 0 to 5 and the owner's corrections are committed. What was
+not, at the stop:
 
 - **Phase 6, the verifier, is not finished.** `scripts/verify_gap.py` does not exist yet. Its parts are written and
   every one runs on the tables, but the review of each part by a second agent was stopped part-way, so no reviewer
@@ -546,6 +612,7 @@ def main() -> None:
                 "the section \"To rebuild\" at the end gives the order.", ""]
         if not (GAP / "gates_phase6.csv").exists():
             doc += [STOPPED_IN_PHASE_6.strip(), ""]
+        doc += handoff()
     for number, title, gate_files, steps, notes in done:
         doc += [f"## Phase {number}: {title}", "", notes.strip(), ""]
         for g in gate_files:

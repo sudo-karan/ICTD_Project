@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T19:28:15Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T20:15:24Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -8,8 +8,9 @@ Phases written up below: 0, 1, 2, 3, 4, 5. The last is Phase 5, forest rights, a
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
-**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026.** Phases 0 to 5 and
-the owner's corrections are committed. What is not:
+**The run was stopped in Phase 6, at the owner's request, in the first hour of 11 October 2026**, and taken up again
+the same day under his handoff (the next section). Phases 0 to 5 and the owner's corrections are committed. What was
+not, at the stop:
 
 - **Phase 6, the verifier, is not finished.** `scripts/verify_gap.py` does not exist yet. Its parts are written and
   every one runs on the tables, but the review of each part by a second agent was stopped part-way, so no reviewer
@@ -25,6 +26,62 @@ the owner's corrections are committed. What is not:
 The scripts of those three phases are in the working tree, uncommitted. The working detail a fresh session needs
 (where the verifier's parts are kept, the state of each at the stop, the order of what is left) is in
 `.session_scratch_2026-10-05/IN_FLIGHT.md`, which is not in git.
+
+## The owner's handoff of 11 October 2026
+
+The run was taken up again on 11 October 2026 under a note from the owner (`.session_scratch_2026-10-05/handoff/2026-10-11_finish_stage4.md`, not in git). It ruled on what was open (one round of review of the verifier's parts and no more; `docs/LAYER.md` to be written again; H9 stays, as a sensitivity; `scripts/layer_overlay.json` stays as it is) and set seven steps. Each ends in a commit.
+
+| step | what | state |
+|---|---|---|
+| 0 | publish the shared copy to GitHub Pages | done |
+| 1 | fix the input listing and rebuild | not yet |
+| 2 | Phase 5b: the need read against the Forest Survey's own figures | not yet |
+| 3 | finish Phase 6 | not yet |
+| 4 | Phase 7 | not yet |
+| 5 | Phase 8, with the additions to the account of the stage | not yet |
+| 6 | the decision view in WebKit, with the machine awake | not yet |
+
+### Step 0: publish the shared copy to GitHub Pages
+
+The copy of the layer that is made to be passed on is published, by the owner's decision, at the address below. It was
+pushed by his own script to the branch `gh-pages` of the public repository: the copy's three files and an empty
+`.nojekyll`, built as a commit in a temporary folder. No branch of this repository was pushed.
+
+**One thing was put to the owner before the push, and changed by his answer.** The copy's README ended by saying that
+terms for passing the copy on were not yet agreed, and asked that it not be passed on or published. He chose to have
+that paragraph reworded, in words he approved, before publishing: it now gives the site's address and says that each
+source keeps its own licence. `scripts/07_build_share.py` was changed in that paragraph and in nothing else the copy
+carries; the copy was built again (its `index.html` and `data.js` are byte for byte what they were); the gate on the
+copy was run again in Chrome and passed every step; then his script was run.
+
+GitHub had switched Pages on by itself when the branch arrived, with the branch as its source; the source was set
+again as instructed. `scripts/check_pages_live.py` (new, main environment) then checked the live site: the table
+below. The browser asks every site for an icon by itself and this site has none; that request is refused, the
+browser logs it, and the check holds that this is the only line in the browser's log. No script error was logged.
+
+The documents that said the terms were not yet agreed were brought up to date in the same commit:
+`docs/DATA_NOTES.md`, `README.md`, and, through their writers, `docs/DECISION_LAYER.md` and `docs/LAYER.md`. Two
+sentences of `docs/DECISION_LAYER.md` that the fourth stage had overtaken were corrected with them: how
+`scripts/write_results.py` has changed since the decision view was built, and which stage folders that build wrote.
+
+- the site: https://sudo-karan.github.io/ICTD_Project/
+- the commit at the head of `gh-pages` when it was checked: `907d0f905b3338c81c4bba00c2be5de0de3082d3`
+- the copy: built 2026-10-10T20:05:42Z from the layer built 2026-10-09T04:08:22Z
+- the check of the live site (`scripts/check_pages_live.py`, run 2026-10-10T20:09:31Z): 9 of 9 checks passed
+
+| check | expected | found | pass |
+|---|---|---|---|
+| the copy on disk is the build its provenance record describes (bytes and SHA-256 of its three files) | 3 of 3 | 3 of 3 | yes |
+| https://sudo-karan.github.io/ICTD_Project/index.html: the bytes and SHA-256 the site serves are those the provenance record gives for index.html | 205691 bytes, sha256 508144e070577a5e | HTTP 200; 205691 bytes, sha256 508144e070577a5e | yes |
+| https://sudo-karan.github.io/ICTD_Project/data.js: the bytes and SHA-256 the site serves are those the provenance record gives for data.js | 22066227 bytes, sha256 4df21a9f2c43845a | HTTP 200; 22066227 bytes, sha256 4df21a9f2c43845a | yes |
+| https://sudo-karan.github.io/ICTD_Project/README.txt: the bytes and SHA-256 the site serves are those the provenance record gives for README.txt | 7390 bytes, sha256 8cf3242e8c5978ad | HTTP 200; 7390 bytes, sha256 8cf3242e8c5978ad | yes |
+| https://sudo-karan.github.io/ICTD_Project/ opened in headless Chrome and became ready | ready | ready after 9.1 s, in Chrome/154.0.8037.99 | yes |
+| units in the page's data, and units drawn on the map | 11468 and 11468 | 11468 and 11468 | yes |
+| script errors the page logged (exceptions, console errors and warnings) | 0 | 0 | yes |
+| errors in the browser's own log, against the addresses asked for that the site answers with 404 (a browser asks every site for /favicon.ico by itself; the site has none) | none but one 'Failed to load resource' for each favicon.ico the site does not have | 1 line(s): log: Failed to load resource: the server responded with a status of 404 (); answered 404: https://sudo-karan.github.io/favicon.ico | yes |
+| requests the page made over http or https, and those of them that did not go to https://sudo-karan.github.io | at least one, and none elsewhere | 3 (/ICTD_Project/, /ICTD_Project/data.js, /favicon.ico); elsewhere: 0 | yes |
+
+*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -550,6 +607,7 @@ kept. Each part was then reviewed, attacked and brought up to date by a fresh ag
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `825898d` Stage 4: the run log, with where the run stopped (Phase 6 in progress)
 - `b80a6c3` Stage 4, the owner's corrections of 10 October: its own environment, requirements-stage4.txt, the forest villages list under his two checks
 - `d9c5130` Stage 4, Phase 5: forest rights, at the level the data allow
 - `957f3aa` Stage 4, Phase 4: the historical companion - units within districts

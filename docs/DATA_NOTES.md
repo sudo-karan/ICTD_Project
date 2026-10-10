@@ -197,8 +197,12 @@ should know before anything is sent:
   licence as the layer's own list of sources gives them.
 - **Scheduled Tribe share in a list that is passed on** is the Foundation's call (`docs/DECISION_LAYER.md` §17). It
   is in the exported list.
-- **Terms for passing the copy on are not yet agreed.** The README inside `70_share/odisha_forest_decision_layer/`
-  says so and asks that the copy not be passed on or published until they are.
+- **The copy is published.** On 11 October 2026 the project owner decided to publish it, without a password, at
+  https://sudo-karan.github.io/ICTD_Project/ (GitHub Pages, from the branch `gh-pages`, which holds the copy's three
+  files and no other file of the repository). The README inside `70_share/odisha_forest_decision_layer/` gives the
+  address and says that each source keeps its own licence; until that day it said that terms for passing the copy on
+  were not yet agreed and asked that it not be passed on or published. `scripts/check_pages_live.py` checks what the
+  site serves against the build; `70_share/pages_publication.json` records the commit and the check.
 
 Not decided here: whether the layer may be passed on by the Foundation to others, and under what statement.
 

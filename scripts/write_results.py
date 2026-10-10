@@ -249,10 +249,30 @@ def table(name, head, rows):
 VERIFIER_OUTPUT = {}                           # what each verifier printed, for a writer that holds a figure of its own against a line of it
 
 
+STAGE4_VERIFIERS = ("verify_gap.py",)           # these run with the stage-4 interpreter (README.md section 0); every other verifier with the main one
+
+
+def interpreter_for(script):
+    """The interpreter a verifier is run with. Stage 4 has an environment of its own, outside the repository
+    (`~/.venvs/ictd-stage4`, or where the variable ICTD_STAGE4_ENV says); the earlier stages' verifiers run in the
+    repository's main one (`.venv`, or the interpreter the variable ICTD_MAIN_PYTHON names). Whichever of the two is
+    running this script is used as it is; the other is looked for at its place, and the run stops if it is not there."""
+    import os
+    stage4_env = Path(os.environ.get("ICTD_STAGE4_ENV", Path.home() / ".venvs" / "ictd-stage4")).resolve()
+    here_is_stage4 = Path(sys.prefix).resolve() == stage4_env
+    if script in STAGE4_VERIFIERS:
+        py = Path(sys.executable) if here_is_stage4 else stage4_env / "bin" / "python"
+    else:
+        py = Path(os.environ.get("ICTD_MAIN_PYTHON", ROOT / ".venv" / "bin" / "python")) if here_is_stage4 else Path(sys.executable)
+    if not py.exists():
+        stop(f"scripts/{script} needs the interpreter {py}, which is not there (README.md section 0)")
+    return str(py)
+
+
 def verifier(script, draft):
     if draft:
         return V("not run for this draft", f"scripts/{script}", "not run")
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / script)], capture_output=True, text=True, cwd=ROOT)
+    r = subprocess.run([interpreter_for(script), str(ROOT / "scripts" / script)], capture_output=True, text=True, cwd=ROOT)
     VERIFIER_OUTPUT[script] = r.stdout
     lines = [l for l in r.stdout.strip().splitlines() if l.strip()]
     last = lines[-1] if lines else ""
@@ -315,7 +335,29 @@ def main():
     show("v_agreement", verifier("verify_agreement.py", a.draft), txt)
     show("v_layer", verifier("verify_layer.py", a.draft), txt)
     show("v_r620", verifier("verify_r620.py", a.draft), txt)
-    hold(not [p for p in (ROOT / "50_gap").glob("*") if p.name != ".gitkeep"] if (ROOT / "50_gap").exists() else True, "stage 4 is not built: `50_gap/` holds no output")
+    # Stage 4 (10 October 2026): built. Its account is docs/GAP.md; this document carries its three headline rows in a section of their own (14).
+    GS, GPM, GUM, GPROV = "50_gap/need_vs_allocation_summary.csv", "50_gap/panel_models.csv", "50_gap/unit_history_models.csv", "50_gap/gap.provenance.json"
+    GBUILDERS = ("08_gap_inputs", "08_build_gap_districts", "08_build_gap_panel", "08_build_gap_units", "08_build_gap_rights")
+    hold((ROOT / "docs" / "GAP.md").is_file() and all(J(GPROV)["steps"][k_]["gates"] == J(GPROV)["steps"][k_]["gates_passed"] > 0 for k_ in GBUILDERS),
+         "stage 4 is built: its tables are in `50_gap/`, every gate of its five builders passed, and its account is `docs/GAP.md`")
+    show("run_gap", V(J(GPROV)["steps"]["08_build_gap_districts"]["run_utc"], GPROV, "key `steps` → `08_build_gap_districts` → `run_utc`"), txt)
+    show("v_gap", verifier("verify_gap.py", a.draft), txt)
+    g = lambda col, **w: cell(GS, col, comparison="C1", **w)
+    show("g_districts", g("n_districts"), n0)
+    g_rho, g_lo, g_hi = show("g_c1_rho", g("rho"), dec(2)), show("g_c1_lo", g("ci95_lo"), dec(2)), show("g_c1_hi", g("ci95_hi"), dec(2))
+    show("g_c1_p", g("p_permutation"), dec(5))
+    show("g_c1_below", g("need_share_pct_where_r_below_0_5"), dec(1)); show("g_c1_below_n", g("n_districts_r_below_0_5"), n0)
+    show("g_c1_above", g("need_share_pct_where_r_above_2"), dec(1))
+    show("g_c1_gaps", g("sum_positive_gaps_lakh"), dec(2))
+    g_b1 = show("g_b1_rho", cell(GS, "rho", comparison="B1"), dec(2))
+    hold(g_lo.v > 0 and cell(GS, "ci95_lo", comparison="B1").v > 0, "stage 4, the headline comparison: the rank correlation of need with post-period plantation money is above zero, and so is the benchmark's with all expenditure")
+    gp = lambda col: cell(GPM, col, id="P1")
+    show("g_p1_b", gp("coefficient"), dec(3)); gp_lo, gp_hi = show("g_p1_lo", gp("wcb_ci95_lo"), dec(3)), show("g_p1_hi", gp("wcb_ci95_hi"), dec(3))
+    show("g_p1_p", gp("wcb_p"), dec(3)); show("g_p1_n", gp("n"), n0)
+    gh = lambda col: cell(GUM, col, id="H1")
+    show("g_h1_b", gh("coefficient"), dec(2)); gh_lo, gh_hi = show("g_h1_lo", gh("wcb_ci95_lo"), dec(2)), show("g_h1_hi", gh("wcb_ci95_hi"), dec(2))
+    show("g_h1_p", gh("wcb_p"), dec(3)); show("g_h1_n", gh("n_units"), n0); show("g_h1_exp", gh("n_exposed"), n0)
+    hold(gp_lo.v < 0 < gp_hi.v and gh_lo.v < 0 < gh_hi.v, "stage 4: the intervals of its panel headline and of its unit headline both include zero")
 
     n_units = show("n_units", key(U, "counts/units"), n0)
     n_lgd = show("n_lgd", key(U, "counts/lgd_panchayat_polygons"), n0)
@@ -362,10 +404,12 @@ it was written. The figures change only when the files do.*
 The project asks whether work under the rural employment guarantee (MGNREGA) in Odisha goes to the places where forest
 is degrading, and to the people who depend on it. To ask that, three things have to be measured on the same pieces of
 land: the condition of the forest (stage 1), social need (stage 2), and what the scheme spent (stage 3). Stage 0 builds
-the pieces of land, the *units*. A fourth stage would set the three beside one another.
+the pieces of land, the *units*. A fourth stage sets the three beside one another.
 
-**That fourth stage is not built.** The project owner is respecifying it. So this document reports measurements and the
-checks made on them. It holds no finding about whether spending follows need, and none should be read into it.
+**That fourth stage is built**, as the project owner specified it on 10 October 2026: districts for the headline,
+units only within districts. Its account is `docs/GAP.md`. The sections that follow report the measurements and the
+checks made on them, as they did before it was built; §14 gives the fourth stage's three headline rows. It describes
+where money went relative to where forest was lost, and it says nothing about why.
 
 | stage | main output | state | how it was checked |
 |---|---|---|---|
@@ -376,7 +420,7 @@ checks made on them. It holds no finding about whether spending follows need, an
 | forest: NIRv greenness trend | columns of `20_degradation/degradation_by_unit.csv` | **blank: the run was stopped, and it is not a measure** | replicated independently and found unfit (§6) |
 | need | `30_need/need_by_unit.csv` | built, {run_need} | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, {run_allocation} | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: {v_r620} (§8) |
-| the comparison of the three | `50_gap/` | **not built** | - |
+| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, {run_gap} | every figure of every table recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: {v_gap} (§14) |
 | map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, {run_layer} | `scripts/verify_layer.py`: {v_layer}; every control exercised in two browser engines, {safari_state} (§10) |
 
 Three statements carry most of what follows.
@@ -1220,8 +1264,9 @@ for discussion with people who know the places. It is not a verdict on any place
     DOC.append("""
 ## 11. Not built, and inputs still blank
 
-- **Stage 4, the comparison of forest condition, need and allocation, is not built.** The project owner is
-  respecifying it. `50_gap/` is empty.
+- **Stage 4, the comparison of forest condition, need and allocation, is no longer in this list**: it was built on
+  10 October 2026 (§14; `docs/GAP.md`). It costs no shortfall and controls for no remoteness, for the two reasons
+  given below.
 - **The pixel-by-pixel overlap of Hansen's loss with CoRE Stack's degradation is not run** (§5.5). It needs an Earth
   Engine job.
 - **The state-wide NIRv run is stopped and nothing is queued** (§6). Its columns are blank.
@@ -1346,8 +1391,42 @@ Collected from `docs/UNITS.md`, `docs/DEGRADATION.md`, `docs/NEED.md`, `docs/NRM
   (§10).
 """)
 
+    # ==== 14. stage 4: appended after the appendix, so that no earlier section changes its number ======================================
+    AFTER = ["""
+## 14. Stage 4: need against allocation
+
+*Added on 10 October 2026, after the section that says where every figure comes from, so that no section above changed
+its number. Its figures are listed in §13 with the others.*
+
+The fourth stage was built on 10 October 2026 as the project owner specified it that day. Its account is `docs/GAP.md`,
+written from the tables in `50_gap/` by `scripts/write_gap.py`; only its three headline rows are given here. **It
+describes where money went relative to where forest was lost. It does not say why.**
+
+- **`C1`, the comparison across districts.** Need is the forest loss of the years 2018 to 2025 in the units where loss is
+  recorded; allocation is plantation expenditure of FY2018-19 to FY2025-26 in the state report. Across {g_districts}
+  districts their rank correlation is {g_c1_rho} (`95 %` interval {g_c1_lo} to {g_c1_hi}; permutation p {g_c1_p}). Much
+  of that is district size: the same need against all the scheme's expenditure gives {g_b1_rho}. {g_c1_below} per cent
+  of the need lies in {g_c1_below_n} districts whose share of the money is under half their share of the need, and
+  {g_c1_above} per cent in districts with more than twice their share. The same money distributed by need would move
+  {g_c1_gaps} lakh rupees; that is not a requirement.
+- **`P1`, the district-year panel.** Within a district and a period, plantation's share of the district's expenditure
+  against the forest loss of the year before: {g_p1_b} percentage points for every `100 ha` (wild-cluster-bootstrap
+  interval {g_p1_lo} to {g_p1_hi}; p {g_p1_p}; {g_p1_n} district-years). The interval includes zero.
+- **`H1`, units within districts.** Units that had forest-named works by FY2017-18 against units of the same district
+  that had none, given their forest and their earlier loss: {g_h1_b} percentage points of the forest at the start of
+  2018 lost in the years 2018 to 2025 (interval {g_h1_lo} to {g_h1_hi}; p {g_h1_p}; {g_h1_n} units, {g_h1_exp} of them
+  with such works). The interval includes zero. It is an association: planners sited the works.
+
+`scripts/verify_gap.py`, which imports nothing from the scripts that built the tables, recomputed every figure of
+every table of the stage: {v_gap}.
+
+**What this changes in the sections above.** §11 says forest-rights titles are in no stage. The fourth stage sets the
+state's district table of community titles beside need (`docs/GAP.md` §10); it still joins no title to a unit, since
+titles are not mapped. §9 says its finding stands whatever stage 4 turns out to be: it does, and the fourth stage
+counts how much of the need lies on outside-village land.
+"""]
     # ==== gates, then the appendix =======================================================================================================
-    body = "".join(DOC)
+    body = "".join(DOC) + "".join(AFTER)
     bad = stray_digits(body)
     if bad:
         stop("the text carries digits of its own:\n  " + "\n  ".join(bad[:25]))
@@ -1357,7 +1436,8 @@ Collected from `docs/UNITS.md`, `docs/DEGRADATION.md`, `docs/NEED.md`, `docs/NRM
         stop("printed but not defined: " + ", ".join(sorted(set(asked) - known)))
     if known - set(asked):
         stop("defined but not printed: " + ", ".join(sorted(known - set(asked))))
-    text = body.format_map({**{k: v["text"] for k, v in FIG.items()}, **{k: v["md"] for k, v in TABLES.items()}})
+    filled = {**{k: v["text"] for k, v in FIG.items()}, **{k: v["md"] for k, v in TABLES.items()}}
+    text, after = "".join(DOC).format_map(filled), "".join(AFTER).format_map(filled)
 
     def mark(path):
         return f"`{path}`" + (" *(working file)*" if path.startswith(SCRATCH) else "")
@@ -1401,8 +1481,8 @@ Collected from `docs/UNITS.md`, `docs/DEGRADATION.md`, `docs/NEED.md`, `docs/NRM
             f"Written {written} by `scripts/write_results.py` (sha256 `{sha256(__file__)[:16]}`).*\n"]
     out = Path(a.draft) if a.draft else OUT
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(text + "\n".join(app), encoding="utf-8")
-    print(f"{out}: {len(text.splitlines()) + len(app):,} lines; {len([k for k in order if k in FIG])} figures, {len(TABLES)} tables ({sum(t['cells'] for t in TABLES.values())} cells), {len(FILES)} files read; "
+    out.write_text(text + "\n".join(app) + after, encoding="utf-8")
+    print(f"{out}: {len(text.splitlines()) + len(app) + len(after.splitlines()):,} lines; {len([k for k in order if k in FIG])} figures, {len(TABLES)} tables ({sum(t['cells'] for t in TABLES.values())} cells), {len(FILES)} files read; "
           f"{len(HELD)} statements tested, {len(SAME)} totals compared; verifiers {'NOT run (draft)' if a.draft else 'run'}")
 
 
