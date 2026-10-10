@@ -101,6 +101,34 @@ the shell from then on, and nothing that needs the network was attempted; the re
 **What comes next.** Phase 2: district need against district allocation (`scripts/08_build_gap_districts.py`).
 """),
     (2, "the headline, district need against district allocation", ["gates_phase2.csv"], ["08_build_gap_districts"], """
+**What was done.** `scripts/08_build_gap_districts.py` built need, allocation and marginalisation for each district,
+the comparisons the instruction fixed (C1 the headline), the splits by Scheduled Tribe class and by tercile, and the
+table of what more is needed, with the cost at the VGPP rate present and blank. Every column is defined in the
+script's docstring. The results are not repeated in this log: they are in `50_gap/need_vs_allocation_summary.csv` and
+will be written into `docs/GAP.md` by its writer.
+
+**Calls made in the run, each to be listed in `docs/GAP.md` as a proposal the owner can overrule.**
+
+- **The rule for C7.** The instruction gave two branches: a zone recorded for every unit, or only for the units the
+  agreement compared. Neither holds to the letter. The repository records the zone model for every unit that has land
+  the CoRE Stack classes on canopy above ten per cent, and the hectares under each model for every unit; the units
+  with no zone model carry no N1 at all (a gate). So the first branch can be decided for every district, and it was
+  used: a district is left out, need and money together, where units wholly under the East Coast model hold more than
+  half of its N1. A district with no N1 stays in. The gate table lists the districts, and those the other reading
+  would leave out; that other reading is computed too, as `C7b`, and is not one of the fixed comparisons.
+- **The direction of the development index.** `docs/DATA_NOTES.md` does not state it. `docs/NEED.md` says the index is
+  the sum of five indicators each ranked from one to three, and the group's data dictionary in `00_raw/docs/` says the
+  ranks run from low to advance. The builder reads both sentences and stops if either is gone. The ADI columns and
+  splits are therefore in.
+- **The index's source and licence line.** `docs/DATA_NOTES.md` gives no single line for `adi_2011`; it gives the
+  judgement that the index is computed from census rows although its documentation mentions SHRUG's keys. The line
+  carried with every district-level result built from the index is the row of the layer's own list of sources, and
+  the builder holds it against that sentence of `docs/DATA_NOTES.md`.
+- **Scheduled Tribe classes.** The layer's rule is not a function of its own: the builder calls the layer builder's
+  helper `classify` and repeats the one expression around it. A gate holds that this gives, for every LGD unit that
+  has a share, the class the layer shows for that unit.
+- **Scheduled Caste terciles** are in: `30_need` carries the population.
+
 **What comes next.** Phase 3: the district-year panel (`scripts/08_build_gap_panel.py`).
 """),
     (3, "the district-year panel", ["gates_phase3.csv"], ["08_build_gap_panel"], """

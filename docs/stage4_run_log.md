@@ -1,10 +1,10 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T15:40:56Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-10T15:43:48Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
-Phases written up below: 0, 1. The last is Phase 1, the five leftovers. Every gate of every phase listed passed.
+Phases written up below: 0, 1, 2. The last is Phase 2, the headline, district need against district allocation. Every gate of every phase listed passed.
 
 The stage outputs (`50_gap/`, `figures/stage4/`) are not in git. If they are missing, rebuild them: the section "To rebuild" at the end gives the order.
 
@@ -222,10 +222,90 @@ the shell from then on, and nothing that needs the network was attempted; the re
 
 *25 of 25 gates passed (`50_gap/gates_phase1.csv`).*
 
+## Phase 2: the headline, district need against district allocation
+
+**What was done.** `scripts/08_build_gap_districts.py` built need, allocation and marginalisation for each district,
+the comparisons the instruction fixed (C1 the headline), the splits by Scheduled Tribe class and by tercile, and the
+table of what more is needed, with the cost at the VGPP rate present and blank. Every column is defined in the
+script's docstring. The results are not repeated in this log: they are in `50_gap/need_vs_allocation_summary.csv` and
+will be written into `docs/GAP.md` by its writer.
+
+**Calls made in the run, each to be listed in `docs/GAP.md` as a proposal the owner can overrule.**
+
+- **The rule for C7.** The instruction gave two branches: a zone recorded for every unit, or only for the units the
+  agreement compared. Neither holds to the letter. The repository records the zone model for every unit that has land
+  the CoRE Stack classes on canopy above ten per cent, and the hectares under each model for every unit; the units
+  with no zone model carry no N1 at all (a gate). So the first branch can be decided for every district, and it was
+  used: a district is left out, need and money together, where units wholly under the East Coast model hold more than
+  half of its N1. A district with no N1 stays in. The gate table lists the districts, and those the other reading
+  would leave out; that other reading is computed too, as `C7b`, and is not one of the fixed comparisons.
+- **The direction of the development index.** `docs/DATA_NOTES.md` does not state it. `docs/NEED.md` says the index is
+  the sum of five indicators each ranked from one to three, and the group's data dictionary in `00_raw/docs/` says the
+  ranks run from low to advance. The builder reads both sentences and stops if either is gone. The ADI columns and
+  splits are therefore in.
+- **The index's source and licence line.** `docs/DATA_NOTES.md` gives no single line for `adi_2011`; it gives the
+  judgement that the index is computed from census rows although its documentation mentions SHRUG's keys. The line
+  carried with every district-level result built from the index is the row of the layer's own list of sources, and
+  the builder holds it against that sentence of `docs/DATA_NOTES.md`.
+- **Scheduled Tribe classes.** The layer's rule is not a function of its own: the builder calls the layer builder's
+  helper `classify` and repeats the one expression around it. A gate holds that this gives, for every LGD unit that
+  has a share, the class the layer shows for that unit.
+- **Scheduled Caste terciles** are in: `30_need` carries the population.
+
+**What comes next.** Phase 3: the district-year panel (`scripts/08_build_gap_panel.py`).
+
+### Gates
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| the Scheduled Tribe class rule used here gives, for every LGD unit that has a share, the class the layer shows for it (`class_st_share` of 60_layer/layer_by_unit.csv); units compared | 7853 | 7853 | yes |
+| the stamp R6.20 prints on the four pre-period tables | 10/10/2020 | 10/10/2020 | yes |
+| districts | 30 | 30 | yes |
+| N1, default window, summed over districts, ha (the three loss cells; within 2 of the owner's 89,657) | 89657 | 89657.2513 | yes |
+| forest loss 2018-2025 over all units, summed over districts, ha (within 1 of 90,028) | 90028 | 90028.4608 | yes |
+| N2, summed over districts, ha (within 1 of 293,921) | 293921 | 293921.0503 | yes |
+| N1 of LGD-unit land plus N1 of outside-village land equals N1, every district and window | yes | yes | yes |
+| r620_plantation_pre_lakh, summed over districts (the gate of step 0) | 151843.18 | 151843.18 | yes |
+| r620_plantation_post_lakh, summed over districts (the gate of step 0) | 13915.72 | 13915.72 | yes |
+| r620_plantation_part_year_lakh, summed over districts (the gate of step 0) | 110.58 | 110.58 | yes |
+| r620_nrm_pre_lakh, summed over districts (the gate of step 0) | 327829.94 | 327829.94 | yes |
+| r620_nrm_post_lakh, summed over districts (the gate of step 0) | 2334964.06 | 2334964.06 | yes |
+| r620_all_pre_lakh, summed over districts (the gate of step 0) | 750836.66 | 750836.66 | yes |
+| r620_all_post_lakh, summed over districts (the gate of step 0) | 3674731.26 | 3674731.26 | yes |
+| FY2018-19 as a per cent of post-period plantation expenditure (the owner's 53 per cent) | 53 | 53.07 | yes |
+| FY2018-19 plus FY2019-20 to 2025-26 equals the post period, every district | yes | yes | yes |
+| works of the dump that fall in no unit, crore rupees (the owner's 73.8) | 73.8 | 73.8 | yes |
+| forest-named expenditure on works started by FY2017-18 as a per cent of all such expenditure in units, a missing start year counted as not started by then (the decision layer's 92.9) | 92.9 | 92.9 | yes |
+| the dump's forest-named expenditure: by FY2017-18 + later + start year missing, summed over districts, equals the table's total | 1448602847.76 | 1448602847.76 | yes |
+| the pre-period plantation share of all expenditure, per cent (the owner's 20.2232) | 20.2232 | 20.2232 | yes |
+| that share applied to the post-period total, lakh (the owner's 743,148.16) | 743148.16 | 743148.16 | yes |
+| LGD population / Scheduled Tribe population, summed over districts | 34766888 / 8895006 | 34766888 / 8895006 | yes |
+| districts in each tercile of ADI | 10 / 10 / 10 | 10 / 10 / 10 | yes |
+| districts in each tercile of Scheduled Caste share | 10 / 10 / 10 | 10 / 10 / 10 | yes |
+| C7: districts left out (most of N1 in units wholly under the East Coast model) - listed, not a gate on a value | a list | Nayagarh, Khordha, Puri, Ganjam, Gajapati | yes |
+| the other reading of the rule: districts that hold the East Coast units the agreement headline left out - listed | a list | Baleshwar, Cuttack, Jajapur, Nayagarh, Khordha, Puri, Ganjam, Gajapati | yes |
+| N1 in units with no zone recorded, ha (so that the rule can be decided for every district) | 0 | 0 | yes |
+| units the agreement headline left out (assessed, wholly under the East Coast model), summed over districts | 468 | 468 | yes |
+| comparisons computed (the owner's thirteen and the second reading of C7) | 14 | 14 | yes |
+| plantation works, state, FY2016-17 / FY2025-26 (the gate of step 0) | 57135 / 4105 | 57135 / 4105 | yes |
+
+*30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
+
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T15:43:09Z)
+
+- `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
+- `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
+- `50_gap/need_vs_allocation.csv` (38,574 bytes, sha256 `4145eb19ecb474d0`)
+- `50_gap/need_vs_allocation_summary.csv` (5,018 bytes, sha256 `4e46a9cf7dd18c51`)
+- `50_gap/marginalisation_split.csv` (7,305 bytes, sha256 `df523c940c65776f`)
+- `50_gap/what_more.csv` (12,125 bytes, sha256 `c70bc6eb0d75b804`)
+- `50_gap/gates_phase2.csv` (3,247 bytes, sha256 `984723269ebd05b0`)
+
 ## Commits of this run, newest first
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `2287f4c` Stage 4, Phase 1: the five leftovers of the batch of 9 October cleared
 - `c9bece2` Stage 4, Phase 0: inputs listed, the district crosswalk, a district for every unit, and the gates on what is built
 
 ## To rebuild
