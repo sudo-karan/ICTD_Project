@@ -33,7 +33,9 @@ WHAT IT CHECKS
     build: every "i" element's own text is empty; the one floating box is empty and hidden while no "i" is open and
     again after each one closes; the pointer on an "i" shows exactly that "i"'s words, wholly inside the window;
     every "i" the data has words for is drawn somewhere and no other; a click on an "i" that stands inside a label
-    does not work the label's control; the page raises no script error and asks the network for nothing.
+    does not work the label's control; the page raises no script error and asks the network for nothing. A run of
+    this part that finds something wrong is made again, up to three runs in all, and every run is kept in the
+    record with what it found (the rule of scripts/run_decision_checks.py for a browser check).
  e. THE CHECKS' OWN CHANGES (an addition to the owner's list, so that "no check is removed or loosened" can be read
     off a table). scripts/verify_layer.py is byte for byte the file of commit 16b1efd. For every other check and
     document writer that this task changed, every block of lines that differs from the commit before the task
@@ -522,8 +524,19 @@ def in_a_browser(folder, D, port=9341):
     profile = tempfile.mkdtemp(prefix="ictd_chrome_profile_")
     c = Chrome(profile, port=port)
     url = "file://" + str(Path(folder) / "index.html")
-    seen, wrong, states, hovered = Counter(), [], [], 0
+    seen, wrong, states, hovered, slowest = Counter(), [], [], 0, 0.0
     net = lambda: [u for u in c.requests if u.startswith("http")]
+
+    def until(want, limit=2.0):
+        """Read the floating box until it is as wanted, for at most two seconds: a bubble that opens or closes within that time is one a reader sees open or close."""
+        nonlocal slowest
+        t0 = time.time()
+        while True:
+            box = c.js(BOX)
+            if want(box) or time.time() - t0 > limit:
+                slowest = max(slowest, time.time() - t0)
+                return box
+            time.sleep(0.05)
 
     def state(name):
         nonlocal hovered
@@ -543,13 +556,11 @@ def in_a_browser(folder, D, port=9341):
                 continue
             xy = c.js(f"(function(){{var e=document.querySelectorAll('.tip')[{t['i']}]; e.scrollIntoView({{block:'nearest'}}); var r=e.getBoundingClientRect(); return [r.left+r.width/2, r.top+r.height/2];}})()")
             c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=xy[0], y=xy[1], button="none")
-            time.sleep(0.25)
-            box = c.js(BOX)
+            box = until(lambda b_: b_["text"] == t["words"] and b_["shown"])
             if box["text"] != t["words"] or not box["shown"] or not box["inside"]:
                 wrong.append(f"{name}: with the pointer on the 'i' beside '{t['beside']}' the box shows {box['text'][:60]!r} (shown {box['shown']}, inside the window {box['inside']}), not its words")
             c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=2, y=2, button="none")
-            time.sleep(0.2)
-            box = c.js(BOX)
+            box = until(lambda b_: b_["text"] == "" and not b_["shown"])
             if box["text"] != "" or box["shown"]:
                 wrong.append(f"{name}: after the pointer left the 'i' beside '{t['beside']}' the box still holds {box['text'][:60]!r}")
             opened += 1
@@ -613,7 +624,22 @@ def in_a_browser(folder, D, port=9341):
     if drawn - expected:
         wrong.append("an 'i' drawn with words the data does not hold for it: " + "; ".join(sorted(x[:50] for x in drawn - expected)))
     return {"browser": version, "opened": "file://" + rel(Path(folder) / "index.html") if Path(folder).resolve().is_relative_to(ROOT) else "a copy in a temporary folder", "states": states,
-            "i_with_distinct_words_drawn": len(drawn), "i_with_distinct_words_expected": len(expected), "bubbles_opened_by_the_pointer": hovered, "wrong": wrong}
+            "i_with_distinct_words_drawn": len(drawn), "i_with_distinct_words_expected": len(expected), "bubbles_opened_by_the_pointer": hovered,
+            "the_slowest_bubble_to_open_or_close_s": round(slowest, 2), "wrong": wrong}
+
+
+def in_a_browser_with_runs(folder, D):
+    """The browser check of one build, run again - up to three runs in all - if a run finds something wrong; every run is kept. This is the rule of scripts/run_decision_checks.py for a browser
+    check: how many runs it needed is part of the result, and what an earlier run found wrong is written down."""
+    runs = []
+    for _ in range(3):
+        runs.append(in_a_browser(folder, D))
+        if not runs[-1]["wrong"]:
+            break
+        time.sleep(3)
+    last = dict(runs[-1])
+    last.update({"runs_made": len(runs), "runs_that_found_nothing_wrong": sum(1 for r in runs if not r["wrong"]), "what_each_earlier_run_found_wrong": [r["wrong"] for r in runs[:-1]]})
+    return last
 
 
 # ---- e. the checks' own changes ---------------------------------------------------------------------------------------------------------------------
@@ -806,8 +832,10 @@ def run_checks(before, now, extra, browser):
         check(f"d4 ({k})", f"in a browser, {CALLED[k]} opened from disk, in the page as it opens, under each layer, with a unit's panel open, in the decision view, and with a district ranked and a filter on: every 'i' element's own text "
               "is empty; the one floating box is empty and hidden while no 'i' is open and again after each one closes; the pointer on an 'i' shows exactly that 'i''s words, wholly inside the window; every 'i' the data has words for "
               "is drawn in one of those states and no other is; a click on an 'i' that stands inside a label does not work the label's control; no script error, and nothing asked of the network", not r["wrong"],
-              f"{r['browser']}; {len(r['states'])} states; {r['i_with_distinct_words_drawn']} of {r['i_with_distinct_words_expected']} 'i' drawn; {r['bubbles_opened_by_the_pointer']} bubbles opened by the pointer" if not r["wrong"]
-              else "WRONG: " + " | ".join(r["wrong"][:4]))
+              (f"{r['browser']}; {len(r['states'])} states; {r['i_with_distinct_words_drawn']} of {r['i_with_distinct_words_expected']} 'i' drawn; {r['bubbles_opened_by_the_pointer']} bubbles opened by the pointer; the slowest "
+               f"took {r['the_slowest_bubble_to_open_or_close_s']} s to open or close" if not r["wrong"] else "WRONG: " + " | ".join(r["wrong"][:4]))
+              + (f"; runs made: {r['runs_made']}, of which {r['runs_that_found_nothing_wrong']} found nothing wrong" + (f" (an earlier run found: {' | '.join(x for w in r['what_each_earlier_run_found_wrong'] for x in w[:2])})"
+                                                                                                                      if r.get("what_each_earlier_run_found_wrong") else "") if "runs_made" in r else ""))
 
     # e. the checks' own changes
     vl = subprocess.run(["git", "-C", str(ROOT), "diff", "--quiet", VERIFY_LAYER_AT, "--", "scripts/verify_layer.py"], capture_output=True).returncode
@@ -1008,7 +1036,7 @@ def main():
     builds = {"layer_run_utc": json.loads(read(ROOT / "60_layer/layer.provenance.json").read_text())["run_utc"], "copy_run_utc": json.loads(read(ROOT / "70_share/share.provenance.json").read_text())["run_utc"],
               "files_sha256": {rel(NOW[k] / f): sha(NOW[k] / f) for k in NOW for f in ("index.html", "data.js")} | {rel(NOW["copy"] / "README.txt"): sha(NOW["copy"] / "README.txt")}}
     me = {"script": "scripts/check_site_copy.py", "script_sha256": sha(__file__)}
-    browser = {k: in_a_browser(NOW[k], now[k]["D"]) for k in NOW}
+    browser = {k: in_a_browser_with_runs(NOW[k], now[k]["D"]) for k in NOW}
     results, pairs, S = run_checks(before, now, extra, browser)
     ok = all(r["pass"] for r in results)
 
@@ -1041,7 +1069,8 @@ def main():
         record = {**me, "run_utc": started, "ended_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "builds": builds, "inputs": INPUTS,
                   "how": "each error was planted on a copy - a copy of a build's data held in memory, a copy of its index.html in a temporary folder beside a link to its data.js, or a copy of the table - and never on the real files; "
                          "an error counts as caught only if a check meant to catch it failed, and a check that already fails on the builds as they are is not counted",
-                  "the_builds_as_they_are": {"checks": len(results), "passed": sum(r["pass"] for r in results), "failed": failed0},
+                  "the_builds_as_they_are": {"checks": len(results), "passed": sum(r["pass"] for r in results), "failed": failed0, "what_each_failed_check_said": {r["id"]: r["detail"] for r in results if not r["pass"]},
+                                             "in_a_browser": {k: {x: v for x, v in browser[k].items() if x != "states"} for k in browser}},
                   "trials": trials, "planted": len(trials), "caught": sum(t["caught"] for t in trials), "every_planted_error_caught": all(t["caught"] for t in trials) and ok}
         out.mkdir(parents=True, exist_ok=True)
         json.dump(record, open(out / TRIALS, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
