@@ -241,7 +241,7 @@ def main():
             s = goto(f"layer=decision&window={w}&{tiers0}&st=0&unit={u}", lambda s: has(s["text"], V["t"]["why_head"]) and has(s["text"], "Unit id " + u) and has(s["text"], e["window"]) and has(s["text"], e["cell"]))
             missing = S.in_order(s["text"], lines, after=X.norm(V["t"]["why_head"]))
             wrongly_near = (not e["near"]) and has(s["text"], V["t"]["near"])
-            wrongly_gov = (not e["gov"]) and has(s["text"], E.T[next(x for x in E.IDS if E.OUT[x])]["governance_prompt"])
+            wrongly_gov = (not e["gov"]) and has(s["text"], E.GOV_ON_THE_PAGE)      # the prompt as the page words it since 11 October 2026 (the owner's third handoff); until then, the decision table's sentence
             units.append({"unit": u, "window": w, "cell": E.T[u][f"cell_{w}"], "type": "outside_village" if E.OUT[u] else "lgd_panchayat", "found": len(lines) - len(missing), "of": len(lines), "missing": missing,
                           "close_call_shown_wrongly": wrongly_near, "governance_prompt_shown_wrongly": wrongly_gov})
             say("unit, by address", f"set the address to '#layer=decision&window={w}&unit={u}'",

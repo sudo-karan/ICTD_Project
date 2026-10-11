@@ -15,6 +15,13 @@ reader would - in Chrome the mouse is moved onto it; in WebKit, which takes no m
 pointer would make - reads the one floating box, then moves away and reads the box again. The step holds only if the box
 showed the caution, lay wholly inside the window, was empty once the pointer had left, and the "i" itself holds no text.
 
+SIX LINES (11 October 2026, the owner's third handoff of that day). Four expected strings follow his words: the East Coast
+badge ("our placebo test fails here"), the head of the grid's first column ("Little or no forest loss in the window"),
+the exported definition of a cell without loss ("little or none"), and the prompt of an outside-village unit. The prompt
+is no longer read from the decision table: the table still carries the sentence of 8 October, the page shows his new
+words in its place until the table is next rebuilt, and this script stops unless the table's prompt is that sentence on
+every outside-village unit and on no other (scripts/verify_decision.py holds both as a check).
+
 The layer is opened from disk (file://), on the build that is in 60_layer/.
 Part A works every new control - the decision view's switch, the four windows, the district the units are ranked in, the
 order within a tier (by hectares lost, or by share lost: added with the owner's rulings of 9 October 2026), the order of
@@ -107,6 +114,10 @@ CHECK = {"name_on_the_polygon_not_contradicted": "the name on its boundary polyg
          "flagged_one_check_contradicts": "flagged: one check contradicts the district it carries", "no_check_possible": "no check possible: a name, and nothing to check it against"}
 WITHIN = {"ha": "Within a tier, most hectares lost first; in a cell without loss, most standing hectares of its kind first.",
           "share": "Within a tier, biggest share lost first (units with no share go last, by hectares lost); in a cell without loss, most standing hectares of its kind first."}       # the two orders within a tier, as the head of the list and the export name them
+GOV_ON_THE_PAGE = "Outside every revenue village. Whose plan covers this land?"                     # the owner's words of 11 October 2026 for the prompt of an outside-village unit
+GOV_IN_THE_TABLE = "No revenue village — this land is in no village plan. Whose plan covers it?"    # the sentence of 8 October 2026, which the decision table carries until it is next rebuilt
+if {T[u]["governance_prompt"] for u in IDS if OUT[u]} != {GOV_IN_THE_TABLE} or {T[u]["governance_prompt"] for u in IDS if not OUT[u]} != {""}:
+    sys.exit("the decision table's governance prompt is not the sentence the page's words stand in for, on every outside-village unit and on no other")
 ORDER_CHANGED = "your own order"                               # what the page and the export call an order of tiers that is not the provisional one
 errors_seen = []                                                # script errors of the page, with where they were read: there must be none
 
@@ -125,7 +136,7 @@ def corro(u):
     if r["corroboration_basis"] == "headline":
         return CORRO[r["corroboration"]]
     if r["corroboration_basis"] == "east_coast_every_unit_kept":
-        return CORRO[r["corroboration"]] + " - East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable"
+        return CORRO[r["corroboration"]] + " - East Coast zone: our placebo test fails here, so corroboration is unreliable"
     return {"below_floor": "Not compared: under 100 ha of land with canopy above 10 % in 2000, the agreement test's floor",
             "below_floor_no_corestack_coverage": "Not compared: under 100 ha of land with canopy above 10 % in 2000, the agreement test's floor; and CoRE Stack gives no class on such land here",
             "corestack_covers_under_floor": "Not compared: CoRE Stack gives a class on under 100 ha of this unit's land with canopy above 10 % in 2000, the agreement test's floor"}[r["corroboration_basis"]]
@@ -189,7 +200,7 @@ def why_expected(u, w, order):
                  f"Under {order_words(order)}, it's {tier_label(cell, order)}. "
                  + (f"In the provisional order it's {tier_label(cell, ORDER0)}, because: " if order != ORDER0 else "") + WHY[cell]),
          "corro": "Corroboration, 2017-2023 (whatever window is chosen): " + corro(u), "work": "Work types: " + WORK[cell],
-         "gov": T[u]["governance_prompt"] if OUT[u] else None,
+         "gov": GOV_ON_THE_PAGE if OUT[u] else None,
          "district": ("District assigned by: " + "; ".join(CHECK[p] for p in r["district_check"].split("; "))) if OUT[u] else None}
     return e
 
@@ -219,7 +230,7 @@ def why_compare(c, u, w, order):
     for j, (a, b) in enumerate(zip(got["hectares"], want["hectares"])):
         if X.norm(a) != b:
             bad.append((f"hectares[{j}]", a, b))
-    col_head = "Some forest loss in the window" if COL[T[got["unit"]][f"cell_{w}"]] == "some" else "No forest loss in the window"
+    col_head = "Some forest loss in the window" if COL[T[got["unit"]][f"cell_{w}"]] == "some" else "Little or no forest loss in the window"
     labels_ok = got["head"] == ["Canopy in 2000", "Standing now", f"Lost in {WIN[w]}"] and len(got["rowlabels"]) == 3 and got["rowlabels"][0] == "Dense: above 30 %" and got["rowlabels"][1] == "Open: 10 to 30 %" \
         and got["rowlabels"][2].startswith("10 % or less: not counted as forest")
     if len(got["hectares"]) != 6 or got["highlighted"] != 1 or not labels_ok or got["gridcol"] != col_head:
@@ -292,7 +303,7 @@ def export_expected(d, w, order, st, keep, built, within="ha"):
     order_text = "; ".join(f"{i + 1} {NAME[c_]}" for i, c_ in enumerate(order)) + f"; not ranked: {NAME[UNRANKED]}"
     rowdef = {"mostly_dense": f"Forest standing now is mostly dense: {SMIN} or more of standing forest, and standing dense at least as large as standing open.",
               "mostly_open": f"Forest standing now is mostly open: {SMIN} or more of standing forest, and standing open larger than standing dense.", "little_or_none": f"Forest standing now is little or none: under {SMIN} of standing forest."}
-    coldef = {"some": f"Forest loss in the window is some: {LMIN} or more.", "none": f"Forest loss in the window is none: under {LMIN}."}
+    coldef = {"some": f"Forest loss in the window is some: {LMIN} or more.", "none": f"Forest loss in the window is little or none: under {LMIN}."}
     filt = {"0": "No filter", "18": "Scheduled Tribe share 18 % or more", "33": "Scheduled Tribe share above 33 %", "50": "Scheduled Tribe share more than 50 %"}[st] + ("" if st == "0" else "; outside-village units kept" if keep else "; outside-village units left out")
     plain = lambda v: shown(v).replace(",", "")
     out = []

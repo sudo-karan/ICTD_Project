@@ -12,6 +12,18 @@ colour. Before a word was changed the two builds were copied, with a list of the
 Both folders are outside git, so those copies are the only "before". This script holds the builds that are on disk
 now against them, and against the owner's two files of that day (his handoff and his deck of words).
 
+THE SIX LINES. Later that day, in his third handoff, the owner gave his words for six lines of the page that the audit
+had listed for him, and said: every other string stays as it is. Before they were changed both builds were copied again,
+with a list of sha256, to
+    .session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/
+    .session_scratch_2026-10-05/70_share_2026-10-11_before_six_fixes/
+and group f below holds the builds on disk against those: the strings that differ are his six lines, each differing by
+exactly his replacement, and nothing else of either build differs but the build's own times and hashes. With them:
+cautions 4 and 6 are in his new words; eight phrases joined the list of group b ("CoRE Stack's own check", "already
+open in 2000", "fairly closed", "No forest loss in the window", "is none: under", "no village plan", "own dashboard",
+"state totals reconciled"); and three kinds of string are no longer outside that list, because the page now words them
+itself: the governance prompt, a cell's definition, and the Hansen row of Sources.
+
 WHAT IT CHECKS
  a. THE NUMBERS. The saved copies still have the sha256 listed when they were made. `layer_by_unit.csv` is byte for
     byte the saved one. In both data.js files every part is the saved copy's but three kinds: parts that hold words
@@ -42,17 +54,23 @@ WHAT IT CHECKS
     document writer that this task changed, every block of lines that differs from the commit before the task
     (`CHECKS_BEFORE`) has a row in 60_layer/site_copy_check_changes.csv, and every row of that table is a change that
     is really in the file.
+ f. THE SIX LINES (the owner's third handoff of 11 October 2026). The copies kept before them still have the sha256
+    listed with them. Against those copies, in each build: no string was added or dropped; every string that differs
+    is one of his six lines and differs by exactly his replacement; no place of a fix still holds its old words; every
+    fix is found in the build. And no part of data.js differs but the parts those strings are in and the build time;
+    index.html is byte for byte the kept one.
  t. THE PLANTED ERRORS. The record of the trials (below) is of this script as it is and of the builds on disk, the
     builds as they are passed every check in it, and every planted error was caught by a check meant to catch it.
 
 --trials plants each error on a COPY - a copy of a build's data held in memory, or a copy of its index.html written to
 a temporary folder beside a link to its data.js - never on the real files, runs the checks on the copy, and counts the
-error as caught only if a check that is MEANT to catch it fails. The eight errors the owner named are the first eight.
+error as caught only if a check that is MEANT to catch it fails. The eight errors the owner named are the first eight;
+the four he named with the six lines, each of which puts an old line back, are numbers 23 to 26.
 
 Reads   60_layer/: index.html, data.js, layer_by_unit.csv, layer.provenance.json, site_copy_audit.csv,
                    site_copy_check_changes.csv, and (the check only) site_copy_trials.json
         70_share/odisha_forest_decision_layer/: index.html, data.js, README.txt; 70_share/share.provenance.json
-        the two saved copies named above, with their lists of sha256
+        the two saved copies named above, and the two kept before the six lines, with their lists of sha256
         20_degradation/agreement_summary.csv (the interval one caution quotes),
         00_raw/05_forest_reference/provider_cautions.json (the provider's sentences the About text quotes)
         git: the check scripts as they were at `CHECKS_BEFORE`, and scripts/verify_layer.py at 16b1efd
@@ -88,6 +106,8 @@ NAME = "odisha_forest_decision_layer"
 SCRATCH = ROOT / ".session_scratch_2026-10-05"
 SAVED = {"layer": SCRATCH / "60_layer_2026-10-11_before_words", "copy": SCRATCH / "70_share_2026-10-11_before_words" / NAME}
 SAVED_LISTS = {"layer": SCRATCH / "60_layer_2026-10-11_before_words" / "sha256.txt", "copy": SCRATCH / "70_share_2026-10-11_before_words" / "sha256.txt"}
+BEFORE_SIX = {"layer": SCRATCH / "60_layer_2026-10-11_before_six_fixes", "copy": SCRATCH / "70_share_2026-10-11_before_six_fixes" / NAME}      # both builds as they stood before the owner's six lines
+BEFORE_SIX_LISTS = {"layer": SCRATCH / "60_layer_2026-10-11_before_six_fixes" / "sha256.txt", "copy": SCRATCH / "70_share_2026-10-11_before_six_fixes" / "sha256.txt"}
 NOW = {"layer": ROOT / "60_layer", "copy": ROOT / "70_share" / NAME}
 CALLED = {"layer": "the full layer", "copy": "the published copy"}
 AUDIT, CHANGES, TRIALS = "60_layer/site_copy_audit.csv", "60_layer/site_copy_check_changes.csv", "site_copy_trials.json"
@@ -211,8 +231,9 @@ def strings(b):
         add("About this map", f"about_html, block {n_ + 1}", "text", t, key="about_html")
     for n_, cells in enumerate(source_rows(D["sources_html"])):
         overlay = bool(cells) and bool(re.match(r"(Loss-pixel|Site-level) overlay", cells[0]))
+        hansen = bool(cells) and cells[0].startswith("Tree canopy in 2000 and tree cover loss")       # reworded with the six lines of 11 October 2026: no longer outside the list of phrases
         for c_, cell in enumerate(cells):
-            add("Sources", f"sources_html, row {n_ + 1}, cell {c_ + 1}", "text", cell, "" if overlay else "a cell of Sources other than the overlay row's", key="sources_html")
+            add("Sources", f"sources_html, row {n_ + 1}, cell {c_ + 1}", "text", cell, "" if overlay or hansen else "a cell of Sources other than the overlay row's and the Hansen row's", key="sources_html")
     for t in blocks(re.sub(r"<table>.*?</table>", " ", D["sources_html"], flags=re.S)):
         add("Sources", "sources_html, outside its table", "text", t, key="sources_html, outside its table")
     add("decision view: controls", "decision.title", "text held in the data (the page draws it nowhere since 11 October 2026)" if new else LABEL + "a heading on the side panel", V.get("title"))
@@ -222,10 +243,11 @@ def strings(b):
         add("decision view: controls", f"decision.windows[{w['id']}].is", "i (the window's description)" if new else "text under a window's years", w["is"], FROM_55 + ": a window's description")
     for c in V["cells"]:
         for k, what in (("name", "a cell's name"), ("legend", "a cell's name"), ("def", "a cell's definition"), ("rests", "a cell's reason"), ("work", "a work-type field"), ("row", "a cell's row"), ("loss", "a cell's column")):
-            add("decision view: legend and why this tier", f"decision.cells[{c['id']}].{k}", "text", c.get(k), FROM_55 + ": " + what)
+            add("decision view: legend and why this tier", f"decision.cells[{c['id']}].{k}", "text (a cell's definition, written by the page's builder)" if k == "def" else "text", c.get(k),
+                "" if k == "def" else FROM_55 + ": " + what)                     # a definition is worded by scripts/_layer_decision.py, not read from 55_decision/: inside the list of phrases since the six lines
     for k, v in V["tier_why"].items():
         add("decision view: legend and why this tier", f"decision.tier_why[{k}]", "text", v, FROM_55 + ": a tier's reason")
-    add("decision view: legend and why this tier", "decision.governance", "text", V["governance"], FROM_55 + ": the governance prompt")
+    add("decision view: legend and why this tier", "decision.governance", "text (the prompt of an outside-village unit)", V["governance"])      # the page's own words since 11 October 2026 (the owner's ruling): no longer outside the list of phrases
     add("decision view: legend and why this tier", "decision.work_note", "note", V["work_note"], FROM_55 + ": the note under a work-type field")
     for k, v in enumerate(V["corro_labels"]):
         add("decision view: legend and why this tier", f"decision.corro_labels[{k}]", "text (a corroboration badge)", v)
@@ -378,7 +400,8 @@ HOLE = re.compile(r"\{(\w+)\}")
 WORDS = [r"\.title", r"\.subtitle", r"\.info_empty", r"\.about_html", r"\.sources_html", r"\.unit_types\.(lgd|out|out_legend)", r"\.floors\[\d+\]\.label", r"\.layers\[\d+\]\.(group|title|legend_title|this_shows|pending)",
          r"\.layers\[\d+\]\.floor_note\.(1|50|100)", r"\.decision\.radio", r"\.decision\.corro_labels\[\d+\]", r"\.decision\.overlay\.label", r"\.decision\.t\.cols\[\d+\]", r"\.decision\.t\.within_options\[\d+\]\[1\]",
          r"\.decision\.t\.(legend_title|legend_note|order_changed|window_head|tiers_head|why_head|why_standing_some|why_standing_little|why_loss_some|why_loss_none|why_share|why_share_none|why_order|why_was|why_unranked|why_low"
-         r"|rank_none|within_tier|within_tier_share|rank_unranked|rank_filter_note|rank_out_kept|rank_out_dropped|keep_out|district_pick)"]        # the parts of data.js that hold words this task reworded: each written out
+         r"|rank_none|within_tier|within_tier_share|rank_unranked|rank_filter_note|rank_out_kept|rank_out_dropped|keep_out|district_pick)",
+         r"\.decision\.cells\[\d+\]\.def", r"\.decision\.governance", r"\.decision\.t\.grid_cols\[0\]"]        # the parts of data.js that hold words this task reworded: each written out (the last three with the six lines)
 TIMES = [r"\.built", r"\.decision\.built"]
 IN_THE_COPY = [r"\.decision\.overlay(\.\w+)?"]
 
@@ -438,7 +461,8 @@ def place(where, was_before):
 # Every figure that is not where it was, with why. (build, place) -> {figure or {placeholder}: why}. A figure not listed here that left or joined a place fails the check.
 WENT = {
     ("both", "layer forest_area"): {"2000": "the deck's name for the layer, 'Forest in 2000 (Hansen)', names the year, as its legend title and its note do; the old name was 'Area under forests'"},
-    ("both", "layer hansen_loss"): {"2001": "the deck's note says 'cleared outright since 2001'; the year also stands in the layer's name and in its legend title",
+    ("both", "layer hansen_loss"): {"30": "the owner's words of 11 October 2026 for the layer's 'i' (his third handoff) say where the layer counts loss: 'only where canopy was above 30 % in 2000', the figure its grey notes already give",
+                                    "2001": "the deck's note says 'cleared outright since 2001'; the year also stands in the layer's name and in its legend title",
                                     "2025": "the deck's name is 'Tree cover loss since 2001 (Hansen)': the end year left the name and still stands in the legend title, 'Tree cover loss 2001-2025 ...'"},
     ("both", "layer corestack_net"): {"2017": "the deck's name is 'Degradation minus improvement (CoRE Stack)': the years left the name and still stand in the legend title",
                                       "2023": "as for 2017: the years left the layer's name and still stand in its legend title"},
@@ -447,10 +471,14 @@ WENT = {
     ("both", "layer nirv"): {"8": "'Landsat 8' stood in the layer's name and in the heading of the unit panel's NIRv section; the section is gone and the name is 'Greenness trend (NIRv)', so it stands once, in the entry's 'i' (and in About)",
                              "2013": "as for 8: the years of the test, 2013-2025, now stand once, in the entry's 'i' (and in About)", "2025": "as for 8: the years of the test, 2013-2025"},
     ("both", "a unit's panel, section 2"): {"2000": "the section's heading no longer names the year: 'Loss by canopy in 2000 (what the forest mask leaves out)' became 'Loss outside the forest mask'; its rows and its 'i' still say 2000"},
-    ("both", "about_html"): {"2013": "the deck's item on NIRv gives the years of the test, 2013-2025", "2025": "the deck's item on NIRv gives the years of the test, 2013-2025",
+    ("both", "about_html"): {"2000": "the owner's bullet on Hansen of 11 October 2026 (his third handoff) no longer names the year: 'canopy that was fairly closed in 2000' and 'land that was already open in 2000' are gone from it",
+                             "2013": "the deck's item on NIRv gives the years of the test, 2013-2025", "2025": "the deck's item on NIRv gives the years of the test, 2013-2025",
                              "7": "the deck's item on NIRv gives the date of the decision, 7 October 2026 (docs/RESULTS.md section 6)", "2026": "the deck's item on NIRv gives the date of the decision, 7 October 2026"},
     ("copy", "about_html"): {"10": "the copy's About no longer has the full layer's paragraph on the overlay (tiles of loss on land with about 10 % canopy in 2000, version v1.13, loss through 2025): the owner's paragraph for the copy has no figure",
-                             "2000": "as for 10: the overlay's paragraph is the owner's for the copy", "1.13": "as for 10: the overlay's paragraph is the owner's for the copy"},
+                             "2000": "as for 10: the overlay's paragraph is the owner's for the copy; and, as in the full layer, his bullet on Hansen of his third handoff no longer names the year", "1.13": "as for 10: the overlay's paragraph is the owner's for the copy"},
+    ("both", "sources_html"): {t: "the Hansen row of Sources, in the owner's words of 11 October 2026 (his third handoff), says what was reconciled: 'the state's canopy of 2000 and its loss for 2001-2020 ... which stop at 2020'"
+                               for t in ("2000", "2001", "2020")},
+    ("copy", "README.txt"): {t: "the README's credits are read from the layer's Sources, and follow its Hansen row: 'the state's canopy of 2000 and its loss for 2001-2020 ... which stop at 2020'" for t in ("2000", "2001", "2020")},
     ("both", "the filter's note"): {"2011": "the deck's 'i' beside the note names the census by its year ('no resident population in the 2011 census'), where the note said 'undefined share'; a year, not a figure of the map"},
     ("both", "the head of the share's column"): {"{window}": "the deck's 'i' in the head names the window twice: the loss of the window, and the forest at the window's start; the page fills both in"},
     ("both", "the heading over the windows"): {"2025": "the deck's 'i' beside the heading says standing forest always runs to 2025, as the line in a unit's panel does ('Standing forest is always through 2025')"},
@@ -474,10 +502,12 @@ def tokens_in_order(text):
 PHRASES = ["pending", "not yet computed", "will be a reported column", "pre-computed and offline", "offline map", "nothing is fetched from the internet", "asks the network for nothing", "project owner", "user of this page",
            "warranted", "honest colour", "what this is, and how to read it", "site-level overlay", "ruled for the analysis", "shown as a sensitivity", "gram panchayat units", "consultation catalogue", "the placebo failed"]
 PHRASES_COPY_ONLY = ["is not beside this page"]                 # the full layer keeps it, for an overlay.js that is missing
+PHRASES_OF_THE_SIX = ["core stack's own check", "already open in 2000", "fairly closed", "no forest loss in the window", "is none: under", "no village plan", "own dashboard", "state totals reconciled"]   # added by the owner with his six lines
+BUT_NOT_AFTER = {"no forest loss in the window": "little or "}     # the head he gave the column, "Little or no forest loss in the window", holds the old head's words: the old head is the phrase without these words before it
 
 
 def has_phrase(phrase, text):
-    return re.search(r"(?<![a-z])" + re.escape(phrase) + r"(?![a-z])", norm(text)) is not None
+    return re.search((f"(?<!{re.escape(BUT_NOT_AFTER[phrase])})" if phrase in BUT_NOT_AFTER else "") + r"(?<![a-z])" + re.escape(phrase) + r"(?![a-z])", norm(text)) is not None
 
 
 def unquoted(text, sentences):
@@ -490,15 +520,16 @@ def unquoted(text, sentences):
 
 # ---- c. the cautions --------------------------------------------------------------------------------------------------------------------------------
 def cautions(across):
-    """The twenty-two cautions of the deck's section 8: (number, what it is, the words that must be reachable - every one of them; a tuple means any one of its members -, where)."""
+    """The twenty-two cautions of the deck's section 8: (number, what it is, the words that must be reachable - every one of them; a tuple means any one of its members -, where).
+    Cautions 4 and 6 are as the owner reworded them in his third handoff of 11 October 2026: Hansen does see loss on open land, and the check that fails in the East Coast zone is this project's placebo test."""
     page, full, readme = ("layer", "copy"), ("layer",), "readme"
     return [
         (1, "not a verdict on any place; not a score", ["not a verdict", "no score"], page),
         (2, "ranked within a district, never across the state; across-state agreement not established, with its interval", ["never across the state", "not established", across], page),
         (3, "what standing forest is, in the owner's words", [STANDING_IS], page),
-        (4, "Hansen can't see thinning, or change on land open in 2000; it's a floor", ["can't see thinning", "already open in 2000", "a floor"], page),
+        (4, "Hansen can't see thinning; it's a floor", ["can't see thinning", "a floor"], page),
         (5, "CoRE Stack's classifiers are right about two times in three; read Degradation with Improvement", ["two times in three", ("read it next to improvement", "read degradation beside improvement")], page),
-        (6, "CoRE Stack's own check fails in the East Coast zone", ["own check fails", "east coast zone"], page),
+        (6, "our placebo test fails in the East Coast zone, on few districts", ["our placebo test fails", "east coast zone", "few districts"], page),
         (7, "units, not hectares: not overlaid pixel by pixel", ["units, not hectares", "pixel by pixel"], page),
         (8, "a flag is relative, not an amount of damage", ["a flag is relative, not an absolute amount of damage"], page),
         (9, "geotagged spending isn't what the panchayat received", [("not what the panchayat of record received", "not what a panchayat received")], page),
@@ -782,12 +813,13 @@ def run_checks(before, now, extra, browser):
             if r["exempt"]:
                 continue
             text = unquoted(r["text"], quoted)
-            for p in PHRASES + (PHRASES_COPY_ONLY if k == "copy" else []):
+            for p in PHRASES + PHRASES_OF_THE_SIX + (PHRASES_COPY_ONLY if k == "copy" else []):
                 if has_phrase(p, text):
                     hits.append(f"'{p}' in {r['where']}")
-        check(f"b1 ({k})", f"none of the phrases the deck lists (its section 11) is in the words of {CALLED[k]}, in an 'i'" + (" or in its README" if k == "copy" else "") + ", outside what the deck exempts (quotations; strings from "
-              "55_decision/; the values of a unit's panel; legend class labels; export column names and the two kinds of unit; the cells of Sources other than the overlay row's)", not hits,
-              f"{len(PHRASES) + (len(PHRASES_COPY_ONLY) if k == 'copy' else 0)} phrases looked for in {sum(1 for r in S[('after', k)] if not r['exempt']):,} strings" if not hits else "FOUND: " + "; ".join(hits[:8]))
+        check(f"b1 ({k})", f"none of the phrases the deck lists (its section 11), and none of the eight the owner added with his six lines of 11 October 2026, is in the words of {CALLED[k]}, in an 'i'" + (" or in its README" if k == "copy" else "")
+              + ", outside what the deck exempts (quotations; strings from 55_decision/; the values of a unit's panel; legend class labels; export column names and the two kinds of unit; the cells of Sources other than the overlay row's "
+              "and the Hansen row's). Since the six lines the governance prompt, a cell's definition and the Hansen row of Sources are the page's own words and are inside the list", not hits,
+              f"{len(PHRASES) + len(PHRASES_OF_THE_SIX) + (len(PHRASES_COPY_ONLY) if k == 'copy' else 0)} phrases looked for in {sum(1 for r in S[('after', k)] if not r['exempt']):,} strings" if not hits else "FOUND: " + "; ".join(hits[:8]))
     whole = {k: norm(" \n ".join(r["text"] for r in S[("after", k)])) for k in ("layer", "copy")}
     whole_saved = {k: norm(" \n ".join(r["text"] for r in S[("before", k)])) for k in ("layer", "copy")}
     back, lost, never, n_fixed, n_listed = [], [], [], 0, 0
@@ -883,6 +915,52 @@ def run_checks(before, now, extra, browser):
               + (f"; runs made: {r['runs_made']}, of which {r['runs_that_found_nothing_wrong']} found nothing wrong" + (f" (an earlier run found: {' | '.join(x for w in r['what_each_earlier_run_found_wrong'] for x in w[:2])})"
                                                                                                                       if r.get("what_each_earlier_run_found_wrong") else "") if "runs_made" in r else ""))
 
+    # f. the six lines of the owner's third handoff of 11 October 2026
+    check("f0", "the copies of the two builds kept before the six lines still have the sha256 that the lists made with them give", not extra["six_wrong"],
+          "; ".join(extra["six_wrong"]) or f"{extra['six_files']} files held against {len(BEFORE_SIX_LISTS)} lists")
+    extra["six_changes"] = []
+    for k in ("layer", "copy"):
+        kept = extra["six"][k]
+        pp = paired(strings(kept), S[("after", k)])
+        added = [b["where"] for a, b in pp if a is None]
+        dropped = [a["where"] for a, b in pp if b is None]
+        stray, back, used = [], [], Counter()
+        for a, b in pp:
+            if a is None or b is None or b["where"] in BUILD_SPECIFIC:
+                continue
+            mine = [x for x in SIX if re.fullmatch(x[1], b["where"])]
+            for fix, _, old, new in mine:                        # no place of a fix still holds its old words
+                if (old.search(b["text"]) if isinstance(old, re.Pattern) else old in b["text"]):
+                    back.append(f"fix {fix} in {b['where']}")
+            if a["text"] == b["text"]:
+                continue
+            t, fixes = a["text"], []
+            for fix, _, old, new in mine:
+                t2 = old.sub(new, t) if isinstance(old, re.Pattern) else t.replace(old, new)
+                if t2 != t:
+                    fixes.append(fix)
+                    used[(fix, SIX.index((fix, _, old, new)))] += 1
+                    t = t2
+            if t != b["text"] or not fixes:
+                stray.append(b["where"])
+            else:
+                extra["six_changes"].append({"build": CALLED[k], "fix": fixes[0], "part": b["part"], "where": b["where"], "kind": b["kind"], "as_it_was": a["text"], "as_it_is": b["text"]})
+        unused = [f"fix {x[0]} ({x[1]})" for n_, x in enumerate(SIX) if (k == "copy" or not x[1].startswith("README")) and not used[(x[0], n_)]]
+        n_changed = sum(1 for c_ in extra["six_changes"] if c_["build"] == CALLED[k])
+        check(f"f1 ({k})", f"against {CALLED[k]} as it was kept before the owner's six lines of 11 October 2026 (his third handoff): no string was added or dropped; every string that differs is one of the six lines and differs by exactly "
+              "his replacement, written out in this check, and by nothing else; no place of a fix still holds its old words; and every fix is found in the build. The build's own date and, in the copy's README, its section on "
+              "this copy's files are left out", not added and not dropped and not stray and not back and not unused,
+              f"{n_changed} strings differ, all of them his: " + "; ".join(f"fix {f_}: {sum(1 for c_ in extra['six_changes'] if c_['build'] == CALLED[k] and c_['fix'] == f_)}" for f_ in range(1, 7))
+              if not (added or dropped or stray or back or unused) else "ADDED: " + "; ".join(added[:3]) + " | DROPPED: " + "; ".join(dropped[:3]) + " | DIFFERS OTHERWISE: " + "; ".join(stray[:4]) + " | OLD WORDS STILL THERE: "
+              + "; ".join(back[:4]) + " | FIX NOT FOUND: " + "; ".join(unused[:4]))
+        d6 = []
+        differ(kept["D"], now[k]["D"], "", d6)
+        other6 = [(p_, how) for p_, how in d6 if not any(re.fullmatch(x, p_) for x in SIX_PARTS)]
+        check(f"f2 ({k})", f"against the same kept build, no part of the data.js of {CALLED[k]} differs - no row of a unit, class, count, colour, shape or figure array, and no other text - but the parts the six lines are in (the About "
+              "and Sources texts, three cells' definitions, the four East Coast badges, the prompt, the head of the grid's first column, four 'i') and the build time; and index.html is byte for byte the kept one",
+              not other6 and kept["page"] == now[k]["page"], f"{len(d6)} parts differ, all of them the six lines' or the build time; index.html the same" if not other6 and kept["page"] == now[k]["page"]
+              else "NOT THE SIX LINES': " + "; ".join(f"{p_} ({how})" for p_, how in other6[:6]) + ("" if kept["page"] == now[k]["page"] else " | index.html differs"))
+
     # e. the checks' own changes
     vl = subprocess.run(["git", "-C", str(ROOT), "diff", "--quiet", VERIFY_LAYER_AT, "--", "scripts/verify_layer.py"], capture_output=True).returncode
     check("e1", f"scripts/verify_layer.py is byte for byte the file of commit {VERIFY_LAYER_AT}, to which the stage-4 checks hold it", vl == 0, "unchanged" if vl == 0 else "IT DIFFERS, or git could not say")
@@ -911,9 +989,40 @@ def run_checks(before, now, extra, browser):
     return results, pairs, S
 
 
+# The six lines: (the fix, the places it is in - a pattern on `where` -, the words as they were, the words as they are). A compiled pattern stands where plain words would not find the one place.
+SIX = [
+    (1, r"decision\.corro_labels\[\d+\]", " - East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable", " - East Coast zone: our placebo test fails here, so corroboration is unreliable"),
+    (1, r"tips\.layer:agreement", "because CoRE Stack's own check fails there (see About this map)", "because our placebo test fails there, though on few districts (see About this map)"),
+    (1, r"tips\.panel:4", "The headline leaves out units wholly under CoRE Stack's East Coast zone model: CoRE Stack's Improvement class is its own check (clearing shouldn't go with improvement), and in that zone it fails, which is "
+                          "what \"the placebo test fails\" in the zone line means.",
+     "The headline leaves out units wholly under CoRE Stack's East Coast zone model. Our placebo test uses CoRE Stack's Improvement class as a check on its Degradation class (clearing shouldn't go with improvement); in that zone it fails, "
+     "though on few districts. That is what \"the placebo test fails\" in the zone line means."),
+    (1, r"about_html, block \d+", "The first is the headline because CoRE Stack's Improvement class is the check on its Degradation class: clearance should not go with improvement.",
+     "The first is the headline because we use CoRE Stack's Improvement class as a check on its Degradation class, our placebo test: clearance should not go with improvement."),
+    (2, r"tips\.layer:hansen_loss", "Hansen picks up clearing of fairly closed canopy. It can't see thinning under a canopy that's still standing, or change on land that was already open in 2000.",
+     "This layer counts loss only where canopy was above 30 % in 2000; the next layer shows it on more open land. Hansen records clearing, tree canopy removed outright: it can't see thinning under a canopy that's still standing."),
+    (2, r"about_html, block \d+", "Hansen tree cover loss dates the outright removal of canopy that was fairly closed in 2000. It's validated, and it's a floor: it can't see thinning, or change on land that was already open in 2000.",
+     "Hansen tree cover loss dates the outright removal of tree canopy, year by year. It's validated, and it's a floor: it can't see thinning under a canopy that still stands."),
+    (3, r"decision\.t\.grid_cols\[0\]", re.compile(r"^No forest loss in the window$"), "Little or no forest loss in the window"),
+    (3, r"decision\.cells\[\w+\]\.def", "Forest loss in the window is none: under", "Forest loss in the window is little or none: under"),
+    (3, r"about_html, block \d+", re.compile(r"(?<=mostly dense|.mostly open|ttle or none) none(?= [\d,]+ [\d,]+$)"), " little or none"),         # a row of the About text's table of cells: its column of loss, before the two counts that end it
+    (4, r"decision\.governance", "No revenue village \u2014 this land is in no village plan. Whose plan covers it?", "Outside every revenue village. Whose plan covers this land?"),
+    (4, r"about_html, block \d+", "No village plan covers them, their panel asks whose plan does, and it says what their assigned district rests on.",
+     "They lie outside every revenue village, so their panel asks whose plan covers them, and says what their assigned district rests on."),
+    (5, r"sources_html, row \d+, cell 2", "through Google Earth Engine; state totals reconciled to Global Forest Watch's published figures",
+     "through Google Earth Engine; the state's canopy of 2000 and its loss for 2001-2020 reconciled to Global Forest Watch's published figures, which stop at 2020"),
+    (5, r"README\.txt: CREDITS AND LICENCES", "through Google Earth Engine; state totals reconciled to Global Forest Watch's published figures",
+     "through Google Earth Engine; the state's canopy of 2000 and its loss for 2001-2020 reconciled to Global Forest Watch's published figures, which stop at 2020"),
+    (6, r"tips\.panel:3", "CoRE Stack's own dashboard takes Deforestation and Afforestation from its land-use maps instead, so its figures for those two will differ.",
+     "CoRE Stack's published block rasters take Deforestation and Afforestation from its land-use maps instead, so their figures for those two will differ."),
+]
+SIX_PARTS = [r"\.about_html", r"\.sources_html", r"\.built", r"\.decision\.built", r"\.decision\.cells\[\d+\]\.def", r"\.decision\.corro_labels\[\d+\]", r"\.decision\.governance", r"\.decision\.t\.grid_cols\[0\]",
+             r"\.tips\.layer:agreement", r"\.tips\.layer:hansen_loss", r"\.tips\.panel:3", r"\.tips\.panel:4"]          # the parts of data.js the six lines are in, and the two build times
 NIRV_ITEM = "the deck's item on NIRv, in place of 'is pending and will be a reported column only': the years of the test (2013-2025) and the date of the decision (7 October 2026)"
-ABOUT_FIGURES = {"layer": {((), ("2013", "2025", "7", "2026")): NIRV_ITEM},
-                 "copy": {((), ("2013", "2025", "7", "2026")): NIRV_ITEM,
+HANSEN_BULLET = ("the owner's bullet on Hansen of 11 October 2026 (his third handoff) no longer names the year 2000: it said 'canopy that was fairly closed in 2000' and 'land that was already open in 2000', and says what Hansen "
+                 "cannot see without them")
+ABOUT_FIGURES = {"layer": {((), ("2013", "2025", "7", "2026")): NIRV_ITEM, (("2000", "2000"), ()): HANSEN_BULLET},
+                 "copy": {((), ("2013", "2025", "7", "2026")): NIRV_ITEM, (("2000", "2000"), ()): HANSEN_BULLET,
                           (("10", "2000", "1.13", "2025"), ()): "the full layer's paragraph on the overlay is replaced, in the copy, by the owner's paragraph, which has no figure"}}      # (figures taken out, figures put in) of the About text, in order -> why
 
 
@@ -946,6 +1055,15 @@ def gather():
             extra["saved_files"] += 1
             if name not in want or sha(base / name) != want[name]:
                 extra["saved_wrong"].append(f"{rel(base / name)} is not the file that was saved")
+    extra["six_wrong"], extra["six_files"] = [], 0
+    for k, lst in BEFORE_SIX_LISTS.items():
+        base = read(lst).parent
+        want = {line.split(None, 1)[1].strip().lstrip("./"): line.split()[0] for line in lst.read_text().splitlines() if line.strip()}
+        for name in (("data.js", "index.html", "layer_by_unit.csv") if k == "layer" else (f"{NAME}/data.js", f"{NAME}/index.html", f"{NAME}/README.txt")):
+            extra["six_files"] += 1
+            if name not in want or sha(base / name) != want[name]:
+                extra["six_wrong"].append(f"{rel(base / name)} is not the file that was kept")
+    extra["six"] = {k: load(BEFORE_SIX[k]) for k in BEFORE_SIX}
     extra["csv_now"], extra["csv_saved"] = sha(read(NOW["layer"] / "layer_by_unit.csv")), sha(read(SAVED["layer"] / "layer_by_unit.csv"))
     with open(read(ROOT / AUDIT), newline="", encoding="utf-8") as fh:
         extra["audit"] = list(csv.DictReader(fh))
@@ -1069,6 +1187,16 @@ def planted(before, now):
         ("21. layer_by_unit.csv with one byte changed", "a copy of the table", None, ["a1"]),
         ("22. a bubble closed by any scroll, so that keyboard focus on an 'i' out of sight shows nothing (the page as it was until 11 October 2026, 16:50 IST)", "a copy of the full layer's index.html",
          lambda: page_of("layer", 'document.addEventListener("scroll", tipFollow, true);', 'document.addEventListener("scroll", function () { if (tipFor) { tipHide(); } }, true);'), ["d4 (layer)"]),
+        ("23. an old line back: 'CoRE Stack's own check' in an East Coast badge", "the full layer's data",
+         lambda: layer(decision={**L["decision"], "corro_labels": [x.replace("our placebo test fails here", "CoRE Stack's own check fails here") if n_ == 4 else x for n_, x in enumerate(L["decision"]["corro_labels"])]}), ["b1 (layer)", "f1 (layer)"]),
+        ("24. an old line back: 'already open in 2000' in the Hansen layer's 'i'", "the copy's data",
+         lambda: copy_(tips={**C["tips"], "layer:hansen_loss": "Hansen picks up clearing of fairly closed canopy. It can't see thinning under a canopy that's still standing, or change on land that was already open in 2000."}), ["b1 (copy)", "f1 (copy)"]),
+        ("25. an old line back: 'No forest loss in the window' at the head of the grid's first column", "the full layer's data",
+         lambda: layer(decision=t_of(L, grid_cols=["No forest loss in the window", L["decision"]["t"]["grid_cols"][1]])), ["b1 (layer)", "f1 (layer)"]),
+        ("26. an old line back: 'no village plan' in the prompt of an outside-village unit", "the copy's data",
+         lambda: copy_(decision={**C["decision"], "governance": "No revenue village \u2014 this land is in no village plan. Whose plan covers it?"}), ["b1 (copy)", "f1 (copy)"]),
+        ("27. a seventh line: one word changed in a string the owner did not reword (the line under a ranked list for the units outside it)", "the full layer's data",
+         lambda: layer(decision=t_of(L, rank_unranked=L["decision"]["t"]["rank_unranked"].replace("on the map but outside the list", "on the map and outside the list"))), ["f1 (layer)", "f2 (layer)"]),
     ]
 
 
@@ -1129,12 +1257,14 @@ def main():
     tr = out / TRIALS if (out / TRIALS).is_file() else ROOT / "60_layer" / TRIALS
     if tr.is_file():
         T = json.loads(read(tr).read_text(encoding="utf-8")) if tr.resolve().is_relative_to(ROOT) else json.loads(tr.read_text(encoding="utf-8"))
-        t_ok = T.get("script_sha256") == me["script_sha256"] and T.get("builds") == builds and T.get("planted", 0) >= 8 and T.get("every_planted_error_caught") is True and T["the_builds_as_they_are"]["failed"] == []
+        the_four = [t_ for t_ in T.get("trials", []) if t_["planted"].split(".")[0] in ("23", "24", "25", "26")]      # the four the owner named with his six lines: each puts an old line back
+        t_ok = T.get("script_sha256") == me["script_sha256"] and T.get("builds") == builds and T.get("planted", 0) >= 8 and T.get("every_planted_error_caught") is True and T["the_builds_as_they_are"]["failed"] == [] \
+            and len(the_four) == 4 and all(t_["caught"] for t_ in the_four)
         detail = f"{T.get('caught')} of {T.get('planted')} caught, run {T.get('run_utc')}" + ("" if t_ok else "; NOT of this script as it is, or not of these builds, or an error was not caught")
     else:
         t_ok, detail = False, "there is no record of the trials: run this script with --trials first"
     results.append({"id": "t1", "check": f"the planted errors: the record of the trials (60_layer/{TRIALS}) is of this script as it is and of the builds on disk, the builds as they are passed every check in it, at least eight errors were "
-                                         "planted - the eight the owner named among them - and every one was caught by a check meant to catch it", "pass": t_ok, "detail": detail})
+                                         "planted - the eight the owner named among them, and the four he named with his six lines, each of which puts an old line back - and every one was caught by a check meant to catch it", "pass": t_ok, "detail": detail})
     table = strings_table(pairs, extra.get("figures_listed", []))
     out.mkdir(parents=True, exist_ok=True)
     cols = ["build", "part", "where", "kind", "before", "after", "status", "note"]
@@ -1150,6 +1280,7 @@ def main():
                "the_saved_copies": {k: rel(SAVED[k]) for k in SAVED}, "checks_were_changed_since_commit": CHECKS_BEFORE,
                "checks": results, "checks_passed": sum(r["pass"] for r in results), "checks_made": len(results), "passed": ok,
                "in_a_browser": browser,
+               "the_six_lines": {"kept_before_them": {k: rel(BEFORE_SIX[k]) for k in BEFORE_SIX}, "strings_that_differ_from_the_kept_builds": extra.get("six_changes", [])},
                "strings_table": {"path": "60_layer/site_copy_strings.csv", "rows": len(table), "columns": cols, "rows_with_no_text_before": sum(1 for r in table if not r["before"]), "rows_with_no_text_after": sum(1 for r in table if not r["after"]),
                                  "by_build_and_status": {f"{b}: {s}": n for (b, s), n in sorted(n_by.items())}}},
               open(out / "site_copy_check.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)

@@ -34,6 +34,13 @@ CHANGED 11 OCTOBER 2026, with the owner's handoff that reworded the page (docs/S
     last commit before the page's words were rewritten (`WORDS_BASE`); what changed since is counted and said;
   - scripts/exercise_layer.py is no longer called unchanged: it was changed on 11 October 2026 only where it pinned
     reworded words. scripts/verify_layer.py is still unchanged.
+Brought up to date again that day, for the owner's third handoff (six lines of the page in his words):
+  - the East Coast badge's note, the governance prompt and the About text's sentence on Hansen are held in their new
+    words; the six lines and his ruling on the prompt are recorded, dated, in sections 12 and 17.5;
+  - of the governance prompt two things are held: the page shows his new words, and the decision table still carries
+    the sentence of 8 October 2026 (it is not rebuilt for one sentence; the builder stops unless it is that sentence);
+  - a third earlier pass of the runner is on record with the session's working files, the one made on the layer as
+    built for the page's words before the six lines; the text says of the pass on record what its record says.
 
 Output: docs/DECISION_LAYER.md and nothing else; its inputs, their sha256 and the UTC time of the run are in its appendix.
   python scripts/write_decision_layer.py              runs the two verifiers, writes docs/DECISION_LAYER.md
@@ -1214,9 +1221,10 @@ record's own; so do the East Coast count and the count not compared.*
   window set to 2017–2023 the cell and the badge are about the same years; in any other window they are not, and the
   label is there so that nobody reads them as if they were.
 - **The {ec_units} units under CoRE Stack's East Coast zone model** carry a note on the badge. Since 11 October 2026
-  it reads "{ec_note}"; until then it said that the placebo failed there. The check it speaks of is this project's
-  placebo test, which uses CoRE Stack's Improvement class as the check on its Degradation class
-  (`docs/RESULTS.md` §5.2), not a check CoRE Stack's producers ran. That failure itself rests on {ec_districts}
+  it reads "{ec_note}"; until then it said that the placebo failed there, and for some hours of that day that
+  CoRE Stack's own check fails there, which the owner corrected (§17.5). The placebo test is this project's: it uses
+  CoRE Stack's Improvement class as a check on its Degradation class (`docs/RESULTS.md` §5.2), and CoRE Stack's
+  producers did not run it. That failure itself rests on {ec_districts}
   districts. Their class is the one computed with every unit
   kept, since the headline leaves them out.
 - **A flag is relative.** It marks the top fifth of the units compared on that measure, not a stated amount of loss
@@ -1244,8 +1252,15 @@ How the badge falls across the cells, in the default window:
     out = T[T.outside_village == 1]
     prompts = sorted(set(out.governance_prompt.dropna()))
     hold(len(prompts) == 1 and out.governance_prompt.notna().all() and T.loc[T.outside_village == 0, "governance_prompt"].isna().all(), "one governance prompt is carried by every outside-village unit and by no other")
-    hold(prompts[0] == "No revenue village — this land is in no village plan. Whose plan covers it?", "the governance prompt is the owner's sentence, word for word, with its dash")
-    show("gov_prompt", V(prompts[0], CU, "column `governance_prompt`: the one text every outside-village unit carries"), txt)
+    hold(prompts[0] == "No revenue village — this land is in no village plan. Whose plan covers it?", "the governance prompt in the decision table is the sentence of 8 October 2026, word for word, with its dash")
+    show("gov_table", V(prompts[0], CU, "column `governance_prompt`: the one text every outside-village unit carries"), txt)
+    show("gov_page", V(LAYER_DATA["decision"]["governance"], "60_layer/data.js", "key `decision` → `governance`: the prompt the page shows in the panel of an outside-village unit"), txt)
+    hold(LAYER_DATA["decision"]["governance"] == "Outside every revenue village. Whose plan covers this land?" and LAYER_DATA["decision"]["governance"] != prompts[0],
+         "the prompt the page shows is the owner's sentence of 11 October 2026, word for word, and is not the sentence the decision table carries")
+    builder_ = W.use("scripts/_layer_decision.py").read_text(encoding="utf-8")
+    hold("if prompts[0] != GOVERNANCE_IN_THE_TABLE:" in builder_ and 'GOVERNANCE_IN_THE_TABLE = "' + prompts[0] + '"' in builder_ and "governance = GOVERNANCE_ON_THE_PAGE" in builder_
+         and 'GOVERNANCE = "' + prompts[0] + '"' in W.use("scripts/05_build_decision.py").read_text(encoding="utf-8"),
+         "the layer's builder stops unless the decision table's prompt is exactly the sentence of 8 October 2026 and then shows the page's words in its place; the script that builds the decision table still writes that sentence")
     sf_all = agg(CU, "`standing_forest_ha` summed over all units", lambda t: t.standing_forest_ha.sum())
     sf_out = agg(CU, "`standing_forest_ha` summed over the outside-village units", lambda t: t.loc[t.outside_village == 1, "standing_forest_ha"].sum())
     calc("out_forest_pct", 100 * sf_out.v / sf_all.v, dec(1), "standing forest in outside-village units ÷ standing forest in all units × 100", [sf_out, sf_all])
@@ -1280,7 +1295,18 @@ other unit, and {out_ranked} of them are in a ranked cell in the default window 
 
 Their panel differs in three ways.
 
-- **A governance prompt**, in these words: "{gov_prompt}"
+- **A governance prompt**, in these words: "{gov_page}" They are the owner's, of 11 October 2026. Until that day
+  the panel showed the sentence the decision table carries, "{gov_table}" Nothing in the repository shows that this
+  land is in no village plan, and works are geotagged on it; the new words keep the question and drop the claim.
+  **His ruling of 11 October 2026 on the prompt.** The prompt comes from the decision table
+  (`55_decision/condition_by_unit.csv`, column `governance_prompt`). To rebuild that table would send the fourth stage
+  through four more steps for one sentence, so it is not rebuilt now. Until it is next rebuilt the part of the
+  layer's builder that makes the decision view (`scripts/_layer_decision.py`) shows the new words in place of the
+  table's: a change of the page only, of the kind already allowed for a cell's name in the legend. That builder
+  still guards the table: it stops the build unless the table's prompt is exactly the old sentence, so that the swap
+  cannot hide a change in the table. When the decision table is next rebuilt, with the Foundation's ruling on the
+  tiers, `scripts/05_build_decision.py` takes the new words and the swap goes. `scripts/verify_decision.py` holds
+  both halves: the page's words, and the table's.
 - **What their district rests on.** An outside-village unit has no census district; one was assigned in `10_units/`,
   and the panel shows how that assignment was checked:
 
@@ -1757,11 +1783,13 @@ Chrome's alone (§16).
     show("pages_checked", key(SITE_CHECK, "run_utc"), txt)
     README_NOW = W.use("70_share/odisha_forest_decision_layer/README.txt").read_text(encoding="utf-8")
     show("ec_note", V(next(x_.split(" - ", 1)[1] for x_ in LAYER_DATA["decision"]["corro_labels"] if "East Coast" in x_), "60_layer/data.js", "key `decision` → `corro_labels`: the note after the dash on a label of an East Coast unit"), txt)
-    hold(len({x_.split(" - ", 1)[1] for x_ in LAYER_DATA["decision"]["corro_labels"] if "East Coast" in x_}) == 1 and "own check fails" in LAYER_DATA["decision"]["corro_labels"][-1] + " ".join(LAYER_DATA["decision"]["corro_labels"]),
-         "every label of an East Coast unit's badge carries one and the same note after its dash")
+    hold(len({x_.split(" - ", 1)[1] for x_ in LAYER_DATA["decision"]["corro_labels"] if "East Coast" in x_}) == 1 and all(("our placebo test fails here" in x_) == ("East Coast" in x_) for x_ in LAYER_DATA["decision"]["corro_labels"])
+         and not any("own check" in x_ for x_ in LAYER_DATA["decision"]["corro_labels"]),
+         "every label of an East Coast unit's badge carries one and the same note after its dash; it says that our placebo test fails there, and no label says that the check is CoRE Stack's own")
     hold("never across the state" in LAYER_DATA["decision"]["t"]["rank_none"] and "not established" in TIPS.get("rank_none", "") and "odds ratio" in TIPS.get("rank_none", "") and "not established" not in LAYER_DATA["decision"]["t"]["rank_none"],
          "the prompt of the empty ranked list says that units are ranked within a district and never across the state, and the \"i\" beside it carries the odds ratios and the words \"not established\"")
-    hold("change on land that was already open in 2000" in ABOUT_PLAIN, "the layer's About text says that Hansen cannot see change on land that was already open in 2000")
+    hold("it can't see thinning under a canopy that still stands" in ABOUT_PLAIN and "open in 2000" not in ABOUT_PLAIN and "fairly closed" not in ABOUT_PLAIN,
+         "the layer's About text says that what Hansen cannot see is thinning under a canopy that still stands, and no longer says that it cannot see change on land that was open in 2000")
     if not site_is_this_copy:
         show("pages_copy_then", key(SITE_CHECK, "copy_run_utc"), txt)
         show("share_made", key(SHARE_REC, "run_utc"), txt)
@@ -1951,6 +1979,19 @@ to carry the window, the export button is off.
          "the kept record of the pass made after the unfinished one is of the same earlier build, lies between it and the pass on record in time, is finished, and every check in it passed on its last run")
     show("before_start", key(PASS_BEFORE, "started_utc"), txt)
     show("before_build", key(PASS_BEFORE, "layer_run_utc"), txt)
+    PASS_WORDS = SCRATCH + "/60_layer_2026-10-11_before_six_fixes/decision_runs.json"       # the pass on the layer as built for the page's words, before the owner's six lines: kept with that build
+    hold("unfinished" not in W.J(PASS_WORDS) and key(PASS_WORDS, "layer_run_utc").v not in (run_l.v, key(PASS_BEFORE, "layer_run_utc").v)
+         and key(PASS_BEFORE, "started_utc").v < key(PASS_WORDS, "started_utc").v < key(RUNS, "started_utc").v and all(x_["last_run_passed"] for x_ in key(PASS_WORDS, "checks").v),
+         "the kept record of the pass on the layer as built for the page's words is of a build that is neither the one on disk nor the one before the words, lies between the earlier passes and the pass on record in time, is finished, and every check in it passed on its last run")
+    show("words_start", key(PASS_WORDS, "started_utc"), txt)
+    show("words_build", key(PASS_WORDS, "layer_run_utc"), txt)
+    words_more = [x_ for x_ in key(PASS_WORDS, "checks").v if x_["runs_made"] > 1]
+    show("words_more", V("every check passed on its first run" if not words_more else "every check passed on its last run; more than one run was needed by " + " and ".join(f"{x_['check']} ({x_['runs_made']} runs)" for x_ in words_more),
+                         PASS_WORDS, "key `checks`: the checks of which more than one run was made, with the number of runs"), txt)
+    more_now = [x_ for x_ in key(RUNS, "checks").v if x_["runs_made"] > 1]
+    show("more_now", V("every check passed, each on its first run" if not more_now else "every check passed on its last run; more than one run was needed by " + " and ".join(f"{x_['check']} ({x_['runs_made']} runs)" for x_ in more_now)
+                       + ", and what each such run failed on is given with the check below", RUNS, "key `checks`: the checks of which more than one run was made, with the number of runs"), txt)
+    hold(all(x_["last_run_passed"] for x_ in key(RUNS, "checks").v), "in the pass on record every check passed on its last run")
     done_ = [k_ for k_, x in unfin.items() if x["runs"] and x["runs"][-1]["exit"] == 0]
     not_done = [k_ for k_ in unfin if k_ not in done_]
     show("unfin_passed", V(len(done_), UNFIN, "key `checks`: the checks whose last run passed"), n0)
@@ -2170,17 +2211,17 @@ this pass it ran {n_checks} checks, and {first_try} passed on their first run. T
 given with it below.
 
 **The pass on record was started {runner_start} (UTC), on the layer as it was built again on 11 October 2026 for the
-page's words (§17.4), and it is of the verifier as it now is.** In it `scripts/verify_decision.py` gave
+owner's six lines (§17.5), and it is of the verifier as it now is.** In it `scripts/verify_decision.py` gave
 "{runner_vd}", which is what the run this script made of the verifier as it wrote the document gave: "{v_decision}".
-The check added on 10 October 2026 (§17.3) is therefore in the pass. Two earlier passes were made for that check on
-the build before this one (built {before_build}). The first, started {unfin_start} (UTC), could not be finished:
+The check added on 10 October 2026 (§17.3) is therefore in the pass. Three earlier passes are kept with the session's
+working files. Two were made for that check on the build of {before_build}. The first, started {unfin_start} (UTC), could not be finished:
 {unfin_passed} of its {unfin_of} checks passed, the verifier with its new check among them, and the check of the
 decision view in WebKit did not run to its end. The machine had gone into standby on a flat battery during that
 pass, and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote
 down "{unfin_error}". The second, started {before_start} (UTC) on mains power with the machine kept awake, ran to
-its end, and every check in it passed. Both records are kept with the session's working files. In the pass on
-record every check passed on its last run; the two checks in WebKit needed more than one run, and how many each
-needed is given with it below.
+its end, and every check in it passed. The third, started {words_start} (UTC), was of the layer as it was built for
+the page's words (built {words_build}; §17.4), before the six lines: {words_more}. In the pass on
+record {more_now}.
 
 **The regression gate: the existing views.**
 
@@ -2408,10 +2449,34 @@ this document:
 - **What he asked be listed and not changed**: the strings that come from `55_decision/` - the cells' names and
   reasons, the tiers' reasons, the work-type fields, the windows' descriptions, the governance prompt - which the
   Foundation will rule on, and sentences of `docs/RESULTS.md`. `docs/SITE_COPY.md` lists what was found in them.
+  Six of the lines so listed he ruled on the same day (§17.5).
 - **The checks.** `scripts/verify_layer.py` is unchanged. `scripts/exercise_layer.py` and
   `scripts/exercise_layer_safari.py` were changed on 11 October 2026 only where they pinned reworded words, as listed
   in `docs/SITE_COPY.md` (the second in none of its own lines). The other checks' expected words follow the reworded
   strings, and no expected number changed (§16).
+
+### 17.5 Changed on 11 October 2026, later that day: six lines, in the owner's words
+
+Six lines of the page that the audit of that morning had listed for him were untrue or misleading, and he gave his
+words for each (his third handoff of the day). Every other string of the page is as it was; `docs/SITE_COPY.md` shows
+that, string by string, against the build kept from before them.
+
+- **It is our placebo test, not "CoRE Stack's own check".** The check that fails in the East Coast zone is this
+  project's, and its failure rests on few districts (§11). The four East Coast badges, the "i" of the comparison
+  layer, the "i" of the comparison's section in a unit's panel and one sentence of the About text say so.
+- **Hansen does see loss on open land; what it cannot see is thinning.** The layer after it draws Hansen's loss on
+  land that was open in the year 2000. The "i" of the Hansen layer and its bullet in the About text no longer say
+  that Hansen cannot see change on such land.
+- **"Little or no" loss, as the cells' names say.** The column of the grid without loss holds every unit under the
+  loss minimum in the window, not only units with none: its head, each cell's definition (and so the exported
+  definition) and that column of the About text's table of cells read "little or no" or "little or none". The
+  decision table's own code for the column is unchanged.
+- **Outside villages: the question is kept and the claim dropped** (§12, with his ruling on where the prompt's words
+  come from until the decision table is next rebuilt).
+- **The Hansen row of the sources says what was reconciled**: the state's canopy of the year 2000 and its loss up to
+  the last year of Global Forest Watch's workbook, and not the later years (`docs/RESULTS.md` §3).
+- **Block rasters, not a dashboard.** It is CoRE Stack's published block rasters that take two of the classes from
+  its land-use maps; the "i" of the CoRE Stack section of a unit's panel says so.
 
 ## 18. What this does not show
 
@@ -2450,10 +2515,10 @@ this document:
   decision view, and are modified since the commit before it: {docs_changed}. A document of that instruction that is
   not in this list was not changed and still describes the state before the decision view; §16 says which checks its
   own script asks for. The layer's two files are now {layer_mb} MB together ({layer_zip_mb} MB zipped, against the
-  {layer_limit_mb} MB it is held under), and beside them is a third file of {ov_bytes} bytes, the overlay's. One
-  sentence of the About text, that Hansen cannot see "change on land that was already open in 2000", is about change
-  short of clearance; the decision view counts Hansen's clearance on that land. The page does not say so; it is listed
-  for the owner in `docs/SITE_COPY.md`.
+  {layer_limit_mb} MB it is held under), and beside them is a third file of {ov_bytes} bytes, the overlay's. Until
+  11 October 2026 a sentence of the About text said that Hansen cannot see change on land that was already open in
+  the year 2000; the decision view counts Hansen's clearance on that land. The owner rewrote the sentence that day
+  (§17.5): what Hansen cannot see is thinning under a canopy that still stands.
 
 ## 19. To rebuild
 

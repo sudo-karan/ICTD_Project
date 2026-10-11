@@ -37,6 +37,11 @@ expected below follow the strings that handoff reworded, each change listed in d
 no check was taken out. Where a caution moved into an "i" the check reads the words of that "i" (the key `tips` at the top of the data, or the two
 keys the overlay's and the windows' "i" reuse) and holds that the page draws it there. The check of the top's keys gained `tips`, the one key that
 handoff allowed, and says why.
+CHANGED AGAIN 11 OCTOBER 2026, with the owner's third handoff of that day (six lines of the page in his words): the words expected of the East Coast
+badges ("our placebo test fails here"), of the head of the grid's first column ("Little or no forest loss in the window") and of that column in the
+About text's table of cells follow them. The check of the governance prompt now holds two things: that the page shows his new words, and that the
+decision table still carries the sentence of 8 October 2026 for every outside-village unit and for no other - the table is not rebuilt for one
+sentence (his ruling), and the page's words stand in for that sentence and for nothing else. No expected number, count or tolerance changed.
 """
 import csv, hashlib, json, re, sys
 from decimal import Decimal, ROUND_HALF_UP
@@ -295,7 +300,7 @@ check("the five names that were replaced on 9 October 2026 are nowhere in the pa
 check("each cell's row and column are the ones its hectares are tested for, and the grid of six in every panel puts each cell under its own row and column",
       all(CELL[({"mostly dense": "mostly_dense", "mostly open": "mostly_open", "little or none": "little_or_none"}[c["row"]], c["loss"])] == c["id"] for c in DV["cells"])
       and DV["grid"] == [["Mostly dense", "dense_none", "dense_loss"], ["Mostly open", "open_none", "open_loss"], ["Little or none", "little_none", "little_loss"]]
-      and DV["t"]["grid_cols"] == ["No forest loss in the window", "Some forest loss in the window"])
+      and DV["t"]["grid_cols"] == ["Little or no forest loss in the window", "Some forest loss in the window"])
 check("every tier has its one line of reason; the heading over the order says it is provisional, and the 'i' the page draws beside that heading (tips.tiers) says it is to be set with the Foundation for Ecological Security and is the "
       "reader's to change", all(DV["tier_why"].get(c) for c in order) and "provisional" in DV["t"]["tiers_head"].lower()
       and "Foundation for Ecological Security" in tips.get("tiers", "") and "change it" in tips.get("tiers", "") and "esc(DV.t.tiers_head) + tip(TIPS.tiers)" in page
@@ -312,7 +317,7 @@ for i, u in enumerate(ids):
         ok = text.startswith(words[a["agreement_class"]]) and "East Coast" not in text
     elif a["agreement_class"] == "zone_model_excluded":
         east += 1
-        ok = text.startswith(words[a["agreement_class_all_assessed"]]) and "East Coast zone: CoRE Stack's own check fails here" in text and "unreliable" in text
+        ok = text.startswith(words[a["agreement_class_all_assessed"]]) and "East Coast zone: our placebo test fails here" in text and "unreliable" in text
     else:
         notc += 1
         ok = text.startswith("Not compared") and (("under 100 ha of land with canopy above 10 %" in text) == (Decimal(a["reference_ha"]) < 100)) and \
@@ -337,7 +342,14 @@ for i, u in enumerate(ids):
             "flagged": o["area_majority_agrees_with_assigned"] == "0" or (o["label_absent_from_collar"] == "1" and o["assigned_by"] == "label"), "nocheck": o["ambiguous_basis"] == "not measurable"}
     wrong += any((say[k] in text) != v for k, v in want.items()) or (not any(want.values()) and "none of the district checks' flags is raised" not in text) or "no check contradicts" in text
 check(f"each of the {n_out:,} outside-village units says what its assigned district rests on, as outside_village_district.csv has it, and no other unit says anything", wrong == 0 and n_out == D["out"].count("1"), f"{wrong} differ")
-check("their governance prompt is the one asked for, word for word", DV["governance"] == "No revenue village — this land is in no village plan. Whose plan covers it?", DV["governance"])
+GOV_ON_THE_PAGE = "Outside every revenue village. Whose plan covers this land?"                       # the owner's words of 11 October 2026 (his third handoff of that day)
+GOV_IN_THE_TABLE = "No revenue village — this land is in no village plan. Whose plan covers it?"      # the sentence of 8 October 2026, which the decision table carries until it is next rebuilt
+gov_out = {T[u]["governance_prompt"] for i, u in enumerate(ids) if D["out"][i] == "1"}
+gov_other = {T[u]["governance_prompt"] for i, u in enumerate(ids) if D["out"][i] != "1"}
+check("their governance prompt: the page shows the owner's words of 11 October 2026, word for word; and the decision table still carries the sentence of 8 October 2026, word for word, for every outside-village unit and for no "
+      "other unit - so the page's words stand in for that one sentence and hide no change in the table (his ruling of 11 October 2026: the table is not rebuilt for one sentence)",
+      DV["governance"] == GOV_ON_THE_PAGE and gov_out == {GOV_IN_THE_TABLE} and gov_other == {""},
+      f"the page: {DV['governance']} | the table, outside-village units: {sorted(gov_out)}; other units: {sorted(gov_other)}")
 F = DV["fields"]
 nc = "no census data for this land"
 check("beside the tier, an outside-village unit's census columns read 'no census data for this land', never blank or zero; the columns are the panel's own cells",
@@ -446,12 +458,13 @@ R620 = {r["fy"]: r for r in rows("40_allocation/state_fy_r620_vs_dump.csv")}
 full_open_loss = [u for u in ids if S1[u]["cell"]["2001_2025"] == "open_loss"]
 near_n = sum(1 for u in site if 10 * min(S1[u]["sd"], S1[u]["so"]) >= 8 * max(S1[u]["sd"], S1[u]["so"]))
 row_words = {"mostly_dense": "mostly dense", "mostly_open": "mostly open", "little_or_none": "little or none"}
+col_words = {"none": "little or none", "some": "some"}      # what the page prints for the table's two loss columns since 11 October 2026 (the owner's third handoff); the table's own codes are the keys
 CAUT = json.loads((ROOT / "00_raw/05_forest_reference/provider_cautions.json").read_text(encoding="utf-8"))          # the providers' cautions about the data, registered on 9 October 2026
 NUM = {0: "none", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
 ov_cfg = json.loads((ROOT / "scripts/layer_overlay.json").read_text(encoding="utf-8")) if (ROOT / "60_layer/overlay.js").is_file() else None
 want = {
     "the table of the six cells: units, and outside-village units among them": all(
-        f"{SPEC_NAMES[c]}</td><td>{row_words[r]}</td><td>{col}</td><td>{sum(1 for u in ids if base[u] == c):,}</td><td>{sum(1 for u in out_units if base[u] == c):,}</td>" in dv_about for (r, col), c in CELL.items()),
+        f"{SPEC_NAMES[c]}</td><td>{row_words[r]}</td><td>{col_words[col]}</td><td>{sum(1 for u in ids if base[u] == c):,}</td><td>{sum(1 for u in out_units if base[u] == c):,}</td>" in dv_about for (r, col), c in CELL.items()),
     "units with a loss under the area of the pixel in the middle of the state": f"in 2018-2025 {sum(1 for u in ids if 0 < S1[u]['fl'][dw] < pixel):,} units have a recorded forest loss above zero and under {g(pixel)} ha, the area of one pixel in the middle of the state" in plain
                                                     and "one pixel or less" not in plain and f"One pixel is about {pixel:.2f} ha" in plain,
     "the number of works in the registered list": (not registered) or f"({len(LIST)} works)" in plain,
