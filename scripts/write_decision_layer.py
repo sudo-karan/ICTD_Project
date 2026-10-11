@@ -1582,9 +1582,12 @@ again before a later use.
     else:
         site_now = ("**The copy on disk is not yet the one the site serves.** `scripts/check_pages_live.py` last checked the site\n"
                     "on {pages_checked}: {pages_checks} of {pages_checks} checks passed, on the copy made {pages_copy_then}. The copy described\n"
-                    "in this section was made {share_made}, after the page's words were rewritten (§17.4), and had not been published\n"
-                    "when this was written. It goes to the site on the owner's word, and this document is written again, from a new\n"
-                    "check of the live site, once it has.")
+                    "in this section was made {share_made}, after the page's words were rewritten and six lines of it corrected\n"
+                    "(§17.4, §17.5), and had not been published when this was written. The owner gave his word for publishing it on\n"
+                    "11 October 2026, in his third handoff of that day. The session that built it could not publish it: its permission\n"
+                    "gate refused the publish script before the script ran, and nothing was done to get round that. It goes to the site\n"
+                    "when the owner runs that script or allows it, and this document is then written again, from a new check of the\n"
+                    "live site.")
     DOC.append("""
 ## 14. The loss-pixel overlay
 

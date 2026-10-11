@@ -25,6 +25,12 @@ The run stops if a check did not pass, a planted error was not caught, a record 
 words is not the committed file, a finding is still marked as to do, a finding marked as fixed in a document still
 stands in it, or a line of docs/RESULTS.md changed in anything but a figure that is listed.
 
+THE SIX LINES. Later on 11 October 2026 the owner gave his words for six lines of the page that the audit had listed
+for him (his third handoff of that day). They are rows of the audit like any other, marked as fixed with his ruling,
+and a section of their own sets each string beside what it was in the build kept before them, from the record of
+scripts/check_site_copy.py (its group f). That section also lists, by `git grep`, where his eight phrases still
+stand in the tracked files this task does not write.
+
 Output: docs/SITE_COPY.md and nothing else; its inputs, their sha256 and the UTC time of the run are at its end.
 """
 import csv
@@ -133,6 +139,14 @@ def main():
         stop("70_share/exercise_share_chrome.json is not a pass of the copy on disk")
     if not (seen["builds"] == now and all(sha(p) == h for p, h in seen["files_sha256"].items()) and all(p["seen"].strip() for p in seen["pictures"])):
         stop("60_layer/site_copy_looked_at.json is of other builds than the ones on disk, or a picture has no note")
+    pics = seen.get("against_the_pictures_kept_before_the_six_lines")
+    if not pics or pics["pictures"] != len(seen["pictures"]) or pics["byte_for_byte_the_same"] + pics["differ_or_are_new"] != pics["pictures"]:
+        stop("60_layer/site_copy_looked_at.json does not say which pictures are the ones kept before the six lines and which were looked at again")
+    six = chk.get("the_six_lines", {}).get("strings_that_differ_from_the_kept_builds") or []
+    f_checks = [c for c in chk["checks"] if c["id"].startswith("f")]
+    if not (six and len(f_checks) == len(F_CHECKS) and all(c["pass"] for c in f_checks) and {x["fix"] for x in six} == set(FIXES)):
+        stop("60_layer/site_copy_check.json does not carry the six lines of the owner's third handoff, each found in the builds, with its group f passed")
+    by_owner = [a for a in audit if a["done"].startswith(SIX_DONE)]
     todo = [a["where"] for a in audit if not a["done"].startswith(("fixed", "listed"))]
     if todo:
         stop("a finding of the audit is neither fixed nor listed for the owner: " + "; ".join(todo))
@@ -207,15 +221,21 @@ again in Chrome and in WebKit with their expected words brought up to date, no e
 
 **What one data key was added.** `data.js` gained one key at its top, `tips`, which holds the words of every "i".
 Nothing else was added to the data.
-""").format(written=written, layer_run=L["run_utc"], copy_run=S["run_utc"], n_checks=chk["checks_made"], n_trials=tri["planted"]))
+
+**Six lines were corrected later the same day.** The audit had listed them for the owner with nothing changed; in his
+third handoff of 11 October 2026 he gave his words for each and asked that every other string stay as it is. They
+are the last {n_six} rows of section 2, with his ruling, and section 13 sets each string beside what it was.
+""").format(written=written, layer_run=L["run_utc"], copy_run=S["run_utc"], n_checks=chk["checks_made"], n_trials=tri["planted"], n_six=len(by_owner)))
 
     D.append(typed("""
 ## 2. What was untrue, and what the page says now
 
 {n_fixed} findings were fixed. The first group is the owner's own table, each row confirmed against its source; the
 second is what one reader found besides. That reader was given every text of both builds, the README and the
-documents, and had not seen the owner's list. "Done" names the step and the commit.
-""").format(n_fixed=len(fixed)))
+documents, and had not seen the owner's list. "Done" names the step and the commit. The last {n_six} rows are lines
+that stood in section 3, listed for the owner, until he gave his words for them in his third handoff of the day
+(section 13); "What it says now" gives those words and, for the prompt, his ruling.
+""").format(n_fixed=len(fixed), n_six=len(by_owner)))
     D.append(table(["Where", "It said", "What is true", "Source", "What it says now", "Done"], [[cellmd(a[k]) for k in ("where", "said", "true", "source", "fix", "done")] for a in fixed]))
 
     D.append(typed("""
@@ -225,7 +245,7 @@ documents, and had not seen the owner's list. "Done" names the step and the comm
 `55_decision/` (a cell's name or reason, a tier's reason, a work-type field, a window's description, the governance
 prompt); a sentence of `docs/RESULTS.md`, or of another document this task does not rewrite; words the deck keeps as
 they are; or the owner's own words. `scripts/check_site_copy.py` holds that each of the page's is still on the page as
-quoted here.
+quoted here. The lines he has since reworded are no longer here: they are in section 2.
 """).format(n_listed=len(listed)))
     D.append(table(["Where", "It says", "What is true", "Source", "Why nothing was changed"], [[cellmd(a[k]) for k in ("where", "said", "true", "source", "fix")] for a in listed]))
 
@@ -345,7 +365,8 @@ sight wherever its panel can scroll; and the last of the planted errors below is
 ### The planted errors
 
 {caught} of {planted} errors, each planted on a copy and never on the real files, were caught by a check meant to
-catch them (run {tri_run}). The first eight are the ones the owner named.
+catch them (run {tri_run}). The first eight are the ones the owner named; those numbered from twenty-three to
+twenty-six are the four he named with the six lines, each of which puts an old line back.
 """).format(caught=tri["caught"], planted=tri["planted"], tri_run=tri["run_utc"]))
     D.append(table(["Planted", "On", "Checks meant to catch it", "Checks that failed", "Caught"],
                    [[cellmd(t["planted"]), cellmd(t["on"]), cellmd(", ".join(t["checks_meant_to_catch_it"])), cellmd(", ".join(t["checks_that_failed"])), "yes" if t["caught"] else "NO"] for t in tri["trials"]]))
@@ -357,10 +378,17 @@ The pictures were taken {shots_utc} in a headless Chrome, of both builds at thre
 opened by the pointer, and every one was opened and looked at. The measurements are the script's; "seen" is what the
 picture shows. The pictures are in `60_layer/site_copy_shots/`, outside git like the rest of that folder.
 
+**The pictures are of the builds with the six lines.** They were all taken again, and four more were taken of each
+build at the largest size, the ones the owner asked for with the six lines: a ranked list with an East Coast badge
+in view, the prompt of a unit outside villages, the comparison section's "i" in the panel of an East Coast unit, and
+the grid of "why this tier". Each picture was compared, byte for byte, with the picture of the same name kept from
+before the six lines: of {pic_n} pictures, {pic_same} are the same and {pic_diff} differ or are new. {pic_how}
+
 **Overall.** {overall}
 
 **At a phone's width.** {phone}
-""").format(shots_utc=seen["pictures_taken_utc"], overall=seen["overall"], phone=seen["what_breaks_at_a_phones_width"]))
+""").format(shots_utc=seen["pictures_taken_utc"], overall=seen["overall"], phone=seen["what_breaks_at_a_phones_width"], pic_n=pics["pictures"], pic_same=pics["byte_for_byte_the_same"],
+            pic_diff=pics["differ_or_are_new"], pic_how=pics["how"][0].upper() + pics["how"][1:] + "."))
 
     def measured(m):
         if "box" in m and not m.get("shown"):
@@ -390,7 +418,7 @@ Four things of the handoff were not done exactly as written:
   keyboard focus as well as the pointer, which is how the defect of section 9 was pinned down;
 - this document is written from the `60_layer/site_copy_*` files, as asked, and from what its section on the runs
   needs besides: the runner's record, the record of the gate on the copy and the two builds' own records. It also
-  reads four documents, to hold a fix or a list against each (section 13).
+  reads four documents, to hold a fix or a list against each (section 14).
 """))
 
     D.append(typed("""
@@ -412,7 +440,74 @@ each is the old line with nothing changed in it but those figures; its headings 
                    [[cellmd(r["kind"]), cellmd(r["as_printed_before"]), cellmd(r["as_printed_now"]), cellmd(r["file"]), cellmd(r["where_in_the_file"])] for r in res["changes"]]))
 
     D.append(typed("""
-## 13. What this document was written from
+## 13. The six lines of the owner's third handoff
+
+Later on 11 October 2026 the owner ruled on six lines that section 3 then listed for him. They were untrue or
+misleading, he gave his words for each, and he asked that every other string stay as it is.
+
+- **It is our placebo test, not "CoRE Stack's own check".** The check that fails in the East Coast zone is this
+  project's: it uses CoRE Stack's Improvement class as a check on its Degradation class. Its failure rests on few
+  districts, and the two "i" that speak of it now say so.
+- **Hansen does see loss on open land; what it cannot see is thinning.** The layer after the Hansen layer draws
+  Hansen's loss on land that was open in the first year of its record.
+- **"Little or no" loss, as the cells' names say.** The column holds every unit under the loss minimum in the
+  window, not only units with none. Only what the page prints changes; the decision table's code for the column is
+  as it was.
+- **Outside villages: the question is kept and the claim dropped.** Nothing in the repository shows that this land
+  is in no village plan, and works are geotagged on it.
+- **The Hansen row of Sources says what was reconciled**, and up to which year. The copy's README takes its credits
+  from that row and follows it.
+- **Block rasters, not a dashboard**, as `docs/LAYER.md` says of the same thing.
+
+**His ruling on the prompt.** The prompt of an outside-village unit comes from the decision table,
+`55_decision/condition_by_unit.csv`, column `governance_prompt`. To rebuild that table for one sentence would send
+the fourth stage through four more steps, so it is not rebuilt now. Until it is next rebuilt the builder of the
+decision view, `scripts/_layer_decision.py`, shows the new words in place of the table's, a change of the page only.
+The builder still guards the table: it stops unless the table's prompt is exactly the old sentence, so that the swap
+cannot hide a change in the table. When the decision table is next rebuilt, with the Foundation's ruling on the
+tiers, `scripts/05_build_decision.py` takes the new words and the swap goes. `scripts/verify_decision.py` holds both
+halves: that the page shows the new words, and that the table still carries the old sentence.
+
+**Every string that differs from the builds kept before the six lines.** Both builds were copied aside before a
+line was changed, as they were before the words were first rewritten. `scripts/check_site_copy.py` holds the builds
+on disk against those copies (its group `f`): no string was added or dropped; each string below differs by exactly
+the owner's replacement and by nothing else; no place of a fix still holds its old words; and no other part of
+`data.js` or of `index.html` differs but the build's own time. In the full layer {six_layer} strings differ, in the
+copy {six_copy}. Where the same string differs in both builds it is one row.
+""").format(six_layer=sum(1 for x in six if x["build"] == full), six_copy=sum(1 for x in six if x["build"] == copy_)))
+    rows6, at6 = [], {}
+    for x in six:
+        k6 = (x["fix"], x["as_it_was"], x["as_it_is"])
+        if k6 in at6:
+            at6[k6]["builds"].add(x["build"])
+            at6[k6]["wheres"].append(x["where"])
+        else:
+            at6[k6] = dict(x, builds={x["build"]}, wheres=[x["where"]])
+            rows6.append(at6[k6])
+    D.append(table(["Fix", "In", "Where", "As it was", "As it is"],
+                   [[cellmd(f"{x['fix']}. {FIXES[x['fix']]}"), cellmd("both builds" if len(x["builds"]) > 1 else next(iter(x["builds"]))), cellmd("; ".join(dict.fromkeys(x["wheres"]))), cellmd(x["as_it_was"]), cellmd(x["as_it_is"])]
+                    for x in sorted(rows6, key=lambda x: x["fix"])]))
+    D.append("\n" + table(["", "Check", "What it found"], [[cellmd(c["id"]), cellmd(c["check"]), cellmd(c["detail"])] for c in f_checks]))
+    grep = []
+    for ph in OLD_WORDS:
+        r = subprocess.run(["git", "-C", str(ROOT), "grep", "-c", "-I", "-F", "-e", ph, "--", "."] + [":!" + x for x in NOT_SEARCHED], capture_output=True, text=True)
+        for line in r.stdout.splitlines():
+            f_, n_ = line.rsplit(":", 1)
+            grep.append([cellmd(ph), cellmd("`" + f_ + "`"), n_])
+    D.append(typed("""
+**Where the old words still stand, outside the page.** The eight phrases the owner added to the list of
+`scripts/check_site_copy.py` were looked for, as he wrote them, in every file git tracks but the registered inputs and
+the documents this task writes by script (those say what changed, and so quote the old words). None of these is a
+string of the page. They are of three kinds: a check or a builder that names an old line in order to forbid it, to
+guard the decision table's sentence or to record the change; the script that builds the decision table, which keeps
+its sentence until that table is next rebuilt; and a hand-kept document or a stage script's own account, which this
+handoff does not rewrite. `README.md` speaks of Hansen on the forest mask, which is blind to open land by
+construction: the owner asked that it be left.
+"""))
+    D.append(table(["The owner's phrase", "File", "Lines that hold it"], grep))
+
+    D.append(typed("""
+## 14. What this document was written from
 
 | File | Bytes | SHA-256 |
 |---|---|---|
@@ -427,6 +522,12 @@ each is the old line with nothing changed in it but those figures; its headings 
           f"{tri['planted']} planted errors; {len(seen['pictures'])} pictures")
 
 
+SIX_DONE = "fixed (the owner's words of 11 October 2026, his third handoff"            # how the audit marks a line the owner reworded in his third handoff
+FIXES = {1: "our placebo test, not CoRE Stack's own check", 2: "Hansen does see loss on open land", 3: "little or no loss", 4: "outside villages: the question kept, the claim dropped", 5: "the Hansen row of Sources",
+         6: "block rasters, not a dashboard"}                                             # the six lines, by the number the check gives each
+F_CHECKS = ("f0", "f1 (layer)", "f2 (layer)", "f1 (copy)", "f2 (copy)")
+OLD_WORDS = ["CoRE Stack's own check", "already open in 2000", "fairly closed", "No forest loss in the window", "is none: under", "no village plan", "own dashboard", "state totals reconciled"]   # the owner's eight phrases, as he wrote them
+NOT_SEARCHED = ["00_raw", "docs/SITE_COPY.md", "docs/DECISION_LAYER.md", "docs/LAYER.md", "docs/RESULTS.md", "docs/GAP.md", "docs/stage4_run_log.md"]      # registered inputs, and the documents this task writes by script
 NIRV_NOW = "stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`)"    # the owner's words for the state of NIRv, row 11 of his table
 IN_DOCUMENTS = [("README.md", "pending, nothing queued", NIRV_NOW), ("docs/DEGRADATION.md", "pending, and **nothing is queued**", NIRV_NOW),      # (the document, what it said, what it must say now)
                 ("README.md", "The page computes nothing", "The page works out no figure"), ("docs/LAYER.md", "it computes nothing", "it works out no figure")]
