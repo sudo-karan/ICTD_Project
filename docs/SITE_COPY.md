@@ -1,6 +1,6 @@
 # The site in plain words: what was changed on 11 October 2026
 
-*Written 2026-10-11T16:36:00Z by `scripts/write_site_copy.py`. No figure in this document was typed: each count, time, hash and
+*Written 2026-10-11T16:45:57Z by `scripts/write_site_copy.py`. No figure in this document was typed: each count, time, hash and
 sentence of the page was read by that script from the files listed at the end, which it holds against the builds on
 disk before it writes a word.*
 
@@ -1385,22 +1385,23 @@ whole.
 | f2 (copy) | against the same kept build, no part of the data.js of the published copy differs - no row of a unit, class, count, colour, shape or figure array, and no other text - but the parts the six lines are in (the About and Sources texts, three cells' definitions, the four East Coast badges, the prompt, the head of the grid's first column, four 'i') and the build time; and index.html is byte for byte the kept one | 16 parts differ, all of them the six lines' or the build time; index.html the same |
 
 **Where the old words still stand, outside the page.** The eight phrases the owner added to the list of
-`scripts/check_site_copy.py` were looked for, as he wrote them, in every file git tracks but the registered inputs and
-the documents this task writes by script (those say what changed, and so quote the old words). None of these is a
-string of the page. They are of three kinds: a check or a builder that names an old line in order to forbid it, to
+`scripts/check_site_copy.py` were looked for, as he wrote them and with a break of line between two of their words
+counted as a space, in every file of text git tracks but the registered inputs and the documents this task writes by
+script (those say what changed, and so quote the old words). None of these is a string of the page. They are of three kinds: a check or a builder that names an old line in order to forbid it, to
 guard the decision table's sentence or to record the change; the script that builds the decision table, which keeps
 its sentence until that table is next rebuilt; and a hand-kept document or a stage script's own account, which this
 handoff does not rewrite. `README.md` speaks of Hansen on the forest mask, which is blind to open land by
 construction: the owner asked that it be left.
 
-| The owner's phrase | File | Lines that hold it |
+| The owner's phrase | File | Times it stands there |
 |---|---|---|
+| CoRE Stack's own check | `docs/DEGRADATION.md` | 1 |
 | CoRE Stack's own check | `scripts/06_build_layer.py` | 1 |
 | CoRE Stack's own check | `scripts/check_site_copy.py` | 5 |
 | CoRE Stack's own check | `scripts/write_decision_layer.py` | 2 |
 | CoRE Stack's own check | `scripts/write_site_copy.py` | 3 |
 | already open in 2000 | `docs/DEGRADATION.md` | 1 |
-| already open in 2000 | `scripts/check_site_copy.py` | 7 |
+| already open in 2000 | `scripts/check_site_copy.py` | 8 |
 | already open in 2000 | `scripts/write_site_copy.py` | 1 |
 | fairly closed | `README.md` | 1 |
 | fairly closed | `scripts/02_assemble_degradation.py` | 1 |
