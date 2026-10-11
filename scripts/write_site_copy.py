@@ -509,23 +509,29 @@ whole.
                    [[cellmd(f"{x['fix']}. {FIXES[x['fix']]}"), cellmd("both builds" if len(x["builds"]) > 1 else next(iter(x["builds"]))), cellmd("; ".join(dict.fromkeys(x["wheres"])))] + [cellmd(t) for t in shown6(x)]
                     for x in sorted(rows6, key=lambda x: x["fix"])]))
     D.append("\n" + table(["", "Check", "What it found"], [[cellmd(c["id"]), cellmd(c["check"]), cellmd(c["detail"])] for c in f_checks]))
-    grep = []
-    for ph in OLD_WORDS:
-        r = subprocess.run(["git", "-C", str(ROOT), "grep", "-c", "-I", "-F", "-e", ph, "--", "."] + [":!" + x for x in NOT_SEARCHED], capture_output=True, text=True)
-        for line in r.stdout.splitlines():
-            f_, n_ = line.rsplit(":", 1)
-            grep.append([cellmd(ph), cellmd("`" + f_ + "`"), n_])
+    found = {}
+    for f_ in subprocess.run(["git", "-C", str(ROOT), "ls-files"], capture_output=True, text=True, check=True).stdout.splitlines():
+        if any(f_ == x or f_.startswith(x + "/") for x in NOT_SEARCHED) or (ROOT / f_).stat().st_size > BIGGEST:
+            continue
+        try:
+            words = " ".join((ROOT / f_).read_text(encoding="utf-8").split())            # a phrase broken over two lines is still the phrase
+        except (UnicodeDecodeError, OSError):
+            continue
+        for ph in OLD_WORDS:
+            if words.count(ph):
+                found[(OLD_WORDS.index(ph), f_)] = words.count(ph)
+    grep = [[cellmd(OLD_WORDS[k]), cellmd("`" + f_ + "`"), str(n_)] for (k, f_), n_ in sorted(found.items())]
     D.append(typed("""
 **Where the old words still stand, outside the page.** The eight phrases the owner added to the list of
-`scripts/check_site_copy.py` were looked for, as he wrote them, in every file git tracks but the registered inputs and
-the documents this task writes by script (those say what changed, and so quote the old words). None of these is a
-string of the page. They are of three kinds: a check or a builder that names an old line in order to forbid it, to
+`scripts/check_site_copy.py` were looked for, as he wrote them and with a break of line between two of their words
+counted as a space, in every file of text git tracks but the registered inputs and the documents this task writes by
+script (those say what changed, and so quote the old words). None of these is a string of the page. They are of three kinds: a check or a builder that names an old line in order to forbid it, to
 guard the decision table's sentence or to record the change; the script that builds the decision table, which keeps
 its sentence until that table is next rebuilt; and a hand-kept document or a stage script's own account, which this
 handoff does not rewrite. `README.md` speaks of Hansen on the forest mask, which is blind to open land by
 construction: the owner asked that it be left.
 """))
-    D.append(table(["The owner's phrase", "File", "Lines that hold it"], grep))
+    D.append(table(["The owner's phrase", "File", "Times it stands there"], grep))
 
     D.append(typed("""
 ## 14. What this document was written from
@@ -552,6 +558,7 @@ NOT_SEARCHED = ["00_raw", "docs/SITE_COPY.md", "docs/DECISION_LAYER.md", "docs/L
 NIRV_NOW = "stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`)"    # the owner's words for the state of NIRv, row 11 of his table
 IN_DOCUMENTS = [("README.md", "pending, nothing queued", NIRV_NOW), ("docs/DEGRADATION.md", "pending, and **nothing is queued**", NIRV_NOW),      # (the document, what it said, what it must say now)
                 ("README.md", "The page computes nothing", "The page works out no figure"), ("docs/LAYER.md", "it computes nothing", "it works out no figure")]
+BIGGEST = 5_000_000                                   # a tracked file larger than this many bytes is not searched for the owner's phrases: none of the texts is
 LONG = 420                                            # a string of section 13 longer than this is shown by the stretch that differs
 CUT = 260                                             # how much of a changed block of a check is shown in section 8: the table itself holds it whole
 LEAD = 90                                             # how much of an unchanged string is shown in section 7
