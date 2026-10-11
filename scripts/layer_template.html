@@ -335,7 +335,9 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   // An "i" is an empty element: it is drawn by the stylesheet and adds no text to the label it stands beside. Its words are an attribute of
   // it (escaped for an attribute, quotes included), written by tip(); they are shown in ONE box, #tipbox, which lies outside the panels, is
   // placed inside the window each time, and is emptied when it closes. It opens on hover, on keyboard focus, and on a tap or a click; it
-  // closes when the pointer leaves, on losing focus, on Escape, on a click elsewhere, and when anything scrolls or the window changes size.
+  // closes when the pointer leaves, on losing focus, on Escape and on a click elsewhere. When something scrolls or the window changes size
+  // the box stays with its "i" as long as the "i" can be seen, and closes when it cannot: an "i" that takes keyboard focus out of sight is
+  // scrolled into view by the browser, and its box must not be closed by that scroll.
   // A click on an "i" that stands inside a label does not work the label's control.
   function attr(s) { return esc(s).replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
   function tip(words) { return words ? '<span class="tip" tabindex="0" role="button" aria-label="More about this" data-tip="' + attr(words) + '"></span>' : ""; }
@@ -364,8 +366,14 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     if (e.key === "Escape" || e.keyCode === 27) { if (tipFor) { tipHide(); } }
     else if (isTip(e.target) && (e.key === "Enter" || e.key === " " || e.keyCode === 13 || e.keyCode === 32)) { e.preventDefault(); tipShow(e.target); }
   });
-  document.addEventListener("scroll", function () { if (tipFor) { tipHide(); } }, true);
-  window.addEventListener("resize", function () { if (tipFor) { tipHide(); } });
+  function tipFollow() {       // something scrolled, or the window changed size: the box stays with its "i" while the "i" can be seen, and closes when it cannot
+    var r;
+    if (!tipFor) { return; }
+    r = tipFor.getBoundingClientRect();
+    if (r.width > 0 && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === tipFor) { tipShow(tipFor); } else { tipHide(); }
+  }
+  document.addEventListener("scroll", tipFollow, true);
+  window.addEventListener("resize", tipFollow);
 
   // ---- the decision view (added 8 Oct 2026) ------------------------------------------------------------------------------------
   // Six cells from 55_decision/condition_by_unit.csv, ranked within ONE district. It stands beside the layers and changes none of

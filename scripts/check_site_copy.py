@@ -31,7 +31,8 @@ WHAT IT CHECKS
     "This shows". Every "i" has words, does not merely repeat its label, and its label does not hold its words. And in
     a browser (a separate, headless Chrome with an empty profile, driven by scripts/_browser_chrome.py), for each
     build: every "i" element's own text is empty; the one floating box is empty and hidden while no "i" is open and
-    again after each one closes; the pointer on an "i" shows exactly that "i"'s words, wholly inside the window;
+    again after each one closes; the pointer on an "i" shows exactly that "i"'s words, wholly inside the window, and
+    so does keyboard focus, also on an "i" that the browser has first to scroll into view;
     every "i" the data has words for is drawn somewhere and no other; a click on an "i" that stands inside a label
     does not work the label's control; the page raises no script error and asks the network for nothing. A run of
     this part that finds something wrong is made again, up to three runs in all, and every run is kept in the
@@ -524,7 +525,7 @@ def in_a_browser(folder, D, port=9341):
     profile = tempfile.mkdtemp(prefix="ictd_chrome_profile_")
     c = Chrome(profile, port=port)
     url = "file://" + str(Path(folder) / "index.html")
-    seen, wrong, states, hovered, slowest = Counter(), [], [], 0, 0.0
+    seen, wrong, states, hovered, focused, focused_after_a_scroll, slowest = Counter(), [], [], 0, 0, 0, 0.0
     net = lambda: [u for u in c.requests if u.startswith("http")]
 
     def until(want, limit=2.0):
@@ -539,7 +540,7 @@ def in_a_browser(folder, D, port=9341):
             time.sleep(0.05)
 
     def state(name):
-        nonlocal hovered
+        nonlocal hovered, focused, focused_after_a_scroll
         time.sleep(0.5)
         s = c.js(LIST_TIPS)
         if not s["box"]["there"] or s["box"]["text"] != "" or s["box"]["shown"] or s["box"]["in_info"]:
@@ -565,9 +566,36 @@ def in_a_browser(folder, D, port=9341):
                 wrong.append(f"{name}: after the pointer left the 'i' beside '{t['beside']}' the box still holds {box['text'][:60]!r}")
             opened += 1
         hovered += opened
-        states.append({"state": name, "i_elements": len(s["tips"]), "on_show_and_opened_by_the_pointer": opened, "window": [s["w"], s["h"]]})
+        # keyboard focus. Each "i" on show is given focus, as a Tab would give it, after its panel has been scrolled so that the "i" is out of sight wherever the panel can scroll:
+        # the browser then scrolls it back into view, and its bubble must open and stay open (found on 11 October 2026: that scroll used to close it).
+        by_focus = after_scroll = 0
+        for t in s["tips"]:
+            if not t["visible"]:
+                continue
+            out_of_sight = c.js(f"""(function(){{var e=document.querySelectorAll('.tip')[{t['i']}], p=e.parentElement;
+              while (p && !(p.scrollHeight > p.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(p).overflowY))) p = p.parentElement;
+              if (p) {{ var r=e.getBoundingClientRect(), q=p.getBoundingClientRect(); p.scrollTop = (r.top - q.top + p.scrollTop > p.clientHeight) ? 0 : p.scrollHeight; }}
+              var r2=e.getBoundingClientRect(); return document.elementFromPoint(r2.left+r2.width/2, r2.top+r2.height/2) !== e;}})()""")
+            time.sleep(0.15)                                     # the scroll just made has passed before focus is given
+            c.js(f"(function(){{document.querySelectorAll('.tip')[{t['i']}].focus(); return 0;}})()")
+            box = until(lambda b_: b_["text"] == t["words"] and b_["shown"])
+            if box["text"] == t["words"] and box["shown"]:
+                time.sleep(0.3)                                  # and it is still open a moment later, when the scroll that focus made has passed
+                box = c.js(BOX)
+            if box["text"] != t["words"] or not box["shown"] or not box["inside"]:
+                wrong.append(f"{name}: with keyboard focus on the 'i' beside '{t['beside']}'" + (", which had first to scroll into view," if out_of_sight else "") + f" the box shows {box['text'][:60]!r} (shown {box['shown']}, inside the window {box['inside']}), not its words")
+            c.js("(function(){ if (document.activeElement) { document.activeElement.blur(); } return 0; })()")
+            box = until(lambda b_: b_["text"] == "" and not b_["shown"])
+            if box["text"] != "" or box["shown"]:
+                wrong.append(f"{name}: after the 'i' beside '{t['beside']}' lost keyboard focus the box still holds {box['text'][:60]!r}")
+            by_focus += 1
+            after_scroll += bool(out_of_sight)
+        focused += by_focus
+        focused_after_a_scroll += after_scroll
+        states.append({"state": name, "i_elements": len(s["tips"]), "on_show_and_opened_by_the_pointer": opened, "opened_by_keyboard_focus": by_focus, "of_them_after_scrolling_into_view": after_scroll, "window": [s["w"], s["h"]]})
 
     try:
+        c.cmd("Emulation.setFocusEmulationEnabled", enabled=True)      # a window off the screen has no focus of its own: without this no element in it is told that it took focus
         c.open(url)
         state("the page as it opens")
         # a click on an "i" inside a label must not work the label's control
@@ -623,9 +651,11 @@ def in_a_browser(folder, D, port=9341):
         wrong.append("words of an 'i' that the data holds and no state of the page draws: " + "; ".join(sorted(x[:50] for x in expected - drawn)))
     if drawn - expected:
         wrong.append("an 'i' drawn with words the data does not hold for it: " + "; ".join(sorted(x[:50] for x in drawn - expected)))
+    if not focused_after_a_scroll:
+        wrong.append("no 'i' was out of sight when it was given keyboard focus: the scroll that focus makes was not exercised")
     return {"browser": version, "opened": "file://" + rel(Path(folder) / "index.html") if Path(folder).resolve().is_relative_to(ROOT) else "a copy in a temporary folder", "states": states,
             "i_with_distinct_words_drawn": len(drawn), "i_with_distinct_words_expected": len(expected), "bubbles_opened_by_the_pointer": hovered,
-            "the_slowest_bubble_to_open_or_close_s": round(slowest, 2), "wrong": wrong}
+            "bubbles_opened_by_keyboard_focus": focused, "of_them_on_an_i_that_had_first_to_scroll_into_view": focused_after_a_scroll, "the_slowest_bubble_to_open_or_close_s": round(slowest, 2), "wrong": wrong}
 
 
 def in_a_browser_with_runs(folder, D):
@@ -830,9 +860,11 @@ def run_checks(before, now, extra, browser):
             check(f"d4 ({k})", f"in a browser, {CALLED[k]}: not opened in this run", False, "the build was not opened")
             continue
         check(f"d4 ({k})", f"in a browser, {CALLED[k]} opened from disk, in the page as it opens, under each layer, with a unit's panel open, in the decision view, and with a district ranked and a filter on: every 'i' element's own text "
-              "is empty; the one floating box is empty and hidden while no 'i' is open and again after each one closes; the pointer on an 'i' shows exactly that 'i''s words, wholly inside the window; every 'i' the data has words for "
-              "is drawn in one of those states and no other is; a click on an 'i' that stands inside a label does not work the label's control; no script error, and nothing asked of the network", not r["wrong"],
-              (f"{r['browser']}; {len(r['states'])} states; {r['i_with_distinct_words_drawn']} of {r['i_with_distinct_words_expected']} 'i' drawn; {r['bubbles_opened_by_the_pointer']} bubbles opened by the pointer; the slowest "
+              "is empty; the one floating box is empty and hidden while no 'i' is open and again after each one closes; the pointer on an 'i' shows exactly that 'i''s words, wholly inside the window, and so does keyboard focus, also on an 'i' "
+              "that the browser has first to scroll into view; every 'i' the data has words for is drawn in one of those states and no other is; a click on an 'i' that stands inside a label does not work the label's control; no script "
+              "error, and nothing asked of the network", not r["wrong"],
+              (f"{r['browser']}; {len(r['states'])} states; {r['i_with_distinct_words_drawn']} of {r['i_with_distinct_words_expected']} 'i' drawn; {r['bubbles_opened_by_the_pointer']} bubbles opened by the pointer and {r['bubbles_opened_by_keyboard_focus']} by keyboard focus "
+               f"({r['of_them_on_an_i_that_had_first_to_scroll_into_view']} of them on an 'i' that had first to scroll into view); the slowest "
                f"took {r['the_slowest_bubble_to_open_or_close_s']} s to open or close" if not r["wrong"] else "WRONG: " + " | ".join(r["wrong"][:4]))
               + (f"; runs made: {r['runs_made']}, of which {r['runs_that_found_nothing_wrong']} found nothing wrong" + (f" (an earlier run found: {' | '.join(x for w in r['what_each_earlier_run_found_wrong'] for x in w[:2])})"
                                                                                                                       if r.get("what_each_earlier_run_found_wrong") else "") if "runs_made" in r else ""))
@@ -1021,6 +1053,8 @@ def planted(before, now):
         ("19. a finding of the audit back in About ('Every number shown is a cell of')", "the copy's data", lambda: about("Every number in a unit's panel is a cell of", "Every number shown is a cell of", "copy"), ["b2"]),
         ("20. a {placeholder} dropped from a sentence of 'why this tier'", "the full layer's data", lambda: layer(decision=t_of(L, why_share=L["decision"]["t"]["why_share"].replace("{start} ha", "the"))), ["a4 (layer)"]),
         ("21. layer_by_unit.csv with one byte changed", "a copy of the table", None, ["a1"]),
+        ("22. a bubble closed by any scroll, so that keyboard focus on an 'i' out of sight shows nothing (the page as it was until 11 October 2026, 16:50 IST)", "a copy of the full layer's index.html",
+         lambda: page_of("layer", 'document.addEventListener("scroll", tipFollow, true);', 'document.addEventListener("scroll", function () { if (tipFor) { tipHide(); } }, true);'), ["d4 (layer)"]),
     ]
 
 
