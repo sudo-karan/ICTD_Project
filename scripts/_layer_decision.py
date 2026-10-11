@@ -19,7 +19,14 @@ second person; what a label needs said beside it is the words of a small "i". bu
 "filter" and "col_share". Two more "i" reuse words the view already had, under their own keys: a window's `is`, and the
 overlay's `note` and `version`. No key of the view itself was added, renamed or taken away. The strings that come from
 55_decision/ (the cells' names and what they rest on, the tiers' reasons, the work-type fields, the windows'
-descriptions, the governance prompt) and the owner's words for standing forest are as they were.
+descriptions) and the owner's words for standing forest are as they were.
+
+SIX LINES (11 Oct 2026, the owner's third handoff of that day), three of them here. The East Coast badges say "our placebo
+test fails here": the check is this project's, not CoRE Stack's. The column of the grid without loss reads "Little or no
+forest loss in the window", and each cell's definition "little or none", since it holds every unit under the loss
+minimum; the table's code for it stays `none`. And the prompt of an outside-village unit: the decision table still
+carries the sentence of 8 October, and the page shows the owner's new words in its place until the table is next rebuilt
+(GOVERNANCE_ON_THE_PAGE, below, says how the build guards that).
 """
 import hashlib
 import json
@@ -36,7 +43,16 @@ LEGEND_NAME = {}
 STANDING_IS = "the forest of 2000 with no loss recorded since; not a measure of tree cover today"          # the owner's wording of 9 October 2026, in place of "a lower bound"
 CAUTIONS = "00_raw/05_forest_reference/provider_cautions.json"
 CORRO = {"both": "Both measures flag this unit", "hansen_only": "Only Hansen flags it (clearance)", "corestack_only": "Only CoRE Stack flags it (degradation)", "neither": "Neither measure flags it"}
-EAST = " - East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable"
+EAST = " - East Coast zone: our placebo test fails here, so corroboration is unreliable"         # the owner's words of 11 October 2026 (his third handoff): the check is this project's, not CoRE Stack's
+# The column of the grid that holds every unit with under the loss minimum in the window - not only units with none. The table's code for it stays `none`; these are the words the page prints for it
+# (the owner's words of 11 October 2026).
+LOSS_WORDS = {"none": "little or none", "some": "some"}
+# The prompt in the panel of every outside-village unit. The decision table (55_decision/condition_by_unit.csv, column governance_prompt) carries the sentence of 8 October 2026. By the owner's ruling of
+# 11 October 2026 the page shows his new words in its place until that table is next rebuilt: a page-only change, of the kind LEGEND_NAME allows for the legend. When the table is next rebuilt,
+# scripts/05_build_decision.py's GOVERNANCE takes the new words and this swap goes. Until then build() stops unless the table's prompt is exactly the old sentence, so that the swap cannot hide a change
+# in the table.
+GOVERNANCE_IN_THE_TABLE = "No revenue village — this land is in no village plan. Whose plan covers it?"
+GOVERNANCE_ON_THE_PAGE = "Outside every revenue village. Whose plan covers this land?"
 NOT_COMPARED = {"below_floor": "Not compared: under {floor:g} ha of land with canopy above 10 % in 2000, the agreement test's floor",
                 "below_floor_no_corestack_coverage": "Not compared: under {floor:g} ha of land with canopy above 10 % in 2000, the agreement test's floor; and CoRE Stack gives no class on such land here",
                 "corestack_covers_under_floor": "Not compared: CoRE Stack gives a class on under {floor:g} ha of this unit's land with canopy above 10 % in 2000, the agreement test's floor"}
@@ -93,7 +109,7 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
     row_def = {"mostly_dense": f"Forest standing now is mostly dense: {smin:g} ha or more of standing forest, and standing dense at least as large as standing open.",
                "mostly_open": f"Forest standing now is mostly open: {smin:g} ha or more of standing forest, and standing open larger than standing dense.",
                "little_or_none": f"Forest standing now is little or none: under {smin:g} ha of standing forest."}
-    col_def = {"some": f"Forest loss in the window is some: {lmin:g} ha or more.", "none": f"Forest loss in the window is none: under {lmin:g} ha."}
+    col_def = {"some": f"Forest loss in the window is some: {lmin:g} ha or more.", "none": f"Forest loss in the window is little or none: under {lmin:g} ha."}
     payload_cells = [{"id": c, "name": defs[c]["name"], "color": CELL_COLOR[c], "row": ROW_WORDS[defs[c]["standing_row"]], "loss": defs[c]["loss_column"], "rests": defs[c]["what_the_name_rests_on"],
                       "def": row_def[defs[c]["standing_row"]] + " " + col_def[defs[c]["loss_column"]], "work": work.loc[c, "work_type_field"], "legend": LEGEND_NAME.get(c, defs[c]["name"])} for c in cells]
     loss_cells = [c for c in cells if defs[c]["loss_column"] == "some"]
@@ -148,7 +164,10 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
     if len(prompts) != 1 or not prompts[0] or (T.loc[~np.asarray(outside, bool), "governance_prompt"].fillna("") != "").any():
         fails.append("the governance prompt is not one sentence carried by the outside_village units and by no other")
         return None
-    governance = prompts[0]
+    if prompts[0] != GOVERNANCE_IN_THE_TABLE:
+        fails.append("the decision table's governance prompt is not the sentence the page's words stand in for (the owner's ruling of 11 October 2026): the swap must not hide a change in the table")
+        return None
+    governance = GOVERNANCE_ON_THE_PAGE
     check_labels, check_code = [""], []
     for o_, c in zip(outside, T["district_check"].fillna("")):
         text = "; ".join(CHECK[p] for p in str(c).split("; ")) if o_ else ""
@@ -261,7 +280,7 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
                   "terms_unresolved": cfg.get("terms_unresolved", "")}
 
     wl = WINDOW_LABEL
-    cell_rows = "".join(f"<tr><td><span class='sw' style='background:{CELL_COLOR[c]}'></span>{defs[c]['name']}</td><td>{ROW_WORDS[defs[c]['standing_row']]}</td><td>{defs[c]['loss_column']}</td>"
+    cell_rows = "".join(f"<tr><td><span class='sw' style='background:{CELL_COLOR[c]}'></span>{defs[c]['name']}</td><td>{ROW_WORDS[defs[c]['standing_row']]}</td><td>{LOSS_WORDS[defs[c]['loss_column']]}</td>"
                         f"<td>{int(cw.loc[c, 'n_units']):,}</td><td>{int(co.loc[c, 'n_units']):,}</td></tr>" for c in order + [unranked])
     tier_list = "; ".join(f"{i + 1} {defs[c]['name']}" for i, c in enumerate(order))
     win_is = {w: P["definitions"]["windows"][w]["is"] for w in windows}
@@ -315,7 +334,7 @@ list; it never orders it. The geotagged spending record effectively ends with wo
 CoRE Stack's East Coast zone model the comparison's own check failed, and the badge says corroboration is unreliable there. In the window {WINDOW_LABEL[default_window]}, of the {int(cw.loc['dense_none', 'n_units']):,} units in <i>{defs['dense_none']['name']}</i>, {intact_compared:,} were compared, and
 {intact_cs:,} of those are flagged by CoRE Stack for degradation ({intact_ec:,} of them under the East Coast model). That cell's name says little or no loss recorded, which means under {lmin:g} ha of forest loss in the window chosen for each unit: its units
 together carry {intact_loss_ha:,.1f} ha of forest loss in that window, {intact_lost:,} of them lost {lmin:g} ha or more at some time in 2001-2025, and Hansen cannot see a canopy thinning.</p>
-<p><b>Outside-village units</b> have forest, so they are classed and listed like any unit: in the window {WINDOW_LABEL[default_window]}, {out_site:,} of them are in a cell other than <i>{defs[unranked]['name']}</i>. No village plan covers them, their panel asks whose plan does, and it says what their
+<p><b>Outside-village units</b> have forest, so they are classed and listed like any unit: in the window {WINDOW_LABEL[default_window]}, {out_site:,} of them are in a cell other than <i>{defs[unranked]['name']}</i>. They lie outside every revenue village, so their panel asks whose plan covers them, and says what their
 assigned district rests on. Their census columns read <i>no census data for this land</i>.</p>
 <p><b>Work types.</b> {cells_naming + " of the " + in_words[len(work)] + " cells name rows of the official list of permissible works by serial number, and the other " + cells_not_naming + " name none: " + str(work["schedule"].iloc[0]) + ". " + work_note + " The word regeneration is in none of its rows, so assisted natural regeneration - the work that the forest cell with the most units points to - is not a work the list names." + uncited_text if registered else "The work-type field of every cell reads <i>" + work.iloc[0]["work_type_field"] + "</i>: the official schedule of permissible works has not been registered as an input, and no list of works is used in its place."}</p>
 <p><b>The loss-pixel overlay</b> {"is optional, online, and off unless ticked: Hansen tree cover loss as map tiles from " + cfg["provider"] + ", for the years of the window chosen, on land with about 10 % canopy or more in 2000. " + overlay["version"] + " It's the one thing on this page that goes online: while it's ticked, the page asks that provider's server for tiles, so your network address, the place you're looking at and the years of the window chosen leave your machine. It can be ticked only in the decision view, and it switches itself off when that view is left or when its tiles stop arriving. Its code is in a third file, overlay.js; without that file, or without a connection, the map works exactly as it does without the overlay. It is a picture to find places by, not something to measure from. Two points of the provider's terms of use are unresolved, and they are ours to decide: the terms ask that each request to an API carry an account's key, while the tile service's reference declares none and it returns tiles without one; and they bind a user to an attribution page written for another of the provider's services. The project's documentation (DECISION_LAYER.md, which comes with the project and not with these files) sets both out." if overlay_js else "is not in this build: no documented tile endpoint has been registered for it."}</p>
@@ -345,7 +364,7 @@ assigned district rests on. Their census columns read <i>no census data for this
             "tier": "Tier {k}: {name}", "unranked": "Not ranked: {name}", "order_default": "the provisional order", "order_changed": "your own order",
             "window_head": "Count loss over", "tiers_head": "Provisional tier order", "reset": "Back to the provisional order",
             "why_head": "Why this tier", "why_window": "Window: forest loss counted over {window} ({is}). Standing forest is always through 2025.",
-            "grid_cols": ["No forest loss in the window", "Some forest loss in the window"],
+            "grid_cols": ["Little or no forest loss in the window", "Some forest loss in the window"],
             "why_cols": ["Canopy in 2000", "Standing now", "Lost in {window}"], "why_rows": ["Dense: above 30 %", "Open: 10 to 30 %", "10 % or less: not counted as forest (the land itself: nothing is taken off it)"],
             "why_low": "Loss on land with 10 % canopy or less is shown for information; it decides nothing.",
             "why_standing_some": "Standing forest: {sf} ha, at or above the {smin} threshold. It's {row}: standing dense is {cmp} standing open.",

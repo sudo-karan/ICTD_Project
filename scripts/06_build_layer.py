@@ -31,6 +31,14 @@ beside it is in a small "i" that opens a bubble. The words of every such bubble 
 makes); two bubbles reuse words the data already had (a window's description, the overlay's note). No figure moved with
 the words: every figure in a text is still read from a stage table here, and scripts/check_site_copy.py holds that.
 
+SIX LINES (11 Oct 2026, the owner's third handoff of that day), in his words. Four of them are written here: the check
+that fails in the East Coast zone is this project's placebo test and not "CoRE Stack's own check" (the comparison
+layer's "i", a panel section's "i", the About text); Hansen does record loss on open land, which the next layer draws,
+and what it cannot see is thinning (the Hansen layer's "i", the About text); the Hansen row of Sources says what was
+reconciled, the canopy of 2000 and the loss of 2001-2020; and it is CoRE Stack's published block rasters, not a
+dashboard, that take two classes from its land-use maps (a panel section's "i"). The other two, and the East Coast
+badges, are in _layer_decision.py.
+
 EVERY FIGURE IN A POPUP IS A CELL OF A STAGE OUTPUT. Areas, counts and rupees are copied from the stage tables.
 Shares and rupees in lakh are computed HERE, written to layer_by_unit.csv, and the page shows that cell as text:
 the page's JavaScript looks values up and computes nothing. scripts/verify_layer.py rebuilds every displayed
@@ -332,7 +340,7 @@ def main():
     v = T["hansen_loss_pct_of_forest"].to_numpy(float)
     add({"id": "hansen_loss", "group": "Forest", "title": "Tree cover loss since 2001 (Hansen)", "legend_title": "Tree cover loss 2001-2025 as a share of the unit's forest (Hansen)",
          "this_shows": "Forest cleared outright since 2001, as a share of the forest in 2000.",
-         "_tip": "Hansen picks up clearing of fairly closed canopy. It can't see thinning under a canopy that's still standing, or change on land that was already open in 2000.",
+         "_tip": "This layer counts loss only where canopy was above 30 % in 2000; the next layer shows it on more open land. Hansen records clearing, tree canopy removed outright: it can't see thinning under a canopy that's still standing.",
          "classes": scale(reds, loss_labels)}, np.where(np.round(np.nan_to_num(v), 2) <= 0, 0, 1 + classify(np.nan_to_num(v), [1, 2.5, 5, 10, 20])), "forest")
     v = T["hansen_loss_pct_of_land_tc_gt10le30"].to_numpy(float)
     add({"id": "canopy_band_loss", "group": "Forest", "title": "Loss on open canopy (Hansen)", "legend_title": "Tree cover loss 2001-2025 on land with 10 to 30 % canopy in 2000, as a share of that land",
@@ -358,7 +366,7 @@ def main():
     add({"id": "agreement", "group": "Forest", "title": "Hansen and CoRE Stack compared", "legend_title": "Hansen loss 2017-2023 beside CoRE Stack Degradation 2017-2023: which measure puts the unit in its top fifth",
          "this_shows": "Units with at least {floor_agreement:g} ha of land with canopy above 10 % in 2000, by whether each measure puts them in its top fifth.",
          "_tip": "Where both do, the claim that the unit degraded is as strong as these two sources can make it; where one does, neither is preferred. It's about units, not hectares: the two haven't been overlaid pixel by pixel. "
-                 "Units wholly under CoRE Stack's East Coast zone model are a class of their own, because CoRE Stack's own check fails there (see About this map); their panel gives the class they'd have with nothing left out.",
+                 "Units wholly under CoRE Stack's East Coast zone model are a class of their own, because our placebo test fails there, though on few districts (see About this map); their panel gives the class they'd have with nothing left out.",
          "classes": [({"label": AGREEMENT[k][0], "color": AGREEMENT[k][1], "flat": 1} if k in ("insufficient_forest", "zone_model_excluded") else {"label": AGREEMENT[k][0], "color": AGREEMENT[k][1]}) for k in order]},
         T["agreement_class"].map({k: i for i, k in enumerate(order)}).to_numpy())
     blues = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"]
@@ -517,11 +525,11 @@ def main():
     # is gone: NIRv is not a measure (the ruling of 7 Oct 2026) and is on no unit. The comparison's minimum is formatted from the agreement table's own floor below.
     PANEL_TIPS = {1: "Hansen's Global Forest Change v1.13, 30 m pixels. Areas are sums of pixel areas inside the unit.",
                   2: "Loss on land with no canopy at all in 2000 is tree cover that grew after 2000 and was removed, or an artefact of detection: not forest that stood in 2000.",
-                  3: "From CoRE Stack's overall_change_2017_2023 (25 m), read from the raw Earth Engine asset: classes named and coloured as CoRE Stack does. CoRE Stack's own dashboard takes Deforestation and Afforestation from "
-                     "its land-use maps instead, so its figures for those two will differ. Only Deforestation was validated by its producers.",
+                  3: "From CoRE Stack's overall_change_2017_2023 (25 m), read from the raw Earth Engine asset: classes named and coloured as CoRE Stack does. CoRE Stack's published block rasters take Deforestation and Afforestation from "
+                     "its land-use maps instead, so their figures for those two will differ. Only Deforestation was validated by its producers.",
                   4: "A unit is compared if it has at least {floor_agreement:g} ha of this land on both sources' grids, and a measure flags it if its rate is in the top fifth of the units compared. A flag is relative, not an absolute amount "
-                     "of damage. The headline leaves out units wholly under CoRE Stack's East Coast zone model: CoRE Stack's Improvement class is its own check (clearing shouldn't go with improvement), and in that zone it fails, which is "
-                     "what \"the placebo test fails\" in the zone line means. The second line keeps every unit. This is about units: the two haven't been overlaid pixel by pixel.",
+                     "of damage. The headline leaves out units wholly under CoRE Stack's East Coast zone model. Our placebo test uses CoRE Stack's Improvement class as a check on its Degradation class (clearing shouldn't go with improvement); "
+                     "in that zone it fails, though on few districts. That is what \"the placebo test fails\" in the zone line means. The second line keeps every unit. This is about units: the two haven't been overlaid pixel by pixel.",
                   5: "From MGNREGA's geotagged assets (Bhuvan, as published by CoRE Stack), works started 2006-07 to 2017-18 in the main. What was geotagged inside this shape, not what the panchayat of record received."}
     if [s_["heading"] for s_ in panel[1:]] != ["Forest and its loss (Hansen)", "Loss outside the forest mask", "Tree cover change 2017-2023 (CoRE Stack)", "Hansen and CoRE Stack compared (2017-2023)", "MGNREGA works geotagged here", "Census 2011"]:
         fails.append("the panel's sections are not in the order the words of their \"i\" are numbered by")
@@ -582,7 +590,7 @@ grey - <i>insufficient forest to assess</i> - and never on the colour scale. The
 You can set it to 50 ha or 1 ha to see what the minimum hides. On the census layers the outside-village units are <i>no census data for this land</i>, never zero.</p>
 <p><b>What each forest measure can and cannot see.</b></p>
 <ul>
-<li><b>Hansen tree cover loss</b> dates the outright removal of canopy that was fairly closed in 2000. It's validated, and it's a floor: it can't see thinning, or change on land that was already open in 2000.</li>
+<li><b>Hansen tree cover loss</b> dates the outright removal of tree canopy, year by year. It's validated, and it's a floor: it can't see thinning under a canopy that still stands.</li>
 <li><b>CoRE Stack tree cover change 2017-2023</b> classes each 25 m pixel inside its own tree mask by whether canopy density or tree height moved a class between two three-year periods. Its Degradation and Improvement classes come from classifiers
 its producers report as right about two times in three, and only Deforestation was validated by them: read Degradation beside Improvement. The two agro-climatic zone models differ, so part of what the map shows follows the zone boundary.</li>
 <li><b>Do the two agree?</b> A unit is compared only if it has at least {fig['floor_agreement']:g} ha of land with canopy above 10 % in 2000 by both sources' grids. The answer is given two ways, side by side:
@@ -591,7 +599,7 @@ its producers report as right about two times in three, and only Deforestation w
 <tr><td><b>The headline:</b> units wholly under CoRE Stack's East Coast zone model left out</td><td>{int(head.n_assessed):,}</td><td>{int(head.both):,}</td><td>about {head.both_expected_if_unrelated:.0f}</td><td>{head.odds_ratio:.2f} ({head.odds_ratio_lo95:.2f} to {head.odds_ratio_hi95:.2f})</td></tr>
 <tr><td>Every unit kept</td><td>{int(every.n_assessed):,}</td><td>{int(every.both):,}</td><td>about {every.both_expected_if_unrelated:.0f}</td><td>{every.odds_ratio:.2f} ({every.odds_ratio_lo95:.2f} to {every.odds_ratio_hi95:.2f})</td></tr>
 </table>
-The first is the headline because CoRE Stack's Improvement class is the check on its Degradation class: clearance should not go with improvement. In the {int(zones.loc['ECPHR only', 'n_assessed']):,} compared units under the East Coast model it does - a rank correlation of
+The first is the headline because we use CoRE Stack's Improvement class as a check on its Degradation class, our placebo test: clearance should not go with improvement. In the {int(zones.loc['ECPHR only', 'n_assessed']):,} compared units under the East Coast model it does - a rank correlation of
 {zones.loc['ECPHR only', 'spearman_hansen_vs_corestack_improvement']:.2f}, against {zones.loc['EPAHR only', 'spearman_hansen_vs_corestack_improvement']:.2f} under the other model - so agreement there cannot be read as agreement about degradation. (That failure is a strong pattern in few districts, not an established fact.) Those are also the units where the two agree most, so leaving them out
 <i>lowers</i> the figure; they are drawn as a class of their own on the agreement layer. The agreement that remains is modest, and in the LGD panchayat units taken alone it is not established: their odds ratio is {head_lgd.odds_ratio:.2f} with an interval of
 {head_lgd.odds_ratio_lo95:.2f} to {head_lgd.odds_ratio_hi95:.2f}, which includes 1. Intervals come from resampling whole districts. The two measures do not measure the same thing and are not expected to mark the same pixels.</li>
@@ -609,7 +617,7 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
 <h1>Sources and licences</h1>
 <table>
 <tr><th>What</th><th>Source</th><th>Licence or terms</th></tr>
-<tr><td>Tree canopy in 2000 and tree cover loss 2001-2025</td><td>Hansen, Potapov, Moore, Hancher et al., Global Forest Change v1.13 (University of Maryland), through Google Earth Engine; state totals reconciled to Global Forest Watch's published figures</td><td>CC BY 4.0</td></tr>
+<tr><td>Tree canopy in 2000 and tree cover loss 2001-2025</td><td>Hansen, Potapov, Moore, Hancher et al., Global Forest Change v1.13 (University of Maryland), through Google Earth Engine; the state's canopy of 2000 and its loss for 2001-2020 reconciled to Global Forest Watch's published figures, which stop at 2020</td><td>CC BY 4.0</td></tr>
 <tr><td>Forest cover of Odisha, as a comparison only (no figure of it is on the map)</td><td>Forest Survey of India, India State of Forest Report 2023</td><td>&copy; Forest Survey of India; non-commercial use with acknowledgment</td></tr>
 <tr><td>Tree cover change 2017-2023 (Deforestation, Degradation, No Change, Improvement, Afforestation, Partially Degraded)</td><td>CoRE Stack (Commoning for Resilience and Equality), ACT4D group, IIT Delhi - core-stack.org</td><td>CC BY 4.0</td></tr>
 <tr><td>Population, households, Scheduled Tribe and Scheduled Caste population</td><td>Census of India 2011, village rows as compiled by the ICTD group, IIT Delhi</td><td>Government of India; compilation CC BY 4.0</td></tr>
