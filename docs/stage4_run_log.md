@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-11T13:58:43Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-11T16:11:11Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -341,7 +341,7 @@ The same day the owner had the words of the map page rewritten in his own - a sh
 | 5 | stage 4 follows the layer | done |
 | 6 | look at it | done |
 | 7 | the documents | done |
-| 8 | publish, on the owner's word | not yet |
+| 8 | publish, on the owner's word | replaced by the third handoff, below |
 
 ### Step 5 of the second handoff: stage 4 follows the layer
 
@@ -373,6 +373,8 @@ or outputs differs, the files whose entry differs, so that the list below says w
 
 *5 of 5 gates passed (`50_gap/gates_site_words.csv`).*
 
+*The two tables are read as they were kept in `.session_scratch_2026-10-05/50_gap_2026-10-11_site_words_step5/` (working files, not in git) before the same two steps were run once more in the third handoff, which wrote them again under the same names.*
+
 Files compared or listed: 57; byte for byte the same: 55. Every file that differs, is new or is gone (`50_gap/rebuild_site_words_differences.csv`):
 
 | file | kind | what differs | why |
@@ -391,7 +393,7 @@ display awake during those runs; it was kept awake from then on, and each check 
 reason was not established. By the owner's ruling of 9 October the fragility of the WebKit checks is recorded and
 not chased.
 
-*`60_layer/decision_runs.json`: started 2026-10-11T11:37:13Z, ended 2026-10-11T12:06:32Z; the layer it checked was built 2026-10-11T11:35:41Z; one check at a time.*
+*`.session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/decision_runs.json` (the record of that pass, kept with the session's working files before the layer was built again for the owner's six lines): started 2026-10-11T11:37:13Z, ended 2026-10-11T12:06:32Z; the layer it checked was built 2026-10-11T11:35:41Z; one check at a time.*
 
 | check | run | started | exit status | its last line | lines that failed |
 |---|---|---|---|---|---|
@@ -430,7 +432,105 @@ lines that give what each verifier printed, which a draft does not run. It diffe
 
 ### Step 8 of the second handoff: the copy on the site
 
-**Not yet published.** The copy with the new words (made 2026-10-11T12:32:18Z) goes to the site on the owner's word. Until then the site serves the copy of Step 0 above, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
+The work stopped at this step and waited for the owner's word, with the copy of this handoff (made 2026-10-11T12:32:18Z) ready and not published. His word came in his third handoff of the day, which replaced the wait: its Step 0 was to publish that copy, and its Step 6 to publish the copy with his six lines. What became of each is in the section below.
+
+## The owner's third handoff of 11 October 2026: publish what is waiting, six lines, publish again
+
+Later the same day the owner gave his yes to publishing, in a third note (`.session_scratch_2026-10-05/handoff/2026-10-11_six_fixes_and_publish.md`, not in git), which replaced the wait at Step 8 of the second handoff. It set seven steps: publish the build that was waiting; then put six lines of the page right, in his words; then check, look, write the documents and publish again.
+
+| step | what | state |
+|---|---|---|
+| 0 | publish the build that is waiting | not done: the publish script was refused before it ran (below) |
+| 1 | the six fixes | done |
+| 2 | the checks | done |
+| 3 | stage 4 follows the layer | done |
+| 4 | look at it | not yet |
+| 5 | the documents | not yet |
+| 6 | publish, and write what the site serves | not yet |
+
+### Step 0 of the third handoff: publish the build that was waiting
+
+**Not done.** The owner's yes to publishing was in this handoff, and its first step was to publish the build that was
+waiting, the copy made 2026-10-11T12:32:18Z. The publish script (`.session_scratch_2026-10-05/handoff/publish_to_github_pages.sh`)
+was not run: the session's permission gate refused the command as a production deploy before the script started, and
+so before git was reached. Nothing was done to get round the refusal. As the handoff says of a Step 0 that fails, the
+work went on to Step 1, and the site went on serving the copy of the first handoff's Step 0 (above).
+
+### Step 1 of the third handoff: the six lines
+
+Six lines of the page that the audit of the second handoff had listed for the owner were untrue or misleading, and he
+gave his words for each: the check that fails in the East Coast zone is this project's placebo test and not CoRE
+Stack's own; Hansen does record loss on open land, and what it cannot see is thinning; the grid's column without loss
+reads "little or no"; the prompt of a unit outside villages keeps its question and drops the claim; the Hansen row of
+the sources says what was reconciled; and it is block rasters, not a dashboard, that take two classes from land-use
+maps. Every other string is as it was. `docs/DECISION_LAYER.md` (its sections on the outside-village units and on what
+changed that day) and `docs/SITE_COPY.md` (its section on the six lines) have each line, old beside new, and his ruling
+on the prompt: the decision table keeps its sentence and is not rebuilt, the page shows the new words in its place, and
+the builder stops unless the table's sentence is the old one.
+
+**What this means for stage 4.** The decision table was not rebuilt, so no input of stage 4 from `55_decision/`
+changed. The layer's two files that stage 4 reads did: `60_layer/data.js` holds the new words, and
+`scripts/06_build_layer.py` wrote four of them. `60_layer/layer_by_unit.csv` is byte for byte what it was. Both builds
+were kept as they stood before the six lines (`.session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/` and
+`70_share_2026-10-11_before_six_fixes/`, working files, not in git).
+
+### Step 2 of the third handoff: the checks
+
+The checks that pin the six lines were changed to follow them, committed, and then run, one at a time. No expected
+number, count or tolerance was changed and no check was taken out. `scripts/check_site_copy.py` gained a group that
+holds each build against the one kept before the six lines: the strings that differ are the six lines, each by
+exactly the owner's replacement, and nothing else differs. `docs/SITE_COPY.md` has the counts, the planted errors and
+every changed block of a check. The table below is the runner's record of the layer's checks on the build with the
+six lines; the two checks in the Safari application were left out as before.
+
+*`60_layer/decision_runs.json`: started 2026-10-11T15:44:03Z, ended 2026-10-11T16:04:05Z; the layer it checked was built 2026-10-11T15:01:22Z; one check at a time.*
+
+| check | run | started | exit status | its last line | lines that failed |
+|---|---|---|---|---|---|
+| verify_layer | 1 | 2026-10-11T15:44:04Z | 0 | 92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays | none |
+| verify_decision | 1 | 2026-10-11T15:44:13Z | 0 | 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts | none |
+| exercise_layer in Chrome | 1 | 2026-10-11T15:44:24Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_layer in WebKit | 1 | 2026-10-11T15:48:39Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_decision in Chrome | 1 | 2026-10-11T15:53:35Z | 0 | 53 of 53 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+| exercise_decision in WebKit | 1 | 2026-10-11T15:59:18Z | 0 | 47 of 47 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+
+Not run in this pass: exercise_layer_safari, as written ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words"); exercise_decision_safari, by address ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words").
+
+*Every check passed on its last run: yes; on its first run: yes.*
+
+### Step 3 of the third handoff: stage 4 follows the layer
+
+The same step as Step 5 of the second handoff, for the same reason: the records of stage 4 hold the bytes and SHA-256
+of `60_layer/data.js` and of `scripts/06_build_layer.py`, and the six lines changed both. The verifier was run on the
+stage as it stood; `scripts/08_gap_inputs.py` and `scripts/08_build_gap_districts.py` were run again in the stage-4
+environment, in that order, and no other step; the verifier was run again. `scripts/08_gap_closing_checks.py` and
+`scripts/08_gap_leftovers_check.py` were not run again. **No table of figures moved.** The comparison below is written
+under the names the second handoff's comparison had (`50_gap/gates_site_words.csv` and
+`50_gap/rebuild_site_words_differences.csv`), as the owner asked, and sets every output beside the same copy as then,
+the one kept before the page's words were first rewritten (`50_gap/before_site_words/`): so it covers both rebuilds.
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_site_words/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 22 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 22 of 22 | 22 of 22 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the later build that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_site_words.csv`).*
+
+Files compared or listed: 57; byte for byte the same: 55. Every file that differs, is new or is gone (`50_gap/rebuild_site_words_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_districts: inputs (60_layer/data.js, scripts/06_build_layer.py), run_utc; 08_gap_inputs: inputs (60_layer/data.js, scripts/06_build_layer.py), outputs (50_gap/inputs_listing.json), run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now; the entries that differ: (60_layer/data.js, scripts/06_build_layer.py)) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+
+### Step 6 of the third handoff: the copy on the site
+
+**Not yet published.** The copy with the six lines (made 2026-10-11T15:02:55Z) is built, checked and ready. Until it is published the site serves the copy of the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -503,9 +603,9 @@ says what was undone and rebuilt.
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-11T12:59:47Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-11T16:07:35Z)
 
-- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `4acd0f9f22f63b1b`)
+- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `70664255fb000ca6`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
@@ -534,7 +634,7 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-11T12:59:45Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-11T16:07:34Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
@@ -556,9 +656,9 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 - `docs/DATA_NOTES.md` (17,554 bytes)
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
-- `scripts/06_build_layer.py` (72,531 bytes)
+- `scripts/06_build_layer.py` (73,474 bytes)
 - `60_layer/layer_by_unit.csv` (10,856,200 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `district_assigned_by`, `district_ambiguous`, `area_ha`, `forest_ha`, `hansen_loss_ha`, `land_ha_tc_gt10le30`, `hansen_loss_ha_tc_gt10le30`, `land_ha_tc_le10`, `hansen_loss_ha_tc_le10`, `hansen_loss_ha_tc_eq0`, `nirv_status`, `forest_pct_of_area`, `land_tc_gt10_ha`, `hansen_loss_pct_of_forest`, `hansen_loss_ha_2017_2023`, `hansen_loss_pct_of_land_tc_gt10le30`, `corestack_loss_ha_tc_gt10`, `corestack_degradation_ha_tc_gt10`, `corestack_partial_degradation_ha_tc_gt10`, `corestack_no_change_ha_tc_gt10`, `corestack_improvement_ha_tc_gt10`, `corestack_gain_ha_tc_gt10`, `corestack_valued_ha_tc_gt10`, `corestack_loss_pct`, `corestack_degradation_pct`, `corestack_partial_degradation_pct`, `corestack_no_change_pct`, `corestack_improvement_pct`, `corestack_gain_pct`, `corestack_net_pct`, `corestack_degradation_ha_all_land`, `corestack_tree_cover_start_ha_all_land`, `agreement_class`, `agreement_class_all_assessed`, `corestack_zone_model`, `agreement_reference_ha`, `agreement_hansen_rate_2017_2023_pct`, `agreement_corestack_degradation_rate_pct`, `n_works`, `expenditure_total`, `expenditure_plantation_category`, `expenditure_forest_named_worktype`, `expenditure_water`, `expenditure_total_lakh`, `expenditure_plantation_category_lakh`, `expenditure_forest_named_worktype_lakh`, `expenditure_water_lakh`, `population`, `households`, `st_pop`, `sc_pop`, `adi_2011`, `st_share_pct`, `sc_share_pct`, `class_forest_area`, `class_hansen_loss_floor_100_ha`, `class_hansen_loss_floor_50_ha`, `class_hansen_loss_floor_1_ha`, `class_canopy_band_loss_floor_100_ha`, `class_canopy_band_loss_floor_50_ha`, `class_canopy_band_loss_floor_1_ha`, `class_corestack_degradation_floor_100_ha`, `class_corestack_degradation_floor_50_ha`, `class_corestack_degradation_floor_1_ha`, `class_corestack_net_floor_100_ha`, `class_corestack_net_floor_50_ha`, `class_corestack_net_floor_1_ha`, `class_agreement`, `class_allocation`, `class_forest_named_expenditure`, `class_st_share`, `class_adi_2011`, `shape_area_change_pct`
-- `60_layer/data.js` (22,289,078 bytes)
+- `60_layer/data.js` (22,289,335 bytes)
 - `00_raw/01_cfr_fra/List_of_Forest_Villages_Old_Habitation.pdf` (4,506,869 bytes)
 - `00_raw/05_forest_reference/isfr2023_vol2_odisha_pdf_pages_260-265.txt` (27,495 bytes)
 - `requirements-stage4.txt` (2,110 bytes)
@@ -723,7 +823,7 @@ will be written into `docs/GAP.md` by its writer.
 
 *30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
 
-### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-11T13:01:15Z)
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-11T16:09:06Z)
 
 - `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
 - `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
@@ -1478,6 +1578,9 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `c562884` Six fixes, Step 2: the checks follow the six lines; the check of the words holds each build against the one kept before them
+- `3f9c593` Six fixes, Step 1: six lines of the page in the owner's words of 11 October (his third handoff); both builds made again
+- `f9bd4b8` Site words, Step 7: the documents - docs/SITE_COPY.md, new; LAYER, DECISION_LAYER, RESULTS, the run log and GAP written again by their scripts
 - `54ac016` Site words, Step 7: the strings table pairs the README's sections by heading; the writer of docs/SITE_COPY.md after a first reading of what it wrote
 - `324351f` Site words, Step 7: the README and DEGRADATION.md brought up to date by hand; the writers of the documents follow the reworded page
 - `492dc65` Site words, Step 5: stage 4 follows the layer - two steps run again, no table of figures moved, verify_gap 338 of 338
