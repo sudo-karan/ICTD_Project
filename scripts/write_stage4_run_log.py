@@ -950,8 +950,11 @@ def third_handoff() -> list[str]:
     if published:
         out += [f"The copy with the six lines (made {made}) was published by the owner's own script, on his word, and the live site was checked against it:", ""] + publication()
     else:
-        out += [f"**Not yet published.** The copy with the six lines (made {made}) is built, checked and ready. Until it is published the site serves the copy of the first handoff's Step 0, and the two records "
-                "in `70_share/` are that publication's, put back beside the new copy after it was built.", ""]
+        out += [f"**Not yet published.** The copy with the six lines (made {made}) is built, checked and ready. The publish script was tried once more at this step, on the owner's word given in this handoff, and "
+                "was refused by the session's permission gate before it ran, as at Step 0. Nothing was done to get round the refusal. Until the owner runs the script himself, or allows it, the site serves the copy of "
+                "the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.", "",
+                "What is left once it is published, in this order: `scripts/check_pages_live.py --wait 10`; `scripts/write_decision_layer.py`, which then says that the site serves this copy; this log, with "
+                "`STEP_8_DONE` set; and `scripts/write_gap.py` last.", ""]
     return out
 
 

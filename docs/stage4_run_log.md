@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-11T16:36:54Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-11T16:41:28Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -544,7 +544,9 @@ printed differently are listed in `docs/SITE_COPY.md`), `docs/LAYER.md`, `docs/S
 
 ### Step 6 of the third handoff: the copy on the site
 
-**Not yet published.** The copy with the six lines (made 2026-10-11T15:02:55Z) is built, checked and ready. Until it is published the site serves the copy of the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
+**Not yet published.** The copy with the six lines (made 2026-10-11T15:02:55Z) is built, checked and ready. The publish script was tried once more at this step, on the owner's word given in this handoff, and was refused by the session's permission gate before it ran, as at Step 0. Nothing was done to get round the refusal. Until the owner runs the script himself, or allows it, the site serves the copy of the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
+
+What is left once it is published, in this order: `scripts/check_pages_live.py --wait 10`; `scripts/write_decision_layer.py`, which then says that the site serves this copy; this log, with `STEP_8_DONE` set; and `scripts/write_gap.py` last.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -1592,6 +1594,7 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `d0c022d` Six fixes, Steps 4 and 5: the pictures looked at again; the documents written again by their scripts
 - `9f28c30` Six fixes, Step 5: in docs/SITE_COPY.md the lines the owner reworded stand last in its table of what was fixed, as its text says; a long string of the six lines is shown by the stretch that differs
 - `779c784` Six fixes, Step 5: the writers of the documents, committed before they are run
 - `cf2e517` Six fixes, Steps 2 and 3: every check passed on the builds with the six lines; stage 4 follows the layer, no table of figures moved
