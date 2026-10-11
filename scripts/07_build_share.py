@@ -53,7 +53,7 @@ README.txt, in the owner's words of 11 October 2026: where the copy is online an
 it isn't, what is left out of this copy (the loss-pixel overlay; "The development index is not in this copy", a sentence
 stage 4's gate on the leftovers reads), whose data it draws on (the rows of the page's own "Sources", read from the
 copy's data.js, not typed here), and that the owner publishes it at `PUBLISHED_AT`, each source under its own licence.
-Every figure in it is read from data.js. Its sentence on phones (`PHONES`) says what was tried.
+Every figure in it is read from data.js. Its sentence on phones (`PHONES`) says what was tried and what was seen.
 
 What is checked here, and the run stops (nothing left in place) if one fails:
   - the two files in 60_layer/ are the ones the layer's run record describes (sha256);
@@ -100,7 +100,10 @@ OVERLAY_ABOUT_COPY = ("<p><b>The loss-pixel overlay isn't in this copy.</b> The 
 OVERLAY_ROW = "Loss-pixel overlay (optional, online, off unless ticked; its code is in overlay.js)"   # the first cell of the layer's row of Sources
 OVERLAY_ROW_COPY = "Loss-pixel overlay (not in this copy)"
 OVERLAY_TERMS_COPY = "{attribution}. Terms of use: {terms_url}. Two points of them are unresolved, which is why the overlay is not in this copy."
-PHONES = "we haven't tried it on a phone."                      # the README's sentence on phones: what was tried, and no more
+# The README's sentence on phones: what was tried, and no more. On 11 October 2026 the page was opened in a window of a phone's width (390 x 844) in a desktop
+# browser and looked at: the two side panels leave the map no room, the legend covers the list of layers, and the page runs off the right edge. No phone was tried.
+PHONES = ("it's laid out for a laptop, and in a window as narrow as a phone's the map gets no room between the two side panels, so it won't work on a phone yet "
+          "(we haven't tried one).")
 
 
 def once(found, what):
