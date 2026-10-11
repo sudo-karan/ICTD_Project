@@ -20,8 +20,8 @@ What it checks:
      for that the site answers with 404, and each of those must be a `favicon.ico`, the icon a browser asks every
      site for by itself. The site has no icon. Any other line in that log fails the check;
   5. every request made over http or https goes to the host of ADDRESS, and there is at least one.
-The overlay box is not ticked here: in the copy it would ask for a file that is left out on purpose, which the gate
-on the copy tests.
+The overlay's box is not touched here: in the copy it is greyed out and cannot be ticked, and the page asks for no
+overlay.js (the owner's ruling of 11 October 2026), which the gate on the copy tests.
 
 `--wait MINUTES` (default 0): before checking, ask the address for `index.html` every 15 seconds until it serves the
 recorded bytes, for at most that long. A site that has just been published takes a minute or two to build.

@@ -237,7 +237,7 @@ def expected(uid):
         ("population [need]", f"{int(round(n.population)):,}"), ("households", f"{int(round(n.households)):,}"), ("st_share x 100", pc(100 * n.st_share) if not pd.isna(n.st_share) else "not defined: no resident population"),
         ("sc_share x 100", pc(100 * n.sc_share) if not pd.isna(n.sc_share) else "not defined: no resident population"), ("adi_2011", f"{n.adi_2011:,.2f}" if not pd.isna(n.adi_2011) else "no index for this unit's villages")]
     flag = ("Under 1 ha of forest: this unit cannot be assessed for forest loss." if h.forest_ha < 1 else
-            "Under 100 ha of forest: below the floor ruled for the analysis, where a loss rate does not repeat from one set of years to the next." if h.forest_ha < 100 else "")
+            "Under 100 ha of forest: below the minimum we use, because a loss rate on this little forest may not repeat from one set of years to the next." if h.forest_ha < 100 else "")
     return rows + [("warning on small forests", flag)]
 
 
@@ -338,7 +338,7 @@ def main():
         before = state(c)
         x, y = c.click_on("#layers .pending")
         s = state(c)
-        say("layer switcher", f"{c.clicked} the entry 'NIRv trend ... pending' at ({x}, {y})", "nothing changed: it is text, not a control", s["layer"] == before["layer"] and s["legend_title"] == before["legend_title"])
+        say("layer switcher", f"{c.clicked} the greyed entry 'Greenness trend (NIRv) - tested, not used' at ({x}, {y})", "nothing changed: it is text, not a control", s["layer"] == before["layer"] and s["legend_title"] == before["legend_title"])
         c.click_on("input[name=layer][value=hansen_loss]"); time.sleep(0.6)
         c.js("(function(){document.querySelector('input[name=layer][value=hansen_loss]').focus(); return 0;})()")
         if c.arrow_down():
@@ -374,8 +374,8 @@ def main():
         # ---- A3. which kinds of unit are shown ----------------------------------------------------------------------------------------
         c.js("(function(){ ICTD_MAP.fitBounds(window.ICTD_LAYER.bounds, {animate:false}); return 0; })()"); time.sleep(0.8)
         n_out, n_lgd = int(U.index.str.startswith("OUTSIDE").sum()), int((~U.index.str.startswith("OUTSIDE")).sum())
-        for sel, what, want in (("#c_lgd", "unticked 'LGD panchayat units'", (0, n_out, "show=out")), ("#c_out", "unticked 'Outside-village units'", (0, 0, "show=none")),
-                                ("#c_lgd", "ticked 'LGD panchayat units' again", (n_lgd, 0, "show=lgd")), ("#c_out", "ticked 'Outside-village units' again", (n_lgd, n_out, ""))):
+        for sel, what, want in (("#c_lgd", "unticked 'Panchayat units'", (0, n_out, "show=out")), ("#c_out", "unticked 'Land outside villages'", (0, 0, "show=none")),
+                                ("#c_lgd", "ticked 'Panchayat units' again", (n_lgd, 0, "show=lgd")), ("#c_out", "ticked 'Land outside villages' again", (n_lgd, n_out, ""))):
             x, y = c.click_on(sel)
             time.sleep(1.2)
             s = state(c)
@@ -402,7 +402,7 @@ def main():
         say("go to a district", f"chose each of the {len(D['districts'])} districts in the list in turn", f"the map moved so that the whole district was in view for {moved} of {len(D['districts'])}" + (f" (not within three seconds: {late})" if late else ""),
             moved == len(D["districts"]) == 30)
         c.js("(function(){var e=document.getElementById('district'); e.value=''; e.dispatchEvent(new Event('change', {bubbles:true})); return 0;})()")
-        say("go to a district", "chose the first line of the list, 'District...'", "nothing moved and nothing broke", not c.errors)
+        say("go to a district", "chose the first line of the list, 'Jump to a district...'", "nothing moved and nothing broke", not c.errors)
 
         # ---- A5. the search box -------------------------------------------------------------------------------------------------------------
         def search(text):
@@ -435,7 +435,7 @@ def main():
         say("search", "emptied the box and pressed Enter", "nothing changed", s["unit"] == prev and not c.errors)
 
         # ---- A6. the two text panels ----------------------------------------------------------------------------------------------------------
-        for btn, name, must in (("#b_about", "What this is, and how to read it", ["Units, not hectares", "The headline:", "Every unit kept", "Honest colour"]), ("#b_sources", "Sources and licences", ["ODbL 1.0", "CC BY-NC-SA 4.0", "Leaflet 1.9.4"])):
+        for btn, name, must in (("#b_about", "About this map", ["Units, not hectares", "The headline:", "Every unit kept", "Small forests are greyed out"]), ("#b_sources", "Sources", ["ODbL 1.0", "CC BY-NC-SA 4.0", "Leaflet 1.9.4"])):
             x, y = c.click_on(btn); time.sleep(0.5)
             txt = c.js("document.getElementById('modalbody').textContent")
             s = state(c)
@@ -504,7 +504,7 @@ def main():
             s["layer"] == "st_share" and s["floor"] == "100" and s["drawn_lgd"] + s["drawn_out"] == D["n"] and s["unit"] == one.index[0])
         c.js("(function(){ location.hash = 'layer=nirv&floor=7&unit=NO_SUCH_UNIT'; return 0; })()"); time.sleep(1.5)
         s = state(c)
-        say("address", "changed the address in place to a layer that is pending, a floor that does not exist and a unit that does not exist", f"layer and floor went to their defaults ({s['layer']}, {s['floor']} ha); the unit already open, {s['unit']}, stayed open; no error",
+        say("address", "changed the address in place to a layer that is greyed out and cannot be chosen (NIRv), a floor that does not exist and a unit that does not exist", f"layer and floor went to their defaults ({s['layer']}, {s['floor']} ha); the unit already open, {s['unit']}, stayed open; no error",
             s["layer"] == D["default_layer"] and s["floor"] == "100" and s["unit"] == one.index[0] and not c.errors)
         t = c.fresh(URL + "#layer=nirv&floor=7&unit=NO_SUCH_UNIT&show=sideways&district=Atlantis&q=&open=nothing")
         s = state(c)

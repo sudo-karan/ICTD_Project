@@ -32,6 +32,11 @@ ADDED 9 OCTOBER 2026, with the owner's rulings, and NOT covered by that replicat
 start of each window and the loss of the window as a share of it, from the yearly columns of stage 1, for every unit and
 window; where the share is blank, its reason and the count; the order by share in the cells with loss, in the table and
 in the page; the five new names of the cells, written out here as he gave them; and the export's columns. Several of its checks are of words that must be there or must not be: each says so in its name.
+CHANGED 11 OCTOBER 2026, with the owner's handoff that reworded the page (a short label, and what it left out in a small "i" beside it): the WORDS
+expected below follow the strings that handoff reworded, each change listed in docs/SITE_COPY.md; no expected number, count or tolerance changed and
+no check was taken out. Where a caution moved into an "i" the check reads the words of that "i" (the key `tips` at the top of the data, or the two
+keys the overlay's and the windows' "i" reuse) and holds that the page draws it there. The check of the top's keys gained `tips`, the one key that
+handoff allowed, and says why.
 """
 import csv, hashlib, json, re, sys
 from decimal import Decimal, ROUND_HALF_UP
@@ -74,7 +79,7 @@ check("the decision table holds each unit of the map once, and the map was built
 KEYS = {"title", "radio", "default_window", "windows", "cells", "tiers", "unranked", "tier_why", "cls", "counts", "dcounts", "rank", "rank_share", "sd", "so", "sf", "low", "loss", "near", "corro", "corro_letters", "corro_labels",
         "check", "check_labels", "governance", "fields", "st_codes", "grid", "work_note", "standing_min", "loss_min", "built", "overlay", "t"}
 TOP = {"title", "subtitle", "built", "bounds", "id", "f", "g", "out", "bar", "codes", "layers", "floors", "default_layer", "default_floor", "districts", "panel", "core_classes", "unit_types", "info_empty", "search_none",
-       "search_many", "about_html", "sources_html", "decision"}
+       "search_many", "about_html", "sources_html", "decision", "tips"}
 SUB = {"t": {"legend_title", "legend_note", "tier", "unranked", "order_default", "order_changed", "window_head", "tiers_head", "reset", "why_head", "why_window", "grid_cols", "why_cols", "why_rows", "why_low", "why_standing_some",
              "why_standing_little", "cmp_dense", "cmp_open", "why_loss_some", "why_loss_none", "why_cell", "why_order", "why_was", "why_unranked", "near", "standing_is", "why_share", "why_share_none", "no_share", "within_tier_share", "within_options", "corro_head", "work_head", "district_head", "rank_none", "within_tier",
              "rank_head", "rank_unranked", "rank_filter_note", "rank_out_kept", "rank_out_dropped", "keep_out_off", "district_pick", "keep_out", "export", "st_options", "cols", "kind", "export_cols"},
@@ -124,9 +129,17 @@ shapes = {"six cells, five of them in the tier order and one outside it": nc_ ==
           "every word of the overlay, every line of a tier, every field's place and every part of a cell a text or a whole number": all(isinstance(v, (str, int)) and not isinstance(v, bool) for part_ in [DV["overlay"], DV["tier_why"], DV["fields"]] + DV["cells"] for v in part_.values()),
           "the class letters the filter reads begin 0123, the four classes of Scheduled Tribe share in their order": D["codes"][:4] == "0123"}
 check("the lists inside the view have the lengths and kinds expected: " + "; ".join(shapes), all(shapes.values()), "not so: " + "; ".join(k for k, v in shapes.items() if not v))
-check("the map's data has, at its top, the keys it had before the decision view and one more, 'decision', and its layers are the eleven it had: no layer and no key was added beside the view",
-      set(D) == TOP and [l.get("id") for l in D["layers"]] == LAYERS, f"unknown: {sorted(set(D) - TOP)}; missing: {sorted(TOP - set(D))}; layers: {len(D['layers'])}")
-check("the view's title, its switch's label and the note under every work-type field are the ones expected", DV["title"] == "Decision view" and DV["radio"].startswith("Where is forest work warranted?") and "ranked within a district" in DV["radio"]
+TIPS = {"floors", "units", "decision", "window_head", "tiers", "rank_none", "filter", "col_share"} | {"layer:" + x for x in LAYERS if x != "adi_2011"} | {f"panel:{k}" for k in range(1, 6)}      # every "i" whose words `tips` holds, by name
+tips = D.get("tips") if isinstance(D.get("tips"), dict) else {}
+check("the map's data has, at its top, the keys it had before the decision view, 'decision', and - since 11 October 2026 - one more, 'tips'. That key was added by the owner's handoff of that day, which reworded the page: a label is short, "
+      "and what it left out stands in a small 'i' beside it. 'tips' holds the words of every such 'i' and nothing else: a flat list of texts under the names written out in this check, none of them empty, none for the development "
+      "index, and no figure, list or array among them. The layers are the eleven they were: no other key and no layer was added",
+      set(D) == TOP and [l.get("id") for l in D["layers"]] == LAYERS and isinstance(D.get("tips"), dict) and set(tips) == TIPS and all(isinstance(v, str) and v.strip() for v in tips.values()),
+      f"unknown: {sorted(set(D) - TOP)}; missing: {sorted(TOP - set(D))}; layers: {len(D['layers'])}; tips: {len(tips)}, unknown {sorted(set(tips) - TIPS)}, missing {sorted(TIPS - set(tips))}")
+check("the view's title, its switch's label and the note under every work-type field are the ones expected: the switch reads 'Decision view', and the 'i' the page draws beside it (tips.decision) asks what the label asked until 11 October "
+      "2026, says the view lists a district's units, and says it is not a verdict",
+      DV["title"] == "Decision view" and DV["radio"] == "Decision view" and tips.get("decision", "").startswith("Where is forest work needed, and what kind?") and "lists a district's units" in tips.get("decision", "")
+      and "not a verdict" in tips.get("decision", "") and "esc(DV.radio) + tip(TIPS.decision)" in page
       and DV["work_note"] == (W_NOTE if (W_NOTE := next(iter({r["note"] for r in rows("55_decision/work_types.csv")}))) else ""))
 check("the layer's run record names the module that wrote every sentence of the view, with the hash of the file that is on disk",
       REC["decision_view"].get("module", {}).get("sha256") == hashlib.sha256((ROOT / "scripts/_layer_decision.py").read_bytes()).hexdigest())
@@ -138,6 +151,7 @@ SPEC_NAMES = {"dense_none": "Closed forest, little or no loss recorded - protect
 NAMES_BEFORE = ("Protect - intact closed forest", "Closed forest under pressure - find the cause first", "Open forest - assisted natural regeneration candidate", "Open forest still losing - restore",
                 "Little forest left, recent loss - verify on the ground")                                       # the five names that were replaced: none may be left anywhere in the view
 LEGEND_SHORT = {}                                                # a cell whose name the legend alone shows in a shorter form, written out; every other cell's legend name is its full name
+DV_H1 = "<h1>The decision view</h1>"                             # where the decision view's part of the About text begins (until 11 October 2026: "Decision view: where is forest work warranted?")
 CELL = {("mostly_dense", "none"): "dense_none", ("mostly_dense", "some"): "dense_loss", ("mostly_open", "none"): "open_none", ("mostly_open", "some"): "open_loss",
         ("little_or_none", "some"): "little_loss", ("little_or_none", "none"): "little_none"}
 cells = [c["id"] for c in DV["cells"]]
@@ -274,7 +288,7 @@ check("the tier order the page starts with is the project owner's provisional or
 everything = json.dumps(D, ensure_ascii=False) + page
 check("the five names that were replaced on 9 October 2026 are nowhere in the page or its data, nor are the words they over-claimed with ('under pressure', 'intact', 'still losing', 'recent loss'); the tiers table carries the new names; "
       "and the legend shows each cell under its full name, or under the shorter form written out in this check",
-      not any(x in everything for x in NAMES_BEFORE) and not re.search(r"under pressure|\bintact\b|still losing|recent loss", json.dumps(DV, ensure_ascii=False) + D["about_html"][D["about_html"].index("Decision view: where is forest work warranted?"):])
+      not any(x in everything for x in NAMES_BEFORE) and not re.search(r"under pressure|\bintact\b|still losing|recent loss", json.dumps(DV, ensure_ascii=False) + D["about_html"][D["about_html"].index(DV_H1):])
       and {r["cell"]: r["cell_name"] for r in tiers} == SPEC_NAMES and all(r["tier_label"] == (f"Tier {r['tier']}: " if r["tier"] else "Not ranked: ") + SPEC_NAMES[r["cell"]] for r in tiers)
       and {c["id"]: c["legend"] for c in DV["cells"]} == {**SPEC_NAMES, **LEGEND_SHORT} and "dvTierLabel(cell, cell.legend)" in page and page.count("cell.legend") == 1,
       f"shortened in the legend: {LEGEND_SHORT or 'none'}")
@@ -282,7 +296,9 @@ check("each cell's row and column are the ones its hectares are tested for, and 
       all(CELL[({"mostly dense": "mostly_dense", "mostly open": "mostly_open", "little or none": "little_or_none"}[c["row"]], c["loss"])] == c["id"] for c in DV["cells"])
       and DV["grid"] == [["Mostly dense", "dense_none", "dense_loss"], ["Mostly open", "open_none", "open_loss"], ["Little or none", "little_none", "little_loss"]]
       and DV["t"]["grid_cols"] == ["No forest loss in the window", "Some forest loss in the window"])
-check("every tier has its one line of reason, and the text says the order is provisional and the user's to change", all(DV["tier_why"].get(c) for c in order) and "provisional" in DV["t"]["tiers_head"].lower()
+check("every tier has its one line of reason; the heading over the order says it is provisional, and the 'i' the page draws beside that heading (tips.tiers) says it is to be set with the Foundation for Ecological Security and is the "
+      "reader's to change", all(DV["tier_why"].get(c) for c in order) and "provisional" in DV["t"]["tiers_head"].lower()
+      and "Foundation for Ecological Security" in tips.get("tiers", "") and "change it" in tips.get("tiers", "") and "esc(DV.t.tiers_head) + tip(TIPS.tiers)" in page
       and "a forester could reasonably put" in DV["tier_why"]["dense_loss"].lower())
 check("a rank is shown as a tier label with its cell's name, never a bare number", DV["t"]["tier"] == "Tier {k}: {name}" and "{name}" in DV["t"]["unranked"])
 
@@ -296,7 +312,7 @@ for i, u in enumerate(ids):
         ok = text.startswith(words[a["agreement_class"]]) and "East Coast" not in text
     elif a["agreement_class"] == "zone_model_excluded":
         east += 1
-        ok = text.startswith(words[a["agreement_class_all_assessed"]]) and "East Coast zone model: the placebo failed there" in text and "unreliable" in text
+        ok = text.startswith(words[a["agreement_class_all_assessed"]]) and "East Coast zone: CoRE Stack's own check fails here" in text and "unreliable" in text
     else:
         notc += 1
         ok = text.startswith("Not compared") and (("under 100 ha of land with canopy above 10 %" in text) == (Decimal(a["reference_ha"]) < 100)) and \
@@ -376,15 +392,18 @@ if registered:
 SUMM = [r for r in rows("20_degradation/agreement_summary.csv") if r["window"] == "common_2017_2023" and float(r["minimum_reference_ha"]) == 100 and r["delivered"] == "1"]
 S, SA = [r for r in SUMM if r["units"] == "lgd_panchayat"], [r for r in SUMM if r["units"] == "all units"]
 about = D["about_html"]
-dv_about = about[about.index("Decision view: where is forest work warranted?"):] if "Decision view: where is forest work warranted?" in about else ""
+dv_about = about[about.index(DV_H1):] if DV_H1 in about else ""
 plain = " ".join(re.sub(r"<[^>]+>", "", dv_about).split())
 if len(S) == 1 and len(SA) == 1:
     s, sa = S[0], SA[0]
     within = f"{float(s['odds_ratio_within_districts']):.2f}, interval {float(s['odds_ratio_within_districts_lo95']):.2f} to {float(s['odds_ratio_within_districts_hi95']):.2f}"
     across = f"{float(s['odds_ratio']):.2f}, {float(s['odds_ratio_lo95']):.2f} to {float(s['odds_ratio_hi95']):.2f}"
     across_all = f"{float(sa['odds_ratio']):.2f}, {float(sa['odds_ratio_lo95']):.2f} to {float(sa['odds_ratio_hi95']):.2f}"
-    check("the reason for ranking only within a district is in the About text and in the empty list, with the odds ratios as agreement_summary.csv has them, the units they are of, and the words 'not established'",
-          within in plain and across in plain and within in DV["t"]["rank_none"] and across in DV["t"]["rank_none"] and "never across the state" in DV["t"]["rank_none"] and "not established" in DV["t"]["rank_none"]
+    why_within = tips.get("rank_none", "")                       # the "i" beside the empty list's prompt: since 11 October 2026 it carries what the prompt itself carried
+    check("the reason for ranking only within a district is in the About text and at the empty list, with the odds ratios as agreement_summary.csv has them, the units they are of, and the words 'not established': the list's prompt says "
+          "'never across the state', and the 'i' the page draws beside that prompt (tips.rank_none) carries the two odds ratios, the units they are of and 'not established'",
+          within in plain and across in plain and "never across the state" in DV["t"]["rank_none"] and within in why_within and across in why_within and "not established" in why_within
+          and "LGD panchayat units of the agreement test's headline" in why_within and "esc(DV.t.rank_none) + tip(TIPS.rank_none)" in dv_bare
           and f"Among the {int(s['n_assessed']):,} LGD panchayat units of the agreement test's headline" in plain and "East Coast zone left out" in plain and "not established" in plain
           and f"For all units of that headline together the across-state figure is {across_all}" in plain and float(s["odds_ratio_lo95"]) < 1 < float(s["odds_ratio_hi95"]) and float(s["odds_ratio_within_districts_lo95"]) > 1,
           f"within districts {within}; across the state {across}; all units {across_all}")
@@ -487,7 +506,7 @@ check(f"three counts on the loss share - units of {dense_name} that lost under 1
 STANDING_IS = "the forest of 2000 with no loss recorded since; not a measure of tree cover today"                # the owner's wording of 9 October 2026
 check("the About text says the thresholds were ruled on by the owner on 9 October 2026 as proposed, the tiers are provisional, standing forest is 'the forest of 2000 with no loss recorded since; not a measure of tree cover today', "
       "that there is no score, and what orders the units within a tier; the build's record gives the thresholds the same standing",
-      all(x in plain for x in ("Two thresholds, ruled on by the project owner on 9 October 2026 as they were proposed.", "provisional", STANDING_IS, "No score", "not a verdict", DV["t"]["within_tier"]))
+      all(x in plain for x in ("Two thresholds, ruled on 9 October 2026 as they were proposed.", "provisional", STANDING_IS, "No score", "not a verdict", DV["t"]["within_tier"]))
       and "await a ruling" not in plain and "(proposed)" not in json.dumps(DV) and P["thresholds"]["status"].startswith("RULED by the project owner on 9 October 2026"))
 check("the About text states the two thresholds, the four windows and the provisional order of tiers as the table and the specification have them",
       f"A unit has little or none under {g(smin)} ha of standing forest; it has some loss from {g(lmin)} ha of forest loss in the window." in plain
@@ -508,12 +527,15 @@ check("standing forest is nowhere called a lower bound - not in the view's data,
 check("the window is named in the legend, in the unit's panel, at the head of the ranked list and in the export's columns", "{window}" in DV["t"]["legend_title"] and "{window}" in DV["t"]["why_window"] and "{window}" in DV["t"]["rank_head"]
       and "{window}" in DV["t"]["why_cols"][2] and "window_of_forest_loss" in DV["t"]["export_cols"])
 check("the list's eleven column heads are the ones asked for - the share beside the hectares lost, the development index still in the list on the page, the spending column labelled with where the geotagged record ends; the head "
-      "of the list says which of the two orders within a tier is in use, by hectares lost as the page opens or by share lost, and that the cells without loss stay ordered by standing hectares; and the address carries the order",
-      DV["t"]["cols"] == ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share of the forest at the start of {window}, %", "Corroboration, 2017-2023", "Scheduled Tribe share",
-                          "Development index 2011", "Forest-named spending (geotagged record; ends FY2017-18)"]
-      and "{within}" in DV["t"]["rank_head"] and "largest first" in DV["t"]["within_tier"] and "by forest loss in the window where the cell has loss" in DV["t"]["within_tier"]
-      and "as a share of the forest at the start of the window where the cell has loss" in DV["t"]["within_tier_share"] and all("by standing hectares of the cell's band where it has none" in DV["t"][k] for k in ("within_tier", "within_tier_share"))
-      and DV["t"]["within_options"] == [["ha", "Within a tier: by hectares lost"], ["share", "Within a tier: by share lost"]]
+      "of the list says which of the two orders within a tier is in use, by hectares lost as the page opens or by share lost, and that the cells without loss stay ordered by standing hectares; and the address carries the order. "
+      "(Since 11 October 2026 the share's head is short, and the 'i' the page draws in that head, with the window filled in, says what the share is a share of: the forest the unit had at the start of the window.)",
+      DV["t"]["cols"] == ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share, %", "Corroboration, 2017-2023", "Scheduled Tribe share",
+                          "Development index 2011", "Forest-named spending, record effectively ends FY2017-18"]
+      and tips.get("col_share") == "Forest loss in {window} as a percentage of the forest the unit had at the start of {window}." and 'tip(dvFill(TIPS.col_share || "", { window: w.label }))' in dv_bare
+      and "{within}" in DV["t"]["rank_head"] and "most hectares lost first" in DV["t"]["within_tier"]
+      and "biggest share lost first" in DV["t"]["within_tier_share"] and "units with no share go last, by hectares lost" in DV["t"]["within_tier_share"]
+      and all("in a cell without loss, most standing hectares of its kind first" in DV["t"][k] for k in ("within_tier", "within_tier_share"))
+      and DV["t"]["within_options"] == [["ha", "By hectares lost"], ["share", "By share lost"]]
       and 'function dvWithin() { return state.within === "share" ? DV.t.within_tier_share : DV.t.within_tier; }' in dv_bare and 'state.within = "ha";' in page and 'if (state.within !== "ha") { h += "&within=" + state.within; }' in dv_bare
       and 'wi = h0.within === "share" ? "share" : "ha";' in dv_bare and "within: dvWithin()" in dv_bare)
 st_classes = [c["label"] for c in next(l for l in D["layers"] if l["id"] == "st_share")["classes"]]
@@ -560,8 +582,11 @@ if cfg.is_file():
     check("the overlay's tiles are asked for with the years of the chosen window, and its label names that window; the version is pinned in the address, never 'latest'; the whole credit is in the note drawn on the map",
           "start_year=" in js and "end_year=" in js and "{window}" in DV["overlay"]["on"] and "{window}" in DV["overlay"]["legend"] and c["attribution"] in DV["overlay"]["legend"] and DV["overlay"]["attribution"] == c["attribution"]
           and all(len(w.get("years", [])) == 2 and f"{w['years'][0]}-{w['years'][1]}" == w["label"] for w in DV["windows"]) and "/latest/" not in c["url_template"] and "/v1.13/" in c["url_template"])
-    check("beside its switch the overlay says that ticking it sends the network address, the place viewed and the years of the window to the provider, and that nothing else on the map asks the network for anything",
-          "network address" in DV["overlay"]["note"] and "years of the window" in DV["overlay"]["note"] and "leave this machine" in DV["overlay"]["note"] and "Nothing else on this map asks the network" in DV["overlay"]["note"])
+    check("beside its switch the overlay says that ticking it sends the network address, the place viewed and the years of the window to the provider, and that nothing else on the map asks the network for anything - since 11 October 2026 "
+          "in the 'i' the page draws beside the box from the overlay's note and its version, and no longer under the box, where the page writes nothing while the overlay is at rest",
+          "network address" in DV["overlay"]["note"] and "years of the window" in DV["overlay"]["note"] and "leave this machine" in DV["overlay"]["note"] and "Nothing else on this map asks the network" in DV["overlay"]["note"]
+          and 'esc(DV.overlay.label) + (DV.overlay.available ? tip(DV.overlay.note + " " + DV.overlay.version) : "")' in part
+          and 'id="overlaymsg">\' + esc(DV.overlay.available ? "" : DV.overlay.unavailable)' in part and 'if (!on) { dvOverlayOff(DV.overlay.available ? "" : DV.overlay.unavailable); return; }' in part)
     check("the overlay has words for tiles that stop arriving - some missing, and the connection lost - and the page uses both", "not a sign of no loss" in DV["overlay"]["partial"] and "took itself off" in DV["overlay"]["lost"]
           and "DV.overlay.partial" in part and "DV.overlay.lost" in part)
 else:

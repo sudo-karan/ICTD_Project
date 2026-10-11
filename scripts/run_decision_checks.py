@@ -5,16 +5,20 @@ makes - a run that fails included.
     python scripts/run_decision_checks.py [--leave-out safari --because "why"]
 
 Why this script exists (9 Oct 2026). The records the checks write (60_layer/exercise_*.json) hold only the LAST run of
-each. On 8 Oct one run of the unchanged WebKit exercise failed one step and the next two passed; nothing but a note made
+each. On 8 Oct one run of the layer's own WebKit exercise failed one step and the next two passed; nothing but a note made
 by hand said so. And two browser checks run at the same time, or beside other heavy work, spoil each other. So the
 checks are run from here, in one order, never two at once, and what each run did is written down as it happens.
 
-Order: the two verifiers; the unchanged exercise in Chrome and in WebKit; the unchanged Safari script, as written; the
+Order: the two verifiers; the layer's own exercise in Chrome and in WebKit; the layer's Safari script, as written; the
 decision view's exercise in Chrome and in WebKit; the Safari check by address. A browser check that does not pass is
 run again, up to two more times, and EVERY run is recorded: how many runs a check needed is part of the result.
 
-For each script it also records whether the file is byte for byte the one in the last commit (git), which is what
-"unchanged" means for the three checks of the regression gate, and the sha256 of the file as it was run; and its own.
+For each script it also records whether the file is byte for byte the one in the last commit (git), so that each record
+is of committed code, and the sha256 of the file as it was run; and its own. Of the three checks of the regression gate
+(the layer's own, from before the decision view), scripts/verify_layer.py is still unchanged. scripts/exercise_layer.py
+and scripts/exercise_layer_safari.py were changed on 11 October 2026 only where they pinned reworded words, as listed in
+docs/SITE_COPY.md (the Safari script in none of its own lines: it pins no reworded word itself, and what it expects of a
+unit's panel comes from exercise_layer.py).
 The browser exercises are given a temporary folder for their screenshots; it is not part of the record.
 
 A pass may LEAVE OUT the two checks in the Safari application (--leave-out safari), and must then say why (--because): the
@@ -26,7 +30,7 @@ leave to control Safari, and no other Safari window showing the layer.
 
 One thing it does to Safari, and only this: before each run of a Safari check it closes any window that an EARLIER run
 of these checks left open - a window whose address carries the scripts' own mark, 60_layer/index.html?exercise=<time>.
-The unchanged Safari script leaves its window open when it stops at its first reading, and then every later run of it
+The layer's Safari script leaves its window open when it stops at its first reading, and then every later run of it
 reads that left-over window instead of its own (Safari hands a window back by its title) and fails too: on 9 Oct 2026
 that is what happened to the second run, until the left-over window was closed by hand. No other window is touched, and
 Safari is not started for this. How many it closed is in the record of each run.
@@ -40,7 +44,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "60_layer" / "decision_runs.json"
 PY = sys.executable
 SHOTS = tempfile.mkdtemp(prefix="ictd_decision_runs_")
-CHECKS = [  # name, script, arguments, is it a browser check (run again if it fails), is it one of the regression gate's unchanged scripts
+CHECKS = [  # name, script, arguments, is it a browser check (run again if it fails), is it one of the regression gate's three scripts (the layer's own, from before the decision view)
     ("verify_layer", "scripts/verify_layer.py", [], False, True),
     ("verify_decision", "scripts/verify_decision.py", [], False, False),
     ("exercise_layer in Chrome", "scripts/exercise_layer.py", ["chrome", SHOTS], True, True),

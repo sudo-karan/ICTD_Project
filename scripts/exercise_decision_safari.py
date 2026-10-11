@@ -3,10 +3,24 @@
     python scripts/exercise_decision_safari.py
 
 This is a NEW check (8 Oct 2026). It is NOT the regression gate and does not stand in for it: the gate asks that
-scripts/exercise_layer_safari.py, left exactly as it was, passes by itself - which it has done since (see the end of this
-paragraph). Why this script exists beside it:
+scripts/exercise_layer_safari.py passes by itself - which it has done since (see the end of this paragraph).
 
-On 8 Oct 2026, on an earlier build of that day, the unchanged script stopped at its first reading, before any of its
+A NOTE OF 11 OCTOBER 2026, on the word "unchanged". Until that day scripts/exercise_layer.py and
+scripts/exercise_layer_safari.py had been left exactly as they were on 7 October. On 11 October 2026 they were changed
+only where they pinned reworded words, as listed in docs/SITE_COPY.md: exercise_layer.py in the words it expects of the
+page, and exercise_layer_safari.py in none of its own lines - it pins no reworded word itself and compares a unit's
+panel through exercise_layer.py's expected(). scripts/verify_layer.py is still unchanged. Where the account below says
+"that script", it is exercise_layer_safari.py as it then was.
+THIS script's own pins of reworded words were brought up to date on the same day (the legend's note; and the overlay's
+note, which no longer stands in the page's text but in the "i" beside the box, which a reading of the page's text cannot
+open). It was NOT run then, by the owner's ruling, and it has not been brought up to date with his rulings of 9 October
+2026: it still reads a text of the data that those rulings removed (t.lower_bound), knows ten cells of a row where the
+list has had eleven since, and does not fill the list's head with the order within a tier. It will stop at its first
+window until that is done.
+
+Why this script exists beside the gate's:
+
+On 8 Oct 2026, on an earlier build of that day, that script stopped at its first reading, before any of its
 assertions (one such stop is on record, with its error, among the session's working files). Two things about how it finds
 and waits for its window can stop it, and both are in Safari and not in the layer.
  1. It finds its window by the address and then reads it through the reference Safari hands back - and Safari hands a
@@ -18,21 +32,21 @@ No window of the owner's was closed, and Safari was not brought to the front, to
 The owner's windows were lost all the same, and not by these scripts: on 8 Oct 2026, mid-run, the hidden Safari received a
 request to quit that nothing here sends (system log, 16:19:50 IST; the machine was heavily loaded), and when Safari was
 started again the three windows it had restored from the owner's last session were no longer open. They were not recreated.
-Later the same day, with Safari already running in the background and no other window showing the layer, the unchanged
-script PASSED as written (60_layer/exercise_safari.json; scripts/run_decision_checks.py now records every run of it). So
+Later the same day, with Safari already running in the background and no other window showing the layer, that script
+PASSED as written (60_layer/exercise_safari.json; scripts/run_decision_checks.py now records every run of it). So
 the gate's Safari half can be met; this script is for the days when the owner's Safari is not in that state, and for the
-decision view, which the unchanged script does not know.
+decision view, which that script does not know.
 (The command the scripts close their own window with - close (first document whose URL starts with the marked address) -
 was tested on two windows of the same title: it closes the marked one and leaves the other.)
 Run it by itself on a machine that is otherwise quiet: on 8 Oct 2026, with seven other jobs running, Safari stopped
 answering and then received a quit request in the middle of a run, and the run was lost.
 
-PART 1 runs main() of exercise_layer_safari.py - every address it opens, every comparison, every assertion, none of them
-       touched - with ONE function of it replaced while this script runs: read(). The replacement asks for the title, the
+PART 1 runs main() of exercise_layer_safari.py - every address it opens, every comparison, every assertion, as that
+       script has them - with ONE function of it replaced while this script runs: read(). The replacement asks for the title, the
        address and the text each THROUGH the address filter, never through a reference by title, and answers "nothing yet"
        while the window is not there instead of stopping. What is compared with what is exactly as it was.
        main() writes 60_layer/exercise_safari.json; this script puts that file back as it found it, so it stays the record
-       of the last run of the unchanged script by itself, and keeps today's readings in its own output.
+       of the last run of that script by itself, and keeps today's readings in its own output.
 PART 2 is the decision view, reached through the parts of the address it understands (layer=decision, window, rank, tiers,
        st, keepout, unit): the legend of each of the four windows with the decision table's counts, the ranked list of two
        districts in two windows (its head, every unit in order, its first rows cell by cell), a changed tier order, the
@@ -53,7 +67,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
-import exercise_layer_safari as S          # unchanged; importing it opens nothing (it sets sys.argv for exercise_layer itself)
+import exercise_layer_safari as S          # importing it opens nothing (it sets sys.argv for exercise_layer itself)
 X = S.X
 import exercise_decision as E              # the decision table and what a unit, a list and a legend should show; opens nothing
 
@@ -115,18 +129,18 @@ def main():
     for other in ("exercise_layer_safari.py", "exercise_layer.py", "exercise_decision.py"):
         X.read(f"scripts/{other}")                               # run here as they are on disk: recorded with their sha256 like every table read
 
-    # ---- PART 1: main() of the unchanged script, its window read by address ------------------------------------------------------------
+    # ---- PART 1: main() of exercise_layer_safari.py, its window read by address ----------------------------------------------------------
     record = ROOT / "60_layer" / "exercise_safari.json"
     kept = record.read_bytes() if record.is_file() else None
     kept_summary = json.loads(kept)["summary"] if kept else None
     S.read = read
-    print("PART 1: main() of exercise_layer_safari.py, unchanged, with its window read by address\n", flush=True)
+    print("PART 1: main() of exercise_layer_safari.py as it is on disk, with its window read by address\n", flush=True)
     try:
         rc1 = S.main()
         part1 = json.load(open(record))
     finally:
         if kept is not None:
-            record.write_bytes(kept)                             # stays the record of the last run of the unchanged script by itself
+            record.write_bytes(kept)                             # stays the record of the last run of that script by itself
         elif record.is_file():
             record.unlink()
     part1["summary"]["how_the_window_was_read"] = HOW
@@ -161,8 +175,9 @@ def main():
             lost = S.in_order(s["text"], [(r, r) for r in want], after=X.norm(title(w)))
             say("window, by address", f"set the address to '#layer=decision&window={w}&...'",
                 f"the legend's title names the window ('{title(w)}') and its six rows - five tiers and 'Not ranked' - follow in the provisional order, each with the decision table's count ({want[0]} ...)"
-                + (f"; missing: {lost[:2]}" if lost else "") + "; with no district chosen the page says why there is no list across the state; the view's controls are unfolded, the overlay's box among them with its words that it is online, optional and off unless ticked",
-                has(s["text"], title(w)) and not lost and has(s["text"], V["t"]["rank_none"]) and has(s["text"], V["t"]["lower_bound"]) and has(s["text"], V["overlay"]["label"]) and has(s["text"], V["overlay"]["note"]) and has(s["text"], V["t"]["tiers_head"]))
+                + (f"; missing: {lost[:2]}" if lost else "") + "; with no district chosen the page says that units are ranked within a district and never across the state; the view's controls are unfolded, the overlay's box among them with nothing "
+                "written under it: since 11 October 2026 its note - online, optional, off unless ticked - stands in the 'i' beside the box, which a reading of the page's text cannot open (exercise_decision.py opens it in Chrome and in WebKit)",
+                has(s["text"], title(w)) and not lost and has(s["text"], V["t"]["rank_none"]) and has(s["text"], V["t"]["lower_bound"]) and has(s["text"], V["overlay"]["label"]) and not has(s["text"], V["overlay"]["note"]) and has(s["text"], V["t"]["tiers_head"]))
 
         # the ranked list: two districts, two windows
         names = [d["name"] for d in D["districts"]]
@@ -197,7 +212,7 @@ def main():
         out_of_order = S.in_order(s["text"], [(u, f"({u})") for u in rows], after=X.norm(head))
         say("tier order, by address", f"set the address to '...&tiers={'.'.join(order)}' (the first two tiers changed places)",
             f"the legend's rows follow the new order ({want[0][:60]}...), the list's head says the order is '{words[:45]}...' and spells it out, and its {len(rows):,} units are in that order",
-            has(s["text"], head) and not S.in_order(s["text"], [(r, r) for r in want], after=X.norm(title(w))) and not out_of_order and has(s["text"], "Tier order in use: " + words))
+            has(s["text"], head) and not S.in_order(s["text"], [(r, r) for r in want], after=X.norm(title(w))) and not out_of_order and has(s["text"], "Tier order: " + words))
 
         # the filter, with the outside-village units kept and then left out (the address can untick the box, not tick it again: this comes last)
         for st, keep in (("50", True), ("33", True), ("33", False)):
@@ -244,7 +259,8 @@ def main():
     summary = {"script": "scripts/exercise_decision_safari.py", "run_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "inputs": X.INPUTS, "browser": f"Safari {version} (the application)",
                "events_were": "none: the page was driven by its address alone and read back through AppleScript (title, address, the text shown); nothing was clicked",
                "how_the_window_was_read": HOW, "opened": S.BASE, "layer_run_utc": prov["run_utc"], "decision_table_run_utc": E.PROV["run_utc"], "files_sha256": files,
-               "this_is_not_the_regression_gate": "the gate is scripts/exercise_layer_safari.py passing by itself, unchanged; part 1 is that script's main() with read() replaced while this script runs",
+               "this_is_not_the_regression_gate": "the gate is scripts/exercise_layer_safari.py passing by itself; part 1 is that script's main() with read() replaced while this script runs. (Until 11 October 2026 that script and scripts/exercise_layer.py "
+                                                  "were unchanged; on that day they were changed only where they pinned reworded words, as listed in docs/SITE_COPY.md. The key 'part1_the_unchanged_scripts_main' keeps its name, which other scripts read.)",
                "part1_the_unchanged_scripts_main": {"exit": rc1, "addresses_tried": part1["summary"]["addresses_tried"], "addresses_as_expected": part1["summary"]["addresses_as_expected"],
                                                      "units_opened_by_address": part1["summary"]["units_opened_by_address"], "values_compared": part1["summary"]["values_compared"], "values_found": part1["summary"]["values_found"]},
                "part2_the_decision_view": {"addresses_tried": len(steps2), "addresses_as_expected": sum(s["ok"] for s in steps2), "lists_opened": lists, "units_opened_by_address": len(units), "lines_compared": of, "lines_found": found,

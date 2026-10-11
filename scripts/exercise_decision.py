@@ -3,8 +3,17 @@ decision table (55_decision/condition_by_unit.csv) and the stage tables behind i
 
     python scripts/exercise_decision.py chrome|webkit [folder for screenshots]
 
-These are the NEW checks that came with the decision view (8 Oct 2026). scripts/exercise_layer.py is left exactly as it
-was and still has to pass by itself; this script only borrows its two browser adapters and adds nothing to it.
+These are the NEW checks that came with the decision view (8 Oct 2026). scripts/exercise_layer.py still has to pass by
+itself; this script only borrows its two browser adapters and adds nothing to it. (That script and
+scripts/exercise_layer_safari.py were changed on 11 October 2026 only where they pinned reworded words, as listed in
+docs/SITE_COPY.md; scripts/verify_layer.py is still unchanged.)
+
+THE "i" (11 October 2026). Three cautions the page used to print in full now stand in an "i" beside what they belong
+to: the reason for ranking only within a district (beside the prompt of the empty list), who a filter leaves out (beside
+the filter's note) and the overlay's note (beside its box). Where a step pinned such a caution it now opens the "i" as a
+reader would - in Chrome the mouse is moved onto it; in WebKit, which takes no mouse, the page is sent the mouseover the
+pointer would make - reads the one floating box, then moves away and reads the box again. The step holds only if the box
+showed the caution, lay wholly inside the window, was empty once the pointer had left, and the "i" itself holds no text.
 
 The layer is opened from disk (file://), on the build that is in 60_layer/.
 Part A works every new control - the decision view's switch, the four windows, the district the units are ranked in, the
@@ -96,9 +105,9 @@ CORRO = {"both": "Both measures flag this unit", "hansen_only": "Only Hansen fla
 CHECK = {"name_on_the_polygon_not_contradicted": "the name on its boundary polygon; none of the district checks' flags is raised", "moved_off_the_name": "moved off the name on its polygon: two checks contradicted the name and agreed with each other",
          "polygon_has_no_name": "its polygon names no district: taken from the panchayat polygons under it or the villages round it", "ambiguous": "ambiguous: two districts within 5 points of each other",
          "flagged_one_check_contradicts": "flagged: one check contradicts the district it carries", "no_check_possible": "no check possible: a name, and nothing to check it against"}
-WITHIN = {"ha": "Within a tier, largest first: by forest loss in the window where the cell has loss, by standing hectares of the cell's band where it has none.",
-          "share": "Within a tier, largest first: by forest loss in the window as a share of the forest at the start of the window where the cell has loss (units with no share after the others, by hectares lost), "
-                   "by standing hectares of the cell's band where it has none."}       # the two orders within a tier, as the head of the list and the export name them
+WITHIN = {"ha": "Within a tier, most hectares lost first; in a cell without loss, most standing hectares of its kind first.",
+          "share": "Within a tier, biggest share lost first (units with no share go last, by hectares lost); in a cell without loss, most standing hectares of its kind first."}       # the two orders within a tier, as the head of the list and the export name them
+ORDER_CHANGED = "your own order"                               # what the page and the export call an order of tiers that is not the provisional one
 errors_seen = []                                                # script errors of the page, with where they were read: there must be none
 
 
@@ -116,7 +125,7 @@ def corro(u):
     if r["corroboration_basis"] == "headline":
         return CORRO[r["corroboration"]]
     if r["corroboration_basis"] == "east_coast_every_unit_kept":
-        return CORRO[r["corroboration"]] + " - East Coast zone model: the placebo failed there, so corroboration is unreliable"
+        return CORRO[r["corroboration"]] + " - East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable"
     return {"below_floor": "Not compared: under 100 ha of land with canopy above 10 % in 2000, the agreement test's floor",
             "below_floor_no_corestack_coverage": "Not compared: under 100 ha of land with canopy above 10 % in 2000, the agreement test's floor; and CoRE Stack gives no class on such land here",
             "corestack_covers_under_floor": "Not compared: CoRE Stack gives a class on under 100 ha of this unit's land with canopy above 10 % in 2000, the agreement test's floor"}[r["corroboration_basis"]]
@@ -132,7 +141,7 @@ def tier_label(cell, order):
 
 
 def order_words(order):
-    return "the provisional order" if order == ORDER0 else "an order changed by the user of this page (" + "; ".join(f"{i + 1} {NAME[c]}" for i, c in enumerate(order)) + ")"
+    return "the provisional order" if order == ORDER0 else ORDER_CHANGED + " (" + "; ".join(f"{i + 1} {NAME[c]}" for i, c in enumerate(order)) + ")"
 
 
 def ranked(district, w, order, st="0", keep_out=True, within="ha"):
@@ -168,17 +177,17 @@ def why_expected(u, w, order):
     e = {"chip": tier_label(cell, order),
          "window": f"Window: forest loss counted over {WIN[w]} ({PROV['definitions']['windows'][w]['is']}). Standing forest is always through 2025.",
          "hectares": [shown(r["standing_dense_ha"]) + " ha", shown(r[f"loss_dense_ha_{w}"]) + " ha", shown(r["standing_open_ha"]) + " ha", shown(r[f"loss_open_ha_{w}"]) + " ha", shown(r["low_2000_ha"]) + " ha", shown(r[f"loss_low_ha_{w}"]) + " ha"],
-         "standing": (f"Standing forest {shown(r['standing_forest_ha'])} ha, under the {SMIN} below which a unit has little or none." if little else
-                      f"Standing forest {shown(r['standing_forest_ha'])} ha, at least the {SMIN} below which a unit has little or none; {ROWW[ROW[cell]]}, because standing dense is "
+         "standing": (f"Standing forest: {shown(r['standing_forest_ha'])} ha, under the {SMIN} threshold, so little or none." if little else
+                      f"Standing forest: {shown(r['standing_forest_ha'])} ha, at or above the {SMIN} threshold. It's {ROWW[ROW[cell]]}: standing dense is "
                       + ("at least as large as" if ROW[cell] == "mostly_dense" else "smaller than") + " standing open."),
-         "loss": f"Forest loss in the window {shown(r[f'forest_loss_ha_{w}'])} ha (dense and open added), " + (f"at least the {LMIN} that counts as some loss." if COL[cell] == "some" else f"under the {LMIN} that counts as some loss."),
-         "share": (f"As a share: the unit had {shown(r[f'forest_at_window_start_ha_{w}'])} ha of forest at the start of {WIN[w]}, and the forest loss of the window is {r[f'forest_loss_share_pct_{w}']} % of it. "
-                   "The share stands beside the cell and decides nothing." if r[f"forest_loss_share_pct_{w}"] else
-                   f"As a share: none is given. The unit had {shown(r[f'forest_at_window_start_ha_{w}'])} ha of forest at the start of {WIN[w]}, under the {SMIN} below which a share means nothing."),
+         "loss": f"Forest loss in the window: {shown(r[f'forest_loss_ha_{w}'])} ha (dense and open added), " + (f"at or above the {LMIN} threshold." if COL[cell] == "some" else f"under the {LMIN} threshold."),
+         "share": (f"As a share: {r[f'forest_loss_share_pct_{w}']} % of the {shown(r[f'forest_at_window_start_ha_{w}'])} ha of forest it had at the start of {WIN[w]}. "
+                   "It's shown beside the cell and decides nothing." if r[f"forest_loss_share_pct_{w}"] else
+                   f"No share: it had {shown(r[f'forest_at_window_start_ha_{w}'])} ha of forest at the start of {WIN[w]}, under the {SMIN} a share needs to mean anything."),
          "near": r["near_dense_open_boundary"] == "1", "grid": NAME[cell],
-         "cell": f"So the cell is: {NAME[cell]}. {RESTS[cell]} " + ("It is on the map and outside the ranked list." if cell not in order else
-                 f"Its place under the tier order in use ({order_words(order)}): {tier_label(cell, order)}. "
-                 + (f"In the provisional order this cell is {tier_label(cell, ORDER0)}; the line recorded for it there: " if order != ORDER0 else "") + WHY[cell]),
+         "cell": f"So the cell is: {NAME[cell]}. {RESTS[cell]} " + ("It's on the map, outside the ranked list." if cell not in order else
+                 f"Under {order_words(order)}, it's {tier_label(cell, order)}. "
+                 + (f"In the provisional order it's {tier_label(cell, ORDER0)}, because: " if order != ORDER0 else "") + WHY[cell]),
          "corro": "Corroboration, 2017-2023 (whatever window is chosen): " + corro(u), "work": "Work types: " + WORK[cell],
          "gov": T[u]["governance_prompt"] if OUT[u] else None,
          "district": ("District assigned by: " + "; ".join(CHECK[p] for p in r["district_check"].split("; "))) if OUT[u] else None}
@@ -239,6 +248,29 @@ def dstate(c):
               ranked_h: Math.round(rk.getBoundingClientRect().height), legend_h: Math.round(document.getElementById('legend').getBoundingClientRect().height)};})()""")
 
 
+def read_tip(c, selector, nth=0):
+    """Open the "i" at the selector as a reader would, read the floating box, move away and read it again.
+    Chrome: the mouse is moved onto the "i" and then off it, to the page's top left corner. WebKit takes no mouse: the page is sent the
+    mouseover, and then the mouseout, that the pointer would make. Nothing here calls the page's own functions for the box."""
+    x, y = c.centre(selector, nth)
+    if BROWSER == "chrome":
+        c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y, button="none")
+    else:
+        c.w.run(f"document.querySelectorAll({json.dumps(selector)})[{nth}].dispatchEvent(new MouseEvent('mouseover', {{bubbles:true, cancelable:true, view:window, clientX:{x}, clientY:{y}}}));")
+    time.sleep(0.4)
+    got = c.js(f"""(function(){{var b=document.getElementById('tipbox'), r=b.getBoundingClientRect(), e=document.querySelectorAll({json.dumps(selector)})[{nth}], d=document.documentElement;
+      return {{words:b.textContent, shown:getComputedStyle(b).display!=='none' && r.width>0 && r.height>0, inside:r.left>=0 && r.top>=0 && r.right<=d.clientWidth && r.bottom<=d.clientHeight, own_text:e.textContent}};}})()""")
+    if BROWSER == "chrome":
+        c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=2, y=2, button="none")
+    else:
+        c.w.run(f"document.querySelectorAll({json.dumps(selector)})[{nth}].dispatchEvent(new MouseEvent('mouseout', {{bubbles:true, cancelable:true, view:window, clientX:2, clientY:2}}));")
+    time.sleep(0.3)
+    after = c.js("(function(){var b=document.getElementById('tipbox'); return {words:b.textContent, shown:getComputedStyle(b).display!=='none'};})()")
+    got["closed_empty"] = after["words"] == "" and not after["shown"]
+    got["ok"] = bool(got["words"]) and got["shown"] and got["inside"] and got["own_text"] == "" and got["closed_empty"]
+    return got
+
+
 def choose(c, selector, value):
     """A native list cannot be opened in a window that is not on a screen: set it and send the change event its handler listens for."""
     c.js(f"(function(){{var e=document.querySelector({json.dumps(selector)}); e.value={json.dumps(value)}; e.dispatchEvent(new Event('change', {{bubbles:true}})); return 0;}})()")
@@ -269,7 +301,7 @@ def export_expected(d, w, order, st, keep, built, within="ha"):
         fnv = "not recorded" if pd.isna(X.AL.loc[u, "expenditure_forest_named_worktype"]) else f"Rs {X.AL.loc[u, 'expenditure_forest_named_worktype'] / 1e5:,.2f} lakh"
         stv = X.NC if OUT[u] else ("not defined: no resident population" if pd.isna(X.N_.loc[u, "st_share"]) else f"{100 * X.N_.loc[u, 'st_share']:,.2f} %")
         out.append([d, u, f[0][1], "Outside-village unit" if OUT[u] else "LGD panchayat unit", "1" if OUT[u] else "0", WIN[w], "2025", tier_label(cell, order), rowdef[ROW[cell]] + " " + coldef[COL[cell]], order_text,
-                    "the provisional order" if order == ORDER0 else "an order changed by the user of this page", WITHIN[within], plain(r_["standing_dense_ha"]), plain(r_[f"loss_dense_ha_{w}"]), plain(r_["standing_open_ha"]), plain(r_[f"loss_open_ha_{w}"]),
+                    "the provisional order" if order == ORDER0 else ORDER_CHANGED, WITHIN[within], plain(r_["standing_dense_ha"]), plain(r_[f"loss_dense_ha_{w}"]), plain(r_["standing_open_ha"]), plain(r_[f"loss_open_ha_{w}"]),
                     plain(r_["low_2000_ha"]), plain(r_[f"loss_low_ha_{w}"]), plain(r_["standing_forest_ha"]), plain(r_[f"forest_loss_ha_{w}"]), plain(r_[f"forest_at_window_start_ha_{w}"]), share_text(u, w), SMIN, LMIN, "yes" if r_["near_dense_open_boundary"] == "1" else "no", corro(u), "2017-2023", stv, fnv,
                     "; ".join(CHECK[p] for p in r_["district_check"].split("; ")) if OUT[u] else "", filt, built])
     return rows, out, order_text, filt
@@ -307,7 +339,7 @@ def export_and_check(c, downloads, cols, d, w, order, st, keep, built, what, wit
             if X.norm(named.get(col, "<no such column>")) != X.norm(b):
                 bad.append((u, col, named.get(col), b))
     record = {"file": ex["name"], "saved_by_the_browser": on_disk is not None, "saved_file_equals_the_text_the_page_made": (on_disk == ex["text"]) if on_disk is not None else None, "columns": head, "rows": len(body), "rows_expected": len(rows),
-              "cells_compared": n_cells, "cells_equal": n_cells - len(bad), "bad": bad[:10], "district": d, "window": WIN[w], "tier_order": order_text, "tier_order_is": "the provisional order" if order == ORDER0 else "an order changed by the user of this page", "filter": filt,
+              "cells_compared": n_cells, "cells_equal": n_cells - len(bad), "bad": bad[:10], "district": d, "window": WIN[w], "tier_order": order_text, "tier_order_is": "the provisional order" if order == ORDER0 else ORDER_CHANGED, "filter": filt,
               "order_within_a_tier": WITHIN[within], "development_index_2011_among_the_columns": "development_index_2011" in head, "rows_with_no_share": sum(1 for u in rows if not T[u][f"forest_loss_share_pct_{w}"])}
     changed = order != ORDER0
     say("export", f"{c.clicked} 'Download this list (CSV)' at ({x}, {y}): {what}",
@@ -350,11 +382,14 @@ def main():
         wx, wy = X.to_screen(c, ll)
         s, px = dstate(c), X.pixel(c, wx, wy)
         want = legend_expected("2018_2025", ORDER0)
-        say("decision view", f"{c.clicked} the radio button 'Where is forest work warranted?' at ({x}, {y})",
+        why_within = read_tip(c, "#rank_msg .tip")                # the "i" beside the prompt: the reason for ranking only within a district
+        say("decision view", f"{c.clicked} the radio button 'Decision view' at ({x}, {y})",
             f"it became the checked view and no ordinary layer stayed checked beside it; its windows, tiers and overlay box unfolded; the legend reads '{s['legend_title']}' with {len(want)} rows - five tiers and 'Not ranked' - each with the decision table's count; "
-            f"the address reads '{s['hash']}'; unit {watch} (cell {T[watch]['cell_2018_2025']}) is drawn {px}, that cell's colour {color[T[watch]['cell_2018_2025']]}; a panel opened under the map saying '{s['msg'][:70]}...'; the export button is off until a district is chosen",
+            f"the address reads '{s['hash']}'; unit {watch} (cell {T[watch]['cell_2018_2025']}) is drawn {px}, that cell's colour {color[T[watch]['cell_2018_2025']]}; a panel opened under the map saying '{s['msg'][:90]}'; the 'i' beside that prompt, "
+            f"opened by the pointer, says '{why_within['words'][:120]}...' and is empty again once the pointer has left; the export button is off until a district is chosen",
             s["layer"] == "decision" and not s["both_checked"] and s["more"] != "none" and s["wrap"] == "dv" and "2018-2025" in s["legend_title"] and s["legend"][:6] == want and "layer=decision" in s["hash"] and px.lower() == color[T[watch]["cell_2018_2025"]].lower()
-            and s["ranked_shown"] and "never across the state" in s["msg"] and "not established" in s["msg"] and s["export_disabled"] and s["drawn"] == len(IDS) and not c.errors)
+            and s["ranked_shown"] and "never across the state" in s["msg"] and why_within["ok"] and "not established" in why_within["words"] and "within districts" in why_within["words"]
+            and s["export_disabled"] and s["drawn"] == len(IDS) and not c.errors)
         c.shot(SHOTS / "A1_decision_on.png")
 
         # ---- A2. the four windows ---------------------------------------------------------------------------------------------------------------
@@ -378,12 +413,15 @@ def main():
             rows, _, _, _ = ranked(d, "2018_2025", ORDER0)
             n_un = sum(1 for u in IDS if T[u]["district"] == d and T[u]["cell_2018_2025"] == UNRANKED)
             inside = c.js(f"ICTD_MAP.getBounds().pad(0.05).contains({json.dumps(D['districts'][names.index(d)]['bbox'])})")
-            say("ranked list", f"chose '{d}' in the list 'Rank the units of...'",
+            of_what = read_tip(c, "table.rk th .tip")             # the "i" in the head of the share's column: what the share is a share of
+            say("ranked list", f"chose '{d}' in the list 'Pick a district...'",
                 f"the head reads '{s['head'][:150]}...'; {len(s['rows']):,} rows, the same units in the same order as the decision table gives ({len(rows):,}: tier by tier, then by loss or by standing hectares), of which "
-                f"{sum(1 for u in rows if OUT[u]):,} outside-village units; the foot says {n_un:,} are 'Not a forest site'; the legend adds each cell's count in {d}; the map moved to the district; address '{s['hash']}'",
+                f"{sum(1 for u in rows if OUT[u]):,} outside-village units; the foot says {n_un:,} are 'Not a forest site'; the legend adds each cell's count in {d}; the map moved to the district; the 'i' in the head of the share's column says "
+                f"'{of_what['words']}'; address '{s['hash']}'",
                 s["rows"] == rows and s["head"].startswith(f"{d}, ranked units: {len(rows)}, tier by tier. {WITHIN['ha']} Forest loss counted over 2018-2025; standing forest through 2025. Tier order: the provisional order.")
                 and f"outside the list: {n_un:,}." in s["unranked"] and s["legend"][:6] == legend_expected("2018_2025", ORDER0, d) and inside and "rank=" in s["hash"] and not s["export_disabled"] and len(s["cols"]) == 11
-                and "2018-2025" in " ".join(s["cols"]) and "2017-2023" in " ".join(s["cols"]) and "ends FY2017-18" in s["cols"][10] and "share" in s["cols"][6] and s["within"] == "ha" and "within=" not in s["hash"]
+                and "2018-2025" in " ".join(s["cols"]) and "2017-2023" in " ".join(s["cols"]) and "ends FY2017-18" in s["cols"][10] and "share" in s["cols"][6] and of_what["ok"]
+                and of_what["words"] == "Forest loss in 2018-2025 as a percentage of the forest the unit had at the start of 2018-2025." and s["within"] == "ha" and "within=" not in s["hash"]
                 and STANDING_IS in s["unranked"] and "lower bound" not in (s["unranked"] + s["legend_note"]).lower() and STANDING_IS in s["legend_note"] and s["keep_disabled"] and "applies when a filter is on" in s["keep_label"])
         c.shot(SHOTS / "A3_ranked.png")
         # ---- A3b. the second order within a tier: by share lost (added with the rulings of 9 October 2026) ----------------------------------------
@@ -394,7 +432,7 @@ def main():
         choose(c, "#rank_within", "share")
         s = dstate(c)
         no_loss = [u for u in by_ha if not T[u]["cell_2018_2025"].endswith("_loss")]
-        say("order within a tier", f"with {d_share} ranked, set the list 'Within a tier' to 'by share lost'",
+        say("order within a tier", f"with {d_share} ranked, set the list of the order within a tier to 'By share lost'",
             f"the {len(s['rows']):,} rows are in the order the decision table gives by share ({differ[d_share]:,} of them in another place than by hectares lost); the units of the cells with little or no loss recorded "
             f"({len(no_loss):,}) are where they were, ordered by standing hectares; the head now says '{s['head'][s['head'].index('Within a tier'):][:118]}...'; address '{s['hash']}'",
             s["rows"] == by_share and by_share != by_ha and sorted(by_share) == sorted(by_ha) and differ[d_share] > 0 and [u for u in s["rows"] if u in set(no_loss)] == no_loss
@@ -403,7 +441,7 @@ def main():
         c.shot(SHOTS / "A3b_by_share.png")
         choose(c, "#rank_within", "ha")
         s = dstate(c)
-        say("order within a tier", "set the list 'Within a tier' back to 'by hectares lost'", f"the rows are in the first order again, the head says so, and the address carries nothing of the order ('{s['hash']}')",
+        say("order within a tier", "set the list of the order within a tier back to 'By hectares lost'", f"the rows are in the first order again, the head says so, and the address carries nothing of the order ('{s['hash']}')",
             s["rows"] == by_ha and WITHIN["ha"] in s["head"] and WITHIN["share"] not in s["head"] and "within=" not in s["hash"] and s["within"] == "ha")
         d = chosen[0]                                             # the district with the most outside-village units in a ranked cell: the rest of part A works in it
         choose(c, "#rank_district", str(names.index(d)))
@@ -441,10 +479,12 @@ def main():
                 c.click_on("#c_keep_out"); time.sleep(0.8)
             s = dstate(c)
             rows, dropped, ok_, od_ = ranked(d, "2018_2025", order, st, keep)
-            say("filter", f"set the filter to Scheduled Tribe share '{st} %' with the box 'Keep outside-village units' {'ticked' if keep else 'unticked'}",
-                f"{len(s['rows']):,} rows remain, the ones need_by_unit.csv gives ({len(rows):,}); the note reads '{s['filter'][:190]}...'; the order within the list did not change; the box can be used now that a filter is on; address '{s['hash']}'",
-                s["rows"] == rows and f"Units left out for a smaller or undefined share: {dropped}." in s["filter"] and not s["keep_disabled"]
-                and (f"Outside-village units kept in the list though the filter cannot be applied to them (no census data): {ok_}." in s["filter"] if keep else f"Outside-village units left out with the filter on, for want of census data: {od_}. Tick the box to bring them back." in s["filter"])
+            left_out = read_tip(c, "#rank_filter .tip")           # the "i" beside the filter's note: who the filter leaves out
+            say("filter", f"set the filter to Scheduled Tribe share '{st} %' with the box 'Keep land outside villages' {'ticked' if keep else 'unticked'}",
+                f"{len(s['rows']):,} rows remain, the ones need_by_unit.csv gives ({len(rows):,}); the note reads '{s['filter'][:190]}...', and the 'i' beside it says who is left out ('{left_out['words']}'); the order within the list did not change; "
+                f"the box can be used now that a filter is on; address '{s['hash']}'",
+                s["rows"] == rows and f"; {dropped} units left out. " in s["filter"] and left_out["ok"] and "a smaller share" in left_out["words"] and "no resident population" in left_out["words"] and not s["keep_disabled"]
+                and (f"{ok_} units of land outside villages kept in: they have no census data to filter on." in s["filter"] if keep else f"{od_} units of land outside villages left out: no census data. Tick the box to bring them back." in s["filter"])
                 and "it never orders it" in s["filter"] and "most of the forest" not in s["filter"] and f"st={st}" in s["hash"] and (("keepout=0" in s["hash"]) == (not keep)))
         c.shot(SHOTS / "A5_filter.png")
 
@@ -503,7 +543,7 @@ def main():
         x, y = c.click_on("input[name=layer][value=hansen_loss]"); time.sleep(1.0)
         s = dstate(c)
         r = why_compare(c, target, "2018_2025", ORDER0)
-        say("decision view", f"{c.clicked} an ordinary layer, 'Tree cover loss 2001-2025 (Hansen)', at ({x}, {y})", f"the decision view stepped aside: its switch is unticked and its controls are folded away again, the list under the map is gone, the map has its full height again "
+        say("decision view", f"{c.clicked} an ordinary layer, 'Tree cover loss since 2001 (Hansen)', at ({x}, {y})", f"the decision view stepped aside: its switch is unticked and its controls are folded away again, the list under the map is gone, the map has its full height again "
             f"({s['map_h']} px), the legend is that layer's ('{s['legend_title'][:40]}...'), and the address is an ordinary layer's, with nothing of the decision view in it ('{s['hash']}'). The unit's panel still carries 'why this tier', now AFTER the "
             f"panel's own sections and not before them ({r['equal']} of {r['of']} lines as the tables give them)",
             s["layer"] == "hansen_loss" and s["more"] == "none" and s["wrap"] == "" and not s["ranked_shown"] and s["ranked_len"] == 0 and "Tree cover loss" in s["legend_title"] and "layer=hansen_loss" in s["hash"]
@@ -648,16 +688,24 @@ def main():
         if not D["overlay"]["available"]:
             c.click_on("#r_decision"); time.sleep(0.8)
             s = dstate(c)
-            say("overlay", "looked at the box 'Site-level overlay'", f"it is there, unticked and disabled, and says: '{s['overlay_msg']}'", s["overlay_disabled"] and not s["overlay"] and "not available" in s["overlay_msg"] and overlay_cfg is None and not (ROOT / "60_layer/overlay.js").exists())
+            say("overlay", f"looked at the overlay's box, '{D['overlay']['label']}'", f"it is there, unticked and disabled, and says: '{s['overlay_msg']}'", s["overlay_disabled"] and not s["overlay"] and "not available" in s["overlay_msg"] and overlay_cfg is None and not (ROOT / "60_layer/overlay.js").exists())
         else:
             host = overlay_cfg["url_template"].split("/")[2]
             reqs = (lambda: [u_ for u_ in c.requests if u_.startswith("http")]) if BROWSER == "chrome" else (lambda: c.js("performance.getEntriesByType('resource').map(function(e){return e.name;}).filter(function(n){return n.indexOf('http')===0;})"))
-            say("overlay", "opened the page on its ordinary layer and looked for the box 'Site-level overlay'", f"it is not on show: it belongs to the decision view and is folded away with it; requests to the network since the page opened: {len(reqs())}",
+            say("overlay", f"opened the page on its ordinary layer and looked for the overlay's box, '{D['overlay']['label']}'", f"it is not on show: it belongs to the decision view and is folded away with it; requests to the network since the page opened: {len(reqs())}",
                 not box_shown() and not s["overlay"] and len(reqs()) == 0)
             c.click_on("#r_decision"); time.sleep(0.8)
-            s, before = dstate(c), reqs()
-            say("overlay", "chose the decision view and read the box before touching it", f"it is on show and unticked; it says '{s['overlay_msg'][:120]}...'; requests to the network since the page opened: {len(before)}; no tile is on the map; overlay.js has not been asked for",
-                box_shown() and not s["overlay"] and not s["overlay_disabled"] and len(before) == 0 and tiles() == [0, 0] and c.js("typeof window.ICTD_OVERLAY") == "undefined" and overlay_cfg["data_version"] in s["overlay_msg"] and "years of the window" in s["overlay_msg"])
+            s = dstate(c)
+            note = read_tip(c, "#c_overlay ~ .tip")                # the "i" beside the box: the overlay's note, which stood under the box until 11 October 2026
+            ix, iy = c.click_on("#c_overlay ~ .tip"); time.sleep(0.6)       # a click on the "i", which stands inside the box's own label, must not tick the box
+            s_i, before = dstate(c), reqs()
+            c.click(2, 2) if BROWSER == "chrome" else c.w.run("document.body.click();")      # a click elsewhere closes the bubble the click on the "i" opened
+            time.sleep(0.3)
+            say("overlay", "chose the decision view and read the box before touching it: its 'i' with the pointer, and then by a click on the 'i'", f"it is on show and unticked, with nothing written under it ('{s['overlay_msg']}'); its 'i' says '{note['words'][:120]}...' and is empty again "
+                f"once the pointer has left; the click on the 'i' at ({ix}, {iy}) did not tick the box; requests to the network since the page opened: {len(before)}; no tile is on the map; overlay.js has not been asked for",
+                box_shown() and not s["overlay"] and not s["overlay_disabled"] and s["overlay_msg"] == "" and not s_i["overlay"] and s_i["overlay_msg"] == "" and len(before) == 0 and tiles() == [0, 0] and c.js("typeof window.ICTD_OVERLAY") == "undefined"
+                and note["ok"] and overlay_cfg["data_version"] in note["words"] and "years of the window" in note["words"] and "off unless ticked" in note["words"]
+                and c.js("document.getElementById('tipbox').textContent") == "")
             c.js("(function(){ ICTD_MAP.setView([20.2, 84.3], 9, {animate:false}); return 0; })()"); time.sleep(0.6)
             x, y = c.click_on("#c_overlay")
             for _ in range(80):                                          # until every tile asked for has been drawn (or the overlay has taken itself off)
@@ -706,8 +754,10 @@ def main():
             on_again = dstate(c)["overlay"] and tiles()[1] >= 1
             x, y = c.click_on("#c_overlay"); time.sleep(0.8)
             s2, tl = dstate(c), tiles()
-            say("overlay", f"came back to the decision view (the box was unticked: {not s['overlay']}), ticked it, and {c.clicked} the box again at ({x}, {y})", f"it came on again ({on_again}) and then off: its tiles are gone ({tl[0]} left) and the message is the idle one again",
-                not s["overlay"] and on_again and not s2["overlay"] and tl[0] == 0 and "off unless ticked" in s2["overlay_msg"])
+            note = read_tip(c, "#c_overlay ~ .tip")
+            say("overlay", f"came back to the decision view (the box was unticked: {not s['overlay']}), ticked it, and {c.clicked} the box again at ({x}, {y})", f"it came on again ({on_again}) and then off: its tiles are gone ({tl[0]} left), nothing is written under the box again "
+                f"('{s2['overlay_msg']}'), and its 'i' still says it is off unless ticked",
+                not s["overlay"] and on_again and not s2["overlay"] and tl[0] == 0 and s2["overlay_msg"] == "" and note["ok"] and "off unless ticked" in note["words"])
             ok_d = no_errors(c, "after the overlay's steps with a connection")
             say("script errors", "read the page's script errors after the overlay's steps with a connection", "none" if ok_d else f"ERRORS: {errors_seen[-1]}", ok_d)
             not_actions += 1
@@ -783,7 +833,7 @@ def main():
                 x, y = c.click_on("#c_overlay"); time.sleep(1.5)
                 s = dstate(c)
                 c.cmd("Network.setBlockedURLs", urls=[])
-                say("overlay", f"with the overlay's own file kept from loading, {c.clicked} the box", f"the box is unticked and says: '{s['overlay_msg']}'; the map is the offline map", not s["overlay"] and "overlay.js, is not beside this page" in s["overlay_msg"])
+                say("overlay", f"with the overlay's own file kept from loading, {c.clicked} the box", f"the box is unticked and says: '{s['overlay_msg']}'; the rest of the map works as before", not s["overlay"] and "overlay.js, is not beside this page" in s["overlay_msg"])
                 ok_blocked &= no_errors(c, "after overlay.js was kept from loading")
                 say("script errors", "read the page's script errors after each of the steps in which the browser was made to fail requests", "none: a request the browser is made to fail is not an error of the page's script" if ok_blocked else f"ERRORS: {errors_seen}", ok_blocked)
                 not_actions += 1
