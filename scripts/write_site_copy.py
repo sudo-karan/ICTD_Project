@@ -7,21 +7,23 @@ check whose words changed, the runs, and what was seen in the screenshots - the 
 
 It types no figure. Every count, time, hash and sentence of the page in the document is read from one of the files
 below; the words typed in this script pass through typed(), which stops the run if they carry a digit outside a code
-span, a date, a step or section number of the handoff, or a file's name. It reads, and stops unless each is there and
-is of the builds on disk:
+span, a date, a step of the handoff, the number of a section or of a row of the owner's table, or the name of a hash.
+It reads, and stops unless each is there and is of the builds on disk:
     60_layer/site_copy_audit.csv            the findings: the owner's table and the blind reader's, each with its fix
     60_layer/site_copy_strings.csv          every visible string and "i" of both builds, before and after
     60_layer/site_copy_check_changes.csv    every changed block of a check, with what it checks
     60_layer/site_copy_check.json           scripts/check_site_copy.py: its checks, and what it saw in a browser
     60_layer/site_copy_trials.json          the errors planted against that check
     60_layer/site_copy_looked_at.json       the screenshots: what was measured and what was seen
+    60_layer/site_copy_results_changes.json the figures of docs/RESULTS.md that changed when it was written again
     60_layer/decision_runs.json             scripts/run_decision_checks.py: every run of the layer's checks
     70_share/exercise_share_chrome.json     scripts/exercise_share.py: the gate on the copy
     60_layer/layer.provenance.json, 70_share/share.provenance.json      the two builds
     README.md, docs/DEGRADATION.md, docs/LAYER.md                       for one hold: the two findings that were in documents
+    docs/RESULTS.md                                                     for one hold: the list of its changed figures is of it
 The run stops if a check did not pass, a planted error was not caught, a record is of another build, the check of the
-words is not the committed file, a finding is still marked as to do, or a finding marked as fixed in a document still
-stands in it.
+words is not the committed file, a finding is still marked as to do, a finding marked as fixed in a document still
+stands in it, or a line of docs/RESULTS.md changed in anything but a figure that is listed.
 
 Output: docs/SITE_COPY.md and nothing else; its inputs, their sha256 and the UTC time of the run are at its end.
 """
@@ -37,7 +39,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "SITE_COPY.md"
 INPUTS = []
-ALLOWED = [r"`[^`]*`", r"\b\d{1,2} October 2026\b", r"\bSteps? \d\b", r"\bsection \d+\b", r"\brow \d+\b"]       # where the typed words may carry a digit: none of them is a measurement
+ALLOWED = [r"`[^`]*`", r"\b\d{1,2} October 2026\b", r"\bSteps? \d\b", r"\bsection \d+\b", r"\brow \d+\b", r"(?m)^#{1,6} \d+\. ", r"\bSHA-256\b"]       # where the typed words may carry a digit (a code span, a date, a step, a section, a row of the owner's table, a heading's number, the name of a hash): none of them is a measurement
 
 
 def stop(m):
@@ -87,7 +89,20 @@ def cellmd(s, cut=None):
 
 
 def table(heads, rows):
-    return "\n".join(["| " + " | ".join(typed(h) for h in heads) + " |", "|" + "---|" * len(heads)] + ["| " + " | ".join(r) + " |" for r in rows]) + "\n"
+    return "\n" + "\n".join(["| " + " | ".join(typed(h) for h in heads) + " |", "|" + "---|" * len(heads)] + ["| " + " | ".join(r) + " |" for r in rows]) + "\n"
+
+
+def merged(rows):
+    """Rows of strings that say the same thing in several places (the same kind of string, the same words before and after) as one row, which names the first place and counts the others."""
+    out, at = [], {}
+    for r in rows:
+        k = (r["kind"], r["before"], r["after"], r["status"], r["note"])
+        if k in at:
+            at[k]["more"] += 1
+        else:
+            at[k] = dict(r, more=0)
+            out.append(at[k])
+    return [dict(r, where=r["where"] + (f" (and {r['more']} more of the same)" if r["more"] else "")) for r in out]
 
 
 def main():
@@ -124,6 +139,9 @@ def main():
     for a in audit:
         if any(not v.strip() for v in a.values()):
             stop("a finding of the audit has an empty cell: " + a["where"])
+    res = J("60_layer/site_copy_results_changes.json")
+    if not (res["now_sha256"] == hashlib.sha256(use(res["document"]).read_bytes()).hexdigest() and res["no_sentence_was_changed"] is True and not res["any_other_line_gone_or_changed"]):
+        stop("60_layer/site_copy_results_changes.json is not of docs/RESULTS.md as it is, or a line of that document changed in more than a listed figure")
     for doc, gone, there in IN_DOCUMENTS:                     # the findings that were in documents and not on the page
         words = " ".join(use(doc).read_text(encoding="utf-8").split())
         if gone in words or there not in words:
@@ -132,14 +150,19 @@ def main():
     fixed = [a for a in audit if a["done"].startswith("fixed")]
     listed = [a for a in audit if a["done"].startswith("listed")]
     on_page = lambda a: a["where"].startswith(("both builds", "full layer", "published copy"))
-    not_deck = [a for a in fixed if "the deck's" in a["fix"] and ("not used" in a["fix"] or "added" in a["fix"] or "softened" in a["fix"])]
+    why = {}                                                  # a finding that says "As the row above" takes that row's reason
+    for i, a in enumerate(audit):
+        why[a["where"]] = why[audit[i - 1]["where"]] if a["true"].strip() == "As the row above." and i else a["true"][len("As the row above: "):].capitalize() if a["true"].startswith("As the row above: ") else a["true"]
+    not_deck = [a for a in fixed if "the deck's own" in a["where"]]
     full, copy_ = "the full layer", "the published copy"
     rows_of = lambda build, parts=None, status=None: [r for r in strings if r["build"] == build and (parts is None or r["part"] in parts) and (status is None or (r["status"] in status))]
     changed = ("reworded", "new", "new: an i", "gone")
     CONTROLS = ("side panel", "decision view: controls", "overlay", "search", "page messages")
     OTHER = ("legend", "a unit's panel", "decision view: the list", "decision view: legend and why this tier", "About this map", "Sources", "README.txt")
-    layer_rows = {(r["where"], r["before"], r["after"]) for r in rows_of(full)}
-    only_copy = [r for r in rows_of(copy_) if r["part"] != "figures" and r["status"] in changed and (r["where"], r["before"], r["after"]) not in layer_rows]
+    layer_rows = {(r["before"], r["after"]) for r in rows_of(full)}
+    only_copy = [r for r in rows_of(copy_) if r["part"] != "figures" and r["status"] in changed and (r["before"], r["after"]) not in layer_rows]
+    moved = lambda r: r["status"] == "unchanged" and r["kind"].startswith("i (")           # the same words, now in an "i"
+    controls = [dict(r, status="the same words, now in an i" if moved(r) else r["status"]) for r in rows_of(full, CONTROLS) if r["status"] in changed or moved(r)]
     string_row = lambda r, cut=None: [cellmd(r["where"]), cellmd(r["kind"]), cellmd(r["before"], cut), cellmd(r["after"], cut), cellmd(r["status"] + ("; " + r["note"] if r["note"] else ""))]
     n_strings = Counter((r["build"], r["status"]) for r in strings if r["part"] != "figures")
     ch_by_file = Counter(c["file"] for c in changes)
@@ -161,7 +184,8 @@ Foundation for Ecological Security will open, without moving a single figure:
 
 - **some of it was no longer true**: NIRv was shown as pending, the page called itself offline, and more (section 2);
 - **it read as if a machine had written it**: long labels, a question for a switch. A label is now short, and what
-  it left out stands in a small "i" beside it, which opens a bubble on hover, on keyboard focus and on a tap;
+  it left out stands in a small "i" beside it, which opens a bubble on hover and on keyboard focus, and on a click,
+  which is what a tap on a touch screen sends (no touch screen was tried);
 - **the published copy showed an overlay box that could not work in it.** By his ruling of that day the box is now
   greyed out in the copy and says so.
 
@@ -197,10 +221,11 @@ documents, and had not seen the owner's list. "Done" names the step and the comm
     D.append(typed("""
 ## 3. Listed for the owner, with nothing changed
 
-{n_listed} findings are listed and nothing was changed for them: a string that comes from `55_decision/` (a cell's
-name or reason, a tier's reason, a work-type field, a window's description, the governance prompt), a sentence of
-`docs/RESULTS.md`, or the owner's own words. `scripts/check_site_copy.py` holds that each of the page's is still on the
-page as quoted here.
+{n_listed} findings are listed and nothing was changed for them. Each is one of these: a string that comes from
+`55_decision/` (a cell's name or reason, a tier's reason, a work-type field, a window's description, the governance
+prompt); a sentence of `docs/RESULTS.md`, or of another document this task does not rewrite; words the deck keeps as
+they are; or the owner's own words. `scripts/check_site_copy.py` holds that each of the page's is still on the page as
+quoted here.
 """).format(n_listed=len(listed)))
     D.append(table(["Where", "It says", "What is true", "Source", "Why nothing was changed"], [[cellmd(a[k]) for k in ("where", "said", "true", "source", "fix")] for a in listed]))
 
@@ -208,10 +233,11 @@ page as quoted here.
 ## 4. The side panel and the decision view's controls, before and after
 
 The full layer. Every string of the side panel, the search, the decision view's controls, the overlay's box and the
-page's own messages that is not what it was: {n_controls} rows. A row marked "new: an i" is the bubble beside the
-label above it.
-""").format(n_controls=len(rows_of(full, CONTROLS, changed))))
-    D.append(table(["Where", "What it is", "Before", "After", "What happened"], [string_row(r) for r in rows_of(full, CONTROLS, changed)]))
+page's own messages that is not what it was, or that keeps its words and now stands in an "i": {n_controls} strings,
+in {n_rows} rows, a string that says the same thing in several places being one row. "Where" is the string's key in
+`data.js`, or its place in `index.html`. A row marked "new: an i" is a bubble that did not exist before.
+""").format(n_controls=len(controls), n_rows=len(merged(controls))))
+    D.append(table(["Where", "What it is", "Before", "After", "What happened"], [string_row(r) for r in merged(controls)]))
     D.append(typed("""
 **In the copy** these rows differ from the full layer's: the overlay's box, by the owner's ruling.
 """))
@@ -266,9 +292,10 @@ four checks hold it to. `scripts/exercise_layer.py` was changed only where it pi
 `scripts/exercise_layer_safari.py` pins none of them in its own lines and did not change; what it expects of a unit's
 panel comes from `scripts/exercise_layer.py`.
 
-Every block of lines that differs from the commit before the checks were changed (`{before}`) is a row below:
-{n_changes} rows in {n_files} files. The table is `60_layer/site_copy_check_changes.csv`, where the old and the new
-words stand whole; here each is cut after its first {cut} characters.
+Every block of lines that differs from the commit before the checks were changed (`{before}`) is a row below, for
+each check and for the two document writers whose holds and quotations follow the page's words: {n_changes} rows in
+{n_files} files. The table is `60_layer/site_copy_check_changes.csv`, where the old and the new words stand whole;
+here each is cut after its first {cut} characters.
 """).format(before=chk["checks_were_changed_since_commit"], n_changes=len(changes), n_files=len(ch_by_file), cut=CUT))
     D.append(table(["File", "Blocks changed"], [[cellmd(f"`{f}`"), str(n)] for f, n in ch_by_file.items()]))
     D.append("\n" + table(["File", "Check", "Was", "Now", "The fact it checks"], [[cellmd("`" + c["file"].split("/")[-1] + "`"), cellmd(c["check"]), cellmd(c["was"], CUT), cellmd(c["now"], CUT), cellmd(c["the_fact_it_checks"])] for c in changes]))
@@ -348,22 +375,44 @@ picture shows. The pictures are in `60_layer/site_copy_shots/`, outside git like
 ## 11. Words of the deck that were not used
 
 The deck asks that its words be used as written and that a word which would misstate something be changed and
-listed. These are those changes; each is a row of section 2.
+listed. These are those changes; each is a row of section 2, where the finding that led to it stands just above it.
 """))
-    D.append(table(["Where", "The deck's words", "Why not", "What the page says"], [[cellmd(a["where"]), cellmd(a["said"]), cellmd(a["true"]), cellmd(a["fix"])] for a in not_deck]))
+    D.append(table(["Where", "The deck's words", "Why not", "What it says", "Done"], [[cellmd(a["where"]), cellmd(a["said"]), cellmd(why[a["where"]]), cellmd(a["fix"]), cellmd(a["done"])] for a in not_deck]))
     D.append(typed("""
-Three things of the handoff could not be done as written, and were done as closely as they could be:
+Four things of the handoff were not done exactly as written:
 
 - the picture "the decision view's list, with a district chosen and the prompt's i open" is two pictures, because
   the prompt stands only while no district is chosen (section 10);
 - the sentence the owner gave for the scripts that were called unchanged is said of `scripts/exercise_layer.py`
   alone, with a clause for `scripts/exercise_layer_safari.py`, which did not need a change (section 8);
 - the check of the words gained one group the owner did not list, on the checks' own changes (its checks `e1` and
-  `e2`), so that "no check is removed or loosened" can be read off a table.
+  `e2`), so that "no check is removed or loosened" can be read off a table; and in a browser it gives every "i"
+  keyboard focus as well as the pointer, which is how the defect of section 9 was pinned down;
+- this document is written from the `60_layer/site_copy_*` files, as asked, and from what its section on the runs
+  needs besides: the runner's record, the record of the gate on the copy and the two builds' own records. It also
+  reads four documents, to hold a fix or a list against each (section 13).
 """))
 
     D.append(typed("""
-## 12. What this document was written from
+## 12. The documents
+
+The documents that describe the page were brought up to date in the same step. `docs/LAYER.md`,
+`docs/DECISION_LAYER.md` and `docs/RESULTS.md` were each written again by its own script; `README.md` and
+`docs/DEGRADATION.md` were edited by hand, for the rows of section 2 that are in documents.
+
+**`docs/RESULTS.md`: every figure that changed.** The owner asked that no sentence of it be changed by hand and that
+every figure that changed be listed, old beside new. `scripts/write_results.py` wrote it again, unchanged itself, from
+the records of the day. The document lists every figure of its own text with the file it is read from, and that list
+was set against the same list of the version of commit `{res_commit}`: of {res_n} figures, {res_changed} are printed
+differently, {res_gone} are gone and {res_added} are new. {res_lines} lines of its text above that list differ, and
+each is the old line with nothing changed in it but those figures; its headings are the same.
+""").format(res_commit=res["before_is_the_document_of_commit"], res_n=res["figures_in_the_text_now"], res_changed=res["figures_printed_differently"], res_gone=res["figures_gone"],
+            res_added=res["figures_added"], res_lines=res["lines_of_the_text_above_section_13_gone_or_changed"]))
+    D.append(table(["What happened", "Before", "Now", "Read from", "Where in that file"],
+                   [[cellmd(r["kind"]), cellmd(r["as_printed_before"]), cellmd(r["as_printed_now"]), cellmd(r["file"]), cellmd(r["where_in_the_file"])] for r in res["changes"]]))
+
+    D.append(typed("""
+## 13. What this document was written from
 
 | File | Bytes | SHA-256 |
 |---|---|---|

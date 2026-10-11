@@ -309,8 +309,13 @@ PAGE_PAIRS = [("Forest condition, MGNREGA allocation and social need - Odisha", 
               ("The map's data file was not found. Keep data.js in the same folder as this file and open it again.", "The map's data didn't load. If you downloaded the map, keep data.js in the same folder as index.html and open it again.")]
 
 
+# The copy's README, old beside new: which section became which. A heading named in neither column pairs with the section of the same heading.
+README_PAIRS = {"WHAT IT IS": "WHAT IT SHOWS", "WHAT IT IS NOT": "WHAT IT ISN'T", "THE MAP OVERLAY IS NOT IN THIS COPY": "LEFT OUT OF THIS COPY", "THE DEVELOPMENT INDEX IS NOT IN THIS COPY": "LEFT OUT OF THIS COPY",
+                "PASSING IT ON": "SHARING IT"}
+
+
 def paired(before, after):
-    """The strings of one build before and after, side by side: by key where a key holds one string, in order where it holds several; the page's own words by the list written out above."""
+    """The strings of one build before and after, side by side: by key where a key holds one string, in order where it holds several; the page's own words and the README's sections by the lists written out above."""
     out = []
     keys = list(dict.fromkeys([r["key"] for r in before] + [r["key"] for r in after]))
     for k in keys:
@@ -325,6 +330,15 @@ def paired(before, after):
                 else:
                     out.append((r, None))
             out += [(None, r) for r in b if r["text"] not in used]
+            continue
+        if k == "README.txt":
+            head = lambda r: r["where"].split(": ", 1)[1]
+            new_, used = {head(r): r for r in b}, set()
+            for r in a:
+                to = README_PAIRS.get(head(r), head(r))
+                out.append((r, new_.get(to)))
+                used.add(to)
+            out += [(None, r) for r in b if head(r) not in used]
             continue
         if len(a) <= 1 and len(b) <= 1:
             out.append((a[0] if a else None, b[0] if b else None))
@@ -787,14 +801,14 @@ def run_checks(before, now, extra, browser):
                 n_fixed += 1
                 if there:
                     back.append(f"{CALLED[k]}: '{a['said'][:70]}'")
-                if "as built in Step 2" not in a["where"] and norm(a["said"]) not in whole_saved[k]:
+                if "as built in Step " not in a["where"] and norm(a["said"]) not in whole_saved[k]:
                     never.append(f"{CALLED[k]}: '{a['said'][:70]}'")
             elif a["done"].startswith("listed"):
                 n_listed += 1
                 if not there:
                     lost.append(f"{CALLED[k]}: '{a['said'][:70]}'")
     check("b2", "of the audit's findings about the page (60_layer/site_copy_audit.csv): the words of each one marked fixed stood in the saved copy of the build it was found in and are no longer in that build (a finding in the deck's "
-          "own words, which were only ever in the build of Step 2, is held to the second half alone); and the words of each one marked as listed for the owner, with nothing changed, are still there", not back and not lost and not never
+          "own words, which were only ever in a build this task made, is held to the second half alone); and the words of each one marked as listed for the owner, with nothing changed, are still there", not back and not lost and not never
           and n_fixed > 0, f"{n_fixed} fixed findings looked for and not found; {n_listed} listed findings looked for and found" if not back and not lost and not never
           else "STILL THERE: " + "; ".join(back[:5]) + " | NO LONGER THERE: " + "; ".join(lost[:5]) + " | NEVER IN THE SAVED BUILD: " + "; ".join(never[:5]))
     ov = now["copy"]["D"]["decision"]["overlay"]

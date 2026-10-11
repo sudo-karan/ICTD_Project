@@ -192,7 +192,7 @@ def main():
         b = box()
         c.shot(SHOTS / "share_overlay_greyed.png")
         say(f"clicked the box at ({x}, {y}), and then its label at ({round(lx)}, {round(ly)})",
-            f"the box is still unticked and greyed out after both clicks, and the page still says: '{b['msg']}'; the page asked for the file {asked_for_overlay() or 'nothing'}; its script elements are {b['scripts']}; no tile is on the map ({b['tiles']}); "
+            f"the box is still unticked and greyed out after both clicks, and the page still says: '{b['msg']}'; the page asked for {('the file ' + str(asked_for_overlay())) if asked_for_overlay() else 'no overlay.js'}; its script elements are {b['scripts']}; no tile is on the map ({b['tiles']}); "
             f"requests to the network since the page opened: {len(net())}",
             not after_box["ticked"] and not b["ticked"] and b["disabled"] and after_box["msg"] == b["msg"] == OVERLAY_SAYS and "is not beside this page" not in b["msg"] and b["tiles"] == 0 and b["overlay_object"] == "undefined"
             and len(net()) == 0 and asked_for_overlay() == [] and b["scripts"] == ["data.js"])
