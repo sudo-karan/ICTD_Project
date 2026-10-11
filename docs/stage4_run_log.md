@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-11T13:06:51Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-11T13:58:43Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -340,7 +340,7 @@ The same day the owner had the words of the map page rewritten in his own - a sh
 | 4 | the checks | done |
 | 5 | stage 4 follows the layer | done |
 | 6 | look at it | done |
-| 7 | the documents | not yet |
+| 7 | the documents | done |
 | 8 | publish, on the owner's word | not yet |
 
 ### Step 5 of the second handoff: stage 4 follows the layer
@@ -408,6 +408,25 @@ not chased.
 Not run in this pass: exercise_layer_safari, as written ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words"); exercise_decision_safari, by address ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words").
 
 *Every check passed on its last run: yes; on its first run: no.*
+
+### Step 7 of the second handoff: the documents
+
+The documents that describe the page were written again, each by its own script and in this order: `docs/RESULTS.md`
+(by `scripts/write_results.py`, which was not changed), `docs/LAYER.md`, `docs/SITE_COPY.md` (new, by
+`scripts/write_site_copy.py`), `docs/DECISION_LAYER.md`, this log, and `docs/GAP.md` last. `README.md` and
+`docs/DEGRADATION.md` were edited by hand: their lines on NIRv in the owner's words, and in the README the rows of the
+copy's builder and its gate, rows for the two new scripts, and the layer section.
+
+**`docs/RESULTS.md`: no sentence was changed.** Of the 272 figures of its text, 4 are printed differently, 0 are gone and 0 are new, against the document of commit `27aea62`; 5 lines of its text differ, each in those figures alone. They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`. The list under Phase 8 below,
+`50_gap/results_md_changes.csv`, was written by `scripts/08_gap_closing_checks.py`, which was not run again: it stays
+the record of the stage-4 run, and is of the document as that run left it.
+
+**`docs/GAP.md` is written after this log, and last**, as "To rebuild" at the end of this log says. Its last section
+gives the size and SHA-256 of every file it read, and this handoff changed several of them: the layer's two files, the
+copy's three and its two records, the two documents on the layer, the layer's builder, two records of `50_gap/` (Step
+5 above) and this log. A draft of it, written before this log, differed from the committed document in those lines,
+in the time at which the tables of districts were made again and in the time of writing; and, being a draft, in the
+lines that give what each verifier printed, which a draft does not run. It differed in no other line.
 
 ### Step 8 of the second handoff: the copy on the site
 
@@ -1459,6 +1478,9 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `54ac016` Site words, Step 7: the strings table pairs the README's sections by heading; the writer of docs/SITE_COPY.md after a first reading of what it wrote
+- `324351f` Site words, Step 7: the README and DEGRADATION.md brought up to date by hand; the writers of the documents follow the reworded page
+- `492dc65` Site words, Step 5: stage 4 follows the layer - two steps run again, no table of figures moved, verify_gap 338 of 338
 - `e69680d` Site words, Step 6: the README's sentence on phones says what was seen at a phone's width
 - `40ca842` Site words: a bubble no longer closes on the scroll that keyboard focus makes; the check of the words now gives every "i" keyboard focus
 - `fc6e583` Site words, Step 4: the check of the words waits for a bubble instead of sleeping, and keeps every run of its browser part

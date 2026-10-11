@@ -505,7 +505,7 @@ def cells_that_differ(a: Path, b: Path) -> str:
     return str(sum(1 for x, y in zip(ra, rb) for k in x if x[k] != y[k]))
 
 
-STEP_7_DONE, STEP_8_DONE = False, False                           # the SECOND handoff's last two steps (below): set when each one's commit is made
+STEP_7_DONE, STEP_8_DONE = True, False                            # the SECOND handoff's last two steps (below): set when each one's commit is made
 # The owner's handoff of 11 October 2026 set seven steps, 0 to 6. A step is listed as done here once its commit is made;
 # the list is typed, and is the one place to change when a step closes.
 HANDOFF_STEPS = [
@@ -793,6 +793,40 @@ not chased.
 """
 
 
+SECOND_STEP_7 = """
+The documents that describe the page were written again, each by its own script and in this order: `docs/RESULTS.md`
+(by `scripts/write_results.py`, which was not changed), `docs/LAYER.md`, `docs/SITE_COPY.md` (new, by
+`scripts/write_site_copy.py`), `docs/DECISION_LAYER.md`, this log, and `docs/GAP.md` last. `README.md` and
+`docs/DEGRADATION.md` were edited by hand: their lines on NIRv in the owner's words, and in the README the rows of the
+copy's builder and its gate, rows for the two new scripts, and the layer section.
+
+**`docs/RESULTS.md`: no sentence was changed.** {results} The list under Phase 8 below,
+`50_gap/results_md_changes.csv`, was written by `scripts/08_gap_closing_checks.py`, which was not run again: it stays
+the record of the stage-4 run, and is of the document as that run left it.
+
+**`docs/GAP.md` is written after this log, and last**, as "To rebuild" at the end of this log says. Its last section
+gives the size and SHA-256 of every file it read, and this handoff changed several of them: the layer's two files, the
+copy's three and its two records, the two documents on the layer, the layer's builder, two records of `50_gap/` (Step
+5 above) and this log. A draft of it, written before this log, differed from the committed document in those lines,
+in the time at which the tables of districts were made again and in the time of writing; and, being a draft, in the
+lines that give what each verifier printed, which a draft does not run. It differed in no other line.
+"""
+
+
+def second_step_7() -> list[str]:
+    """Step 7 of the second handoff: the documents. The counts are read from the list of the figures of docs/RESULTS.md that changed."""
+    p = ROOT / "60_layer" / "site_copy_results_changes.json"
+    if not (STEP_7_DONE and p.exists()):
+        return []
+    r = json.loads(p.read_text(encoding="utf-8"))
+    results = (f"Of the {r['figures_in_the_text_now']} figures of its text, {r['figures_printed_differently']} are printed differently, {r['figures_gone']} are gone and {r['figures_added']} are new, "
+               f"against the document of commit `{r['before_is_the_document_of_commit']}`; {r['lines_of_the_text_above_section_13_gone_or_changed']} lines of its text differ, each in those figures alone. "
+               "They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`.")
+    if r["no_sentence_was_changed"] is not True:
+        raise SystemExit("60_layer/site_copy_results_changes.json does not say that no sentence of docs/RESULTS.md was changed")
+    return ["### Step 7 of the second handoff: the documents", "", SECOND_STEP_7.strip().format(results=results), ""]
+
+
 def second_handoff() -> list[str]:
     """The owner's second handoff of 11 October 2026 (the page's words): its steps, and what of it bears on stage 4. Its account is docs/SITE_COPY.md."""
     if not (GAP / "gates_site_words.csv").exists():
@@ -808,6 +842,7 @@ def second_handoff() -> list[str]:
     runs = browser_runs()
     if runs:
         out += ["### The layer's checks on the build with the new words", "", SECOND_RUNS.strip(), ""] + runs
+    out += second_step_7()
     now = publication()
     share = ROOT / "70_share" / "share.provenance.json"
     if now and share.exists():

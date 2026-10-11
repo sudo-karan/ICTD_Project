@@ -1,7 +1,7 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-10T23:09:20Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
-file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-09T04:08:22Z.*
+*Written 2026-10-11T13:56:35Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-11T11:35:41Z.*
 
 ## 1. What this is
 
@@ -16,7 +16,8 @@ This document describes that layer. Four things about it come first.
 - **It is added; nothing is replaced.** The measurement stays exactly as it was. No file of `10_units/` to `50_gap/`
   and no existing column was changed. The new tables are in a new folder, `55_decision/` (10 tables, a run
   record and the record of a gate). The view is a new entry in the layer of `60_layer/`,
-  beside the existing ones, which keep their behaviour and their defaults (§16 says how that was checked).
+  beside the existing ones, which keep their behaviour and their defaults (§16 says how that was checked; their
+  words were rewritten on 11 October 2026, §17.4).
 - **It is a way of reading the measurements, not a new measurement.** Each of the 11,468 units
   (7,976 LGD panchayat units and 3,492 outside-village units) is placed in one of six cells by two questions put
   to Hansen's record: how much forest stands now, and is it mostly closed or mostly open; and was forest lost in a
@@ -524,8 +525,10 @@ panchayat units of the agreement test's headline, from `20_degradation/agreement
 odds ratio is 2.84 (interval 1.92 to 5.24); across the state it is 1.55
 (0.80 to 3.61), an interval that includes one. So for those units agreement across the state is
 not established, and a state-wide leaderboard of them would rest on a comparison the analysis does not establish. The
-layer's About text says this, with the units it is true of, and so does the panel under the map while no district is
-chosen.
+layer's About text says this, with the units it is true of. So does the panel under the map while no district is
+chosen: its prompt says that units are ranked within a district and never across the state, and, since
+11 October 2026, the "i" beside the prompt carries the two odds ratios and the words "not established" (until then the prompt
+itself carried the whole sentence).
 
 **What that row is, and what it is not.** It is the delivered headline of the agreement test: 1,649 LGD panchayat
 units in 25 districts, with the East Coast zone left out, at the 100 ha floor (`docs/RESULTS.md` §5).
@@ -657,8 +660,10 @@ record's own; so do the East Coast count and the count not compared.*
 - **The badge has its own window, 2017–2023**, and is labelled with it whatever window the user has chosen. With the
   window set to 2017–2023 the cell and the badge are about the same years; in any other window they are not, and the
   label is there so that nobody reads them as if they were.
-- **The 468 units under CoRE Stack's East Coast zone model** carry a note on the badge: the placebo failed
-  there, so corroboration is unreliable (`docs/RESULTS.md` §5.2). That failure itself rests on 8
+- **The 468 units under CoRE Stack's East Coast zone model** carry a note on the badge. Since 11 October 2026
+  it reads "East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable"; until then it said that the placebo failed there. The check it speaks of is this project's
+  placebo test, which uses CoRE Stack's Improvement class as the check on its Degradation class
+  (`docs/RESULTS.md` §5.2), not a check CoRE Stack's producers ran. That failure itself rests on 8
   districts. Their class is the one computed with every unit
   kept, since the headline leaves them out.
 - **A flag is relative.** It marks the top fifth of the units compared on that measure, not a stated amount of loss
@@ -822,10 +827,11 @@ Four limits on what this mapping is.
 The list was three days old when it was registered and can be amended by a later notification. It should be checked
 again before a later use.
 
-## 14. The site-level overlay
+## 14. The loss-pixel overlay
 
 The units say where to look; they do not show where inside a unit the loss is. For that the layer can lay Hansen's
-loss over the map as public map tiles. **It is optional, online, and off unless ticked.**
+loss over the map as public map tiles. **It is optional, online, and off unless ticked.** (Until 11 October 2026 the
+page called it the site-level overlay; its box now reads "Loss pixels (Global Forest Watch)".)
 
 - **With no network the layer is exactly what it was.** Nothing is asked for until the box is ticked. If the browser
   reports no connection, or the tiles cannot be reached, the box does not stay ticked and the control says the
@@ -843,16 +849,20 @@ loss over the map as public map tiles. **It is optional, online, and off unless 
 - **It cannot come on behind the user's back.** Its file is asked for on a tick, and if the box has been unticked or
   the view left by the time the file arrives, nothing is drawn.
 - **Where its code lives.** The layer's two files, `index.html` and `data.js`, ask the network for nothing, and the
-  existing checks that enforce this are unchanged and still pass. The overlay's code is in a third file,
-  `60_layer/overlay.js`, loaded only when the box is ticked. So the existing statements that the layer is "pre-computed and
-  offline" and fetches nothing remain true of the layer with the overlay off, which is how it opens. They are not true
-  while the box is ticked, and the layer's About text says so in as many words. One thing about this has to be said
+  checks that enforce this still pass (`scripts/verify_layer.py`, unchanged, and the layer's own exercise, which reads
+  the files the page loads). The overlay's code is in a third file,
+  `60_layer/overlay.js`, loaded only when the box is ticked. Until 11 October 2026 the page called itself "pre-computed and
+  offline"; it no longer does, because the copy on the website reaches its reader over the internet
+  (`docs/SITE_COPY.md`). What its About text says now - that the layers ask no other site for anything - is true of the
+  layer with the overlay off, which is how it opens, and the same text says that the overlay is the one thing on the
+  page that goes online. One thing about this has to be said
   plainly: the unchanged check `scripts/verify_layer.py` still prints that the page's "own script asks for nothing
   else" than `data.js`. That is true of the page as it opens; the check looks for certain words and cannot see the
   few lines that load the overlay's file on a tick. `scripts/verify_decision.py` pins those lines down instead: one
   script element, one address, reached only from the box's own change.
 - **What leaves the machine when it is ticked**, as the registration puts it: only requests for tiles, to the registered host and no other, and only while the box is ticked: each carries the tile's place and zoom and the years of the window chosen, with the browser's usual headers. Opened from disk, the page has no web address of its own to pass on. Nothing about a unit is sent.
-  The control says this beside the box.
+  The "i" beside the box says this. Until 11 October 2026 the same words stood under the box; while the overlay is
+  at rest nothing is written there now.
 
 **The endpoint and its terms, as registered** in `scripts/layer_overlay.json` (as read 2026-10-08T12:31:13Z):
 
@@ -907,33 +917,52 @@ writes `70_share/odisha_forest_decision_layer/`: a folder with the layer's `inde
 `overlay.js`; and a zip of that folder beside it, `70_share/odisha_forest_decision_layer.zip` (6.0 MB). The
 two files are the layer's with the development index of 2011 taken out and nothing else: its layer, its value in
 every unit's row, its line in a unit's panel, its column of the ranked list, its row of the sources, and the places of
-the About text that speak of it (11,468 units' values; the copy's `data.js` is 194,058 bytes
+the About text that speak of it (11,468 units' values; the copy's `data.js` is 196,976 bytes
 shorter than the layer's). The script first writes the layer's `data.js` out again untouched and stops unless that
 gives back the layer's own bytes, so what was not taken out is the layer's. The README says how to open the copy,
 what it is and is not, that the map overlay and the development index are not in it, whose data it draws on
 (11 rows, read from the copy's own list of sources) and where the copy is published.
-The page in the copy is the layer's page less the one cell of the ranked list that printed the index, so its box
-"Site-level overlay" is still there. `scripts/exercise_share.py` opened the copy from disk in Chrome
-(Chrome/154.0.8037.99): 8 of 8 steps did what they should. It holds the two files against
-`60_layer/`'s under that rule, written out a second time in the gate; it looks for the index's id and its names on
-the page in both files and finds none; the page loaded those two files and asked the network for nothing; with the
-box ticked the control said "The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before.", the box was unticked again and no tile was drawn; and with a district
-ranked and one of its units opened, the list, the panel, the list of layers and the two text panels showed the index
-nowhere, and no empty or shifted cell where it had been. The browser logged once that a file was not found, which is
-the point of the copy; nothing else was logged. **Which checks of the copy changed, and why:** until 10 October 2026
-the script and the gate each held the copy's two files byte for byte against `60_layer/`'s; that comparison cannot
-hold once the index is out, and each now holds them against the layer's files under the rule above. `60_layer/` is
-unchanged and keeps the index (§10).
+
+**The overlay's box in the copy: the owner's ruling of 11 October 2026.** Until that day the page in the copy was the
+layer's page, box and all. The box could be ticked; the page then asked for an `overlay.js` that the copy does not
+have, unticked the box and said that the file was not beside the page. On the published site that was a request for a
+missing file, and the copy's About text described an overlay the copy did not have. He ruled, in place of the words of
+his gate of 9 October 2026 on the overlay:
+
+- in the copy the overlay's box is greyed out and cannot be ticked;
+- it says that it is not in this copy, in his words: "Not in this copy, while we check the tile provider's terms of use.";
+- the page asks for no `overlay.js` at all;
+- the copy still carries no code that can ask the provider's server for anything;
+- in the copy's data the overlay's part holds only `available` (`0`), `label` and `unavailable`.
+
+The full layer in `60_layer/` is not changed by this: its box works as before. `scripts/07_build_share.py` makes the
+change in the copy's `data.js` - those three keys, the one paragraph of the About text on the overlay and the
+overlay's row of the sources, each in his words for the copy - and in nothing of `index.html`, whose one line that
+could ask for `overlay.js` is never reached once the box is written disabled.
+
+`scripts/exercise_share.py` opened the copy from disk in Chrome (Chrome/154.0.8037.99): 8 of 8
+steps did what they should. It holds the two files against `60_layer/`'s under the rule - the layer's files without
+the development index, with the overlay switched off as ruled, and nothing else - written out a second time in the
+gate; it looks for the index's id and its names on the page in both files and finds none; the page loaded those two
+files and asked the network for nothing; the overlay's box was on show, greyed out and unticked, still unticked after
+a click on it and one on its label, with his words under it and no "i" beside it; no `overlay.js` was asked for and no
+tile was drawn; and with a district ranked and one of its units opened, the list, the panel, the list of layers and
+the two text panels showed the index nowhere, and no empty or shifted cell where it had been. The browser's log held
+no line (until this ruling one line was let through: that a file was not found, `overlay.js`). **Which checks of the
+copy changed, and why:** until 10 October 2026 the script and the gate each held the copy's two files byte for byte
+against `60_layer/`'s; that comparison cannot hold once the index is out, and each now holds them against the layer's
+files under the rule above, which since 11 October 2026 carries the overlay's change too. `60_layer/` keeps the index
+(§10) and a working overlay.
 
 **The copy is published.** On 11 October 2026 the owner decided to publish it, without a password, at
 https://sudo-karan.github.io/ICTD_Project/: GitHub Pages, from the branch `gh-pages` of the public repository (commit `907d0f905b33`), which
 holds the copy's three files and an empty `.nojekyll` and no other file of the repository. Until that day the copy's
 README said that terms for passing it on were not yet agreed and asked that it not be published; it now gives the
-address, and says that each source keeps its own licence. `scripts/check_pages_live.py` fetched the three files from
-the site and opened it in Chrome (2026-10-10T20:09:31Z): 9 of 9 checks passed. The bytes the site
-serves are the build's; the map draws every unit; the page logs no script error; and every request goes to the
-site's own host. The browser's own request for an icon, which the site does not have, is refused, and the check
-records it.
+address, and says that each source keeps its own licence. **The copy on disk is not yet the one the site serves.** `scripts/check_pages_live.py` last checked the site
+on 2026-10-10T20:09:31Z: 9 of 9 checks passed, on the copy made 2026-10-10T20:05:42Z. The copy described
+in this section was made 2026-10-11T12:32:18Z, after the page's words were rewritten (§17.4), and had not been published
+when this was written. It goes to the site on the owner's word, and this document is written again, from a new
+check of the live site, once it has.
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew 12 tiles of
 12 asked for, from the registered host and no other (one address asked for: `https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&end_year=2025`), with the
@@ -986,9 +1015,11 @@ to carry the window, the export button is off.
 
 ## 16. How it was verified: which check was applied where
 
-**This build applies the owner's rulings of 9 October 2026, and it was verified lightly, on purpose.** No unit changes
-cell, so, as he instructed, no independent replication was made, no adversarial review, and no run in the Safari
-application. What follows says which check was applied to what.
+**This build applies the owner's rulings of 9 October 2026 and carries his words of 11 October 2026, and it was
+verified lightly, on purpose.** No unit changes cell, so, as he instructed, no independent replication was made, no
+adversarial review, and no run in the Safari application. On 11 October 2026 the words of the page were rewritten
+and no figure moved: that change has its own account and its own checks, `docs/SITE_COPY.md`. What follows says which
+check was applied to what.
 
 **That no unit changed cell.**
 
@@ -1028,46 +1059,60 @@ application. What follows says which check was applied to what.
 
 **How the checks were run.** By `scripts/run_decision_checks.py`, one after another and never two at once, on the
 build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). In
-this pass it ran 6 checks, and 5 passed on their first run. The runs of each browser check are
+this pass it ran 6 checks, and 4 passed on their first run. The runs of each browser check are
 given with it below.
 
-**The pass on record was started 2026-10-10T22:41:56Z (UTC), and it is of the verifier as it now is.** In it
-`scripts/verify_decision.py` gave "62 of 62 checks passed", which is what the run this script made of the verifier as it wrote
-the document gave: "62 of 62 checks passed". The check added on 10 October 2026 (§17.3) is therefore in the pass. An earlier
-pass, started 2026-10-10T11:29:27Z (UTC) for the same purpose, could not be finished: 5 of its 6
-checks passed, the verifier with its new check among them, and the check of the decision view in WebKit did not run
-to its end. The machine had gone into standby on a flat battery during that pass, and afterwards the off-screen
-WebKit view stopped answering; the run was stopped by hand, and the runner wrote down "RuntimeError: the WebKit driver ended". That record
-is kept with the session's working files. The pass on record was made on mains power with the machine kept awake,
-on the same build of the layer, and in it the check of the decision view in WebKit ran to its end and passed.
+**The pass on record was started 2026-10-11T11:37:13Z (UTC), on the layer as it was built again on 11 October 2026 for the
+page's words (§17.4), and it is of the verifier as it now is.** In it `scripts/verify_decision.py` gave
+"62 of 62 checks passed", which is what the run this script made of the verifier as it wrote the document gave: "62 of 62 checks passed".
+The check added on 10 October 2026 (§17.3) is therefore in the pass. Two earlier passes were made for that check on
+the build before this one (built 2026-10-09T04:08:22Z). The first, started 2026-10-10T11:29:27Z (UTC), could not be finished:
+5 of its 6 checks passed, the verifier with its new check among them, and the check of the
+decision view in WebKit did not run to its end. The machine had gone into standby on a flat battery during that
+pass, and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote
+down "RuntimeError: the WebKit driver ended". The second, started 2026-10-10T22:41:56Z (UTC) on mains power with the machine kept awake, ran to
+its end, and every check in it passed. Both records are kept with the session's working files. In the pass on
+record every check passed on its last run; the two checks in WebKit needed more than one run, and how many each
+needed is given with it below.
 
 **The regression gate: the existing views.**
 
 - `scripts/verify_layer.py`, unchanged: "92 of 92 checks passed" (with the one remark of §14 on what its sentence about the page's
   own script can and cannot see).
-- `scripts/exercise_layer.py`, unchanged, in Chrome (Chrome/154.0.8037.99): 53 of 53 actions did what they
+- `scripts/exercise_layer.py` in Chrome (Chrome/154.0.8037.99): 53 of 53 actions did what they
   should; 29 units clicked on the map; 1,276 of 1,276 displayed values equal the stage tables.
   Runs made of it on this build: 1; runs that passed: 1.
-- `scripts/exercise_layer.py`, unchanged, in WebKit (WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine)): 53 of 53 actions; 29
-  units; 1,276 of 1,276 values. Runs made of it on this build: 2; runs that passed every step:
+- `scripts/exercise_layer.py` in WebKit (WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine)): 53 of 53 actions; 29
+  units; 1,276 of 1,276 values. Runs made of it on this build: 3; runs that passed every step:
   1; steps that failed in any run: [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script).
-- **`scripts/exercise_layer_safari.py`, unchanged, in the Safari application: NOT RUN on this build.** The runner's
-  record names it as left out and gives the reason: "the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started". Its last record, still in `60_layer/`, is of the run
+- *On the word "unchanged".* Until 10 October 2026 the three scripts of this gate were unchanged since before the
+  decision view. `scripts/verify_layer.py` still is. `scripts/exercise_layer.py` and
+  `scripts/exercise_layer_safari.py` were changed on 11 October 2026 only where they pinned reworded words, as listed
+  in `docs/SITE_COPY.md` (the second of them in none of its own lines: it pins no reworded word itself, and what it
+  expects of a unit's panel comes from the first).
+- **`scripts/exercise_layer_safari.py` in the Safari application: NOT RUN on this build.** The runner's
+  record names it as left out and gives the reason: "the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words". Its last record, still in `60_layer/`, is of the run
   of 2026-10-08T22:53:16Z on the layer built 2026-10-08T22:42:59Z, the build the owner ruled on: 48 addresses showed what they
   should and 1,265 values of the units' panels were in the page's text. So **the Safari third of the regression
-  gate is not shown for the build described here.** What can be said without it: that script reads the existing
-  views only; they are drawn by lines of the page that this batch did not touch (the table below) from stage tables
-  that did not change; and the same views passed the unchanged exercise in Chrome and in WebKit on this build. That
-  is an argument and not a run.
-- *The same holds for `scripts/exercise_decision_safari.py`*, which ran the main routine of that unchanged script in
+  gate is not shown for the build described here.** Until 10 October 2026 one thing could be said without it: that
+  script reads the existing views only, and they were drawn by lines of the page that had not been touched since the
+  decision view was added (the first table below). That no longer holds. On 11 October 2026 the words of those
+  views were rewritten, and lines of the page that draw them were changed with them (the second table below). What
+  can be said now is less: the same views, in their new words, passed the layer's exercise in Chrome and in WebKit on
+  this build; the stage tables did not change; and `docs/SITE_COPY.md` shows that no figure, class or count of the
+  page moved. That is not a run in Safari.
+- *The same holds for `scripts/exercise_decision_safari.py`*, which ran the main routine of that script in
   the Safari application (Safari 27.0 (the application)) with one function replaced, the one that reads the window (title, address and text were each asked for through the address filter (first document whose URL starts with the marked address), never through the by-title reference Safari returns; a reading made before the window exists counts as 'nothing yet'): its last
   record is of the layer built 2026-10-08T22:42:59Z, where 48 of 48 addresses showed what they should and
   1,265 of 1,265 values of 29 units' panels were in the page's text. Not run on this build.
-- **That nothing existing changed in code or data** was also checked directly. This script compared the record of the
-  layer built 2026-10-07T12:05:18Z, kept with the session's working files, with today's: all 23 inputs that layer
-  was built from go into today's layer with the same hash, beside 13 new inputs. It asked git what changed
-  since the commit before the decision view (`44890a1`): four files of code and data that existed then have lines
-  added and none removed.
+  Nor could it be, as it stands: it has not been brought up to date with the rulings of 9 October 2026 (it reads a
+  text of the data that they removed), and it reads the page's text only, so it cannot open an "i".
+- **That nothing existing changed in the data, and how the code changed,** was also checked directly. This script
+  compared the record of the layer built 2026-10-07T12:05:18Z, kept with the session's working files, with today's: all
+  23 inputs that layer was built from go into today's layer with the same hash, beside 13 new
+  inputs. It asked git what had changed between the commit before the decision view (`44890a1`) and the last
+  commit before the page's words were rewritten (`27aea62`): four files of code and data that existed then had
+  lines added and none removed.
 
 | file that existed before | lines added | lines removed |
 |---|---|---|
@@ -1077,16 +1122,29 @@ on the same build of the layer, and in it the check of the decision view in WebK
 | `scripts/layer_template.html` | 311 | 0 |
 
   *The lines added to `.gitignore` keep fetched files and stage outputs out of git; those added to the manifest are
-  the rows of §13 and §14.* The only other files that existed then and are modified are documents the owner ordered
-  brought up to date on 9 October 2026: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`; and the script that writes one of them. **`scripts/write_results.py`
+  the rows of §13 and §14.* The only other files that existed then and were modified up to that commit are documents
+  the owner ordered brought up to date on 9 October 2026: `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md`; and the script that writes one of them.
+
+  **Since that commit the page's words were rewritten** (§17.4). Of the files of code and data that existed before
+  the decision view, these have changed since, lines of existing code among them; none is a stage table or a file of
+  `00_raw/`:
+
+| file that existed before the decision view | lines added since the words were rewritten | lines removed |
+|---|---|---|
+| `scripts/06_build_layer.py` | 109 | 75 |
+| `scripts/exercise_layer.py` | 7 | 7 |
+| `scripts/layer_template.html` | 80 | 30 |
+
+  **`scripts/write_results.py`
   was changed, by the owner's choice of 9 October 2026, in one rule**: it refused to write `docs/RESULTS.md` unless
   the record of the check in the Safari application was of the layer on disk; it now allows that record to be of an
   earlier build when the runner's record of this build names the check as left out with a reason, and then says so in
-  the text. Its rule for the Chrome and WebKit records is unchanged. Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each verifier with the interpreter of its stage. With both changes the script has 140 lines added and 20 removed since that commit. The unchanged check scripts
+  the text. Its rule for the Chrome and WebKit records is unchanged. Since then the fourth stage has changed the same script again (on 10 October 2026 and on 11 October 2026): it reports that stage's headline rows in a section of its own, and runs each verifier with the interpreter of its stage. With both changes the script has 140 lines added and 20 removed since that commit. The check scripts
   that were run are as committed (the runner's record says so of each); and the decision view's build wrote no file
   of `10_units/` to `40_allocation/`. `50_gap/` is the fourth stage's and was built after it (`docs/GAP.md`).
-- **What did change for an existing view**, and the owner accepted (§17): a heading and one line, the decision view's
-  switch, stand above the list of layers; and every unit's panel ends with the block "why this tier". The decision
+- **What did change for an existing view**, and the owner accepted (§17): the decision view's switch stands above the
+  list of layers - under a heading of its own until 11 October 2026, and since then under one heading with them - and
+  every unit's panel ends with the block "why this tier". The decision
   view's other controls stay folded away, its radio button is a group of its own so that the keyboard moves through
   the existing layers as before, and an existing view's address is what it was.
 
@@ -1106,23 +1164,24 @@ on the same build of the layer, and in it the check of the decision view in WebK
   before every reload: none. Runs made of it on this build: 1; runs that passed: 1.
 - The same in WebKit: 47 of 47 steps, 46 units, 874 of 874 comparisons.
   There events are made inside the page, the exported text is read from the page and not from a saved file, and the
-  browser cannot be put offline or have an address blocked. Runs made of it on this build: 1; runs that
-  passed: 1.
+  browser cannot be put offline or have an address blocked. Runs made of it on this build: 2; runs that
+  passed: 1; what a run that did not pass ended on: RuntimeError: js: Error Domain=WKErrorDomain Code=4 "A JavaScript exception occurred" UserInfo={WKJavaScriptExceptionLineNumber=789, WKJavaScriptExceptionMessage=TypeError: undefined is not an object (evaluating 'r._code'), WKJava [cut here].
 - The exports, field by field: §15. The overlay, online in both and offline in Chrome: §14.
 - In the Safari application, by address and with nothing clicked: **not run on this build** (the same reason). On
   the build the owner ruled on, 59 of 59 addresses of the decision view showed what they should, and
   657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
   build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-10T22:16:08Z, opened the copy in
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-11T13:34:25Z, opened the copy in
 `70_share/odisha_forest_decision_layer/` from disk in Chrome: 8 of 8 steps did what they
 should (§14).
 
 **The fragility of the Safari and WebKit checks: recorded, and by the owner's ruling not chased.** On the layer built
-2026-10-08T13:02:50Z, 3 runs of the unchanged WebKit exercise were made and in 1, the first, one step
+2026-10-08T13:02:50Z, 3 runs of the layer's own WebKit exercise (`scripts/exercise_layer.py`, as it then was)
+were made and in 1, the first, one step
 failed: a drag of the map made in script, which did not move the map. No cause was established. One candidate, not
 tested: the step before the drag is a zoom by the mouse wheel, and the map library ignores a mouse-down while it
-still marks a zoom as under way; the unchanged script waits a fixed time. Of the unchanged Safari script on that
+still marks a zoom as under way; that script waits a fixed time. Of the layer's Safari script on that
 day: it stopped at its first reading, twice, before any assertion: Safari held another window of the same page, and had just been started in the background. On the layer built 2026-10-08T20:41:54Z, 3 runs of it were made and 1 passed; the note
 added by hand to that pass's record: *This is the record the runner wrote on 9 October 2026, as it was written, with this one note added. In it the unchanged Safari script was run three times. The first run, with Safari not yet running, stopped at its first reading and left its window open. The second run read that left-over window instead of its own, as Safari hands a window back by its title, and failed most of its addresses. While the second run was still going, the left-over window - the one whose address carried the first run's own mark - was closed by hand; no other window was touched. The third run then passed as written. The runner was changed after this pass to close such left-over windows of its own checks itself, before each Safari run, and to record how many it closed.* On the layer the owner ruled on, built 2026-10-08T22:42:59Z, all
 8 checks were run and 8 passed on their first run. And what happened to the owner's Safari
@@ -1138,13 +1197,17 @@ weaker than their names. A third found one more false sentence in the layer - a 
 "with canopy above ten per cent" - and again checks weaker than their names: the list's check, the gate on tiles
 drawn, the verifier's checks of the view's lists and of the page's handlers. Each was corrected. What that history
 shows is that sentences in words are where this work has gone wrong, more than figures, and that each round of
-checking found the round before it too generous to itself. **No review was made of this build**, by the owner's
-instruction: it changes labels, adds two figures beside the cell and an order within a tier, and moves no unit. The
+checking found the round before it too generous to itself. **No review was made of the build of 9 October 2026**, by
+the owner's instruction: it changed labels, added two figures beside the cell and an order within a tier, and moved
+no unit. **Of the words of 11 October 2026 one reading was made**, as he asked: one reader that had not seen his list
+read every text of both builds, the copy's README and the documents, and listed what was stale, untrue, overstated
+or unsupported; `docs/SITE_COPY.md` gives what it found and what was done with each. The
 conclusions this text draws from figures are tested when it is written and listed in §20.4; a sentence that is not
 such a conclusion is tested by nothing, and a reader should hold the prose to the tables.
 
 **What was not done.** No run was made in the Safari application on this build, and no control was ever clicked
-there. The layer has not been opened in Firefox (not installed on this machine), on a phone, in print, or on a
+there. The layer has not been opened in Firefox (not installed on this machine), on a phone (on 11 October 2026 it
+was looked at in a window of a phone's width, in a desktop browser: `docs/SITE_COPY.md`), in print, or on a
 machine with little memory. The district's list, the filter's list and the list of the order within a tier were set
 through their change events in both engines, because a native pop-up cannot be clicked in a window that is not on a
 screen. Two behaviours of the overlay were read in the page's code and not exercised in a browser: that nothing is
@@ -1239,6 +1302,30 @@ stage, and the first is recorded here as a call of that instruction that he can 
   yearly columns, holds them against the table's column, and this script holds its own count against the verifier's.
 - **Two more of the provider's pages are registered** (§14): its developer page and its guide to API keys.
 
+### 17.4 Changed on 11 October 2026: the words of the page, and the overlay's box in the copy
+
+On 11 October 2026 the owner had the words of the page rewritten in his own - a short label, and what it left out in
+a small "i" beside it - with every untrue line fixed and no figure moved. `docs/SITE_COPY.md` is the account: every
+finding, every string before and after, every check whose words changed, the runs, and what was seen. What bears on
+this document:
+
+- **His ruling on the overlay's box in the copy**, which replaces the words of his gate of 9 October 2026 on the
+  overlay (§14): in the copy the box is greyed out and cannot be ticked; it says that it is not in this copy, in his
+  words; the page asks for no `overlay.js`; the copy carries no code that can ask the provider's server for anything;
+  and in the copy's data the overlay's part holds only `available` (`0`), `label` and `unavailable`. The full layer's
+  box works as before.
+- **One key was added to the layer's data, `tips`**, which holds the words of every "i". No other key was added, and
+  `scripts/verify_decision.py` holds the top of the data to the keys it knows.
+- **NIRv is shown as tested and not used**, where the page said it was pending; the unit panel's section for it is
+  gone.
+- **What he asked be listed and not changed**: the strings that come from `55_decision/` - the cells' names and
+  reasons, the tiers' reasons, the work-type fields, the windows' descriptions, the governance prompt - which the
+  Foundation will rule on, and sentences of `docs/RESULTS.md`. `docs/SITE_COPY.md` lists what was found in them.
+- **The checks.** `scripts/verify_layer.py` is unchanged. `scripts/exercise_layer.py` and
+  `scripts/exercise_layer_safari.py` were changed on 11 October 2026 only where they pinned reworded words, as listed
+  in `docs/SITE_COPY.md` (the second in none of its own lines). The other checks' expected words follow the reworded
+  strings, and no expected number changed (§16).
+
 ## 18. What this does not show
 
 - **It is Hansen's record, read one way.** Standing forest is the forest of 2000 with no loss recorded since; not a measure of tree cover today: it ignores gain, and it inherits
@@ -1277,8 +1364,9 @@ stage, and the first is recorded here as a call of that instruction that he can 
   not in this list was not changed and still describes the state before the decision view; §16 says which checks its
   own script asks for. The layer's two files are now 22.5 MB together (6.0 MB zipped, against the
   25.0 MB it is held under), and beside them is a third file of 1,213 bytes, the overlay's. One
-  sentence of the existing About text, that Hansen "cannot see change on land that was already open in 2000", is
-  about change short of clearance; the decision view counts Hansen's clearance on that land.
+  sentence of the About text, that Hansen cannot see "change on land that was already open in 2000", is about change
+  short of clearance; the decision view counts Hansen's clearance on that land. The page does not say so; it is listed
+  for the owner in `docs/SITE_COPY.md`.
 
 ## 19. To rebuild
 
@@ -1289,6 +1377,9 @@ stage, and the first is recorded here as a call of that instruction that he can 
 .venv/bin/python scripts/run_decision_checks.py                  # both verifiers, then the browser checks, one at a time
 .venv/bin/python scripts/07_build_share.py                       # the copy without the overlay, and its zip
 .venv/bin/python scripts/exercise_share.py                       # the copy opened from disk in Chrome
+.venv/bin/python scripts/check_site_copy.py --trials             # the page's words: errors planted on copies of the two builds
+.venv/bin/python scripts/check_site_copy.py                      # the page's words, held against the builds saved before they were rewritten
+.venv/bin/python scripts/write_site_copy.py                      # docs/SITE_COPY.md
 .venv/bin/python scripts/write_decision_layer.py
 ```
 
@@ -1304,7 +1395,8 @@ Some things this document reads are working files of the session and are rebuilt
 independent replication, the decision tables and the layer's records as they stood when the owner ruled on them, the
 record of the trials of the list's check, the copies of the provider's pages, the record of the layer built on
 7 October 2026, the note of the runs of 8 October 2026 and the record of a pass of the runner with a step made by hand
-(§20). It stops if one is missing. The gate on the renaming needs the table as it was ruled on, and stops unless that
+(§20). `scripts/check_site_copy.py` reads two more: the two builds as they stood before the page's words were
+rewritten on 11 October 2026. It stops if one is missing. The gate on the renaming needs the table as it was ruled on, and stops unless that
 copy has the hash written in the gate's script.
 
 Run the browser checks one at a time, on a machine that is otherwise quiet.
@@ -1317,9 +1409,9 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-10T23:09:20Z | this run | the UTC time at which this script ran |
+| 2026-10-11T13:56:35Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
-| 2026-10-09T04:08:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
+| 2026-10-11T11:35:41Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
 | 11,468 | `55_decision/decision.provenance.json` | key `counts` → `units` |
 | 7,976 | `55_decision/decision.provenance.json` | key `counts` → `by_level` → `lgd_panchayat` |
@@ -1483,6 +1575,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 2,891 | `55_decision/decision.provenance.json`; `55_decision/condition_by_unit.csv` | computed here: units less the units not compared. From: key `counts` → `units`; rows counted by this script: rows whose `corroboration` is not_compared |
 | 8,577 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `corroboration` is not_compared |
 | 468 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `corroboration_basis` is east_coast_every_unit_kept |
+| East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable | `60_layer/data.js` | key `decision` → `corro_labels`: the note after the dash on a label of an East Coast unit |
 | 8 | `20_degradation/agreement_by_zone.csv` | column `n_districts`; row where `zone_model_of_the_units_valued_land` is 'ECPHR only' |
 | 808 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `corroboration_basis` is below_floor_no_corestack_coverage |
 | 696 | `55_decision/condition_by_unit.csv` | rows counted by this script: rows whose `corroboration_basis` is below_floor_no_corestack_coverage and whose `agreement_reference_ha` is zero |
@@ -1518,6 +1611,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | (vi) forest fire management works, including firebreaks, fuel buffer zones and allied measures | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | the sub-item heading of its last row |
 | Sl. 375, Allied measures - forest: Construction of animal protection trenches for community | `00_raw/06_scheme/so5448e_2026-10-05_permissible_works_english_table.csv` | its last row: serial, work type and work name |
 | regeneration; forest land; grazing; biodiversity | `55_decision/decision.provenance.json` | key `work_types` → `words_in_no_row_of_the_list` |
+| Loss pixels (Global Forest Watch) | `60_layer/data.js` | key `decision` → `overlay` → `label` |
 | 60_layer/overlay.js | `60_layer/layer.provenance.json` | key `decision_view` → `overlay_file` → `path` |
 | only requests for tiles, to the registered host and no other, and only while the box is ticked: each carries the tile's place and zoom and the years of the w... | `scripts/layer_overlay.json` | key `what_is_sent` |
 | 2026-10-08T12:31:13Z | `scripts/layer_overlay.json` | key `verified_utc` |
@@ -1548,15 +1642,17 @@ This section is the script's own record of what it read. Paths are relative to t
 | 13 | `00_raw/05_forest_reference/provider_cautions.json` | key `checks_passed` → `sentences_found_word_for_word` |
 | 6.0 | `70_share/share.provenance.json` | key `the_copy` → `zip` → `bytes` |
 | 11,468 | `70_share/share.provenance.json` | key `development_index_left_out` → `unit_rows_from_which_the_value_was_taken` |
-| 194,058 | `70_share/share.provenance.json` | key `development_index_left_out` → `bytes_shorter_than_the_layers` → `data.js` |
+| 196,976 | `70_share/share.provenance.json` | key `development_index_left_out` → `bytes_shorter_than_the_layers` → `data.js` |
 | 11 | `70_share/share.provenance.json` | key `checks_passed` → `credits_read_from_the_layers_own_sources` |
+| Not in this copy, while we check the tile provider's terms of use. | `70_share/exercise_share_chrome.json` | key `summary` → `what_the_page_says_beside_the_greyed_overlay_box` |
 | Chrome/154.0.8037.99 | `70_share/exercise_share_chrome.json` | key `browser` |
 | 8 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
-| The overlay's file, overlay.js, is not beside this page. Everything else on the map works as before. | `70_share/exercise_share_chrome.json` | key `summary` → `what_the_control_said_when_ticked` |
 | https://sudo-karan.github.io/ICTD_Project/ | `70_share/pages_publication.json` | key `address` |
 | 907d0f905b33 | `70_share/pages_publication.json` | key `gh_pages_commit_when_checked`, its first twelve characters |
 | 2026-10-10T20:09:31Z | `70_share/pages_live_check.json` | key `run_utc` |
 | 9 | `70_share/pages_live_check.json` | key `checks_made` |
+| 2026-10-10T20:05:42Z | `70_share/pages_live_check.json` | key `copy_run_utc` |
+| 2026-10-11T12:32:18Z | `70_share/share.provenance.json` | key `run_utc` |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
 | https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&en... | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → `0` → `one_tile_address` |
@@ -1587,13 +1683,15 @@ This section is the script's own record of what it read. Paths are relative to t
 | 29 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `ambiguities_reported` |
 | 67 | `55_decision/condition_by_unit.csv` | its columns: their number |
 | 6 | `60_layer/decision_runs.json` | key `checks`: their number |
-| 5 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
-| 2026-10-10T22:41:56Z | `60_layer/decision_runs.json` | key `started_utc` |
+| 4 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
+| 2026-10-11T11:37:13Z | `60_layer/decision_runs.json` | key `started_utc` |
 | 62 of 62 checks passed | `60_layer/decision_runs.json` | key `checks`: the first clause of the last line of the run of `verify_decision` in that pass |
+| 2026-10-09T04:08:22Z | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_words/decision_runs.json` *(working file)* | key `layer_run_utc` |
 | 2026-10-10T11:29:27Z | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `started_utc` |
 | 5 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: the checks whose last run passed |
 | 6 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: their number |
 | RuntimeError: the WebKit driver ended | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `checks`: what the last run of that check said |
+| 2026-10-10T22:41:56Z | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_words/decision_runs.json` *(working file)* | key `started_utc` |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
 | 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_chrome.json` | key `summary` → `units_clicked` |
@@ -1604,10 +1702,10 @@ This section is the script's own record of what it read. Paths are relative to t
 | 53 | `60_layer/exercise_webkit.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_webkit.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_compared` |
-| 2 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
+| 3 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_layer in WebKit' |
 | [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit' |
-| the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
+| the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
 | 2026-10-08T22:53:16Z | `60_layer/exercise_safari.json` | key `summary` → `run_utc` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_tried` |
@@ -1622,6 +1720,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 23 | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | key `inputs`: the files it lists with a sha256 |
 | 13 | `60_layer/layer.provenance.json`; `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | computed here: inputs of today's layer less inputs of the layer of 7 October. From: key `inputs`: the files it lists with a sha256; key `inputs` |
 | `44890a1` | `git` | the commit this batch started from |
+| `27aea62` | `git` | the last commit before the page's words were rewritten on 11 October 2026 |
 | `CLAUDE.md`, `README.md`, `docs/DATA_NOTES.md`, `docs/LAYER.md`, `docs/RESULTS.md` | `git diff --name-status 44890a1` | the documents among the files modified |
 | 140 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines added |
 | 20 | `git diff --numstat 44890a1 -- scripts/write_results.py` | lines removed |
@@ -1642,12 +1741,13 @@ This section is the script's own record of what it read. Paths are relative to t
 | 47 | `60_layer/exercise_decision_webkit.json` | key `summary` → `steps` |
 | 46 | `60_layer/exercise_decision_webkit.json` | key `summary` → `units_opened` |
 | 874 | `60_layer/exercise_decision_webkit.json` | key `summary` → `lines_compared` |
-| 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in WebKit' |
+| 2 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_decision in WebKit' |
+| RuntimeError: js: Error Domain=WKErrorDomain Code=4 "A JavaScript exception occurred" UserInfo={WKJavaScriptExceptionLineNumber=789, WKJavaScriptExceptionMes... | `60_layer/decision_runs.json` | key `checks`: for each run of 'exercise_decision in WebKit' that did not pass, the start of its `error` or of its last line |
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
-| 2026-10-10T22:16:08Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-11T13:34:25Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
 | 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
 | 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
 | 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
@@ -1715,7 +1815,8 @@ Every cell of a table that is not a typed label was read from the file and colum
 | §13, work types | 12 | `55_decision/tiers.csv` | `cell_name` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
 |  |  | `55_decision/work_types.csv` | `work_type_field` | `cell` is 'open_loss'; `cell` is 'dense_loss'; `cell` is 'open_none'; `cell` is 'dense_none'; `cell` is 'little_loss'; `cell` is 'little_none' |
 | §13, forest-named rows cited by no cell | 51 | `55_decision/work_rows_naming_forest.csv` | `serial`, `work_type`, `work_name` | `serial` is 90; `serial` is 92; `serial` is 93; `serial` is 94; `serial` is 95; `serial` is 96; `serial` is 97; `serial` is 98; `serial` is 104; `serial` is 106; `serial` is 107; `serial` is 109; `serial` is 111; `serial` is 112; `serial` is 113; `serial` is 333; `serial` is 375 |
-| §16, the files that existed before and were added to | 12 | `git diff --numstat 44890a1` | the file, lines added, lines removed |  |
+| §16, the files that existed before and were added to | 12 | `git diff --numstat 44890a1 27aea62` | the file, lines added, lines removed |  |
+| T_words | 9 | `git diff --numstat 27aea62` | the file, lines added, lines removed |  |
 
 ### 20.3 Files read
 
@@ -1724,6 +1825,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `.session_scratch_2026-10-05/55_decision_2026-10-08_as_ruled_on/tiers.csv` *(working file)* | 2,893 | `a734d457e7718afa` | - |
 | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | 14,664 | `6e93fd76b286d905` | 2026-10-07T12:05:18Z |
 | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | 6,680 | `6eec553b95fa0587` | - |
+| `.session_scratch_2026-10-05/60_layer_2026-10-11_before_words/decision_runs.json` *(working file)* | 6,283 | `ec5e567f36c3eb86` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | 5,032 | `61eeeb47e485e682` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-09_pass_with_a_step_by_hand.json` *(working file)* | 9,187 | `8d52b25a4496ad2c` | - |
 | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | 6,230 | `8308830d5aa72e67` | - |
@@ -1775,26 +1877,26 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `55_decision/tiers.csv` | 3,015 | `a7a7db34b7bcb90f` | - |
 | `55_decision/work_rows_naming_forest.csv` | 2,055 | `a1c52ae8265c0c5c` | - |
 | `55_decision/work_types.csv` | 5,133 | `f6d27c0a66b4100a` | - |
-| `60_layer/data.js` | 22,260,285 | `c0224a1627682b2a` | - |
-| `60_layer/decision_runs.json` | 6,283 | `ec5e567f36c3eb86` | - |
-| `60_layer/exercise_chrome.json` | 26,823 | `67ea8be4deefc1eb` | 2026-10-10T22:45:57Z |
-| `60_layer/exercise_decision_chrome.json` | 51,691 | `79b6595a09b1dbb3` | 2026-10-10T22:58:37Z |
+| `60_layer/data.js` | 22,289,078 | `20e13c90e57c5786` | - |
+| `60_layer/decision_runs.json` | 7,901 | `155d635dd615c4e4` | - |
+| `60_layer/exercise_chrome.json` | 26,772 | `dbf5902181912163` | 2026-10-11T11:41:28Z |
+| `60_layer/exercise_decision_chrome.json` | 52,956 | `9ef511eb720e0d00` | 2026-10-11T11:58:41Z |
 | `60_layer/exercise_decision_safari.json` | 59,230 | `4e0185fff677500e` | 2026-10-08T23:04:30Z |
-| `60_layer/exercise_decision_webkit.json` | 49,674 | `6276c97084b8f642` | 2026-10-10T23:02:53Z |
+| `60_layer/exercise_decision_webkit.json` | 50,929 | `6075501c678cf004` | 2026-10-11T12:06:29Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,314 | `4f73f836d6ee40ea` | 2026-10-10T22:54:10Z |
-| `60_layer/index.html` | 205,721 | `94c9a3a8f195fec4` | - |
-| `60_layer/layer.provenance.json` | 24,478 | `27ffbf7609d05e5c` | 2026-10-09T04:08:22Z |
-| `70_share/exercise_share_chrome.json` | 5,063 | `01798797082efcbd` | 2026-10-10T22:16:08Z |
-| `70_share/odisha_forest_decision_layer/README.txt` | 7,390 | `8cf3242e8c5978ad` | - |
-| `70_share/odisha_forest_decision_layer/data.js` | 22,066,227 | `4df21a9f2c43845a` | - |
-| `70_share/odisha_forest_decision_layer/index.html` | 205,691 | `508144e070577a5e` | - |
+| `60_layer/exercise_webkit.json` | 27,263 | `e531327ac8d430e3` | 2026-10-11T11:53:52Z |
+| `60_layer/index.html` | 210,942 | `ca74b4cbc4b6dfa6` | - |
+| `60_layer/layer.provenance.json` | 24,384 | `976d8eb3df12a27f` | 2026-10-11T11:35:41Z |
+| `70_share/exercise_share_chrome.json` | 5,519 | `641dca931a3702b2` | 2026-10-11T13:34:25Z |
+| `70_share/odisha_forest_decision_layer/README.txt` | 7,116 | `01dc2a7b8b8130ee` | - |
+| `70_share/odisha_forest_decision_layer/data.js` | 22,092,102 | `98bce06e1f0b74bb` | - |
+| `70_share/odisha_forest_decision_layer/index.html` | 210,912 | `4e98a6bf1248c5f2` | - |
 | `70_share/pages_live_check.json` | 4,511 | `151685df83b61163` | 2026-10-10T20:09:31Z |
 | `70_share/pages_publication.json` | 1,179 | `4f3655a396a1be8d` | - |
-| `70_share/share.provenance.json` | 3,871 | `4678936032348686` | 2026-10-10T20:05:42Z |
+| `70_share/share.provenance.json` | 5,785 | `49376afe13032e48` | 2026-10-11T12:32:18Z |
 | `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
 | `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
-| `scripts/run_decision_checks.py` | 9,681 | `48a395deca2576e3` | - |
+| `scripts/run_decision_checks.py` | 10,140 | `40cf7e95e9c69bc2` | - |
 | `scripts/write_results.py` | 114,011 | `b918073042879cfc` | - |
 
 ### 20.4 Statements tested before they were written
@@ -1985,10 +2087,14 @@ Each of these is something the text says in words. The script tested it against 
 - the registered page `05_forest_reference/gfw_developer_help_page_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
 - the registered page `05_forest_reference/gfw_api_key_guide_2026-10-08.html` is byte for byte the copy read on 8 October 2026, and its manifest row gives its bytes and its sha256
 - the extract of the provider's cautions is the file its manifest row describes, it was made from the two registered pages that are on disk, and the layer's record says the About text reads the cautions from it
-- the copy in `70_share/odisha_forest_decision_layer/` was made from the layer that is in `60_layer/`; its two files are the layer's without the development index of 2011, which neither names; its three files are the ones its record describes and it holds no other; and the check that opened it in Chrome was made on those files and passed every step
+- the copy in `70_share/odisha_forest_decision_layer/` was made from the layer that is in `60_layer/`; its two files are the layer's without the development index of 2011, which neither names, and with the overlay switched off; its three files are the ones its record describes and it holds no other; and the check that opened it in Chrome was made on those files and passed every step
 - the field left out of the copy is `adi_2011`, its value was taken from the row of every unit, and `60_layer/data.js` still has it
-- what the copy's control said when ticked is the layer's own sentence for a file that is not beside the page
-- the copy on disk is the one the public site serves: the check of the live site passed every check on this build, the three files it fetched are byte for byte those on disk, and the copy's README gives the site's address and no longer says that terms are not agreed
+- in the copy the overlay's part of the data is `available` 0, the layer's label and one sentence; that sentence is what the page said under the greyed box in the browser and what the copy's record gives; the box stayed unticked when clicked and no `overlay.js` was asked for; and the full layer's overlay is available and keeps its own words for a missing file
+- every label of an East Coast unit's badge carries one and the same note after its dash
+- the prompt of the empty ranked list says that units are ranked within a district and never across the state, and the "i" beside it carries the odds ratios and the words "not established"
+- the layer's About text says that Hansen cannot see change on land that was already open in 2000
+- the last check of the live site passed every check, on a copy made before the one on disk; the page and the data the site then served are not the files on disk; and the README of the copy on disk gives the site's address
+- the copy on disk is the one the public site serves, or it is a later copy that has not been published yet: in the first case the check of the live site passed every check on this build, the three files it fetched are byte for byte those on disk, and the copy's README gives the site's address and no longer says that terms are not agreed
 - an exported row carries district, unit id, unit type, window, tier label, tier definition, the tier order in use and whether it was changed, what orders units within a tier, the six hectare figures, corroboration with its window, the outside-village flag and the build time
 - the export has the same columns in WebKit as in Chrome, and in the second list as in the first
 - in Chrome the exported file was saved by the browser, read back from disk, and equal to the text the page made (export)
@@ -2023,22 +2129,25 @@ Each of these is something the text says in words. The script tested it against 
 - the last run of the check 'exercise_layer in WebKit' on this build passed
 - the last run of the check 'exercise_decision in Chrome' on this build passed
 - the last run of the check 'exercise_decision in WebKit' on this build passed
-- the kept record of the pass that could not be finished is of the layer on disk, was started before the pass on record, and is marked unfinished
+- the kept record of the pass that could not be finished is of an earlier build of the layer, was started before the pass on record, and is marked unfinished
+- the kept record of the pass made after the unfinished one is of the same earlier build, lies between it and the pass on record in time, is finished, and every check in it passed on its last run
 - in the unfinished pass every check but the one of the decision view in WebKit passed on its last run, the verifier among them
 - in the unfinished pass the verifier gave the count this script's own run of it gave
 - the pass on record was made with the verifier as it now is: its count is the count of this script's own run of it
 - in the pass on record the check of the decision view in WebKit, which the earlier pass could not finish, ran to its end and passed
-- the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the unchanged script passed
+- the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the layer's Safari script passed
 - the record gives one reason for leaving out both Safari checks
-- on an earlier build, the run of the unchanged WebKit exercise that failed a step was the first made of it, and the step was the map drag
+- on an earlier build, the run of the layer's own WebKit exercise that failed a step was the first made of it, and the step was the map drag
 - the kept record of the pass with a step made by hand is a finished record, made before the pass reported here, in which every check passed on its last run
 - the kept record of the checks of the build the owner ruled on is a finished record of that build
 - the map library embedded in the page ignores a mouse-down on a map that still marks a zoom as under way
-- the four tracked files that existed before and were changed have lines added and none removed
-- of the files that existed before the decision view, the only ones modified are the four of code and data that were added to, documents the owner ordered brought up to date, and the script that writes one of those documents; none is deleted or renamed
+- up to the last commit before the page's words were rewritten, the four tracked files that existed before the decision view and were changed had lines added and none removed
+- since the last commit before the page's words were rewritten, the files of code and data that existed before the decision view and are modified are the layer's builder, the page's template and the layer's own exercise (and, if it was changed, the script that writes the results document); no stage table and no file of `00_raw/` is among them, and no file is deleted or renamed
+- git counts the lines changed in each of those files
+- of the files that existed before the decision view, the only ones modified up to the last commit before the page's words were rewritten are the four of code and data that were added to, documents the owner ordered brought up to date, and the script that writes one of those documents; none is deleted or renamed
 - if the results script is changed, it carries the one exception its own docstring states, on the record of the check in the Safari application, and its rule for the Chrome and WebKit records is unchanged
 - what is said of the results script's later changes follows the script on disk: whether it has the fourth stage's section and chooses an interpreter for each verifier
-- the three unchanged scripts of the regression gate that were run are as committed
+- the scripts of the regression gate that were run - the layer's verifier, which is unchanged, and its exercise in two browsers - are as committed
 - no file of `00_raw/` that is in the last commit was edited: the manifest, if it differs from that commit, has rows appended to it and every committed byte in place
 - every stage table the layer of 7 October 2026 was built from goes into today's layer with the same sha256
 - recorded loss on the open band rises across the three periods several times faster than loss in the forest mask
@@ -2203,4 +2312,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*357 figures and 22 tables (699 cells) from 75 files; 241 statements tested; 153 totals compared. Written 2026-10-10T23:09:20Z by `scripts/write_decision_layer.py` (sha256 `6f2e4a749fc683da`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*365 figures and 23 tables (708 cells) from 76 files; 248 statements tested; 153 totals compared. Written 2026-10-11T13:56:35Z by `scripts/write_decision_layer.py` (sha256 `2ef75b480d7e084e`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
