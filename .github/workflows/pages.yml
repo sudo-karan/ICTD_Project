@@ -1,0 +1,45 @@
+# Deploys the folder site/ of main to GitHub Pages: https://sudo-karan.github.io/ICTD_Project/
+# This is GitHub's own starter workflow for static content (actions/starter-workflows, pages/static.yml, as of
+# 11 October 2026), with two changes: it runs only when site/ or this file changes on main, and it uploads site/
+# rather than the whole repository. scripts/publish_site.sh fills site/ and pushes main.
+name: Publish the site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  # Allows you to run this workflow by hand from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in progress and the latest queued.
+# Runs in progress are not cancelled, so that a deployment always completes.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
