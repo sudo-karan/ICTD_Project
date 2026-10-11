@@ -17,7 +17,7 @@ image. That is a result, and it is §5. NIRv stays in the table as a reported co
 |---|---|---|---|
 | Hansen Global Forest Change | stand-replacing loss of tree cover, by year 2001–2025, on a year-2000 canopy mask | measure: the validated floor | built, independently replicated twice |
 | CoRE Stack tree-change classes | a change of class in canopy density or height between about 2016–19 and 2022–25, inside the producers' tree mask | measure: thinning, and change outside Hansen's mask | built (run 2026-10-05T21:40:02Z); reconciled to the producers' one published Odisha figure |
-| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | **a reported column, not a measure** (§5) | pending, and **nothing is queued** — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then |
+| NIRv trend from Landsat 8 | a decline in November–December greenness, 2013–2025 | **a reported column, not a measure** (§5) | stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`) — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then |
 
 ## 1. Hansen: forest, and the land the planning system has no population figures for
 
@@ -574,7 +574,7 @@ over deciduous forest should expect the same.
 **What follows (ruling of 7 October 2026).** NIRv is not a measure of degradation in this project and nothing in
 stage 1 waits for it. It is a *reported column* of `degradation_by_unit.csv`: `nirv_slope` and `nirv_declining_ha` from
 the date-standardised value, with the first design's beside them as `_unadjusted`, and the caveats of §5.4 attached.
-**State: pending, and **nothing is queued** — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then.** `nirv_by_unit.csv` does not exist yet; nothing below is a state-wide figure.
+**State: stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`) — 72 of 84 tiles of stored observations exist (2026-10-07T08:36:08Z); the other 12 and the 13 blocks of yearly values were cancelled from outside this pipeline on 7 October, with every other pending task of the project, and the chain stopped (§6, §10). Queueing them again is the project owner's decision; the columns of `degradation_by_unit.csv` stay blank until then.** `nirv_by_unit.csv` does not exist yet; nothing below is a state-wide figure.
 
 ### 5.1 The design
 
@@ -657,7 +657,7 @@ returned.
 
 ### 5.5 What is delivered
 
-- In `degradation_by_unit.csv`: `nirv_status` (pending until the run ends), `nirv_slope`, `nirv_declining_ha`,
+- In `degradation_by_unit.csv`: `nirv_status` (it reads `pending`: the run was stopped and nothing is queued), `nirv_slope`, `nirv_declining_ha`,
   `nirv_increasing_ha`, `nirv_trend_ha` from the date-standardised value; the three `_unadjusted` columns from the
   first design; `missing_data_share_nirv`. Never read the declining area without the increasing one.
 - Not delivered: NIRv in the agreement table (§4b), or as an input to stage 4.

@@ -228,8 +228,10 @@ transformation writes into a numbered folder. That is what makes the methods sec
 | `exercise_decision.py` | the decision view's check in a browser (`chrome`, `webkit`): every new control, units of all six cells opened on the map, two exported lists checked field by field, the overlay online, offline and failing. |
 | `exercise_decision_safari.py` | the decision view in the Safari application, by address, with the unchanged Safari script's routine and one function replaced. Not part of the regression gate. |
 | `run_decision_checks.py` | runs both verifiers and the browser checks one at a time and writes down every run, a failed one included (`60_layer/decision_runs.json`). |
-| `07_build_share.py` | the copy made to be passed on, `70_share/odisha_forest_decision_layer/`: the layer's two files without `overlay.js` and, since 10 October 2026, without the development index of 2011 (`adi_2011` and everything that displays it; `60_layer/` keeps it), a README (how to open it, what it is and is not, what is left out, credits, that terms for passing it on are not yet agreed) and a zip beside the folder. |
-| `exercise_share.py` | the gate on that copy: its two files held against `60_layer/`'s under the rule "the layer's without the development index and nothing else", the index's id and names looked for in both, and the copy opened from disk in Chrome - its overlay control says its file is not beside the page, the page asks the network for nothing, and the ranked list, a unit's panel, the list of layers and the two text panels show the index nowhere. |
+| `07_build_share.py` | the copy that is published, `70_share/odisha_forest_decision_layer/`: the layer's two files without `overlay.js` and, since 10 October 2026, without the development index of 2011 (`adi_2011` and everything that displays it; `60_layer/` keeps it). Since 11 October 2026, by the owner's ruling, the overlay's box is greyed out in the copy and cannot be ticked: it says that it is not in this copy, the page asks for no `overlay.js`, and the overlay's part of the copy's data is cut to three keys. With a README in the owner's words (where it is online and how to open it, what it shows and what it isn't, what is left out, credits, where it is published) and a zip beside the folder. |
+| `exercise_share.py` | the gate on that copy: its two files held against `60_layer/`'s under the rule "the layer's without the development index, with the overlay switched off, and nothing else", the index's id and names looked for in both, and the copy opened from disk in Chrome - its overlay box is greyed out, stays unticked when clicked and says that it is not in this copy; the page asks for no `overlay.js` and nothing from the network; the browser's log holds no line; and the ranked list, a unit's panel, the list of layers and the two text panels show the index nowhere. |
+| `check_site_copy.py` | check; changes nothing it reads. The words of the page after they were rewritten on 11 October 2026, held against copies of both builds saved before a word was changed: no figure, class, count or colour moved (`layer_by_unit.csv` byte for byte; every part of `data.js` but the parts that hold words; every unit's row; every figure place by place); none of the phrases the owner listed is left and no finding of the audit that is marked fixed; each of his cautions is still reachable; each label is short; and, in headless Chrome, every "i" opens its bubble on the pointer and on keyboard focus, wholly inside the window, and empties it on closing. With `--trials` it plants errors on copies and records that each is caught. Writes `60_layer/site_copy_check.json` and `60_layer/site_copy_strings.csv`; with `--trials`, `60_layer/site_copy_trials.json` |
+| `write_site_copy.py` | writes `docs/SITE_COPY.md` from the `60_layer/site_copy_*` files, the runner's record and the gate on the copy: what was untrue and what the page says now, every string before and after, every check whose words changed, the runs, and what was seen in the screenshots. It types no figure, and stops unless every record is of the builds on disk. |
 | `check_pages_live.py` | check; publishes nothing. The copy as the owner publishes it (https://sudo-karan.github.io/ICTD_Project/, since 11 October 2026): the three files the site serves against the build's bytes and SHA-256, and the page opened in headless Chrome (every unit drawn, no script error, every request to the site's own host). Writes `70_share/pages_live_check.json` and `70_share/pages_publication.json` |
 | `write_decision_layer.py` | writes `docs/DECISION_LAYER.md` with the reading functions and the gates of `write_results.py`: no figure is typed. |
 
@@ -296,8 +298,8 @@ correction for the date of each image. **NIRv is a reported column, not a measur
 | Hansen Global Forest Change v1.13 | `hansen_by_unit.csv`, `hansen_by_unit_thresholds.csv`, `hansen_loss_by_canopy_band.csv`, `hansen_loss_by_canopy_band_by_unit.csv` | built; independently replicated twice |
 | CoRE Stack tree-change classes 2017–2023 | `corestack_by_unit.csv`, `corestack_by_unit_bands.csv` | built, every class by canopy band |
 | Hansen beside CoRE Stack | `agreement_by_unit.csv`, `agreement_summary.csv`, `agreement_definitions.csv`; and what they assume: `agreement_intervals.csv`, `agreement_by_zone.csv`, `agreement_floor_repeatability.csv` | built; arithmetic rebuilt by a second script (41 of 41 checks passed) |
-| the sources side by side | `degradation_by_unit.csv` | built; NIRv columns blank, `nirv_status` = pending |
-| NIRv, Landsat 8, 2013–2025 — a reported column | — | **pending, nothing queued**: 72 of 84 tiles of observations exist; the other 12 and the 13 blocks were cancelled from outside this pipeline on 7 Oct 2026 and the chain stopped. `scripts/run_nirv_chain.py --resubmit-cancelled` resumes it, on the project owner's word |
+| the sources side by side | `degradation_by_unit.csv` | built; NIRv columns blank (`nirv_status` reads `pending`) |
+| NIRv, Landsat 8, 2013–2025 — a reported column | — | **stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`)**: 72 of 84 tiles of observations exist; the other 12 and the 13 blocks were cancelled from outside this pipeline on 7 Oct 2026 and the chain stopped. `scripts/run_nirv_chain.py --resubmit-cancelled` would resume it, on the project owner's word |
 | minimum forest area for stage 4 | `forest_floor_options.csv`, `forest_floor_repeatability.csv` | a recommendation, applied to nothing |
 
 - **The forest mask is `treecover2000` > 30 — strictly above (ruling of 6 Oct 2026).** Every threshold in
@@ -590,11 +592,11 @@ section once carried those of 7 October 2026 after the layer had been rebuilt. T
 files and their sizes, §4 the shapes, §8 the checks) and, for the decision view, in `docs/DECISION_LAYER.md` (§16),
 both written from the build that is on disk. What must not be lost:
 
-- **Every number shown is a cell of a stage table**, formatted in Python. The page computes nothing. `scripts/verify_layer.py`
+- **Every number shown is a cell of a stage table**, formatted in Python. The page works out no figure; what it counts is the rows of a list, the units a filter leaves out, the matches of a search and a tier's place in the order in use. `scripts/verify_layer.py`
   rebuilds every displayed field of every unit from the stage tables, and `scripts/exercise_layer.py` works every
   control of the page in Chrome and in WebKit and compares units clicked on the map, field by field, with the stage
   tables. How many checks, units and values, and that all passed: `docs/LAYER.md` §8.
-- **Honest colour.** A unit with too little forest for a rate to mean anything is drawn in a flat grey class,
+- **Small forests are greyed out** (the page's heading for it; "Honest colour" until 11 October 2026). A unit with too little forest for a rate to mean anything is drawn in a flat grey class,
   *insufficient forest to assess*, not on the colour scale; the floor is 100 ha by default (the ruled floor), with 50 ha and 1 ha as the other
   setting. Outside-village units on a need measure read *no census data for this land*, never blank or zero.
 - **Geometry is simplified at 30 m** (shared boundaries kept shared). How many vertices that leaves, and the error in
@@ -622,9 +624,14 @@ account; the figures are there and are not repeated here. What must not be lost:
   a third file. **The copy to pass on is `70_share/odisha_forest_decision_layer/`** (a zip of it lies beside it),
   **which leaves that file out** and, since 10 October 2026, the development index of 2011 as well: no file that is
   passed on carries `adi_2011` for a unit, while `60_layer/` keeps it. Since 11 October 2026 the owner publishes that
-  copy at https://sudo-karan.github.io/ICTD_Project/ (`scripts/check_pages_live.py` checks the live site against the build).
+  copy at https://sudo-karan.github.io/ICTD_Project/ (`scripts/check_pages_live.py` checks the live site against the build),
+  and in it the overlay's box is greyed out and says that the overlay is not in this copy (his ruling of that day).
+- **The page's words were rewritten on 11 October 2026**, in the owner's own, with no figure moved: a short label,
+  and what it left out in a small "i" beside it. `docs/SITE_COPY.md` is the account; `scripts/check_site_copy.py`
+  holds both builds against copies saved before a word was changed.
 - **Rebuild** with `scripts/05_build_decision.py`, `scripts/05_check_rename.py`, `scripts/06_build_layer.py`,
-  `scripts/run_decision_checks.py`, `scripts/07_build_share.py`, `scripts/exercise_share.py`, then
+  `scripts/run_decision_checks.py`, `scripts/07_build_share.py`, `scripts/exercise_share.py`,
+  `scripts/check_site_copy.py` (with `--trials`, then without), `scripts/write_site_copy.py`, then
   `scripts/write_decision_layer.py`.
 
 ---
