@@ -23,6 +23,9 @@ rebuild can then be set against the build before it after later steps have run. 
 differences were classed as tables of figures, so the count of tables in the comparison written for Step 3 of the
 owner's handoff was one too high; that comparison was made again with this version.
 
+Since the owner's second handoff of 11 October 2026 a record's list of inputs or outputs that differs is given with the
+files whose entry differs, so that the list says which input moved a record and not only that one did.
+
 Writes `rebuild_<name>_differences.csv` (`file`, `kind`, `same_bytes`, `what_differs`, `why`: one row for every file
 of either build; `why` is filled for the files that are expected to differ, from the short list of reasons in this
 script, and says "NOT EXPECTED" for any other file that differs) and `gates_<name>.csv` (`gate`, `expected`, `found`,
@@ -74,6 +77,21 @@ def files_of(folder: Path) -> dict[str, Path]:
     return out
 
 
+def which(x, y) -> str:
+    """Of two versions of a record's list of files (a dict by name or path, or a list of entries with a `path`): the files whose entry differs, in brackets; nothing for anything else."""
+    def by_path(v):
+        if isinstance(v, dict) and all(isinstance(e, dict) for e in v.values()):
+            return {e.get("path", k): e for k, e in v.items()}
+        if isinstance(v, list) and all(isinstance(e, dict) and "path" in e for e in v):
+            return {e["path"]: e for e in v}
+        return None
+    px, py = by_path(x), by_path(y)
+    if px is None or py is None:
+        return ""
+    names = sorted(k for k in set(px) | set(py) if px.get(k) != py.get(k))
+    return " (" + ", ".join(names) + ")" if names else ""
+
+
 def compare(name: str, a: Path, b: Path) -> tuple[str, bool]:
     """What differs between two versions of a file, in words, and whether a figure does (for a table: any cell, column or row)."""
     if a.read_bytes() == b.read_bytes():
@@ -98,12 +116,12 @@ def compare(name: str, a: Path, b: Path) -> tuple[str, bool]:
                     if x is None or y is None:
                         parts.append(f"{s}: {'new' if x is None else 'gone'}")
                     elif x != y:
-                        parts.append(f"{s}: " + ", ".join(k for k in sorted(set(x) | set(y)) if x.get(k) != y.get(k)))
+                        parts.append(f"{s}: " + ", ".join(k + which(x.get(k), y.get(k)) for k in sorted(set(x) | set(y)) if x.get(k) != y.get(k)))
                 return "steps that differ, and in which keys - " + "; ".join(parts), False
             keys = [k for k in sorted(set(ja) | set(jb)) if ja.get(k) != jb.get(k)]
             extra = ""
             if "inputs" in keys and isinstance(ja.get("inputs"), list) and isinstance(jb.get("inputs"), list):
-                extra = f" (inputs: {len(ja['inputs'])} then, {len(jb['inputs'])} now)"
+                extra = f" (inputs: {len(ja['inputs'])} then, {len(jb['inputs'])} now" + (f"; the entries that differ:{which(ja['inputs'], jb['inputs'])}" if which(ja["inputs"], jb["inputs"]) else "") + ")"
             return "keys that differ: " + ", ".join(keys) + extra, False
         return "its contents", False
     la, lb = a.read_text(encoding="utf-8", errors="replace").splitlines(), b.read_text(encoding="utf-8", errors="replace").splitlines()

@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-10T23:17:44Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-11T13:06:51Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -62,7 +62,7 @@ sentences of `docs/DECISION_LAYER.md` that the fourth stage had overtaken were c
 | errors in the browser's own log, against the addresses asked for that the site answers with 404 (a browser asks every site for /favicon.ico by itself; the site has none) | none but one 'Failed to load resource' for each favicon.ico the site does not have | 1 line(s): log: Failed to load resource: the server responded with a status of 404 (); answered 404: https://sudo-karan.github.io/favicon.ico | yes |
 | requests the page made over http or https, and those of them that did not go to https://sudo-karan.github.io | at least one, and none elsewhere | 3 (/ICTD_Project/, /ICTD_Project/data.js, /favicon.ico); elsewhere: 0 | yes |
 
-*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*
+*From the two records of that publication, `pages_publication.json` and `pages_live_check.json`, as they were kept in `.session_scratch_2026-10-05/70_share_2026-10-11_before_words/` (working files, not in git) before the copy was built again for the page's words.*
 
 ### Step 1: fix the input listing and rebuild
 
@@ -311,7 +311,7 @@ differ but the time of writing, which held until this step. It now also allows a
 browser checks, and a line of the text that differs only in such figures. It fails, as before, on any other figure
 and on any other line. No other gate, expected value or tolerance was changed.
 
-*`60_layer/decision_runs.json`: started 2026-10-10T22:41:56Z, ended 2026-10-10T23:02:56Z; the layer it checked was built 2026-10-09T04:08:22Z; one check at a time.*
+*`.session_scratch_2026-10-05/60_layer_2026-10-11_before_words/decision_runs.json` (the record of that pass, kept with the session's working files before the layer was built again for the page's words): started 2026-10-10T22:41:56Z, ended 2026-10-10T23:02:56Z; the layer it checked was built 2026-10-09T04:08:22Z; one check at a time.*
 
 | check | run | started | exit status | its last line | lines that failed |
 |---|---|---|---|---|---|
@@ -326,6 +326,92 @@ and on any other line. No other gate, expected value or tolerance was changed.
 Not run in this pass: exercise_layer_safari, as written ("the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started"); exercise_decision_safari, by address ("the owner's handoff of 11 October 2026: Chrome and WebKit only; the Safari application is not to be started").
 
 *Every check passed on its last run: yes; on its first run: no.*
+
+## The owner's second handoff of 11 October 2026: the page's words
+
+The same day the owner had the words of the map page rewritten in his own - a short label, and what it left out in a small "i" beside it - with every untrue line fixed and no figure moved (`.session_scratch_2026-10-05/handoff/2026-10-11_site_copy_and_audit.md` and the deck of words beside it, not in git). Its account is `docs/SITE_COPY.md`, written by `scripts/write_site_copy.py`: every finding, every string before and after, every check whose words changed, the runs, and what was seen. This log keeps what bears on stage 4 and on taking the work up again.
+
+| step | what | state |
+|---|---|---|
+| 0 | keep what is live | done |
+| 1 | the audit | done |
+| 2 | the words, in the full layer | done |
+| 3 | the copy | done |
+| 4 | the checks | done |
+| 5 | stage 4 follows the layer | done |
+| 6 | look at it | done |
+| 7 | the documents | not yet |
+| 8 | publish, on the owner's word | not yet |
+
+### Step 5 of the second handoff: stage 4 follows the layer
+
+Stage 4 reads two files of the layer: `60_layer/data.js`, for the layer's own row of sources for the development index,
+and `60_layer/layer_by_unit.csv`, for the class of Scheduled Tribe share the layer shows for a unit. Its records hold
+the bytes and SHA-256 of those two and of `scripts/06_build_layer.py`. The rewording changed the first and the third.
+The second, the table of figures, is byte for byte what it was (`docs/SITE_COPY.md`).
+
+The verifier was run on the stage as it stood. It failed two checks and no other: the listing of inputs and the run
+record still held the earlier bytes and SHA-256 of those two files. `scripts/08_gap_inputs.py` and
+`scripts/08_build_gap_districts.py` were run again in the stage-4 environment, in that order. No other step's section
+lists a file that those two runs changed, so no other step was run. **No table of figures moved**: the comparison
+below sets every output beside the copy kept from before (`50_gap/before_site_words/`). The verifier then passed every
+check. `scripts/08_gap_closing_checks.py` and `scripts/08_gap_leftovers_check.py` were not run again, as instructed:
+their tables stay the record of the stage-4 run.
+
+One script of the stage was changed: `scripts/08_gap_compare_builds.py` now names, for a record whose list of inputs
+or outputs differs, the files whose entry differs, so that the list below says which input moved a record.
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_site_words/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 22 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 22 of 22 | 22 of 22 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the later build that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_site_words.csv`).*
+
+Files compared or listed: 57; byte for byte the same: 55. Every file that differs, is new or is gone (`50_gap/rebuild_site_words_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_districts: inputs (60_layer/data.js, scripts/06_build_layer.py), run_utc; 08_gap_inputs: inputs (60_layer/data.js, scripts/06_build_layer.py), outputs (50_gap/inputs_listing.json), run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now; the entries that differ: (60_layer/data.js, scripts/06_build_layer.py)) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+
+### The layer's checks on the build with the new words
+
+The layer's checks were run again on the build with the new words, one at a time, with the two checks in the Safari
+application left out as before. The table is the runner's record. A browser check that does not pass is run again,
+and every run is kept. The two checks in WebKit needed more than one run: in the layer's own exercise the drag of the
+map made by script left the map where it was, the step that had failed once on 8 October and once in Step 6 above; and
+one run of the decision view's exercise ended on an error raised inside the map library. Nothing was keeping the
+display awake during those runs; it was kept awake from then on, and each check then passed. Whether that was the
+reason was not established. By the owner's ruling of 9 October the fragility of the WebKit checks is recorded and
+not chased.
+
+*`60_layer/decision_runs.json`: started 2026-10-11T11:37:13Z, ended 2026-10-11T12:06:32Z; the layer it checked was built 2026-10-11T11:35:41Z; one check at a time.*
+
+| check | run | started | exit status | its last line | lines that failed |
+|---|---|---|---|---|---|
+| verify_layer | 1 | 2026-10-11T11:37:13Z | 0 | 92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays | none |
+| verify_decision | 1 | 2026-10-11T11:37:21Z | 0 | 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts | none |
+| exercise_layer in Chrome | 1 | 2026-10-11T11:37:31Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_layer in WebKit | 1 | 2026-10-11T11:41:31Z | 1 | 52 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | FAIL  [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) -> its centre moved from 20.205 N 84.440 E to 20.205 N 84.440 E, and the unit that was open stayed open |
+| exercise_layer in WebKit | 2 | 2026-10-11T11:45:40Z | 1 | 52 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | FAIL  [map] dragged the map 180 px left and 120 px up (mouse-down, eight mouse-moves and mouse-up, made in script) -> its centre moved from 20.205 N 84.440 E to 20.205 N 84.440 E, and the unit that was open stayed open |
+| exercise_layer in WebKit | 3 | 2026-10-11T11:49:48Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_decision in Chrome | 1 | 2026-10-11T11:53:54Z | 0 | 53 of 53 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+| exercise_decision in WebKit | 1 | 2026-10-11T11:58:44Z | 1 | RuntimeError: js: Error Domain=WKErrorDomain Code=4 "A JavaScript exception occurred" UserInfo={WKJavaScriptExceptionLineNumber=789, WKJavaScriptExceptionMessage=TypeError: undefined is not an object (evaluating 'r._code'), WKJavaScriptExceptionColumnNumber=62360, WKJavaScriptExceptionSourceURL=file://<repository>/60_layer/index.html, NSLocalizedDescription=A JavaScript exception occurred} | none |
+| exercise_decision in WebKit | 2 | 2026-10-11T12:02:05Z | 0 | 47 of 47 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+
+Not run in this pass: exercise_layer_safari, as written ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words"); exercise_decision_safari, by address ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words").
+
+*Every check passed on its last run: yes; on its first run: no.*
+
+### Step 8 of the second handoff: the copy on the site
+
+**Not yet published.** The copy with the new words (made 2026-10-11T12:32:18Z) goes to the site on the owner's word. Until then the site serves the copy of Step 0 above, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -398,9 +484,9 @@ says what was undone and rebuilt.
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-10T22:21:21Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-11T12:59:47Z)
 
-- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `e7544b139b1c3216`)
+- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `4acd0f9f22f63b1b`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
@@ -429,7 +515,7 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-10T22:21:20Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-11T12:59:45Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
@@ -451,9 +537,9 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 - `docs/DATA_NOTES.md` (17,554 bytes)
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
-- `scripts/06_build_layer.py` (69,130 bytes)
+- `scripts/06_build_layer.py` (72,531 bytes)
 - `60_layer/layer_by_unit.csv` (10,856,200 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `district_assigned_by`, `district_ambiguous`, `area_ha`, `forest_ha`, `hansen_loss_ha`, `land_ha_tc_gt10le30`, `hansen_loss_ha_tc_gt10le30`, `land_ha_tc_le10`, `hansen_loss_ha_tc_le10`, `hansen_loss_ha_tc_eq0`, `nirv_status`, `forest_pct_of_area`, `land_tc_gt10_ha`, `hansen_loss_pct_of_forest`, `hansen_loss_ha_2017_2023`, `hansen_loss_pct_of_land_tc_gt10le30`, `corestack_loss_ha_tc_gt10`, `corestack_degradation_ha_tc_gt10`, `corestack_partial_degradation_ha_tc_gt10`, `corestack_no_change_ha_tc_gt10`, `corestack_improvement_ha_tc_gt10`, `corestack_gain_ha_tc_gt10`, `corestack_valued_ha_tc_gt10`, `corestack_loss_pct`, `corestack_degradation_pct`, `corestack_partial_degradation_pct`, `corestack_no_change_pct`, `corestack_improvement_pct`, `corestack_gain_pct`, `corestack_net_pct`, `corestack_degradation_ha_all_land`, `corestack_tree_cover_start_ha_all_land`, `agreement_class`, `agreement_class_all_assessed`, `corestack_zone_model`, `agreement_reference_ha`, `agreement_hansen_rate_2017_2023_pct`, `agreement_corestack_degradation_rate_pct`, `n_works`, `expenditure_total`, `expenditure_plantation_category`, `expenditure_forest_named_worktype`, `expenditure_water`, `expenditure_total_lakh`, `expenditure_plantation_category_lakh`, `expenditure_forest_named_worktype_lakh`, `expenditure_water_lakh`, `population`, `households`, `st_pop`, `sc_pop`, `adi_2011`, `st_share_pct`, `sc_share_pct`, `class_forest_area`, `class_hansen_loss_floor_100_ha`, `class_hansen_loss_floor_50_ha`, `class_hansen_loss_floor_1_ha`, `class_canopy_band_loss_floor_100_ha`, `class_canopy_band_loss_floor_50_ha`, `class_canopy_band_loss_floor_1_ha`, `class_corestack_degradation_floor_100_ha`, `class_corestack_degradation_floor_50_ha`, `class_corestack_degradation_floor_1_ha`, `class_corestack_net_floor_100_ha`, `class_corestack_net_floor_50_ha`, `class_corestack_net_floor_1_ha`, `class_agreement`, `class_allocation`, `class_forest_named_expenditure`, `class_st_share`, `class_adi_2011`, `shape_area_change_pct`
-- `60_layer/data.js` (22,260,285 bytes)
+- `60_layer/data.js` (22,289,078 bytes)
 - `00_raw/01_cfr_fra/List_of_Forest_Villages_Old_Habitation.pdf` (4,506,869 bytes)
 - `00_raw/05_forest_reference/isfr2023_vol2_odisha_pdf_pages_260-265.txt` (27,495 bytes)
 - `requirements-stage4.txt` (2,110 bytes)
@@ -618,7 +704,7 @@ will be written into `docs/GAP.md` by its writer.
 
 *30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
 
-### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-10T20:20:22Z)
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-11T13:01:15Z)
 
 - `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
 - `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
@@ -1373,6 +1459,14 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `e69680d` Site words, Step 6: the README's sentence on phones says what was seen at a phone's width
+- `40ca842` Site words: a bubble no longer closes on the scroll that keyboard focus makes; the check of the words now gives every "i" keyboard focus
+- `fc6e583` Site words, Step 4: the check of the words waits for a bubble instead of sleeping, and keeps every run of its browser part
+- `5920593` Site words, Step 4: the checks follow the reworded strings; a new check of the words, scripts/check_site_copy.py
+- `2e748c9` Site words, Step 1: the blind reader's findings that are in page strings, fixed in the builders
+- `00a106a` Site words, Step 3: the published copy - the overlay's box greyed out as ruled on 11 October, the README in the owner's words
+- `605a9c4` Site words, Step 2: the full layer's words rewritten to the owner's deck; an "i" beside a label, its words in one new key of data.js
+- `27aea62` Handoff of 11 October, Step 6: the layer's checks in Chrome and WebKit on record with the verifier as it stands; the documents written from them
 - `ae35f9b` Handoff of 11 October, Step 5: Phase 8 - docs/GAP.md, with the owner's additions and a reading of every sentence against its rows
 - `db644c0` Handoff of 11 October, Step 4: Phase 7 - the six figures and the three deck tables, made again from the tables the verifier checked
 - `780b81c` Handoff of 11 October, Step 3: Phase 6 - the independent verifier, its one round of review, and 42 planted errors caught

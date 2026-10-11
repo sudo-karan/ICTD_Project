@@ -13,6 +13,13 @@ their columns from `50_gap/inputs_listing.json`; the package versions and the ga
 from `50_gap/results_md_changes.csv`. What is typed is the notes below: what a phase was
 for, what was decided in it, and where to pick up. The notes carry no figure of the analysis.
 
+Since the owner's second handoff of 11 October 2026 (the page's words; `docs/SITE_COPY.md` is its account) the layer and
+the copy have been built again, and the records beside them are of the new builds. The two tables of the first handoff
+that are printed from such records - the publication of its Step 0 and the runs of its Step 6 - are therefore read from
+the copies of `60_layer/` and `70_share/` that were kept before a word was changed (working files, not in git), where
+those copies are there, so that each table stays the record of its own step. The second handoff has a section of its
+own.
+
 Writes one file, `docs/stage4_run_log.md`. The stage outputs it reads are not in git: if `50_gap/` is empty, run the
 builders in the order the log gives under "To rebuild" and then this script.
 """
@@ -29,6 +36,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GAP = ROOT / "50_gap"
 OUT = ROOT / "docs" / "stage4_run_log.md"
+KEPT = ROOT / ".session_scratch_2026-10-05"                       # working files of the sessions: not in git
+KEPT_LAYER, KEPT_SHARE = KEPT / "60_layer_2026-10-11_before_words", KEPT / "70_share_2026-10-11_before_words"      # the two builds as they stood before the page's words were rewritten
 
 # One entry per phase: (number, title, the gate files it wrote, the provenance sections it wrote, the notes).
 # A phase appears in the log once its first gate file exists. NOTES is typed prose; it carries no figure.
@@ -496,6 +505,7 @@ def cells_that_differ(a: Path, b: Path) -> str:
     return str(sum(1 for x, y in zip(ra, rb) for k in x if x[k] != y[k]))
 
 
+STEP_7_DONE, STEP_8_DONE = False, False                           # the SECOND handoff's last two steps (below): set when each one's commit is made
 # The owner's handoff of 11 October 2026 set seven steps, 0 to 6. A step is listed as done here once its commit is made;
 # the list is typed, and is the one place to change when a step closes.
 HANDOFF_STEPS = [
@@ -684,9 +694,14 @@ and on any other line. No other gate, expected value or tolerance was changed.
 ]
 
 
-def publication() -> list[str]:
-    """Step 0 of the handoff, from the two records of the published copy."""
-    pub, chk = ROOT / "70_share" / "pages_publication.json", ROOT / "70_share" / "pages_live_check.json"
+def mask(s) -> str:
+    """A record of a browser check can carry the address a page was opened at, a path of the machine it ran on: the log names it from the repository."""
+    return str(s).replace(str(ROOT), "<repository>")
+
+
+def publication(folder: Path | None = None) -> list[str]:
+    """The two records of the published copy: of the copy as it stands (`70_share/`), or, given a folder, the records kept there."""
+    pub, chk = (folder or ROOT / "70_share") / "pages_publication.json", (folder or ROOT / "70_share") / "pages_live_check.json"
     if not (pub.exists() and chk.exists()):
         return []
     p, c = json.loads(pub.read_text(encoding="utf-8")), json.loads(chk.read_text(encoding="utf-8"))
@@ -695,20 +710,24 @@ def publication() -> list[str]:
            f"- the check of the live site (`scripts/check_pages_live.py`, run {c['run_utc']}): {c['checks_passed']} of {c['checks_made']} checks passed", "",
            "| check | expected | found | pass |", "|---|---|---|---|"]
     out += [f"| {esc(x['check'])} | {esc(x['expected'])} | {esc(x['found'])} | {'yes' if x['pass'] else 'NO'} |" for x in c["checks"]]
+    if folder is not None:
+        return out + ["", f"*From the two records of that publication, `pages_publication.json` and `pages_live_check.json`, as they were kept in `{folder.relative_to(ROOT)}/` (working files, not in git) "
+                          "before the copy was built again for the page's words.*", ""]
     return out + ["", "*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*", ""]
 
 
-def browser_runs() -> list[str]:
-    """Step 6: the runner's own record of the checks of the layer, every run of each."""
-    p = ROOT / "60_layer" / "decision_runs.json"
+def browser_runs(folder: Path | None = None) -> list[str]:
+    """The runner's own record of the checks of the layer, every run of each: of the layer as it stands (`60_layer/`), or, given a folder, the record kept there."""
+    p = (folder or ROOT / "60_layer") / "decision_runs.json"
     if not p.exists():
         return []
     d = json.loads(p.read_text(encoding="utf-8"))
-    out = [f"*`60_layer/decision_runs.json`: started {d['started_utc']}, ended {d['ended_utc']}; the layer it checked was built {d['layer_run_utc']}; one check at a time.*", "",
+    where = "`60_layer/decision_runs.json`" if folder is None else f"`{folder.relative_to(ROOT)}/decision_runs.json` (the record of that pass, kept with the session's working files before the layer was built again for the page's words)"
+    out = [f"*{where}: started {d['started_utc']}, ended {d['ended_utc']}; the layer it checked was built {d['layer_run_utc']}; one check at a time.*", "",
            "| check | run | started | exit status | its last line | lines that failed |", "|---|---|---|---|---|---|"]
     for c in d["checks"]:
         for r in c["runs"]:
-            out.append(f"| {esc(c['check'])} | {r['run']} | {r['started_utc']} | {r['exit']} | {esc(r['last_line'])} | {esc('; '.join(r['failed_lines']) or 'none')} |")
+            out.append(f"| {esc(c['check'])} | {r['run']} | {r['started_utc']} | {r['exit']} | {esc(mask(r['last_line']))} | {esc(mask('; '.join(r['failed_lines'])) or 'none')} |")
     out += ["", "Not run in this pass: " + "; ".join(f"{x['check']} (\"{x['why']}\")" for x in d["checks_not_run_in_this_pass"]) + ".", "",
             f"*Every check passed on its last run: {'yes' if d['every_check_passed_on_its_last_run'] else 'NO'}; on its first run: "
             f"{'yes' if d['every_check_passed_on_its_first_run'] else 'no'}.*", ""]
@@ -728,7 +747,7 @@ def handoff() -> list[str]:
         if done and notes.strip():
             out += [f"### Step {n}: {what}", "", notes.strip(), ""]
             if n == 0:
-                out += publication()
+                out += publication(KEPT_SHARE if (KEPT_SHARE / "pages_publication.json").exists() else None)
             if n == 1:
                 out += rebuild("step1")
             if n == 2:
@@ -736,7 +755,70 @@ def handoff() -> list[str]:
             if n == 5:
                 out += rebuild("step5")
             if n == 6:
-                out += browser_runs()
+                out += browser_runs(KEPT_LAYER if (KEPT_LAYER / "decision_runs.json").exists() else None)
+    return out
+
+
+# The owner's second handoff of 11 October 2026: nine steps, 0 to 8. Typed, like the list of the first: a step is listed as done once its commit is made.
+SECOND_STEPS = [
+    (0, "keep what is live", True), (1, "the audit", True), (2, "the words, in the full layer", True), (3, "the copy", True), (4, "the checks", True),
+    (5, "stage 4 follows the layer", True), (6, "look at it", True), (7, "the documents", STEP_7_DONE), (8, "publish, on the owner's word", STEP_8_DONE),
+]
+SECOND_STEP_5 = """
+Stage 4 reads two files of the layer: `60_layer/data.js`, for the layer's own row of sources for the development index,
+and `60_layer/layer_by_unit.csv`, for the class of Scheduled Tribe share the layer shows for a unit. Its records hold
+the bytes and SHA-256 of those two and of `scripts/06_build_layer.py`. The rewording changed the first and the third.
+The second, the table of figures, is byte for byte what it was (`docs/SITE_COPY.md`).
+
+The verifier was run on the stage as it stood. It failed two checks and no other: the listing of inputs and the run
+record still held the earlier bytes and SHA-256 of those two files. `scripts/08_gap_inputs.py` and
+`scripts/08_build_gap_districts.py` were run again in the stage-4 environment, in that order. No other step's section
+lists a file that those two runs changed, so no other step was run. **No table of figures moved**: the comparison
+below sets every output beside the copy kept from before (`50_gap/before_site_words/`). The verifier then passed every
+check. `scripts/08_gap_closing_checks.py` and `scripts/08_gap_leftovers_check.py` were not run again, as instructed:
+their tables stay the record of the stage-4 run.
+
+One script of the stage was changed: `scripts/08_gap_compare_builds.py` now names, for a record whose list of inputs
+or outputs differs, the files whose entry differs, so that the list below says which input moved a record.
+"""
+SECOND_RUNS = """
+The layer's checks were run again on the build with the new words, one at a time, with the two checks in the Safari
+application left out as before. The table is the runner's record. A browser check that does not pass is run again,
+and every run is kept. The two checks in WebKit needed more than one run: in the layer's own exercise the drag of the
+map made by script left the map where it was, the step that had failed once on 8 October and once in Step 6 above; and
+one run of the decision view's exercise ended on an error raised inside the map library. Nothing was keeping the
+display awake during those runs; it was kept awake from then on, and each check then passed. Whether that was the
+reason was not established. By the owner's ruling of 9 October the fragility of the WebKit checks is recorded and
+not chased.
+"""
+
+
+def second_handoff() -> list[str]:
+    """The owner's second handoff of 11 October 2026 (the page's words): its steps, and what of it bears on stage 4. Its account is docs/SITE_COPY.md."""
+    if not (GAP / "gates_site_words.csv").exists():
+        return []
+    out = ["## The owner's second handoff of 11 October 2026: the page's words", "",
+           "The same day the owner had the words of the map page rewritten in his own - a short label, and what it left out in a small \"i\" beside it - with every "
+           "untrue line fixed and no figure moved (`.session_scratch_2026-10-05/handoff/2026-10-11_site_copy_and_audit.md` and the deck of words beside it, not in "
+           "git). Its account is `docs/SITE_COPY.md`, written by `scripts/write_site_copy.py`: every finding, every string before and after, every check whose words "
+           "changed, the runs, and what was seen. This log keeps what bears on stage 4 and on taking the work up again.", "",
+           "| step | what | state |", "|---|---|---|"]
+    out += [f"| {n} | {what} | {'done' if done else 'not yet'} |" for n, what, done in SECOND_STEPS]
+    out += ["", "### Step 5 of the second handoff: stage 4 follows the layer", "", SECOND_STEP_5.strip(), ""] + rebuild("site_words")
+    runs = browser_runs()
+    if runs:
+        out += ["### The layer's checks on the build with the new words", "", SECOND_RUNS.strip(), ""] + runs
+    now = publication()
+    share = ROOT / "70_share" / "share.provenance.json"
+    if now and share.exists():
+        made = json.loads(share.read_text(encoding="utf-8"))["run_utc"]
+        of_this_copy = json.loads((ROOT / "70_share" / "pages_live_check.json").read_text(encoding="utf-8")).get("copy_run_utc") == made
+        out += ["### Step 8 of the second handoff: the copy on the site", ""]
+        if of_this_copy:
+            out += ["The copy with the new words was published by the owner's own script, on his word, and the live site was checked against it:", ""] + now
+        else:
+            out += [f"**Not yet published.** The copy with the new words (made {made}) goes to the site on the owner's word. Until then the site serves the copy of Step 0 "
+                    "above, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.", ""]
     return out
 
 
@@ -998,7 +1080,7 @@ def main() -> None:
                 "the section \"To rebuild\" at the end gives the order.", ""]
         if not (GAP / "gates_phase6.csv").exists():
             doc += [STOPPED_IN_PHASE_6.strip(), ""]
-        doc += handoff()
+        doc += handoff() + second_handoff()
     for number, title, gate_files, steps, notes in done:
         doc += [f"## Phase {number}: {title}", "", notes.strip(), ""]
         for g in gate_files:
