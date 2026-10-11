@@ -94,6 +94,23 @@ def cellmd(s, cut=None):
     return s or " "
 
 
+def around(a, b, margin=110):
+    """Two texts that differ in one stretch: each cut to that stretch and to what stands on either side of it, at whole words, and said to be cut."""
+    n, p, e = min(len(a), len(b)), 0, 0
+    while p < n and a[p] == b[p]:
+        p += 1
+    while e < n - p and a[len(a) - 1 - e] == b[len(b) - 1 - e]:
+        e += 1
+    lo = max(0, p - margin)
+    lo = a.rfind(" ", 0, lo) + 1 if lo else 0
+    out = []
+    for t in (a, b):
+        hi = len(t) - max(0, e - margin)
+        hi = t.find(" ", hi) if 0 <= t.find(" ", hi) else len(t)
+        out.append(("[...] " if lo else "") + t[lo:hi] + (" [...]" if hi < len(t) else ""))
+    return out
+
+
 def table(heads, rows):
     return "\n" + "\n".join(["| " + " | ".join(typed(h) for h in heads) + " |", "|" + "---|" * len(heads)] + ["| " + " | ".join(r) + " |" for r in rows]) + "\n"
 
@@ -162,6 +179,7 @@ def main():
             stop(f"{doc} still says '{gone}', or does not say '{there}': a finding of the audit that is marked as fixed in a document is not")
 
     fixed = [a for a in audit if a["done"].startswith("fixed")]
+    fixed = [a for a in fixed if not a["done"].startswith(SIX_DONE)] + [a for a in fixed if a["done"].startswith(SIX_DONE)]       # the lines the owner reworded in his third handoff stand last
     listed = [a for a in audit if a["done"].startswith("listed")]
     on_page = lambda a: a["where"].startswith(("both builds", "full layer", "published copy"))
     why = {}                                                  # a finding that says "As the row above" takes that row's reason
@@ -473,7 +491,9 @@ line was changed, as they were before the words were first rewritten. `scripts/c
 on disk against those copies (its group `f`): no string was added or dropped; each string below differs by exactly
 the owner's replacement and by nothing else; no place of a fix still holds its old words; and no other part of
 `data.js` or of `index.html` differs but the build's own time. In the full layer {six_layer} strings differ, in the
-copy {six_copy}. Where the same string differs in both builds it is one row.
+copy {six_copy}. Where the same string differs in both builds it is one row. A long string is shown by the stretch
+that differs and what stands on either side of it, with a mark where it is cut; the record of the check holds each
+whole.
 """).format(six_layer=sum(1 for x in six if x["build"] == full), six_copy=sum(1 for x in six if x["build"] == copy_)))
     rows6, at6 = [], {}
     for x in six:
@@ -484,8 +504,9 @@ copy {six_copy}. Where the same string differs in both builds it is one row.
         else:
             at6[k6] = dict(x, builds={x["build"]}, wheres=[x["where"]])
             rows6.append(at6[k6])
+    shown6 = lambda x: around(x["as_it_was"], x["as_it_is"]) if max(len(x["as_it_was"]), len(x["as_it_is"])) > LONG else [x["as_it_was"], x["as_it_is"]]
     D.append(table(["Fix", "In", "Where", "As it was", "As it is"],
-                   [[cellmd(f"{x['fix']}. {FIXES[x['fix']]}"), cellmd("both builds" if len(x["builds"]) > 1 else next(iter(x["builds"]))), cellmd("; ".join(dict.fromkeys(x["wheres"]))), cellmd(x["as_it_was"]), cellmd(x["as_it_is"])]
+                   [[cellmd(f"{x['fix']}. {FIXES[x['fix']]}"), cellmd("both builds" if len(x["builds"]) > 1 else next(iter(x["builds"]))), cellmd("; ".join(dict.fromkeys(x["wheres"])))] + [cellmd(t) for t in shown6(x)]
                     for x in sorted(rows6, key=lambda x: x["fix"])]))
     D.append("\n" + table(["", "Check", "What it found"], [[cellmd(c["id"]), cellmd(c["check"]), cellmd(c["detail"])] for c in f_checks]))
     grep = []
@@ -531,6 +552,7 @@ NOT_SEARCHED = ["00_raw", "docs/SITE_COPY.md", "docs/DECISION_LAYER.md", "docs/L
 NIRV_NOW = "stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`)"    # the owner's words for the state of NIRv, row 11 of his table
 IN_DOCUMENTS = [("README.md", "pending, nothing queued", NIRV_NOW), ("docs/DEGRADATION.md", "pending, and **nothing is queued**", NIRV_NOW),      # (the document, what it said, what it must say now)
                 ("README.md", "The page computes nothing", "The page works out no figure"), ("docs/LAYER.md", "it computes nothing", "it works out no figure")]
+LONG = 420                                            # a string of section 13 longer than this is shown by the stretch that differs
 CUT = 260                                             # how much of a changed block of a check is shown in section 8: the table itself holds it whole
 LEAD = 90                                             # how much of an unchanged string is shown in section 7
 
