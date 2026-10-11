@@ -863,7 +863,7 @@ def second_handoff() -> list[str]:
     return out
 
 
-THIRD_STEP_3_DONE, THIRD_STEP_4_DONE, THIRD_STEP_5_DONE = True, False, False       # the THIRD handoff's steps 3, 4 and 5: each set when the step is done
+THIRD_STEP_3_DONE, THIRD_STEP_4_DONE, THIRD_STEP_5_DONE = True, True, True       # the THIRD handoff's steps 3, 4 and 5: each set when the step is done
 THIRD_STEP_0 = """
 **Not done.** The owner's yes to publishing was in this handoff, and its first step was to publish the build that was
 waiting, the copy made {waiting}. The publish script (`.session_scratch_2026-10-05/handoff/publish_to_github_pages.sh`)

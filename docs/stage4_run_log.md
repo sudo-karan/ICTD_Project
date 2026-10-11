@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-11T16:11:11Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-11T16:36:54Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -419,7 +419,7 @@ The documents that describe the page were written again, each by its own script 
 `docs/DEGRADATION.md` were edited by hand: their lines on NIRv in the owner's words, and in the README the rows of the
 copy's builder and its gate, rows for the two new scripts, and the layer section.
 
-**`docs/RESULTS.md`: no sentence was changed.** Of the 272 figures of its text, 4 are printed differently, 0 are gone and 0 are new, against the document of commit `27aea62`; 5 lines of its text differ, each in those figures alone. They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`. The list under Phase 8 below,
+**`docs/RESULTS.md`: no sentence was changed.** Of the 272 figures of its text, 3 are printed differently, 0 are gone and 0 are new, against the document of commit `f9bd4b8`; 4 lines of its text differ, each in those figures alone. They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`. The list under Phase 8 below,
 `50_gap/results_md_changes.csv`, was written by `scripts/08_gap_closing_checks.py`, which was not run again: it stays
 the record of the stage-4 run, and is of the document as that run left it.
 
@@ -444,8 +444,8 @@ Later the same day the owner gave his yes to publishing, in a third note (`.sess
 | 1 | the six fixes | done |
 | 2 | the checks | done |
 | 3 | stage 4 follows the layer | done |
-| 4 | look at it | not yet |
-| 5 | the documents | not yet |
+| 4 | look at it | done |
+| 5 | the documents | done |
 | 6 | publish, and write what the site serves | not yet |
 
 ### Step 0 of the third handoff: publish the build that was waiting
@@ -527,6 +527,20 @@ Files compared or listed: 57; byte for byte the same: 55. Every file that differ
 |---|---|---|---|
 | `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_districts: inputs (60_layer/data.js, scripts/06_build_layer.py), run_utc; 08_gap_inputs: inputs (60_layer/data.js, scripts/06_build_layer.py), outputs (50_gap/inputs_listing.json), run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
 | `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now; the entries that differ: (60_layer/data.js, scripts/06_build_layer.py)) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+
+### Step 4 of the third handoff: look at it
+
+The pictures of both builds were taken again, with four more of each build at the largest size: a ranked list with an
+East Coast badge in view, the prompt of a unit outside villages, the comparison section's "i" in the panel of an East
+Coast unit, and the grid of "why this tier". Each was compared, byte for byte, with the picture kept from before the
+six lines; a picture that differs, or is new, was opened and looked at again. `docs/SITE_COPY.md` has the note on
+each.
+
+### Step 5 of the third handoff: the documents
+
+Written again, each by its own script and in this order: `docs/RESULTS.md` (no sentence changed; the figures that are
+printed differently are listed in `docs/SITE_COPY.md`), `docs/LAYER.md`, `docs/SITE_COPY.md`, `docs/DECISION_LAYER.md`
+(with the owner's ruling on the prompt, dated), this log, and `docs/GAP.md` last.
 
 ### Step 6 of the third handoff: the copy on the site
 
@@ -1578,6 +1592,9 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `9f28c30` Six fixes, Step 5: in docs/SITE_COPY.md the lines the owner reworded stand last in its table of what was fixed, as its text says; a long string of the six lines is shown by the stretch that differs
+- `779c784` Six fixes, Step 5: the writers of the documents, committed before they are run
+- `cf2e517` Six fixes, Steps 2 and 3: every check passed on the builds with the six lines; stage 4 follows the layer, no table of figures moved
 - `c562884` Six fixes, Step 2: the checks follow the six lines; the check of the words holds each build against the one kept before them
 - `3f9c593` Six fixes, Step 1: six lines of the page in the owner's words of 11 October (his third handoff); both builds made again
 - `f9bd4b8` Site words, Step 7: the documents - docs/SITE_COPY.md, new; LAYER, DECISION_LAYER, RESULTS, the run log and GAP written again by their scripts

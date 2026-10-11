@@ -1,6 +1,6 @@
 # Stage 4: forest condition, need and allocation, compared
 
-*Written 2026-10-11T13:58:52Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
+*Written 2026-10-11T16:36:55Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
 the file named for it in the last section, and each conclusion drawn from figures was tested against them before it was
 written. The figures change only when the files do.*
 
@@ -12,7 +12,7 @@ and have they seen good enough resource allocation in the past".
 This stage sets three things beside one another that the earlier stages measured apart: where forest was lost
 (stage 1, read through the decision table), who lives there (stage 2), and where the employment scheme's money went
 (stage 3, and the scheme's own state report). It was built on 10 October 2026 as the project owner ruled it that day
-(§2). Its tables are in `50_gap/` (the tables of districts were made 2026-10-11T13:01:15Z); `docs/RESULTS.md` and
+(§2). Its tables are in `50_gap/` (the tables of districts were made 2026-10-11T16:09:06Z); `docs/RESULTS.md` and
 `docs/DECISION_LAYER.md` describe what they are built from.
 
 **It describes where money went relative to where forest was lost. It says nothing about why.** No figure here is an
@@ -776,8 +776,8 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-11T13:58:52Z | this run | the UTC time at which this script ran |
-| 2026-10-11T13:01:15Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
+| 2026-10-11T16:36:55Z | this run | the UTC time at which this script ran |
+| 2026-10-11T16:09:06Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
 | 30 | `50_gap/district_need.csv` | rows counted by this script: its rows |
 | 11,468 | `50_gap/district_need.csv` | worked out by this script from its rows: `n_units` summed |
 | 3,492 | `50_gap/district_need.csv` | worked out by this script from its rows: `n_units_outside` summed |
@@ -1102,7 +1102,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `50_gap/fra_two_reports.csv` | 310 | `8630d58c44690c10` | - |
 | `50_gap/fsi_district_check.csv` | 4,676 | `bf01bd9e191dcb8c` | - |
 | `50_gap/fsi_summary.csv` | 2,210 | `2f2e621f9e30fc1d` | - |
-| `50_gap/gap.provenance.json` | 48,350 | `44a624baab177379` | - |
+| `50_gap/gap.provenance.json` | 48,350 | `8e3089f636cbd1d8` | - |
 | `50_gap/gates_environment.csv` | 1,384 | `0db35e1441b74f38` | - |
 | `50_gap/gates_phase2.csv` | 3,247 | `984723269ebd05b0` | - |
 | `50_gap/gates_phase3.csv` | 1,629 | `6d12e48b7d993518` | - |
@@ -1111,7 +1111,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `50_gap/gates_phase5b.csv` | 2,270 | `abacddb86066d298` | - |
 | `50_gap/gates_step3.csv` | 587 | `2eae4aa7335390ee` | - |
 | `50_gap/inputs_check.csv` | 3,941 | `524cc7de7a83aa12` | - |
-| `50_gap/inputs_listing.json` | 23,556 | `4acd0f9f22f63b1b` | - |
+| `50_gap/inputs_listing.json` | 23,556 | `70664255fb000ca6` | - |
 | `50_gap/marginalisation_split.csv` | 7,305 | `df523c940c65776f` | - |
 | `50_gap/need_vs_allocation.csv` | 38,574 | `4145eb19ecb474d0` | - |
 | `50_gap/need_vs_allocation_summary.csv` | 5,000 | `77831ac32e2c5717` | - |
@@ -1129,19 +1129,19 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `55_decision/condition_by_unit.csv` | 7,275,979 | `f5f8a218e86a16b7` | - |
 | `55_decision/decision.provenance.json` | 25,625 | `d62a8eb63f364179` | - |
 | `55_decision/tiers.csv` | 3,015 | `a7a7db34b7bcb90f` | - |
-| `60_layer/data.js` | 22,289,078 | `20e13c90e57c5786` | - |
+| `60_layer/data.js` | 22,289,335 | `2659642e6adf8b37` | - |
 | `60_layer/index.html` | 210,942 | `ca74b4cbc4b6dfa6` | - |
 | `60_layer/layer_by_unit.csv` | 10,856,200 | `7558cff1e5aeb469` | - |
-| `70_share/exercise_share_chrome.json` | 5,519 | `641dca931a3702b2` | 2026-10-11T13:34:25Z |
-| `70_share/odisha_forest_decision_layer/README.txt` | 7,116 | `01dc2a7b8b8130ee` | - |
-| `70_share/odisha_forest_decision_layer/data.js` | 22,092,102 | `98bce06e1f0b74bb` | - |
+| `70_share/exercise_share_chrome.json` | 5,519 | `c19b19ba4254da3c` | 2026-10-11T16:04:37Z |
+| `70_share/odisha_forest_decision_layer/README.txt` | 7,177 | `0c8754bbef8307c6` | - |
+| `70_share/odisha_forest_decision_layer/data.js` | 22,092,359 | `34f9bccff25d7583` | - |
 | `70_share/odisha_forest_decision_layer/index.html` | 210,912 | `4e98a6bf1248c5f2` | - |
-| `70_share/share.provenance.json` | 5,785 | `49376afe13032e48` | - |
+| `70_share/share.provenance.json` | 5,785 | `3d7f3e90096686e0` | - |
 | `docs/DATA_NOTES.md` | 17,554 | `a8d4cb646aab38a1` | - |
-| `docs/DECISION_LAYER.md` | 254,144 | `b3d61bb2d2440213` | - |
-| `docs/LAYER.md` | 73,745 | `d048ded4719d4a64` | - |
+| `docs/DECISION_LAYER.md` | 259,593 | `2a6ed3d3939a3188` | - |
+| `docs/LAYER.md` | 74,580 | `591fe964a6587072` | - |
 | `docs/NEED.md` | 19,029 | `de30a2951f052f54` | - |
-| `docs/stage4_run_log.md` | 153,868 | `e04665da81df1690` | - |
+| `docs/stage4_run_log.md` | 165,154 | `d781fbeb1d28e05a` | - |
 | `figures/stage4/F1_state_report.png` | 169,399 | `c4e238215e532a6b` | - |
 | `figures/stage4/F2_outside_village_asymmetry.png` | 93,303 | `f033aeabd3b3efed` | - |
 | `figures/stage4/F3_map_of_cells.png` | 1,167,578 | `e4ccf36206922a92` | - |
@@ -1149,7 +1149,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `figures/stage4/F5_need_and_money_by_marginalisation.png` | 158,318 | `896b2330113b87c2` | - |
 | `figures/stage4/F6_estimates_with_wild_bootstrap_intervals.png` | 363,743 | `55bc528befd1ed74` | - |
 | `requirements-stage4.txt` | 2,110 | `ce2ca3bda40374df` | - |
-| `scripts/06_build_layer.py` | 72,531 | `1181b072cc28b475` | - |
+| `scripts/06_build_layer.py` | 73,474 | `ab7b4f2a5f30d6df` | - |
 | `scripts/08_build_gap_districts.py` | 53,675 | `cd1d56a5ac0a16f8` | - |
 | `scripts/08_build_gap_fsi.py` | 16,738 | `ef81b08886e0c180` | - |
 | `scripts/08_build_gap_panel.py` | 24,335 | `dbdae06f86ca8eac` | - |
@@ -1293,4 +1293,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a design constant written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum; the name of a comparison, a model, a measure of need or a figure; the name of a kind of standard error. Everything else that is a number came from a file.
 
-*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-11T13:58:52Z by `scripts/write_gap.py` (sha256 `059ac9988190d532`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-11T16:36:55Z by `scripts/write_gap.py` (sha256 `059ac9988190d532`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
