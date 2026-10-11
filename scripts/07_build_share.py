@@ -238,7 +238,7 @@ def main():
         D["title"].upper() + f"\nA working map for discussion. Online at {PUBLISHED_AT}",
         "HOW TO OPEN IT\n" + wrap("Open the address above in a web browser. Or keep index.html and data.js together in one folder and open index.html (double-click it): it needs nothing installed and works without a "
                                   "connection. Once it has loaded, the page asks no other site for anything. We've checked the map in Chrome and in Safari's engine (WebKit) on a laptop, and this copy in Chrome; " + PHONES
-                                  + " On the page, \"About this map\" explains how it's made and how to read it, and \"Sources\" lists every dataset and its licence."),
+                                  + " On the page, \"About this map\" explains how it's made and how to read it, and \"Sources\" says where the data comes from and under what licence."),
         "WHAT IT SHOWS\n" + wrap(f"{n:,} units covering Odisha: panchayat units, and the land outside any revenue village. For each, it shows forest condition, past MGNREGA spending and social need, each as its own layer, "
                                  "built from public data. The decision view reads the forest data a second way: each unit goes in one of six cells, by how much of its forest of 2000 has no loss recorded since "
                                  f"({DV['standing_min']} or more, or less) and by the forest loss recorded in a window of years you choose ({DV['loss_min']} or more, or less). Within one district, units are listed tier by tier.")

@@ -99,7 +99,7 @@ STAGE_RECORDS = ("10_units/units.provenance.json", "10_units/outside_village_dis
                  "20_degradation/agreement.provenance.json", "20_degradation/forest_floor.provenance.json", "30_need/need.provenance.json", "40_allocation/allocation.provenance.json")
 STAGE_RECORDS = STAGE_RECORDS + ("55_decision/decision.provenance.json",)                       # the decision view (added 8 Oct 2026)
 FLOORS = {"100": 100.0, "50": 50.0, "1": 1.0}      # hectares; the first is the default: the floor ruled on 7 Oct 2026
-FLOOR_LABEL = {"100": " (default)", "50": "", "1": " (any measurable forest)"}
+FLOOR_LABEL = {"100": " (default)", "50": "", "1": " (the least we assess)"}
 ZONE_EXCLUDED = "#bcd3d6"
 ZONE_WORDS = {"EPAHR only": "Eastern Plateau and Hills", "ECPHR only": "East Coast Plains and Hills - the placebo test fails in this model: read its Degradation class with caution",
               "both models": "both models: the unit straddles the two"}
@@ -470,7 +470,7 @@ def main():
     if not set(T.loc[outside, "district_assigned_by"]) <= set(how):
         fails.append(f"outside_village_district.csv has a way of assigning a district that the map has no words for: {sorted(set(T.loc[outside, 'district_assigned_by']) - set(how))}")
     flag = np.where(T["forest_ha"] < 1, "Under 1 ha of forest: this unit cannot be assessed for forest loss.",
-                    np.where(T["forest_ha"] < 100, "Under 100 ha of forest: below the minimum we use, because a loss rate on this little forest doesn't repeat from one set of years to the next.", ""))
+                    np.where(T["forest_ha"] < 100, "Under 100 ha of forest: below the minimum we use, because a loss rate on this little forest may not repeat from one set of years to the next.", ""))
     F = []
     for i, r in enumerate(T.itertuples(index=False)):
         o = bool(r.outside_village)
@@ -575,7 +575,7 @@ datasets (tree canopy, its loss, tree-cover change), indicators per unit, and on
 administrative: an LGD panchayat unit is the villages mapped to one LGD panchayat id (not always a whole gram panchayat). <b>Outside-village units</b> (hatched) are the land outside any revenue village; what that land is in law isn't in the data we used. They are {fig['out_area']:.0f} % of the area and hold {fig['out_forest']:.0f} % of
 the forest and {fig['out_loss']:.0f} % of its loss, and they have no census rows. The few blank patches inside the state are {uc['villages_with_no_lgd_panchayat']} villages
 ({uc['villages_with_no_lgd_panchayat_km2']:,.0f} km<sup>2</sup>) that have a census code but no row in the village-to-panchayat mapping: they belong to no unit. The district of an outside-village unit is the district named on its boundary polygon,
-checked against the villages round it; the panel says so where it was assigned another way or is ambiguous.</p>
+checked where it could be against the panchayat polygons under it and the villages round it; its panel says what the district rests on, and where a check contradicts it or none was possible.</p>
 <p><b>Small forests are greyed out.</b> More than half of the units ({checks['units_under_1_ha_of_forest'][0]:,} of {n:,}) have under one hectare of forest, and a rate on a little forest is noise: between odd and even years the rank correlation of a unit's loss rate is {fig['rep_1']:.2f} for units
 with 1 to 2 ha of forest and {fig['rep_5']:.2f} at 5 to 10 ha. On the land the two measures are compared on it is still only {fig['rep10_50']:.2f} at 50 to 100 ha, and {fig['rep10_100']:.2f} at 100 to 250 ha. So on the forest layers a unit with too little of the land a layer rests on is
 grey - <i>insufficient forest to assess</i> - and never on the colour scale. The minimum is 100 ha, the one we use in the analysis ({checks['units_under_100_ha_of_forest'][0]:,} units grey on the Hansen layer; the coloured units still hold {fig['kept_100']:.1f} % of the forest).
@@ -592,7 +592,7 @@ its producers report as right about two times in three, and only Deforestation w
 <tr><td>Every unit kept</td><td>{int(every.n_assessed):,}</td><td>{int(every.both):,}</td><td>about {every.both_expected_if_unrelated:.0f}</td><td>{every.odds_ratio:.2f} ({every.odds_ratio_lo95:.2f} to {every.odds_ratio_hi95:.2f})</td></tr>
 </table>
 The first is the headline because CoRE Stack's Improvement class is the check on its Degradation class: clearance should not go with improvement. In the {int(zones.loc['ECPHR only', 'n_assessed']):,} compared units under the East Coast model it does - a rank correlation of
-{zones.loc['ECPHR only', 'spearman_hansen_vs_corestack_improvement']:.2f}, against {zones.loc['EPAHR only', 'spearman_hansen_vs_corestack_improvement']:.2f} under the other model - so agreement there cannot be read as agreement about degradation. Those are also the units where the two agree most, so leaving them out
+{zones.loc['ECPHR only', 'spearman_hansen_vs_corestack_improvement']:.2f}, against {zones.loc['EPAHR only', 'spearman_hansen_vs_corestack_improvement']:.2f} under the other model - so agreement there cannot be read as agreement about degradation. (That failure is a strong pattern in few districts, not an established fact.) Those are also the units where the two agree most, so leaving them out
 <i>lowers</i> the figure; they are drawn as a class of their own on the agreement layer. The agreement that remains is modest, and in the LGD panchayat units taken alone it is not established: their odds ratio is {head_lgd.odds_ratio:.2f} with an interval of
 {head_lgd.odds_ratio_lo95:.2f} to {head_lgd.odds_ratio_hi95:.2f}, which includes 1. Intervals come from resampling whole districts. The two measures do not measure the same thing and are not expected to mark the same pixels.</li>
 <li><b>Units, not hectares.</b> Where the two measures agree, they agree about <i>which units</i> are degrading, not <i>which hectares</i>: we haven't overlaid them pixel by pixel. That needs one more Earth Engine job.</li>
@@ -603,7 +603,7 @@ that holds most of their own panchayat's works. Works typed as forest or forestr
 <p><b>The shapes are simplified</b> so that the file can be e-mailed: {ae['vertices_before']:,} boundary points to {ae['vertices_after']:,}, with a tolerance of {ae['tolerance_m']:g} m and shared boundaries kept shared. The whole area changes by {ae['total_area_change_pct']:+.5f} %;
 a unit's drawn area by {ae['per_unit_abs_change_pct']['median']} % at the median and under {ae['per_unit_abs_change_pct']['p95']} % for 95 units in 100; {ae['units_changed_by_more_than_5_pct']} very small units (none larger than {ae['largest_such_unit_ha']} ha) change by more than 5 %.
 Every area printed in a panel is the unit's true area, not that of the simplified shape. There's no background map, and the layers above ask no other site for anything.</p>
-<p><b>To check a figure.</b> Every number in a unit's panel is a cell of <code>layer_by_unit.csv</code>, which is built from the stage tables <code>degradation_by_unit.csv</code>, <code>agreement_by_unit.csv</code>, <code>need_by_unit.csv</code> and <code>allocation_by_unit.csv</code>; the decision view's come from <code>condition_by_unit.csv</code>. The page looks figures up; the only counting it does is of the rows of a list and the matches of a search.</p>
+<p><b>To check a figure.</b> Every number in a unit's panel is a cell of <code>layer_by_unit.csv</code>, which is built from the stage tables <code>degradation_by_unit.csv</code>, <code>corestack_by_unit_bands.csv</code>, <code>agreement_by_unit.csv</code>, <code>need_by_unit.csv</code> and <code>allocation_by_unit.csv</code>; the decision view's come from <code>condition_by_unit.csv</code>. The page looks figures up; the only counting it does is of the rows of a list, the matches of a search and a tier's place in the order.</p>
 """
     sources = """
 <h1>Sources and licences</h1>

@@ -372,7 +372,7 @@ assigned district rests on. Their census columns read <i>no census data for this
             "keep_out_off": "(applies when a filter is on)",
             "district_pick": "Pick a district\u2026", "keep_out": "Keep land outside villages", "export": "Download this list (CSV)",
             "st_options": [["0", "No filter"], ["18", "Scheduled Tribe share 18 % or more"], ["33", "Scheduled Tribe share above 33 %"], ["50", "Scheduled Tribe share more than 50 %"]],
-            "cols": ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share, %", "Corroboration, 2017-2023", "Scheduled Tribe share", "Development index 2011", "Forest-named spending, record ends FY2017-18"],
+            "cols": ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share, %", "Corroboration, 2017-2023", "Scheduled Tribe share", "Development index 2011", "Forest-named spending, record effectively ends FY2017-18"],
             "kind": ["LGD panchayat unit", "Outside-village unit"],
             "export_cols": EXPORT_COLS,
         },
