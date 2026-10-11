@@ -706,12 +706,19 @@ def mask(s) -> str:
 
 
 def publication(folder: Path | None = None) -> list[str]:
-    """The two records of the published copy: of the copy as it stands (`70_share/`), or, given a folder, the records kept there."""
+    """The two records of the published copy: of the copy as it stands (`70_share/`), or, given a folder, the records kept there. A record of the first publication is of
+    the branch `gh-pages`, and gives the commit at its head; a record made since the owner's handoff of 11 October 2026 ("One branch: main") is of the folder `site/` of `main`,
+    and gives the commit at the head of `main` and the last commit to change `site/`. Either kind is read as it is."""
     pub, chk = (folder or ROOT / "70_share") / "pages_publication.json", (folder or ROOT / "70_share") / "pages_live_check.json"
     if not (pub.exists() and chk.exists()):
         return []
     p, c = json.loads(pub.read_text(encoding="utf-8")), json.loads(chk.read_text(encoding="utf-8"))
-    out = [f"- the site: {p['address']}", f"- the commit at the head of `{p['branch']}` when it was checked: `{p['gh_pages_commit_when_checked']}`",
+    if "site_commit" in p:
+        where = [f"- deployed from the folder `{p['folder']}` of the branch `{p['branch']}`, by the workflow `{p['workflow']}`",
+                 f"- the commit at the head of `{p['branch']}` when it was checked: `{p['main_commit_when_checked']}`; the last commit to change `{p['folder']}` at that head: `{p['site_commit']}`"]
+    else:
+        where = [f"- the commit at the head of `{p['branch']}` when it was checked: `{p['gh_pages_commit_when_checked']}`"]
+    out = [f"- the site: {p['address']}"] + where + [
            f"- the copy: built {p['copy_built_utc']} from the layer built {p['layer_built_utc']}",
            f"- the check of the live site (`scripts/check_pages_live.py`, run {c['run_utc']}): {c['checks_passed']} of {c['checks_made']} checks passed", "",
            "| check | expected | found | pass |", "|---|---|---|---|"]
@@ -1186,7 +1193,7 @@ def results_changes() -> list[str]:
 
 
 def commits() -> list[str]:
-    r = subprocess.run(["git", "log", "--format=%h %s", "16b1efd..HEAD"], capture_output=True, text=True, cwd=ROOT)
+    r = subprocess.run(["git", "log", "--first-parent", "--format=%h %s", "16b1efd..HEAD"], capture_output=True, text=True, cwd=ROOT)      # this history's own line: without --first-parent the two commits that main held before the join of 11 October 2026 would be listed too
     lines = [l for l in r.stdout.splitlines() if l.strip()]
     if not lines:
         return []

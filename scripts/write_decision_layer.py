@@ -41,6 +41,11 @@ Brought up to date again that day, for the owner's third handoff (six lines of t
     the sentence of 8 October 2026 (it is not rebuilt for one sentence; the builder stops unless it is that sentence);
   - a third earlier pass of the runner is on record with the session's working files, the one made on the layer as
     built for the page's words before the six lines; the text says of the pass on record what its record says.
+And once more that day, for his fourth handoff ("One branch: main"): the site is deployed from the folder site/ of
+main by a workflow, and no longer from a branch gh-pages. The paragraph on the publication says so and keeps the
+first publication as history; the commit it names is the record's `site_commit`, the last commit to change site/.
+A record of the first publication, which has no such key, is still read, and the text then says that the site is
+still served the old way.
 
 Output: docs/DECISION_LAYER.md and nothing else; its inputs, their sha256 and the UTC time of the run are in its appendix.
   python scripts/write_decision_layer.py              runs the two verifiers, writes docs/DECISION_LAYER.md
@@ -1583,11 +1588,22 @@ again before a later use.
         site_now = ("**The copy on disk is not yet the one the site serves.** `scripts/check_pages_live.py` last checked the site\n"
                     "on {pages_checked}: {pages_checks} of {pages_checks} checks passed, on the copy made {pages_copy_then}. The copy described\n"
                     "in this section was made {share_made}, after the page's words were rewritten and six lines of it corrected\n"
-                    "(§17.4, §17.5), and had not been published when this was written. The owner gave his word for publishing it on\n"
-                    "11 October 2026, in his third handoff of that day. The session that built it could not publish it: its permission\n"
-                    "gate refused the publish script before the script ran, and nothing was done to get round that. It goes to the site\n"
-                    "when the owner runs that script or allows it, and this document is then written again, from a new check of the\n"
-                    "live site.")
+                    "(§17.4, §17.5), and had not been published when this was written. It goes to the site when the owner runs\n"
+                    "`scripts/publish_site.sh`, which fills `site/` with the copy and pushes `main`; this document is then written\n"
+                    "again, from a new check of the live site.")
+    from_main = "site_commit" in W.J(SITE)            # the record of a publication from the folder site/ of main; the record of the first publication, from a branch gh-pages, has no such key
+    if from_main:
+        site_route = ("It was first published that day from a branch `gh-pages` of the public repository, which held the copy's three\n"
+                      "files and an empty `.nojekyll`. By his decision of the same day the repository has one branch, `main`, and the\n"
+                      "site is deployed from its folder `site/` by the workflow `.github/workflows/pages.yml`, GitHub's starter workflow\n"
+                      "for static pages narrowed to that folder; `gh-pages` is deleted. `scripts/publish_site.sh` fills `site/` with the\n"
+                      "copy's three files, and no other, and pushes `main`. The last commit to change `site/` is `{pages_commit}`.")
+    else:
+        site_route = ("It is served by GitHub Pages from the branch `gh-pages` of the public repository (commit `{pages_commit}`), which\n"
+                      "holds the copy's three files and an empty `.nojekyll` and no other file of the repository. By his decision of the\n"
+                      "same day the site is to be deployed from the folder `site/` of `main` instead, by the workflow\n"
+                      "`.github/workflows/pages.yml`, and `gh-pages` deleted; the record of the live site that this document reads is\n"
+                      "still of the first publication.")
     DOC.append("""
 ## 14. The loss-pixel overlay
 
@@ -1717,8 +1733,7 @@ files under the rule above, which since 11 October 2026 carries the overlay's ch
 (§10) and a working overlay.
 
 **The copy is published.** On 11 October 2026 the owner decided to publish it, without a password, at
-{pages_address}: GitHub Pages, from the branch `gh-pages` of the public repository (commit `{pages_commit}`), which
-holds the copy's three files and an empty `.nojekyll` and no other file of the repository. Until that day the copy's
+{pages_address}. """ + site_route + """ Until that day the copy's
 README said that terms for passing it on were not yet agreed and asked that it not be published; it now gives the
 address, and says that each source keeps its own licence. """ + site_now + """
 
@@ -1781,7 +1796,17 @@ Chrome's alone (§16).
     show("share_zip_mb", key(SHARE_REC, "the_copy/zip/bytes"), W.mb)
     show("share_credits", key(SHARE_REC, "checks_passed/credits_read_from_the_layers_own_sources"), n0)
     show("pages_address", key(SITE, "address"), txt)
-    show("pages_commit", V(key(SITE, "gh_pages_commit_when_checked").v[:12], SITE, "key `gh_pages_commit_when_checked`, its first twelve characters"), txt)
+    if from_main:
+        show("pages_commit", V(key(SITE, "site_commit").v[:12], SITE, "key `site_commit`, its first twelve characters"), txt)
+        workflow_ = W.use(".github/workflows/pages.yml").read_text(encoding="utf-8")
+        hold(key(SITE, "branch").v == "main" and key(SITE, "folder").v == "site/" and key(SITE, "workflow").v == ".github/workflows/pages.yml" and bool(key(SITE, "main_commit_when_checked").v)
+             and "branches: [main]" in workflow_ and "path: site" in workflow_
+             and all(W.sha256(W.use("site/" + f_)) == W.sha256(W.use("70_share/odisha_forest_decision_layer/" + f_)) for f_ in ("index.html", "data.js", "README.txt")),
+             "the record of the publication is of the folder site/ of the branch main, with the commit at the head of main when it was checked; the workflow in the repository deploys that folder of that branch; and the three files "
+             "of site/ are byte for byte the copy's")
+    else:
+        show("pages_commit", V(key(SITE, "gh_pages_commit_when_checked").v[:12], SITE, "key `gh_pages_commit_when_checked`, its first twelve characters"), txt)
+        hold(key(SITE, "branch").v == "gh-pages", "the record of the publication that this document reads is of the first publication, from the branch gh-pages")
     show("pages_checks", key(SITE_CHECK, "checks_made"), n0)
     show("pages_checked", key(SITE_CHECK, "run_utc"), txt)
     README_NOW = W.use("70_share/odisha_forest_decision_layer/README.txt").read_text(encoding="utf-8")

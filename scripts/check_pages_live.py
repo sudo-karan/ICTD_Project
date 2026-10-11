@@ -5,13 +5,19 @@
 
 The copy of the layer that is made to be passed on (`70_share/odisha_forest_decision_layer/`, built and gated by
 `scripts/07_build_share.py` and `scripts/exercise_share.py`) is published by the project owner at ADDRESS: GitHub
-Pages, from the branch `gh-pages` of `sudo-karan/ICTD_Project`, which holds the copy's three files and an empty
-`.nojekyll` and nothing else (his decision of 11 October 2026; the push is made by a script of his, outside this
-repository's branches). This script reads the address and checks what it serves. It runs in the main environment.
+Pages, deployed from the folder `site/` of the branch `main` of `sudo-karan/ICTD_Project` by the workflow
+`.github/workflows/pages.yml`. `scripts/publish_site.sh` fills `site/` with the copy's three files, and nothing else,
+and pushes `main`; the push is the owner's. This script reads the address and checks what it serves. It runs in the
+main environment.
+
+How it came to be so: the site was first published on 11 October 2026 from a branch `gh-pages`, which held the copy's
+three files and an empty `.nojekyll`. By the owner's decision of the same day (his handoff "One branch: main") it is
+deployed from `site/` on `main`, and `gh-pages` is deleted.
 
 What it checks:
   1. `index.html`, `data.js` and `README.txt`, fetched from the site, have the bytes and the SHA-256 that
-     `70_share/share.provenance.json` records for the copy, and the files on disk are that build too;
+     `70_share/share.provenance.json` records for the copy, and the files on disk are that build too: the copy's,
+     and those of `site/`, the folder that is published, which holds those three and no other file;
   2. in a separate, headless Chrome with an empty profile, driven through the DevTools protocol by the driver the
      gate on the copy uses (`scripts/_browser_chrome.py`): the page becomes ready; its data holds 11,468 units (the
      owner's figure) and the map draws every one of them;
@@ -29,9 +35,10 @@ recorded bytes, for at most that long. A site that has just been published takes
 Writes, into `70_share/` only:
   pages_live_check.json     the address, the time, the browser, each file as fetched, what the page did, and each check
                             (`check`, `expected`, `found`, `pass`); `passed` is true only if every check passed
-  pages_publication.json    the address; the commit at the head of `gh-pages` on GitHub when the check ran (read with
-                            `git ls-remote`, which changes nothing); the build time of the copy; the layer's build
-                            time; and the check's result with the time it ran
+  pages_publication.json    the address; the branch, the folder and the workflow; the commit at the head of `main` on
+                            GitHub when the check ran (read with `git ls-remote`, which changes nothing) and the last
+                            commit to change `site/` at that head (read from this repository with `git log`); the
+                            build time of the copy; the layer's build time; and the check's result with the time it ran
 The exit status is 0 only if every check passed.
 """
 from __future__ import annotations
@@ -54,7 +61,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 ADDRESS = "https://sudo-karan.github.io/ICTD_Project/"
 REPOSITORY = "https://github.com/sudo-karan/ICTD_Project.git"
-BRANCH = "gh-pages"
+BRANCH = "main"                                       # until the owner's handoff of 11 October 2026 ("One branch: main"): "gh-pages"
+FOLDER, WORKFLOW = "site/", ".github/workflows/pages.yml"       # the folder of that branch that is published, and the workflow that deploys it
 UNITS_EXPECTED = 11468
 NAME = "odisha_forest_decision_layer"
 COPY, PROV = ROOT / "70_share" / NAME, ROOT / "70_share" / "share.provenance.json"
@@ -93,9 +101,14 @@ def main() -> int:
         print(("PASS  " if ok else "FAIL  ") + f"{check} | expected {expected} | found {found}", flush=True)
 
     on_disk = {n: {"bytes": (COPY / n).stat().st_size, "sha256": sha((COPY / n).read_bytes())} for n in FILES}
-    add("the copy on disk is the build its provenance record describes (bytes and SHA-256 of its three files)", "3 of 3",
-        f"{sum(on_disk[n] == {'bytes': want[n]['bytes'], 'sha256': want[n]['sha256']} for n in FILES)} of 3",
-        sorted(want) == sorted(FILES) and all(on_disk[n] == {"bytes": want[n]["bytes"], "sha256": want[n]["sha256"]} for n in FILES))
+    site = ROOT / FOLDER
+    in_site = {n: {"bytes": (site / n).stat().st_size, "sha256": sha((site / n).read_bytes())} for n in FILES if (site / n).is_file()}
+    others = sorted(q.name for q in site.iterdir() if not q.name.startswith(".") and q.name not in FILES) if site.is_dir() else []
+    add("the copy on disk is the build its provenance record describes (bytes and SHA-256 of its three files), and so is the folder site/, which is what is published and holds no other file", "3 of 3, and 3 of 3 in site/",
+        f"{sum(on_disk[n] == {'bytes': want[n]['bytes'], 'sha256': want[n]['sha256']} for n in FILES)} of 3, and "
+        f"{sum(in_site.get(n) == {'bytes': want[n]['bytes'], 'sha256': want[n]['sha256']} for n in FILES)} of 3 in site/" + (f"; other files in site/: {', '.join(others)}" if others else ""),
+        sorted(want) == sorted(FILES) and all(on_disk[n] == {"bytes": want[n]["bytes"], "sha256": want[n]["sha256"]} for n in FILES)
+        and all(in_site.get(n) == {"bytes": want[n]["bytes"], "sha256": want[n]["sha256"]} for n in FILES) and not others)
 
     polled, deadline = 0, time.time() + 60 * a.wait
     while a.wait and time.time() < deadline:
@@ -173,15 +186,17 @@ def main() -> int:
     OUT_CHECK.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     head = subprocess.run(["git", "ls-remote", "--heads", REPOSITORY, BRANCH], capture_output=True, text=True, cwd=ROOT, env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
     commit = head.stdout.split()[0] if head.returncode == 0 and head.stdout.strip() else None
+    last = subprocess.run(["git", "log", "-1", "--format=%H", commit, "--", FOLDER.rstrip("/")], capture_output=True, text=True, cwd=ROOT) if commit else None     # needs that head in this repository: fetch first
+    site_commit = last.stdout.strip() if last is not None and last.returncode == 0 and last.stdout.strip() else None
     OUT_PUBLICATION.write_text(json.dumps({
-        "what": "The shared copy of the layer as published by the project owner (his decision of 11 October 2026): where, from which commit, which build, and what the check of the live site found.",
-        "address": ADDRESS, "repository": REPOSITORY, "branch": BRANCH, "gh_pages_commit_when_checked": commit,
-        "what_the_branch_holds": "index.html, data.js and README.txt of 70_share/odisha_forest_decision_layer/, and an empty .nojekyll",
+        "what": "The shared copy of the layer as published by the project owner (his decisions of 11 October 2026): where, from which branch, folder and commit, which build, and what the check of the live site found.",
+        "address": ADDRESS, "repository": REPOSITORY, "branch": BRANCH, "folder": FOLDER, "workflow": WORKFLOW, "main_commit_when_checked": commit, "site_commit": site_commit,
+        "what_the_folder_holds": "index.html, data.js and README.txt of 70_share/odisha_forest_decision_layer/",
         "copy_built_utc": recorded["run_utc"], "layer_built_utc": recorded["layer_run_utc"],
         "files": {n: {"bytes": want[n]["bytes"], "sha256": want[n]["sha256"]} for n in FILES},
         "live_check": {"record": "70_share/pages_live_check.json", "run_utc": started, "checks_passed": record["checks_passed"], "checks_made": record["checks_made"], "passed": passed}},
         indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"\n{record['checks_passed']} of {record['checks_made']} checks passed; gh-pages is at {commit}; wrote 70_share/pages_live_check.json and 70_share/pages_publication.json")
+    print(f"\n{record['checks_passed']} of {record['checks_made']} checks passed; main is at {commit}, and site/ was last changed by {site_commit}; wrote 70_share/pages_live_check.json and 70_share/pages_publication.json")
     return 0 if passed else 1
 
 
