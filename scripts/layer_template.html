@@ -87,6 +87,12 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
 #dv .tiers div { display: flex; align-items: center; margin: 1px 0; }
 #dv .tiers button { padding: 0 6px; margin: 0 3px 0 0; font-size: 11px; }
 .leaflet-container { font: inherit; }
+/* the "i" beside a label (added 11 Oct 2026): drawn here, with no text of its own; its words are shown in the one box below, which lies outside the panels */
+.tip { display: inline-block; width: 15px; height: 15px; margin-left: 5px; border: 1px solid #6b6b6b; border-radius: 50%; box-sizing: border-box; vertical-align: -2px; cursor: help; color: #444; background: #fff; text-align: center; text-indent: 0; text-transform: none; letter-spacing: 0; font: italic 700 11px/13px Georgia, "Times New Roman", serif; }
+.tip::before { content: "i"; }
+.tip:hover, .tip:focus { background: #1c1c1c; border-color: #1c1c1c; color: #fff; outline: none; }
+#tipbox { display: none; position: fixed; z-index: 1500; left: 0; top: 0; box-sizing: border-box; max-width: 300px; background: #1c1c1c; color: #fff; border-radius: 4px; padding: 7px 9px; font-size: 12.5px; line-height: 1.4; font-weight: 400; box-shadow: 0 2px 8px rgba(0,0,0,.35); pointer-events: none; }
+.layer.off { color: #888; cursor: default; }
 </style>
 </head>
 <body>
@@ -94,20 +100,18 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   <div id="side">
     <h1 id="title"></h1>
     <p class="sub" id="subtitle"></p>
-    <p><button id="b_about">What this is, and how to read it</button><button id="b_sources">Sources and licences</button></p>
-    <h2>Decision view</h2>
+    <p><button id="b_about" title="How we made the map, and how to read it">About this map</button><button id="b_sources" title="Every dataset we use, and its licence">Sources</button></p>
+    <h2>Show on the map</h2>
     <div id="dv"></div>
-    <h2>Layer</h2>
     <div id="layers"></div>
-    <h2>Honest colour</h2>
-    <p class="sub">A rate on a few hectares of forest is noise. Units with less than this much of the land a forest layer rests on are shown as <b>insufficient forest to assess</b>, not on the colour scale:</p>
+    <h2>Minimum forest<span class="tipslot" data-key="floors"></span></h2>
     <div id="floors"></div>
-    <h2>Units shown</h2>
+    <h2>Show units<span class="tipslot" data-key="units"></span></h2>
     <label class="layer"><input type="checkbox" id="c_lgd" checked> <span id="l_lgd"></span></label>
     <label class="layer"><input type="checkbox" id="c_out" checked> <span class="sw hatch" style="background-color:#fff"></span><span id="l_out"></span></label>
-    <h2>Go to</h2>
+    <h2>Find</h2>
     <select id="district"></select>
-    <p style="margin-top:6px"><input type="text" id="search" placeholder="Unit name or id, then Enter"></p>
+    <p style="margin-top:6px"><input type="text" id="search" placeholder="Name or unit id, then Enter"></p>
     <p class="sub" id="searchmsg"></p>
     <p class="sub" id="built"></p>
   </div>
@@ -115,6 +119,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   <div id="info"></div>
 </div>
 <div id="modal"><div class="box"><p style="text-align:right;margin:0"><button id="b_close">Close</button></p><div id="modalbody"></div></div></div>
+<div id="tipbox" role="tooltip"></div>
 <script>
 /*LEAFLET_JS*/
 </script>
@@ -124,11 +129,12 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   "use strict";
   var D = window.ICTD_LAYER;
   if (!D) {
-    document.body.innerHTML = '<p class="fatal">The map\'s data file was not found. Keep <b>data.js</b> in the same folder as this file and open it again.</p>';
+    document.body.innerHTML = '<p class="fatal">The map\'s data didn\'t load. If you downloaded the map, keep <b>data.js</b> in the same folder as index.html and open it again.</p>';
     return;
   }
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var TIPS = D.tips || {};                 // the words of every "i" (added 11 Oct 2026): a place and its words, made by the builder
   var N = D.id.length, CODES = D.codes;
   var state = { layer: D.default_layer, floor: D.default_floor, lgd: true, out: true, sel: -1, legend: true };
   var DV = D.decision || null;             // the decision view (added 8 Oct 2026): beside the layers, changing none of them
@@ -194,16 +200,16 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   D.layers.forEach(function (l) {
     if (l.group !== lastGroup) { html += '<div class="group">' + esc(l.group) + "</div>"; lastGroup = l.group; }
     html += l.pending
-      ? '<span class="layer pending">&#9675; ' + esc(l.title) + " &mdash; " + esc(l.pending) + "</span>"
-      : '<label class="layer"><input type="radio" name="layer" value="' + l.id + '"> ' + esc(l.title) + "</label>";
+      ? '<span class="layer pending">&#9675; ' + esc(l.title) + " &mdash; " + esc(l.pending) + tip(TIPS["layer:" + l.id]) + "</span>"
+      : '<label class="layer"><input type="radio" name="layer" value="' + attr(l.id) + '"> ' + esc(l.title) + "</label>";
   });
   $("layers").innerHTML = html;
   html = "";
   D.floors.forEach(function (f) {
-    html += '<label class="layer"><input type="radio" name="floor" value="' + f.id + '"> ' + esc(f.label) + "</label>";
+    html += '<label class="layer"><input type="radio" name="floor" value="' + attr(f.id) + '"> ' + esc(f.label) + "</label>";
   });
   $("floors").innerHTML = html;
-  html = '<option value="">District&hellip;</option>';
+  html = '<option value="">Jump to a district&hellip;</option>';
   D.districts.forEach(function (d, k) { html += '<option value="' + k + '">' + esc(d.name) + "</option>"; });
   $("district").innerHTML = html;
 
@@ -213,7 +219,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   function showLegend() {
     if (state.layer === "decision") { dvLegend(); return; }
     var l = layerById[state.layer], counts = l.floored ? l.counts[state.floor] : l.counts.all, h, k, c, sep = false;
-    h = '<div class="lh"><div class="t">' + esc(l.legend_title) + '</div><button id="b_legend" title="Hide or show the legend, to see the map under it">' + (state.legend ? "Hide" : "Show") + "</button></div>";
+    h = '<div class="lh"><div class="t">' + esc(l.legend_title) + tip(TIPS["layer:" + l.id]) + '</div><button id="b_legend" title="Hide or show the legend, to see the map under it">' + (state.legend ? "Hide" : "Show") + "</button></div>";
     if (!state.legend) { $("legend").innerHTML = h; return; }
     for (k = 0; k < l.classes.length; k++) {
       c = l.classes[k];
@@ -229,8 +235,8 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   function showInfo() {
     if (state.sel < 0) { $("info").innerHTML = D.info_empty; return; }
     var f = D.f[state.sel], h = "", bar = D.bar[state.sel];
-    D.panel.forEach(function (sec) {
-      if (sec.heading) { h += (sec.top ? "<h1>" : "<h3>") + esc(sec.heading_field !== undefined ? f[sec.heading_field] : sec.heading) + (sec.top ? "</h1>" : "</h3>"); }
+    D.panel.forEach(function (sec, k) {
+      if (sec.heading) { h += (sec.top ? "<h1>" : "<h3>") + esc(sec.heading_field !== undefined ? f[sec.heading_field] : sec.heading) + (sec.top ? "</h1>" : tip(TIPS["panel:" + k]) + "</h3>"); }
       if (sec.flag_field !== undefined && f[sec.flag_field]) { h += '<div class="flag">' + esc(f[sec.flag_field]) + "</div>"; }
       if (sec.rows) {
         h += '<table class="kv">';
@@ -239,7 +245,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
       }
       if (sec.bar && bar) {
         h += '<div class="bar">';
-        D.core_classes.forEach(function (c, k) { h += '<span title="' + esc(c.name) + '" style="width:' + bar[k] + "%;background:" + c.color + '"></span>'; });
+        D.core_classes.forEach(function (c, k) { h += '<span title="' + attr(c.name) + '" style="width:' + bar[k] + "%;background:" + c.color + '"></span>'; });
         h += '</div><p class="note">';
         D.core_classes.forEach(function (c) { h += '<span class="sw" style="background:' + c.color + '"></span>' + esc(c.name) + " &nbsp; "; });
         h += "</p>";
@@ -325,6 +331,42 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   $("legend").addEventListener("click", function (e) { if (e.target.id === "b_legend") { state.legend = !state.legend; showLegend(); } });
   $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
 
+  // ---- the "i" beside a label (added 11 Oct 2026) -----------------------------------------------------------------------------------
+  // An "i" is an empty element: it is drawn by the stylesheet and adds no text to the label it stands beside. Its words are an attribute of
+  // it (escaped for an attribute, quotes included), written by tip(); they are shown in ONE box, #tipbox, which lies outside the panels, is
+  // placed inside the window each time, and is emptied when it closes. It opens on hover, on keyboard focus, and on a tap or a click; it
+  // closes when the pointer leaves, on losing focus, on Escape, on a click elsewhere, and when anything scrolls or the window changes size.
+  // A click on an "i" that stands inside a label does not work the label's control.
+  function attr(s) { return esc(s).replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+  function tip(words) { return words ? '<span class="tip" tabindex="0" role="button" aria-label="More about this" data-tip="' + attr(words) + '"></span>' : ""; }
+  var tipFor = null;
+  function isTip(e) { return !!(e && e.classList && e.classList.contains("tip")); }
+  function tipHide() { var b = $("tipbox"); b.style.display = "none"; b.textContent = ""; tipFor = null; }
+  function tipShow(el) {
+    var b = $("tipbox"), vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight, r, w, hgt, x, y;
+    b.textContent = el.getAttribute("data-tip");
+    b.style.maxWidth = Math.min(300, vw - 16) + "px"; b.style.left = "0px"; b.style.top = "0px"; b.style.display = "block";
+    r = el.getBoundingClientRect(); w = b.offsetWidth; hgt = b.offsetHeight;
+    x = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, vw - w - 8));
+    y = r.bottom + 6;
+    if (y + hgt > vh - 8) { y = r.top - hgt - 6; }       // no room below: above the "i"
+    if (y < 8) { y = 8; }
+    b.style.left = Math.round(x) + "px"; b.style.top = Math.round(y) + "px";
+    tipFor = el;
+  }
+  (function () { var slots = document.querySelectorAll(".tipslot"), k; for (k = 0; k < slots.length; k++) { slots[k].outerHTML = tip(TIPS[slots[k].getAttribute("data-key")]); } })();
+  document.addEventListener("mouseover", function (e) { if (isTip(e.target)) { tipShow(e.target); } else if (tipFor && !document.body.contains(tipFor)) { tipHide(); } });
+  document.addEventListener("mouseout", function (e) { if (isTip(e.target) && document.activeElement !== e.target) { tipHide(); } });
+  document.addEventListener("focusin", function (e) { if (isTip(e.target)) { tipShow(e.target); } });
+  document.addEventListener("focusout", function (e) { if (isTip(e.target)) { tipHide(); } });
+  document.addEventListener("click", function (e) { if (isTip(e.target)) { e.preventDefault(); tipShow(e.target); } else if (tipFor) { tipHide(); } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" || e.keyCode === 27) { if (tipFor) { tipHide(); } }
+    else if (isTip(e.target) && (e.key === "Enter" || e.key === " " || e.keyCode === 13 || e.keyCode === 32)) { e.preventDefault(); tipShow(e.target); }
+  });
+  document.addEventListener("scroll", function () { if (tipFor) { tipHide(); } }, true);
+  window.addEventListener("resize", function () { if (tipFor) { tipHide(); } });
+
   // ---- the decision view (added 8 Oct 2026) ------------------------------------------------------------------------------------
   // Six cells from 55_decision/condition_by_unit.csv, ranked within ONE district. It stands beside the layers and changes none of
   // them. Like the rest of the page it works out no figure: it looks up text the builder made, joins it, and counts places in the
@@ -355,7 +397,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     for (k = 0; k < list.length; k++) {
       cell = dvCellById(list[k]); idx = DV.cells.indexOf(cell);
       if (list[k] === DV.unranked) { h += '<div class="flatsep"></div>'; }
-      h += '<div class="lr" title="' + esc(dvTierLabel(cell)) + '"><span class="sw" style="background:' + cell.color + '"></span>' + esc(dvTierLabel(cell, cell.legend)) + ' <span class="n">(' + esc(DV.counts[state.window][idx])
+      h += '<div class="lr" title="' + attr(dvTierLabel(cell)) + '"><span class="sw" style="background:' + cell.color + '"></span>' + esc(dvTierLabel(cell, cell.legend)) + ' <span class="n">(' + esc(DV.counts[state.window][idx])
         + (state.rank >= 0 ? "; " + esc(DV.dcounts[state.window][state.rank][idx]) + " in " + esc(D.districts[state.rank].name) : "") + ")</span></div>";
     }
     h += '<div class="flatsep"></div><div class="lr"><span class="sw hatch" style="background-color:#fff"></span>' + esc(D.unit_types.out_legend) + "</div>";
@@ -364,12 +406,12 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     $("legend").innerHTML = h;
   }
   function dvControls() {
-    var h = '<label class="layer"><input type="radio" name="dlayer" id="r_decision" value="decision"> ' + esc(DV.radio) + "</label>";
-    h += '<div id="dv_more" style="display:none"><p class="sub" style="margin-top:8px">' + esc(DV.t.window_head) + ":</p>";
-    DV.windows.forEach(function (w) { h += '<label class="layer"><input type="radio" name="dwindow" value="' + w.id + '"> ' + esc(w.label) + ' <span class="sub">' + esc(w.is) + "</span></label>"; });
-    h += '<p class="sub" style="margin-top:8px">' + esc(DV.t.tiers_head) + ':</p><div class="tiers" id="dv_tiers"></div><p><button id="b_tier_reset">' + esc(DV.t.reset) + "</button></p>";
-    h += '<label class="layer"><input type="checkbox" id="c_overlay"' + (DV.overlay.available ? "" : " disabled") + "> " + esc(DV.overlay.label) + "</label>";
-    h += '<p class="sub" id="overlaymsg">' + esc(DV.overlay.available ? DV.overlay.note + " " + DV.overlay.version : DV.overlay.unavailable) + "</p></div>";
+    var h = '<label class="layer"><input type="radio" name="dlayer" id="r_decision" value="decision"> ' + esc(DV.radio) + tip(TIPS.decision) + "</label>";
+    h += '<div id="dv_more" style="display:none"><p class="sub" style="margin-top:8px">' + esc(DV.t.window_head) + tip(TIPS.window_head) + "</p>";
+    DV.windows.forEach(function (w) { h += '<label class="layer"><input type="radio" name="dwindow" value="' + attr(w.id) + '"> ' + esc(w.label) + tip(w.is) + "</label>"; });
+    h += '<p class="sub" style="margin-top:8px">' + esc(DV.t.tiers_head) + tip(TIPS.tiers) + '</p><div class="tiers" id="dv_tiers"></div><p><button id="b_tier_reset">' + esc(DV.t.reset) + "</button></p>";
+    h += '<label class="layer' + (DV.overlay.available ? "" : " off") + '"><input type="checkbox" id="c_overlay"' + (DV.overlay.available ? "" : " disabled") + "> " + esc(DV.overlay.label) + (DV.overlay.available ? tip(DV.overlay.note + " " + DV.overlay.version) : "") + "</label>";
+    h += '<p class="sub" id="overlaymsg">' + esc(DV.overlay.available ? "" : DV.overlay.unavailable) + "</p></div>";
     $("dv").innerHTML = h;
   }
   function dvTiers() {
@@ -409,18 +451,18 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     D.districts.forEach(function (d, i) { opts += '<option value="' + i + '"' + (i === state.rank ? " selected" : "") + ">" + esc(d.name) + "</option>"; });
     if (state.rank >= 0) { r = dvRows(); }
     h = '<p style="margin:2px 0 6px"><select id="rank_district">' + opts + '</select><select id="rank_st">'
-      + DV.t.st_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.st ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + '</select><select id="rank_within">'
-      + DV.t.within_options.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.within ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"
+      + DV.t.st_options.map(function (o) { return '<option value="' + attr(o[0]) + '"' + (o[0] === state.st ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + '</select><select id="rank_within">'
+      + DV.t.within_options.map(function (o) { return '<option value="' + attr(o[0]) + '"' + (o[0] === state.within ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"
       + '<label><input type="checkbox" id="c_keep_out"' + (state.keepOut ? " checked" : "") + (state.st === "0" ? " disabled" : "") + "> " + esc(DV.t.keep_out) + (state.st === "0" ? " " + esc(DV.t.keep_out_off) : "") + "</label> "
       + '<button id="b_export"' + (!r || !r.rows.length ? " disabled" : "") + ">" + esc(DV.t.export) + "</button></p>";
-    if (state.rank < 0) { el.innerHTML = h + '<p id="rank_msg">' + esc(DV.t.rank_none) + "</p>"; return; }
+    if (state.rank < 0) { el.innerHTML = h + '<p id="rank_msg">' + esc(DV.t.rank_none) + tip(TIPS.rank_none) + "</p>"; return; }
     L = DV.loss[state.window];
     h += '<p id="rank_head"><b>' + esc(dvFill(DV.t.rank_head, { district: D.districts[state.rank].name, n: r.rows.length, window: w.label, order: dvOrderWords(), within: dvWithin() })) + "</b></p>";
     if (state.st !== "0") {
-      h += '<p class="note" id="rank_filter">' + esc(dvFill(DV.t.rank_filter_note, { label: dvFilterLabel(), m: r.dropped })) + " "
+      h += '<p class="note" id="rank_filter">' + esc(dvFill(DV.t.rank_filter_note, { label: dvFilterLabel(), m: r.dropped })) + tip(TIPS.filter) + " "
         + esc(state.keepOut ? dvFill(DV.t.rank_out_kept, { k: r.outKept }) : dvFill(DV.t.rank_out_dropped, { k: r.outDropped })) + "</p>";
     }
-    h += '<table class="rk"><tr>' + DV.t.cols.map(function (c) { return "<th>" + esc(dvFill(c, { window: w.label })) + "</th>"; }).join("") + "</tr>";
+    h += '<table class="rk"><tr>' + DV.t.cols.map(function (c, k) { return "<th>" + esc(dvFill(c, { window: w.label })) + (k === 6 ? tip(dvFill(TIPS.col_share || "", { window: w.label })) : "") + "</th>"; }).join("") + "</tr>";
     r.rows.forEach(function (x) {
       var i = x[0], cell = x[1], f = D.f[i];
       h += '<tr class="r" data-u="' + i + '"><td><span class="tierchip" style="border-left-color:' + cell.color + '">' + esc(dvTierLabel(cell)) + "</span></td><td>" + esc(f[F.name]) + " (" + esc(f[F.id]) + ")</td><td>"
@@ -518,7 +560,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   }
   function dvOverlay(on) {  // the optional online overlay: its code is in overlay.js, which is asked for here and nowhere else, and only on a tick
     var s;
-    if (!on) { dvOverlayOff(DV.overlay.available ? DV.overlay.note + " " + DV.overlay.version : DV.overlay.unavailable); return; }
+    if (!on) { dvOverlayOff(DV.overlay.available ? "" : DV.overlay.unavailable); return; }
     if (!DV.overlay.available) { dvOverlayOff(DV.overlay.unavailable); return; }
     if (navigator.onLine === false) { dvOverlayOff(DV.overlay.offline); return; }
     function add() {

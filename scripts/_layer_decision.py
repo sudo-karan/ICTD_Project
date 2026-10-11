@@ -12,6 +12,14 @@ and joins them. Nothing existing is changed by it: no field of the unit panel, n
 WHY overlay.js IS A FILE OF ITS OWN. The layer's own checks - which stay as they are - forbid any map-tile or network code in
 index.html and data.js. So the one piece of code that can ask the network for something lives in a third file that the page
 loads only when its user ticks the overlay. Delete overlay.js and the layer is exactly the offline layer.
+
+THE WORDS (11 Oct 2026, the owner's second handoff of that day). The view's labels were shortened and put in the first and
+second person; what a label needs said beside it is the words of a small "i". build() returns those words under "tips" and
+06_build_layer.py puts them into the one new key of data.js, `tips`: "decision", "window_head", "tiers", "rank_none",
+"filter" and "col_share". Two more "i" reuse words the view already had, under their own keys: a window's `is`, and the
+overlay's `note` and `version`. No key of the view itself was added, renamed or taken away. The strings that come from
+55_decision/ (the cells' names and what they rest on, the tiers' reasons, the work-type fields, the windows'
+descriptions, the governance prompt) and the owner's words for standing forest are as they were.
 """
 import hashlib
 import json
@@ -28,7 +36,7 @@ LEGEND_NAME = {}
 STANDING_IS = "the forest of 2000 with no loss recorded since; not a measure of tree cover today"          # the owner's wording of 9 October 2026, in place of "a lower bound"
 CAUTIONS = "00_raw/05_forest_reference/provider_cautions.json"
 CORRO = {"both": "Both measures flag this unit", "hansen_only": "Only Hansen flags it (clearance)", "corestack_only": "Only CoRE Stack flags it (degradation)", "neither": "Neither measure flags it"}
-EAST = " - East Coast zone model: the placebo failed there, so corroboration is unreliable"
+EAST = " - East Coast zone: CoRE Stack's own check fails here, so corroboration is unreliable"
 NOT_COMPARED = {"below_floor": "Not compared: under {floor:g} ha of land with canopy above 10 % in 2000, the agreement test's floor",
                 "below_floor_no_corestack_coverage": "Not compared: under {floor:g} ha of land with canopy above 10 % in 2000, the agreement test's floor; and CoRE Stack gives no class on such land here",
                 "corestack_covers_under_floor": "Not compared: CoRE Stack gives a class on under {floor:g} ha of this unit's land with canopy above 10 % in 2000, the agreement test's floor"}
@@ -203,9 +211,8 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
     n_site = int(near.n_units_mostly_dense_or_mostly_open)
     out_site = int(sum(int(co.loc[c, "n_units"]) for c in cells if c != unranked))
     registered = bool(P["work_types"]["registered"])
-    within_tier = "Within a tier, largest first: by forest loss in the window where the cell has loss, by standing hectares of the cell's band where it has none."
-    within_tier_share = ("Within a tier, largest first: by forest loss in the window as a share of the forest at the start of the window where the cell has loss (units with no share after the others, by hectares lost), "
-                         "by standing hectares of the cell's band where it has none.")
+    within_tier = "Within a tier, most hectares lost first; in a cell without loss, most standing hectares of its kind first."
+    within_tier_share = "Within a tier, biggest share lost first (units with no share go last, by hectares lost); in a cell without loss, most standing hectares of its kind first."
     sh = share_t[share_t.window == default_window].set_index("cell")
     sc = P["counts"]["loss_as_a_share"][default_window]
     dl_share, none_share = e("dense_loss_share_under_1pct"), e("none_cell_share_over_2pct")
@@ -238,7 +245,7 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
         same = "v1.13" in str(cfg["data_version"]).lower()
         version_note = (f"Tiles: {cfg['data_version']}, loss through {cfg['loss_through_year']} - the version the unit tables are built from." if same else
                         f"Tiles: {cfg['data_version']}, loss through {cfg['loss_through_year']}. The unit tables are built from v1.13 (loss through 2025): the overlay's pixels may disagree with them.")
-        overlay = {"available": 1, "label": f"Site-level overlay: Hansen tree cover loss as map tiles from {cfg['provider']}",
+        overlay = {"available": 1, "label": f"Loss pixels ({str(cfg['provider']).split(' (')[0]})",
                    "note": "Online, optional, off unless ticked. When it is ticked this page asks " + cfg["provider"] + " for map tiles, so your network address, the place you are looking at and the years of the window chosen "
                            "leave this machine. Nothing else on this map asks the network for anything.", "version": version_note, "attribution": cfg["attribution"],
                    "legend": "Overlay on - pink: Hansen tree cover loss in {window} on land with about 10 % canopy or more in 2000. A picture to find places by: do not measure from it. " + str(cfg["attribution"]) + ".",
@@ -265,9 +272,9 @@ def build(root, ids, outside, district_names, summ, st_classes, fields, also, fa
     quote = lambda k: "<q>" + pcs[k]["text"] + "</q>"
     uncited_text = (" The rows of the list that name forest and are cited by no cell, for the Foundation to rule on: " + "; ".join(uncited) + ".") if uncited else ""
     about = f"""
-<h1>Decision view: where is forest work warranted?</h1>
-<p><b>What it is.</b> A second way to read the same measurements, added beside the layers above; nothing in them is changed by it. Each unit is placed in one of six cells by two questions put to Hansen's record: how much forest is standing now, and is it
-mostly closed or mostly open; and was forest lost in the window of years you choose. The cells are put in an order of tiers, and within one district the units are listed tier by tier. {within_tier} It is a prompt for where to look, to be set against
+<h1>The decision view</h1>
+<p><b>What it is.</b> A second way to read the same measurements; it changes nothing in the layers above. Each unit is placed in one of six cells by two questions put to Hansen's record: how much forest is standing now, and is it
+mostly closed or mostly open; and was forest lost in the window of years you choose. The cells are put in an order of tiers, and within one district the units are listed tier by tier. {within_tier} It's a starting point for where to look, to be checked against
 what people who know the places see. It is not a verdict on any place, and it is not a score.</p>
 <table>
 <tr><th>cell</th><th>forest standing now</th><th>forest loss in the window</th><th>units, window {wl[default_window]}</th><th>of them outside-village units</th></tr>
@@ -279,7 +286,7 @@ It can be wrong in either direction: gain is not netted off, so cover that grew 
 {quote('errors')} The split into dense and open is that of 2000, so thinning since then is not seen; and tree cover here is any vegetation taller than 5 m,
 which does not tell a natural forest from a plantation. Loss on land with 10 % canopy or less in 2000 is printed in the panel and decides nothing: most of it is on land with no canopy at all in 2000, and its rise over time is largely the producers'
 change of method.</p>
-<p><b>Two thresholds, ruled on by the project owner on 9 October 2026 as they were proposed.</b> A unit has <i>little or none</i> under {smin:g} ha of standing forest; it has <i>some</i> loss from {lmin:g} ha of forest loss in the window. Neither is the 100 ha of the agreement test, which is a
+<p><b>Two thresholds, ruled on 9 October 2026 as they were proposed.</b> A unit has <i>little or none</i> under {smin:g} ha of standing forest; it has <i>some</i> loss from {lmin:g} ha of forest loss in the window. Neither is the 100 ha of the agreement test, which is a
 floor for comparing rates and is not used here. One pixel is about {pixel:.2f} ha, and in {wl[default_window]} {one_px:,} units have a recorded forest loss above zero and under {pixel:g} ha, the area of one pixel in the middle of the state: slivers cut by a
 boundary and, where pixels are smaller than that, whole single pixels. A single pixel must not decide a cell; {lmin:g} ha is the smallest patch the Forest Survey of India counts as forest cover. Units with {smin:g} ha or more standing hold {keep:.1f} % of all standing forest. Among units with {smin:g} ha or more standing,
 {float(recur['value']):.0f} % of those that lost {lmin:g} ha or more in 2018-2021 lost that much again in 2022-2025; of those that lost under {pixel:g} ha, or nothing, {float(fresh['value']):.0f} %. The thresholds matter. In the window {wl[default_window]}:
@@ -297,11 +304,11 @@ opens, or by share lost; the cells with little or no loss recorded stay ordered 
 <p><b>The window</b> is the span of years over which loss is counted: {wl['2018_2025']} ({win_is['2018_2025']}: plantation is {pl16:.1f} % of expenditure there in FY2016-17 and {pl18:.1f} % in FY2018-19), {wl['2001_2025']} ({win_is['2001_2025']}),
 {wl['2017_2023']} ({win_is['2017_2023']}) and {wl['2021_2025']} ({win_is['2021_2025']}). It is named in the legend, in every unit's panel, at the head of the ranked list and in every row of an exported list. A cell's name speaks of loss recorded in the window chosen:
 under {wl['2001_2025']} that is at any time since 2001 - {full_quiet:,} of the {int(full.sum()):,} units in <i>{defs['open_loss']['name']}</i> under that window lost under {lmin:g} ha in {wl[default_window]}.</p>
-<p><b>The tiers are provisional</b>, to be set with the Foundation for Ecological Security: {tier_list}; <i>{defs[unranked]['name']}</i> is on the map and outside the list. A forester could reasonably put tier 2 above tier 1. The order is yours to change
+<p><b>The tiers are provisional</b>, to be set with the Foundation for Ecological Security: {tier_list}; <i>{defs[unranked]['name']}</i> is on the map and outside the list. A forester could reasonably put tier 2 above tier 1. You can change the order
 on the left; an exported list says which order made it.</p>
 <p><b>Why the list is within a district and never across the state.</b> Among the {n_head:,} LGD panchayat units of the agreement test's headline (at least {floor:g} ha of land with canopy above 10 % in 2000, East Coast zone left out, 2017-2023), the two
 forest measures agree within districts (odds ratio {within}); across the state their agreement is not established ({across}, an interval that includes 1). For all units of that headline together the across-state figure is {across_all}. So for LGD
-panchayat units a state-wide ranking would rest on a comparison this analysis does not establish. There is no state-wide ranking.</p>
+panchayat units a state-wide ranking would rest on a comparison we can't establish. There is no state-wide ranking.</p>
 <p><b>No score.</b> There is no index, no weight and no number out of a hundred. Loss as a share, Scheduled Tribe share, the development index and past spending on forest-named works stand beside the tier, never inside it. Scheduled Tribe share can filter the
 list; it never orders it. The geotagged spending record effectively ends with works started in 2017-18. An exported list has {len(EXPORT_COLS)} columns; the development index is shown in the list on this page and is left out of the exported file.</p>
 <p><b>Corroboration.</b> Each unit carries what the existing comparison of Hansen with CoRE Stack already says of it, for 2017-2023 whatever window is chosen: both measures flag it, one does, neither does, or it was not compared and why. In the units under
@@ -311,19 +318,19 @@ together carry {intact_loss_ha:,.1f} ha of forest loss in that window, {intact_l
 <p><b>Outside-village units</b> have forest, so they are classed and listed like any unit: in the window {WINDOW_LABEL[default_window]}, {out_site:,} of them are in a cell other than <i>{defs[unranked]['name']}</i>. No village plan covers them, their panel asks whose plan does, and it says what their
 assigned district rests on. Their census columns read <i>no census data for this land</i>.</p>
 <p><b>Work types.</b> {cells_naming + " of the " + in_words[len(work)] + " cells name rows of the official list of permissible works by serial number, and the other " + cells_not_naming + " name none: " + str(work["schedule"].iloc[0]) + ". " + work_note + " The word regeneration is in none of its rows, so assisted natural regeneration - the work that the forest cell with the most units points to - is not a work the list names." + uncited_text if registered else "The work-type field of every cell reads <i>" + work.iloc[0]["work_type_field"] + "</i>: the official schedule of permissible works has not been registered as an input, and no list of works is used in its place."}</p>
-<p><b>The site-level overlay</b> {"is optional, online, and off unless ticked: Hansen tree cover loss as map tiles from " + cfg["provider"] + ", for the years of the window chosen, on land with about 10 % canopy or more in 2000. " + overlay["version"] + " It is the one exception to 'nothing is fetched from the internet': while it is ticked the page asks that provider's server for tiles, so the network address of whoever is looking, the place they are looking at and the years of the window chosen leave the machine. It can be ticked only in the decision view, and it switches itself off when that view is left or when its tiles stop arriving. Its code is in a third file, overlay.js; without that file, or without a connection, the map is exactly the offline map. It is a picture to find places by, not something to measure from. Two points of the provider's terms of use are unresolved and are the project owner's to decide: the terms ask that each request to an API carry an account's key, while the tile service's reference declares none and it returns tiles without one; and they bind a user to an attribution page written for another of the provider's services. The project's documentation (DECISION_LAYER.md, which comes with the project and not with these files) sets both out." if overlay_js else "is not in this build: no documented tile endpoint has been registered for it."}</p>
+<p><b>The loss-pixel overlay</b> {"is optional, online, and off unless ticked: Hansen tree cover loss as map tiles from " + cfg["provider"] + ", for the years of the window chosen, on land with about 10 % canopy or more in 2000. " + overlay["version"] + " It's the one thing on this page that goes online: while it's ticked, the page asks that provider's server for tiles, so your network address, the place you're looking at and the years of the window chosen leave your machine. It can be ticked only in the decision view, and it switches itself off when that view is left or when its tiles stop arriving. Its code is in a third file, overlay.js; without that file, or without a connection, the map works exactly as it does without the overlay. It is a picture to find places by, not something to measure from. Two points of the provider's terms of use are unresolved, and they are ours to decide: the terms ask that each request to an API carry an account's key, while the tile service's reference declares none and it returns tiles without one; and they bind a user to an attribution page written for another of the provider's services. The project's documentation (DECISION_LAYER.md, which comes with the project and not with these files) sets both out." if overlay_js else "is not in this build: no documented tile endpoint has been registered for it."}</p>
 """
     sources_rows = ""
     if overlay_js:
-        sources_rows += (f"<tr><td>Site-level overlay (optional, online, off unless ticked; not in this file)</td><td>{cfg['provider']}: tree cover loss map tiles, {cfg['data_version']}</td>"
-                         f"<td>{cfg['attribution']}. Requested only when the overlay is ticked. Terms of use: {cfg['terms_url']} - two points of them are unresolved (see 'The site-level overlay' in the text on how to read this layer)</td></tr>\n")
+        sources_rows += (f"<tr><td>Loss-pixel overlay (optional, online, off unless ticked; its code is in overlay.js)</td><td>{cfg['provider']}: tree cover loss map tiles, {cfg['data_version']}</td>"
+                         f"<td>{cfg['attribution']}. Requested only when the overlay is ticked. Terms of use: {cfg['terms_url']} - two points of them are unresolved (see About this map)</td></tr>\n")
     sources_rows += (f"<tr><td>Cautions about Hansen's data quoted in the decision view</td><td>Global Forest Watch's record of the dataset Tree cover loss ({PC['inputs'][0]['source_url']}) and the University of Maryland's page for "
                      f"Global Forest Change version 1.13 ({PC['inputs'][1]['source_url']}), both as read on 8 October 2026</td><td>Short quotations, each with its source; the data itself is CC BY 4.0</td></tr>\n")
     if registered:
         sources_rows += f"<tr><td>Work types named in the decision view</td><td>{work.iloc[0]['schedule']}; Gazette of India, read from egazette.gov.in</td><td>Government of India; no licence is stated for the Gazette</td></tr>\n"
 
     payload = {
-        "title": "Decision view", "radio": "Where is forest work warranted? (six cells, ranked within a district)", "default_window": default_window,
+        "title": "Decision view", "radio": "Decision view", "default_window": default_window,
         "windows": [{"id": w, "label": wl[w], "is": P["definitions"]["windows"][w]["is"], "years": [int(y) for y in P["definitions"]["windows"][w]["years"]]} for w in windows],
         "cells": payload_cells, "tiers": order, "unranked": unranked, "tier_why": {r.cell: r.why_this_place_in_the_order for r in tiers.itertuples()},
         "cls": cls, "counts": counts, "dcounts": dcounts, "rank": rank, "rank_share": rank_share,
@@ -333,40 +340,39 @@ assigned district rests on. Their census columns read <i>no census data for this
         "fields": fields, "st_codes": st_codes, "grid": grid, "work_note": work_note,
         "standing_min": f"{smin:g} ha", "loss_min": f"{lmin:g} ha", "built": started, "overlay": overlay,
         "t": {
-            "legend_title": "Decision view: forest standing through 2025, and forest loss in {window}",
-            "legend_note": "This shows which of six cells each unit is in. Thresholds: {smin} of standing forest; {lmin} of forest loss in the window. Standing forest is " + STANDING_IS + ". Tier order in use: {order}.",
-            "tier": "Tier {k}: {name}", "unranked": "Not ranked: {name}", "order_default": "the provisional order", "order_changed": "an order changed by the user of this page",
-            "window_head": "Forest loss counted over", "tiers_head": "Tier order (provisional; yours to change)", "reset": "Back to the provisional order",
-            "why_head": "Decision view: why this tier", "why_window": "Window: forest loss counted over {window} ({is}). Standing forest is always through 2025.",
+            "legend_title": "Forest standing through 2025, and forest loss in {window}",
+            "legend_note": "Thresholds: {smin} of standing forest; {lmin} of forest loss in the window. Standing forest is " + STANDING_IS + ". Tier order: {order}.",
+            "tier": "Tier {k}: {name}", "unranked": "Not ranked: {name}", "order_default": "the provisional order", "order_changed": "your own order",
+            "window_head": "Count loss over", "tiers_head": "Provisional tier order", "reset": "Back to the provisional order",
+            "why_head": "Why this tier", "why_window": "Window: forest loss counted over {window} ({is}). Standing forest is always through 2025.",
             "grid_cols": ["No forest loss in the window", "Some forest loss in the window"],
             "why_cols": ["Canopy in 2000", "Standing now", "Lost in {window}"], "why_rows": ["Dense: above 30 %", "Open: 10 to 30 %", "10 % or less: not counted as forest (the land itself: nothing is taken off it)"],
-            "why_low": "Loss on land with 10 % canopy or less is reported and decides nothing.",
-            "why_standing_some": "Standing forest {sf} ha, at least the {smin} below which a unit has little or none; {row}, because standing dense is {cmp} standing open.",
-            "why_standing_little": "Standing forest {sf} ha, under the {smin} below which a unit has little or none.",
+            "why_low": "Loss on land with 10 % canopy or less is shown for information; it decides nothing.",
+            "why_standing_some": "Standing forest: {sf} ha, at or above the {smin} threshold. It's {row}: standing dense is {cmp} standing open.",
+            "why_standing_little": "Standing forest: {sf} ha, under the {smin} threshold, so little or none.",
             "cmp_dense": "at least as large as", "cmp_open": "smaller than",
-            "why_loss_some": "Forest loss in the window {fl} ha (dense and open added), at least the {lmin} that counts as some loss.",
-            "why_loss_none": "Forest loss in the window {fl} ha (dense and open added), under the {lmin} that counts as some loss.",
-            "why_share": "As a share: the unit had {start} ha of forest at the start of {window}, and the forest loss of the window is {share} % of it. The share stands beside the cell and decides nothing.",
-            "why_share_none": "As a share: none is given. The unit had {start} ha of forest at the start of {window}, under the {smin} below which a share means nothing.",
+            "why_loss_some": "Forest loss in the window: {fl} ha (dense and open added), at or above the {lmin} threshold.",
+            "why_loss_none": "Forest loss in the window: {fl} ha (dense and open added), under the {lmin} threshold.",
+            "why_share": "As a share: {share} % of the {start} ha of forest it had at the start of {window}. It's shown beside the cell and decides nothing.",
+            "why_share_none": "No share: it had {start} ha of forest at the start of {window}, under the {smin} a share needs to mean anything.",
             "no_share": "no share: under " + f"{smin:g} ha" + " of forest at the start of the window",
-            "why_cell": "So the cell is: {name}. {rests}", "why_order": "Its place under the tier order in use ({order}): {tier}.",
-            "why_was": "In the provisional order this cell is {ptier}; the line recorded for it there:",
-            "why_unranked": "It is on the map and outside the ranked list.",
+            "why_cell": "So the cell is: {name}. {rests}", "why_order": "Under {order}, it's {tier}.",
+            "why_was": "In the provisional order it's {ptier}, because:",
+            "why_unranked": "It's on the map, outside the ranked list.",
             "near": "Close call: standing dense and standing open are within a fifth of each other, so mostly dense or mostly open is a fine distinction here.",
             "standing_is": "Standing forest is " + STANDING_IS + ".", "corro_head": "Corroboration, 2017-2023 (whatever window is chosen)", "work_head": "Work types", "district_head": "District assigned by",
-            "rank_none": ("Choose a district to rank its units. Units are ranked within a district, never across the state: among the LGD panchayat units of the agreement test's headline, the two forest measures agree within districts "
-                          "(odds ratio " + within + ") and their agreement across the state is not established (" + across + ")."),
+            "rank_none": "Choose a district to rank its units. We rank within a district, never across the state.",
             "within_tier": within_tier, "within_tier_share": within_tier_share,
-            "within_options": [["ha", "Within a tier: by hectares lost"], ["share", "Within a tier: by share lost"]],
+            "within_options": [["ha", "By hectares lost"], ["share", "By share lost"]],
             "rank_head": "{district}, ranked units: {n}, tier by tier. {within} Forest loss counted over {window}; standing forest through 2025. Tier order: {order}.",
-            "rank_unranked": "Units of this district in the cell {name}, on the map and outside the list: {n}.",
-            "rank_filter_note": "Filter on: {label}. Units left out for a smaller or undefined share: {m}. Scheduled Tribe share filters the list; it never orders it.",
-            "rank_out_kept": "Outside-village units kept in the list though the filter cannot be applied to them (no census data): {k}.",
-            "rank_out_dropped": "Outside-village units left out with the filter on, for want of census data: {k}. Tick the box to bring them back.",
+            "rank_unranked": "In {name}, on the map but outside the list: {n}.",
+            "rank_filter_note": "Filter on: {label}; {m} units left out. Scheduled Tribe share filters the list; it never orders it.",
+            "rank_out_kept": "{k} units of land outside villages kept in: they have no census data to filter on.",
+            "rank_out_dropped": "{k} units of land outside villages left out: no census data. Tick the box to bring them back.",
             "keep_out_off": "(applies when a filter is on)",
-            "district_pick": "Rank the units of...", "keep_out": "Keep outside-village units (no census data) in the list", "export": "Download this list (CSV)",
+            "district_pick": "Pick a district\u2026", "keep_out": "Keep land outside villages", "export": "Download this list (CSV)",
             "st_options": [["0", "No filter"], ["18", "Scheduled Tribe share 18 % or more"], ["33", "Scheduled Tribe share above 33 %"], ["50", "Scheduled Tribe share more than 50 %"]],
-            "cols": ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share of the forest at the start of {window}, %", "Corroboration, 2017-2023", "Scheduled Tribe share", "Development index 2011", "Forest-named spending (geotagged record; ends FY2017-18)"],
+            "cols": ["Tier", "Unit", "Kind", "Standing dense, ha", "Standing open, ha", "Forest loss in {window}, ha", "Loss as a share, %", "Corroboration, 2017-2023", "Scheduled Tribe share", "Development index 2011", "Forest-named spending, record ends FY2017-18"],
             "kind": ["LGD panchayat unit", "Outside-village unit"],
             "export_cols": EXPORT_COLS,
         },
@@ -391,4 +397,14 @@ assigned district rests on. Their census columns read <i>no census data for this
                                                 "forest_site_units": n_site, "intact_cell_units": int(cw.loc["dense_none", "n_units"]), "intact_cell_units_compared": intact_compared, "intact_cell_units_flagged_by_corestack": intact_cs,
                                                 "of_them_under_the_east_coast_model": intact_ec, "intact_cell_units_that_lost_the_loss_minimum_in_2001_2025": intact_lost,
                                                 "outside_village_units_in_a_ranked_cell": out_site}}
-    return {"payload": payload, "about_html": about, "sources_rows": sources_rows, "overlay_js": overlay_js, "record": record_out}
+    # The words of the view's "i" (11 Oct 2026): 06_build_layer.py puts them into data.js under `tips`, beside the layers' own. `rank_none` is the rest of the
+    # sentence the empty list used to carry whole, word for word from "Among": its two odds ratios are the same two strings the About text prints. `col_share`
+    # keeps {window}, which the page fills with the window chosen, as it fills the column heads.
+    tips = {"decision": "Where is forest work needed, and what kind? This view puts every unit in one of six cells (protect; find the cause first; assisted natural regeneration; restore; verify on the ground; not a forest site) "
+                        "and lists a district's units in our provisional order of priority. A starting point to check with people who know the ground, not a verdict.",
+            "window_head": "Standing forest always runs to 2025; this only changes which years of loss count.",
+            "tiers": "To be set with the Foundation for Ecological Security. Use the arrows to change it: the map, the list and any download follow your order.",
+            "rank_none": "Among the LGD panchayat units of the agreement test's headline, the two forest measures agree within districts (odds ratio " + within + ") and their agreement across the state is not established (" + across + ").",
+            "filter": "Left out: units with a smaller share, or with no resident population in the 2011 census.",
+            "col_share": "Forest loss in {window} as a percentage of the forest the unit had at the start of {window}."}
+    return {"payload": payload, "about_html": about, "sources_rows": sources_rows, "overlay_js": overlay_js, "record": record_out, "tips": tips}
