@@ -1725,7 +1725,10 @@ gate; it looks for the index's id and its names on the page in both files and fi
 files and asked the network for nothing; the overlay's box was on show, greyed out and unticked, still unticked after
 a click on it and one on its label, with his words under it and no "i" beside it; no `overlay.js` was asked for and no
 tile was drawn; and with a district ranked and one of its units opened, the list, the panel, the list of layers and
-the two text panels showed the index nowhere, and no empty or shifted cell where it had been. The browser's log held
+the two text panels showed the index nowhere, and no empty or shifted cell where it had been. Since 13 October 2026
+it also opens the Guide by its button (§17.6): the window showed the guide's first heading and a line of its last
+section, held the guide's {share_guide_pics} pictures, each drawn from its own bytes inside the page, and named the
+index nowhere. The browser's log held
 no line (until this ruling one line was let through: that a file was not found, `overlay.js`). **Which checks of the
 copy changed, and why:** until 10 October 2026 the script and the gate each held the copy's two files byte for byte
 against `60_layer/`'s; that comparison cannot hold once the index is out, and each now holds them against the layer's
@@ -1781,6 +1784,14 @@ Chrome's alone (§16).
     hold(key(SHARE_REC, "development_index_left_out/layer/id").v == "adi_2011" and key(SHARE_REC, "development_index_left_out/unit_rows_from_which_the_value_was_taken").v == n_units.v
          and "adi_2011" in PAGE_DATA and "adi_2011" not in W.use("70_share/odisha_forest_decision_layer/data.js").read_text(encoding="utf-8"),
          "the field left out of the copy is `adi_2011`, its value was taken from the row of every unit, and `60_layer/data.js` still has it")
+    show("share_guide_pics", key(SHARE_EX, "summary/pictures_drawn_in_the_guides_panel"), n0)
+    guide_step = [s_ for s_ in W.J(SHARE_EX)["steps"] if s_["did"].startswith("opened the Guide by its button")]
+    hold(len(guide_step) == 1 and guide_step[0]["ok"] is True and "the development index named in it: False" in guide_step[0]["happened"] and "and holds a line of its last section: True" in guide_step[0]["happened"]
+         and key(SHARE_EX, "summary/the_guide_in_the_copy_is_the_layers_character_for_character").v is True
+         and key(SHARE_EX, "summary/pictures_drawn_in_the_guides_panel").v == LAYER_DATA["guide_html"].count("<img ") == len(key(L, "guide/pictures").v)
+         and not re.search("development index|adi_2011", LAYER_DATA["guide_html"], re.I),
+         "the gate on the copy opened the Guide by its button: its window showed the guide's first heading and a line of its last section and held as many pictures as the guide carries, each drawn; the development index is "
+         "named nowhere in the guide; and the copy's guide is the layer's, character for character")
     show("share_steps", key(SHARE_EX, "summary/steps"), n0)
     show("share_msg", key(SHARE_EX, "summary/what_the_page_says_beside_the_greyed_overlay_box"), txt)
     COPY_DATA = W.use("70_share/odisha_forest_decision_layer/data.js").read_text(encoding="utf-8")
@@ -2522,6 +2533,21 @@ that, string by string, against the build kept from before them.
   the last year of Global Forest Watch's workbook, and not the later years (`docs/RESULTS.md` §3).
 - **Block rasters, not a dashboard.** It is CoRE Stack's published block rasters that take two of the classes from
   its land-use maps; the "i" of the CoRE Stack section of a unit's panel says so.
+
+### 17.6 Changed on 13 October 2026: a Guide button and a loader
+
+On 13 October 2026 the owner had a third button put on the page, Guide, which opens his guide to the map
+(`docs/GUIDE.md`) with its pictures, and a loader that says what the page is doing while it opens. Nothing of the
+decision view was changed: no cell, tier, window, threshold, count or word of it. `docs/LAYER.md` (its section on the
+Guide button and the loader) and `docs/SITE_COPY.md` (its section on the guide, its pictures and the gate on its
+figures) are the account. What bears on this document:
+
+- **One key was added to the layer's data, `guide_html`**, which holds the guide as the page shows it.
+  `scripts/verify_decision.py` holds the top of the data to the keys it knows, and now knows this one.
+- **The copy carries the same guide**, unchanged, and the gate on the copy gained one step, which opens the Guide in
+  the copy and reads it (§14). The guide names the development index nowhere.
+- **The checks of the decision view** were run again on the new build and are as §16 gives them. The exercise of
+  the layer's other controls gained steps for the Guide and for the loader (`docs/LAYER.md`).
 
 ## 18. What this does not show
 
