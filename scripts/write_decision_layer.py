@@ -2034,6 +2034,22 @@ to carry the window, the export button is off.
     dw_bad = [str(r_["error"] or r_["last_line"]).replace(str(ROOT), "<repository>") for r_ in e_dw["runs"] if r_["exit"] != 0]
     show("dw_failed", V("none did not pass" if not dw_bad else "; ".join(x_[:230].rstrip() + (" [cut here]" if len(x_) > 230 else "") for x_ in dw_bad), RUNS,
                         "key `checks`: for each run of 'exercise_decision in WebKit' that did not pass, the start of its `error` or of its last line"), txt)
+    failed_dc = [l for r_ in e_dc["runs"] for l in r_["failed_lines"]]
+    show("dc_failed_steps", V("none" if not failed_dc else "; ".join(sorted({l.split("->")[0].replace("FAIL", "").strip() for l in failed_dc})), RUNS, "key `checks`: the `failed_lines` of the runs of 'exercise_decision in Chrome'"), txt)
+    show("dc_failed_first", V("" if not failed_dc else " What the first of them recorded: \"" + failed_dc[0].split("->", 1)[1].split(";")[0].strip() + "\".", RUNS,
+                              "key `checks`: of the first failed line of the runs of 'exercise_decision in Chrome', what happened, up to its first semicolon"), txt)
+    hold(not failed_dc or all("[overlay]" in l for l in failed_dc), "every step of the decision view's exercise in Chrome that failed in a run of the pass on record is a step of the overlay, which needs the tile provider's host to answer")
+    # An earlier pass on this same build: the runner keeps one record, and the pass on record replaced it. What is said of it is read from this document as it was written at EARLIER_AT.
+    EARLIER_AT = "6a06f58"
+    import subprocess
+    was_ = subprocess.run(["git", "-C", str(ROOT), "show", EARLIER_AT + ":docs/DECISION_LAYER.md"], capture_output=True, text=True).stdout
+    m_ = re.search(r"\*\*The pass on record was started (\S+) \(UTC\)", was_)
+    earlier_here = bool(m_) and run_l.v < m_.group(1) < key(RUNS, "started_utc").v
+    show("six_pass", V((" A fourth was of this same build: started " + m_.group(1) + " (UTC), for the six lines, with every check passing on its first run. The runner keeps one record, and the pass on record "
+                        "replaced that one; it stands in this document as it was written at commit `" + EARLIER_AT + "`, and its table is in `docs/stage4_run_log.md`.") if earlier_here else "",
+                       "git show " + EARLIER_AT + ":docs/DECISION_LAYER.md", "the time at which the pass then on record was started, where that lies between the build of the layer on disk and the pass now on record"), txt)
+    hold(not earlier_here or " ".join("In the pass on record every check passed, each on its first run.".split()) in " ".join(was_.split()),
+         "where an earlier pass was made on the build on disk, this document as it was written then says that every check of it passed on its first run")
     failed_wk = [l for r_ in e_wk["runs"] for l in r_["failed_lines"]]
     show("wk_failed_steps", V("none" if not failed_wk else "; ".join(sorted({l.split("->")[0].replace("FAIL", "").strip() for l in failed_wk})), RUNS, "key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit'"), txt)
 
@@ -2248,7 +2264,7 @@ decision view in WebKit did not run to its end. The machine had gone into standb
 pass, and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote
 down "{unfin_error}". The second, started {before_start} (UTC) on mains power with the machine kept awake, ran to
 its end, and every check in it passed. The third, started {words_start} (UTC), was of the layer as it was built for
-the page's words (built {words_build}; §17.4), before the six lines: {words_more}. In the pass on
+the page's words (built {words_build}; §17.4), before the six lines: {words_more}.{six_pass} In the pass on
 record {more_now}.
 
 **The regression gate: the existing views.**
@@ -2312,7 +2328,8 @@ record {more_now}.
   (nineteen a unit: lines that must be there, the share among them, lines that must not, and the block's place in the
   panel). A click that opens nothing, or a unit that does not touch the one aimed at, fails the run: there was none.
   {dc_neighbour} clicks opened a touching neighbour. The page's script errors were read at the end of every part and
-  before every reload: none. Runs made of it on this build: {dcr_runs}; runs that passed: {dcr_pass}.
+  before every reload: none. Runs made of it on this build: {dcr_runs}; runs that passed: {dcr_pass}; steps that
+  failed in any run: {dc_failed_steps}.{dc_failed_first}
 - The same in WebKit: {dw_actions} of {dw_actions} steps, {dw_units} units, {dw_lines} of {dw_lines} comparisons.
   There events are made inside the page, the exported text is read from the page and not from a saved file, and the
   browser cannot be put offline or have an address blocked. Runs made of it on this build: {dwr_runs}; runs that
