@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-12T06:06:16Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-12T06:14:34Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -580,7 +580,7 @@ This replaces the rule of the earlier handoffs that no branch of this repository
 | 5 | the owner publishes | done |
 | 6 | the live site | done |
 | 7 | the documents | done |
-| 8 | the other branches go | not yet |
+| 8 | the other branches go | done |
 
 ### Step 1 of the fourth handoff: `main` takes the history
 
@@ -685,6 +685,17 @@ Files compared or listed: 59; byte for byte the same: 57. Every file that differ
 |---|---|---|---|
 | `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_districts: inputs (docs/DATA_NOTES.md), run_utc; 08_gap_inputs: inputs (docs/DATA_NOTES.md), outputs (50_gap/inputs_listing.json), run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
 | `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now; the entries that differ: (docs/DATA_NOTES.md)) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
+
+### Step 8 of the fourth handoff: the other branches
+
+With the live site checked serving the new copy from `main`, and the documents of Step 7 pushed, the other branches
+were deleted: `two-measure-stage1` and `gh-pages` on GitHub, `two-measure-stage1` and `github-main` here. Every
+commit of `two-measure-stage1` and of `github-main` is in `main`. The commits of `gh-pages` held the first
+publication's three files and an empty `.nojekyll`; the files are those of the copy made on 10 October, kept with the
+session's working files. Before the deletion GitHub reported that Pages is built by the workflow; after it, the site
+still served the three files of the build. The repository now has one branch, `main`, here and on GitHub. To publish
+a later copy: `bash scripts/publish_site.sh`, then `.venv/bin/python scripts/check_pages_live.py --wait 10`. What is
+left is the owner's: `gh-pages` can be taken out of the deployment branches of the environment `github-pages`.
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -1732,6 +1743,7 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `cf7910e` One branch, Steps 6 and 7: the live site checked serving the new copy from main; the documents say how the site is published
 - `343fc27` One branch, Step 7: the decision layer's writer says what a failed run in Chrome failed on, and that an earlier pass was made on this build
 - `852abde` Publish the shared copy of the layer, built 2026-10-11T15:02:55Z
 - `999d1d0` One branch, Step 3: the scripts that describe the publication follow the new route - site/ on main, by a workflow

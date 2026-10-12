@@ -1,6 +1,6 @@
 # Stage 4: forest condition, need and allocation, compared
 
-*Written 2026-10-12T06:06:31Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
+*Written 2026-10-12T06:14:38Z by `scripts/write_gap.py`. No figure in this document was typed. Each was read by that script from
 the file named for it in the last section, and each conclusion drawn from figures was tested against them before it was
 written. The figures change only when the files do.*
 
@@ -776,7 +776,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-12T06:06:31Z | this run | the UTC time at which this script ran |
+| 2026-10-12T06:14:38Z | this run | the UTC time at which this script ran |
 | 2026-10-12T05:52:15Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
 | 30 | `50_gap/district_need.csv` | rows counted by this script: its rows |
 | 11,468 | `50_gap/district_need.csv` | worked out by this script from its rows: `n_units` summed |
@@ -1141,7 +1141,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `docs/DECISION_LAYER.md` | 262,044 | `9540cad0f5a08e94` | - |
 | `docs/LAYER.md` | 74,609 | `fb4f5f5bf8261e50` | - |
 | `docs/NEED.md` | 19,029 | `de30a2951f052f54` | - |
-| `docs/stage4_run_log.md` | 181,504 | `d08af2c74133dcd1` | - |
+| `docs/stage4_run_log.md` | 182,608 | `12fa41c0383e233c` | - |
 | `figures/stage4/F1_state_report.png` | 169,399 | `c4e238215e532a6b` | - |
 | `figures/stage4/F2_outside_village_asymmetry.png` | 93,303 | `f033aeabd3b3efed` | - |
 | `figures/stage4/F3_map_of_cells.png` | 1,167,578 | `e4ccf36206922a92` | - |
@@ -1293,4 +1293,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a design constant written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum; the name of a comparison, a model, a measure of need or a figure; the name of a kind of standard error. Everything else that is a number came from a file.
 
-*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-12T06:06:31Z by `scripts/write_gap.py` (sha256 `059ac9988190d532`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*256 figures and 14 tables (588 cells) from 100 files; 99 statements tested; 22 totals compared. Written 2026-10-12T06:14:38Z by `scripts/write_gap.py` (sha256 `059ac9988190d532`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*

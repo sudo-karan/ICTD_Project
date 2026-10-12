@@ -994,7 +994,7 @@ def third_runs_as_logged() -> list[str]:
             f"commit `{THIRD_RUNS_AT}`; the record on disk is under the fourth handoff, below.*", ""] + was[b:c + 1] + [""]
 
 
-FOURTH_STEP_7_DONE, FOURTH_STEP_8_DONE = True, False              # the FOURTH handoff's last two steps: each set when the step is done
+FOURTH_STEP_7_DONE, FOURTH_STEP_8_DONE = True, True              # the FOURTH handoff's last two steps: each set when the step is done
 FOURTH_DECISIONS = """
 **The owner's two decisions.**
 
@@ -1056,10 +1056,14 @@ listed. Those three cite the records of the layer's checks, and the checks of St
 they were written again from the records on disk, in the usual order. In `docs/RESULTS.md` no sentence was changed.
 """
 FOURTH_STEP_8 = """
-With the live site checked serving the new copy from `main`, the other branches were deleted: `two-measure-stage1`
-and `gh-pages` on GitHub, `two-measure-stage1` and `github-main` here. Every commit of `two-measure-stage1` and of
-`github-main` is in `main`. The commits of `gh-pages` held the first publication's three files and an empty
-`.nojekyll`; the files are those of the copy made on 10 October, kept with the session's working files.
+With the live site checked serving the new copy from `main`, and the documents of Step 7 pushed, the other branches
+were deleted: `two-measure-stage1` and `gh-pages` on GitHub, `two-measure-stage1` and `github-main` here. Every
+commit of `two-measure-stage1` and of `github-main` is in `main`. The commits of `gh-pages` held the first
+publication's three files and an empty `.nojekyll`; the files are those of the copy made on 10 October, kept with the
+session's working files. Before the deletion GitHub reported that Pages is built by the workflow; after it, the site
+still served the three files of the build. The repository now has one branch, `main`, here and on GitHub. To publish
+a later copy: `bash scripts/publish_site.sh`, then `.venv/bin/python scripts/check_pages_live.py --wait 10`. What is
+left is the owner's: `gh-pages` can be taken out of the deployment branches of the environment `github-pages`.
 """
 
 
