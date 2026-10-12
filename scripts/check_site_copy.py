@@ -1617,7 +1617,8 @@ def run_checks(before, now, extra, browser):
           "each worked out again from the file's own figure; a sentence whose figures stand in two passages must be listed too. A picture's file name and the address a link points to are not figures; a file's or a "
           "command's name with a digit in it must stand whole in a named file. The counts of this build's own runs are held by g5 and g7. (What this does not show: that the passage says what the sentence says. A lone small "
           "figure can stand, beside a shared word, in a passage about something else; every trace is in 60_layer/site_copy_guide_figures.csv to be read.)",
-          not bad and n_found > 100, f"{len(guide_units(md))} sentences and cells with a figure: {n_found} found in one passage, {n_derived} that come from a figure of a named file by a listed rule, {n_runs} counts of this build's own runs; "
+          not bad and n_found > 100, f"{len(guide_units(md))} sentences and cells with a figure, in {len(rows_)} rows of the table (a sentence that draws on two passages has two): {n_found} found in one passage, "
+          f"{n_derived} that come from a figure of a named file by a listed rule, {n_runs} counts of this build's own runs; "
           f"{len(GUIDE_SPLIT)} sentences listed as standing in two passages" if not bad else "NOT TRACED: " + " | ".join(bad[:5]) + (f" ... {len(bad)} in all" if len(bad) > 5 else ""))
     bad = guide_counts_wrong(md, G["x"])
     check("g5", "the guide's own counts: in its table 'How it was checked', the result of each row that is a count of this build's own runs is the result on record - verify_layer.py and verify_decision.py as the runner's record "
@@ -2025,6 +2026,7 @@ def main():
                              "strings_added_to_the_page_itself": [{"where": w_, "string": t_} for w_, t_ in ADDED_13_OCT], "places_of_index_html_changed": len(PAGE_13_OCT),
                              "files_its_figures_are_traced_to": [f_ for f_ in GUIDE_FILES if f_ not in NOT_SEARCHED] + [UMD_PAGE],
                              "figures_table": {"path": "60_layer/site_copy_guide_figures.csv", "rows": len(extra.get("guide_rows", [])), "columns": g_cols,
+                                               "sentences_and_cells_with_a_figure": len(guide_units(extra["guide"]["md"])),
                                                "by_how": dict(Counter(r_["how"].split(":")[0] for r_ in extra.get("guide_rows", [])))},
                              "figures_that_come_from_a_figure_of_a_named_file": [{"the_guides_words": r_["the_guides_words"], "figure": r_["its_figures"], "how": r_["how"], "from": r_["passage"]}
                                                                                  for r_ in extra.get("guide_rows", []) if r_["how"].startswith("comes from")],
