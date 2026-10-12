@@ -25,7 +25,7 @@ Outside-village units are 27 % of the area mapped but hold 59 % of its forest an
 
 ## Opening it
 
-Open [sudo-karan.github.io/ICTD_Project](https://sudo-karan.github.io/ICTD_Project/) in a browser on a laptop or desktop. The page carries about 22 MB of data, so the first load can take a moment on a slow connection. While the data loads, the page says so; then it says it is drawing the units, and the map appears.
+Open [sudo-karan.github.io/ICTD_Project](https://sudo-karan.github.io/ICTD_Project/) in a browser on a laptop or desktop. The page carries about 23 MB of data, so the first load can take a moment on a slow connection. While the data loads, the page says so; then it says it is drawing the units, and the map appears.
 
 It also works without a connection. Download `index.html` and `data.js` from the [site folder of the repository](https://github.com/sudo-karan/ICTD_Project/tree/main/site), keep them together in one folder, and open `index.html`. It needs nothing installed, and once loaded it asks no other site for anything.
 
@@ -257,10 +257,10 @@ Every check below passed on this build before it was published. Each verifier re
 | `verify_layer.py` | Rebuilds every field the page shows, for every unit, from the stage tables. | 92 of 92 checks; 11,468 units, 44 fields each |
 | `verify_decision.py` | Re-adds every hectare of the decision view from the yearly figures, and re-derives every cell, order, share and count. | 62 of 62 checks; 4 windows, 6 cells, 30 districts |
 | `verify_agreement.py` | Rebuilds the arithmetic of the Hansen and CoRE Stack comparison from the two sources. | 41 of 41 checks |
-| `exercise_layer.py`, in Chrome and in WebKit | Works every control of the page, clicks units on the map, and compares each value shown with the tables. | 53 of 53 control actions in each browser; 1,276 of 1,276 values shown equal the tables; no script error |
+| `exercise_layer.py`, in Chrome and in WebKit | Works every control of the page, clicks units on the map, and compares each value shown with the tables. | 60 of 60 control actions in each browser; 1,276 of 1,276 values shown equal the tables; no script error |
 | `exercise_decision.py`, in Chrome and in WebKit | Works every control of the decision view, opens units of all six cells, and checks two downloaded lists cell by cell. | 53 of 53 steps in Chrome, 47 of 47 in WebKit; 874 of 874 lines of "why this tier" as the tables give them; every cell of both downloads correct |
-| `exercise_share.py` | Holds the shared copy to the full version, less one 2011 layer and with the overlay off. | 8 of 8 steps; no request to the network |
-| `check_site_copy.py` | Holds the page's words against copies saved before they were rewritten: no figure, class, count or colour moved. It also traces every figure in this guide to the file it comes from. | 51 of 51 checks |
+| `exercise_share.py` | Holds the shared copy to the full version, less one 2011 layer and with the overlay off. | 9 of 9 steps; no request to the network |
+| `check_site_copy.py` | Holds the page's words against copies saved before they were rewritten: no figure, class, count or colour moved. It also traces every figure in this guide to the file it comes from. | 59 of 59 checks |
 | `verify_gap.py` | Recomputes every table of the analysis from its inputs. Then 42 deliberate errors were planted in copies of its files, one at a time. | 338 of 338 checks; 42 of 42 planted errors caught |
 | `check_pages_live.py` | Fetches the live site and holds its bytes to the build. Then it opens the site in a fresh browser, counts the units drawn and watches for errors and requests to other sites. | Run after every publication: 9 checks |
 
