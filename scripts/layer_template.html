@@ -93,6 +93,21 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
 .tip:hover, .tip:focus { background: #1c1c1c; border-color: #1c1c1c; color: #fff; outline: none; }
 #tipbox { display: none; position: fixed; z-index: 1500; left: 0; top: 0; box-sizing: border-box; max-width: 300px; background: #1c1c1c; color: #fff; border-radius: 4px; padding: 7px 9px; font-size: 12.5px; line-height: 1.4; font-weight: 400; box-shadow: 0 2px 8px rgba(0,0,0,.35); pointer-events: none; }
 .layer.off { color: #888; cursor: default; }
+/* the guide (added 13 Oct 2026): docs/GUIDE.md as the builder turned it into HTML, shown in the window the About and Sources texts use. A picture is as wide as the text; a table wider than the window scrolls sideways inside it */
+.guide h2 { font-size: 15px; text-transform: none; letter-spacing: 0; color: #1c1c1c; margin: 22px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #ddd; }
+.guide img { display: block; width: 100%; height: auto; border: 1px solid #bbb; box-sizing: border-box; }
+.guide p.pic { margin: 12px 0 2px; }
+.guide p.pic + p { color: #555; font-size: 12.5px; margin-top: 2px; }
+.guide .wide { overflow-x: auto; margin: 8px 0; }
+.guide code { font-size: 12.5px; background: #f3f3f0; border-radius: 2px; padding: 0 3px; }
+.guide li { margin: 3px 0; }
+#b_about, #b_sources, #b_guide { padding: 4px 8px; margin-right: 3px; }       /* the three buttons stay on one line in the side panel, also beside a scroll bar */
+/* the loader (added 13 Oct 2026): over the map area from the moment the page opens until it is ready. Its bar moves and counts nothing: the page cannot know how much of data.js has arrived */
+#loading { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 1100; background: #e9eef2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#loadmsg { margin: 0 0 10px; font-size: 15px; color: #333; }
+#loadbar { width: 180px; height: 4px; border-radius: 2px; background: #c9d3da; overflow: hidden; }
+#loadbar span { display: block; width: 40%; height: 100%; border-radius: 2px; background: #47657a; animation: loadbar 1.1s ease-in-out infinite alternate; }
+@keyframes loadbar { from { transform: translateX(0); } to { transform: translateX(150%); } }
 </style>
 </head>
 <body>
@@ -100,7 +115,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   <div id="side">
     <h1 id="title"></h1>
     <p class="sub" id="subtitle"></p>
-    <p><button id="b_about" title="How we made the map, and how to read it">About this map</button><button id="b_sources" title="Where the data comes from, and under what licence">Sources</button></p>
+    <p><button id="b_about" title="How we made the map, and how to read it">About this map</button><button id="b_sources" title="Where the data comes from, and under what licence">Sources</button><button id="b_guide" title="What every control does, and how the map was made and checked">Guide</button></p>
     <h2>Show on the map</h2>
     <div id="dv"></div>
     <div id="layers"></div>
@@ -115,7 +130,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     <p class="sub" id="searchmsg"></p>
     <p class="sub" id="built"></p>
   </div>
-  <div id="mapwrap"><div id="map"></div><div id="legend"></div></div>
+  <div id="mapwrap"><div id="map"></div><div id="legend"></div><div id="loading" role="status"><p id="loadmsg">Loading the map&hellip;</p><div id="loadbar"><span></span></div></div></div>
   <div id="info"></div>
 </div>
 <div id="modal"><div class="box"><p style="text-align:right;margin:0"><button id="b_close">Close</button></p><div id="modalbody"></div></div></div>
@@ -132,6 +147,17 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
     document.body.innerHTML = '<p class="fatal">The map\'s data didn\'t load. If you downloaded the map, keep <b>data.js</b> in the same folder as index.html and open it again.</p>';
     return;
   }
+  // ---- the loader (added 13 Oct 2026) ---------------------------------------------------------------------------------------------
+  // The page opens with a message over the map area. It is written in the markup above, so it shows while data.js is still arriving.
+  // Here the data is in. The message changes, the browser is given one frame to paint it, and only then is the map drawn: by start(),
+  // which is the rest of this script. A timer stands behind the frame, for a window that is given no frames (a tab in the background).
+  // The message goes where the page says it is ready, at the end of start().
+  document.getElementById("loadmsg").innerHTML = "Drawing the units&hellip;";
+  var begun = false;
+  function begin() { if (!begun) { begun = true; start(); } }
+  if (window.requestAnimationFrame) { window.requestAnimationFrame(function () { setTimeout(begin, 0); }); }
+  setTimeout(begin, 300);
+  function start() {       // everything from here to the end of this script is this one function: its lines keep the indentation they had before 13 Oct 2026
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
   var TIPS = D.tips || {};                 // the words of every "i" (added 11 Oct 2026): a place and its words, made by the builder
@@ -324,9 +350,10 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   $("search").addEventListener("keydown", function (e) {
     if (e.keyCode === 13 || e.key === "Enter") { search(this.value); }
   });
-  function modal(html) { $("modalbody").innerHTML = html; $("modal").style.display = "block"; }
+  function modal(html) { $("modalbody").innerHTML = html; $("modal").style.display = "block"; $("modalbody").parentNode.scrollTop = 0; }       // each text opens at its top (13 Oct 2026: the guide is long)
   $("b_about").onclick = function () { modal(D.about_html); };
   $("b_sources").onclick = function () { modal(D.sources_html); };
+  $("b_guide").onclick = function () { modal(D.guide_html); };       // the guide (added 13 Oct 2026): docs/GUIDE.md as the builder turned it into HTML, in the same window
   $("b_close").onclick = function () { $("modal").style.display = "none"; };
   $("legend").addEventListener("click", function (e) { if (e.target.id === "b_legend") { state.legend = !state.legend; showLegend(); } });
   $("modal").onclick = function (e) { if (e.target === this) { this.style.display = "none"; } };
@@ -646,7 +673,7 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
   }
 
   // ---- start: the layer, floor and unit can be given in the address after #, and followed when the address changes -----
-  // Also: show=lgd|out|both|none (which kinds of unit are drawn), district=<name>, q=<what to search for>, open=about|sources.
+  // Also: show=lgd|out|both|none (which kinds of unit are drawn), district=<name>, q=<what to search for>, open=about|sources|guide.
   function fromAddress(first) {
     var h0 = readHash(), k, want;
     if (h0.show) {
@@ -662,11 +689,13 @@ table.grid6 td.in { outline: 2px solid #000; outline-offset: -2px; color: #000; 
       for (k = 0; k < D.districts.length; k++) { if (D.districts[k].name.toLowerCase() === h0.district.toLowerCase()) { gotoDistrict(k); break; } }
     }
     if (h0.q) { $("search").value = h0.q; search(h0.q); }
-    if (h0.open === "about") { modal(D.about_html); } else if (h0.open === "sources") { modal(D.sources_html); }
+    if (h0.open === "about") { modal(D.about_html); } else if (h0.open === "sources") { modal(D.sources_html); } else if (h0.open === "guide") { modal(D.guide_html); }
   }
   fromAddress(true);
   window.addEventListener("hashchange", function () { fromAddress(false); });
+  $("loading").style.display = "none";       // the map is drawn: the loader goes (added 13 Oct 2026)
   window.ICTD_READY = true;
+  }                        // the end of start()
 })();
 </script>
 </body>

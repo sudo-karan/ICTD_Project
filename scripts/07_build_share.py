@@ -36,6 +36,12 @@ Each is found exactly once or the run stops, and the run stops if "adi_2011", th
 head or the words "development index" in any case are still in either file. The README says the index is not in
 this copy.
 
+THE GUIDE (the owner's handoff of 13 October 2026). The guide that the page's third button opens (`guide_html` in
+data.js: docs/GUIDE.md as the layer's builder turned it into HTML, its pictures inside it) is carried into the copy
+unchanged: nothing of it is cut and nothing is added. The run stops if the layer has no guide, or if the copy's is not
+the layer's, character for character. The guide names the development index nowhere; if it did, the run would stop on
+the words, as it does for every other part of the two files.
+
 In      60_layer/index.html, 60_layer/data.js      read, and written again without the development index and with the
                                                    overlay switched off
         60_layer/layer.provenance.json             the build they are of: its time, the two hashes it records, and the
@@ -62,6 +68,7 @@ What is checked here, and the run stops (nothing left in place) if one fails:
   - the overlay's paragraph of the About text and its row of "Sources" are each found exactly once, and the row's
     cells carry the credit and the terms the layer's record registered;
   - in the copy's data the overlay holds exactly `available` 0, `label` and `unavailable`;
+  - the layer has a guide, and the copy's guide is the layer's, character for character;
   - the copy holds exactly three files and none is overlay.js;
   - the zip holds exactly those three files under the folder's name, and each unpacks to the bytes of the file on disk.
 What is NOT checked here: that a browser opens the copy, shows the overlay's box greyed out and unticked with the
@@ -215,6 +222,9 @@ def main():
     ov = (L.get("decision_view") or {}).get("overlay") or {}
     if not DV or not DV["overlay"].get("available") or not ov.get("registered") or any(not ov.get(k) for k in ("provider", "attribution", "terms_url")):
         stop("the layer has no decision view, or its overlay is not registered with a provider, a credit and its terms: the copy's words for the overlay rest on them")
+    guide = D.get("guide_html")                                     # the guide (13 October 2026): carried into the copy unchanged
+    if not isinstance(guide, str) or not guide.strip():
+        stop("the layer has no guide (guide_html): build the layer again, with docs/GUIDE.md")
     page = (SRC / "index.html").read_text(encoding="utf-8")
     if page.count('s.src = "overlay.js"') != 1:
         stop("the page does not ask for overlay.js in exactly one place")
@@ -224,6 +234,8 @@ def main():
     DV = D["decision"]
     if DV["overlay"] != {"available": 0, "label": off["overlay_in_the_copy"]["label"], "unavailable": OVERLAY_UNAVAILABLE} or OVERLAY_ROW in text or "The loss-pixel overlay</b> is optional" in text:
         stop("in the copy's data the overlay is not switched off as ruled: `available` 0, the label and the owner's words, with his paragraph and his row of Sources")
+    if D.get("guide_html") != guide:
+        stop("the copy's guide is not the layer's, character for character: nothing of the guide may be cut or added on the way into the copy")
     made = {"data.js": text.encode("utf-8"), "index.html": page.encode("utf-8")}
     plain = lambda s: " ".join(html.unescape(re.sub(r"<[^>]+>", " ", s)).split())
     credits = []
@@ -307,12 +319,14 @@ def main():
               "the_copy": {"folder": f"70_share/{NAME}", "files": {f: {"bytes": (folder / f).stat().st_size, "sha256": sha(folder / f)} for f in ("index.html", "data.js", "README.txt")},
                            "zip": {"path": f"70_share/{NAME}.zip", "bytes": z.stat().st_size, "sha256": sha(z), "holds": sorted(f"{NAME}/{f}" for f in ("README.txt", "index.html", "data.js"))}},
               "checks_passed": {"written_again_untouched_the_layers_data_js_gives_back_its_own_bytes": True, "index_html_and_data_js_are_the_layers_without_the_development_index": True,
-                                "the_overlay_is_switched_off_in_the_copys_data": True,
+                                "the_overlay_is_switched_off_in_the_copys_data": True, "the_guide_is_the_layers_character_for_character": True,
                                 "the_development_index_is_named_in_index_html_or_data_js": False, "the_readme_says_the_development_index_is_not_in_this_copy": True,
                                 "files_in_the_copy": 3, "overlay_js_in_the_copy": False, "zip_unpacks_to_the_same_bytes": True,
                                 "the_layers_files_are_the_ones_its_record_describes": True, "credits_read_from_the_layers_own_sources": len(credits)},
               "development_index_left_out": dict(cut, why="no file that is passed on carries unit-level adi_2011 values (10 October 2026; reversible: docs/DECISION_LAYER.md section 17). 60_layer/ keeps the index",
                                                  bytes_shorter_than_the_layers={f: len(full[f].encode("utf-8")) - len(made[f]) for f in ("index.html", "data.js")}),
+              "the_guide": {"carried": "unchanged: the copy's guide_html is the layer's", "characters": len(guide), "sha256_of_its_utf8_bytes": hashlib.sha256(guide.encode("utf-8")).hexdigest(),
+                            "pictures_inside_it": guide.count('<img src="data:image/webp;base64,'), "left_out_of_the_layers_build": bool(L.get("guide", {}).get("pictures_left_out_of_this_build"))},
               "left_out_on_purpose": {"file": "60_layer/overlay.js", "why": "two points of the tile provider's terms of use are unresolved (docs/DECISION_LAYER.md); the copy that is published carries no code that can ask the provider's server for anything"},
               "overlay_switched_off": dict(off, ruling="the owner's ruling of 11 October 2026: in the copy the overlay's box is greyed out and cannot be ticked, says it is not in this copy, and the page asks for no overlay.js at all; "
                                                       "60_layer/ is not changed by it"),

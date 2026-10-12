@@ -17,6 +17,7 @@ In : --units                                       the stage-0 layer: geometry, 
      30_need/need_by_unit.csv                      stage 2: Census 2011 counts, st_share, sc_share, adi_2011
      40_allocation/allocation_by_unit.csv          stage 3: MGNREGA works geotagged inside each unit, and their expenditure
      scripts/vendor/leaflet-1.9.4/, scripts/layer_template.html   the map library (embedded) and the page
+     docs/GUIDE.md, docs/guide/*.webp              the guide the page's third button opens, and the pictures it names
 Out: 60_layer/ and nowhere else
      index.html              the map: open it from disk. Self-contained - it makes no network request
      data.js                 its data: the simplified unit shapes, every displayed figure, every class. Keep it beside index.html
@@ -38,6 +39,14 @@ and what it cannot see is thinning (the Hansen layer's "i", the About text); the
 reconciled, the canopy of 2000 and the loss of 2001-2020; and it is CoRE Stack's published block rasters, not a
 dashboard, that take two classes from its land-use maps (a panel section's "i"). The other two, and the East Coast
 badges, are in _layer_decision.py.
+
+THE GUIDE (13 Oct 2026, the owner's handoff of that day). A third button, Guide, opens docs/GUIDE.md in the window the
+other two use. scripts/_guide.py turns that file into the page's own HTML here, when the page is built, and it is carried
+in data.js as `guide_html`, beside `about_html` and `sources_html`; each picture the guide names goes into that HTML as a
+`data:image/webp;base64,` address. The page never reads Markdown and asks for no file of the guide, so the window opens
+without a connection. The build stops if a picture the guide names is missing. The run record gives the sha256 of the
+guide and of each picture. --guide-without-pictures leaves the picture lines out: it is for the one build the pictures
+are taken of, before they exist, and the record says so.
 
 EVERY FIGURE IN A POPUP IS A CELL OF A STAGE OUTPUT. Areas, counts and rupees are copied from the stage tables.
 Shares and rupees in lakh are computed HERE, written to layer_by_unit.csv, and the page shows that cell as text:
@@ -94,6 +103,7 @@ import shapely
 from pyproj import Geod
 
 import _layer_decision                                       # the decision view (added 8 Oct 2026): what it adds to the layer, from 55_decision/
+import _guide                                                # the guide (added 13 Oct 2026): docs/GUIDE.md as the page's own HTML
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "60_layer"
@@ -189,6 +199,7 @@ def encode(geom):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--units", required=True, help="the stage-0 layer, e.g. 10_units/units.gpkg")
+    ap.add_argument("--guide-without-pictures", action="store_true", help="leave the guide's picture lines out: for the one build its pictures are taken of, before they exist")
     a = ap.parse_args()
     started = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     inputs = []
@@ -629,6 +640,9 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
 </table>
 <p class="sub">Reference: Mehta et al., &ldquo;Initial Observations from Field Testing of a Digital Participatory Tool to Improve Water Security in Rural India&rdquo;, ICTD 2024.</p>
 """
+    # the guide (added 13 Oct 2026): docs/GUIDE.md as the page's own HTML, its pictures inside it
+    guide = _guide.build(ROOT, also, fails, pictures=not a.guide_without_pictures)
+    stop_if_failed("turning the guide into the page's own HTML")
     payload = {
         "title": "Odisha forest decision layer", "subtitle": f"Forest condition, past MGNREGA spending and social need for {n:,} units across Odisha. A demo for discussion.",
         "built": f"Built {started[:10]} from data tables of {max(json.load(open(also(p, 'the date in the texts')))['run_utc'] for p in STAGE_RECORDS)[:10]} and earlier.",
@@ -640,7 +654,7 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
         "core_classes": [{"name": name, "color": color} for name, color, _ in CORE_CLASSES],
         "panel": panel, "info_empty": "<h3>Click a unit on the map</h3><p class='sub'>Its numbers will show here.</p>", "tips": tips,
         "search_none": "No unit with that name or id.", "search_many": "{n} units match; showing the first. Add more of the name, or use the id.",
-        "about_html": about, "sources_html": sources,
+        "about_html": about, "sources_html": sources, "guide_html": guide["html"],
         "bounds": [[float(g.total_bounds[1]), float(g.total_bounds[0])], [float(g.total_bounds[3]), float(g.total_bounds[2])]],
         "districts": districts, "id": ids.tolist(), "out": "".join("1" if o else "0" for o in outside), "f": F, "bar": bars, "g": shapes,
     }
@@ -700,6 +714,7 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
                    "embedded": {"leaflet": "1.9.4", "leaflet_js_sha256": LEAFLET_SHA256, "licence": "BSD 2-Clause"},
                    "outputs": {"index.html": sizes["index.html"], "data.js": sizes["data.js"], "sha256": {"index.html": sha256(OUT / "index.html"), "data.js": sha256(OUT / "data.js")}, "both_bytes": sum(sizes.values()), "both_zipped_bytes": zipped, "limit_bytes": MAX_BYTES, "network_requests": 0},
                    "geometry": area_error, "floors_ha": FLOORS, "default_floor_ha": FLOORS[next(iter(FLOORS))],
+                   "guide": guide["record"],
                    "decision_view": {**dv["record"], "overlay_file": ({"path": "60_layer/overlay.js", "bytes": (OUT / "overlay.js").stat().st_size, "sha256": sha256(OUT / "overlay.js")} if dv["overlay_js"] else None)},
                    "layers": [{"id": L["id"], "title": L["title"], "classes": [c["label"] for c in L["classes"]], "units_per_class": {f: [int((x == i).sum()) for i in range(len(L["classes"]))] for f, x in L["_arrays"].items()}} for L in layers],
                    "omitted_on_purpose": {"columns": list(SHRUG_COLUMNS), "why": "SHRUG is CC BY-NC-SA 4.0; a shared file carrying its estimates could become a derived work under that licence. They remain in 30_need/need_by_unit.csv"},
@@ -709,6 +724,9 @@ Every area printed in a panel is the unit's true area, not that of the simplifie
                    "versions": {"python": sys.version.split()[0], "geopandas": gpd.__version__, "shapely": shapely.__version__, "geos": ".".join(map(str, shapely.geos_version)), "pandas": pd.__version__}}, fh, indent=2)
     print(f"60_layer/: index.html {sizes['index.html'] / 1e6:.2f} MB + data.js {sizes['data.js'] / 1e6:.2f} MB = {sum(sizes.values()) / 1e6:.2f} MB ({zipped / 1e6:.2f} MB zipped; limit {MAX_BYTES / 1e6:g} MB); "
           f"layer_by_unit.csv n = {len(T):,} units, {len(T.columns)} columns; blank cells in {len(blank)} columns (census figures of the {n_out:,} outside-village units; shares where the land is absent)")
+    gr = guide["record"]
+    print(f"  the guide: docs/GUIDE.md ({gr['source']['bytes']:,} bytes) as {gr['html']['bytes']:,} bytes of HTML in data.js, of them {gr['html']['of_them_the_pictures_as_base64']:,} its {len(gr['pictures'])} pictures"
+          + (" - THE PICTURES ARE LEFT OUT OF THIS BUILD (--guide-without-pictures): it is not a build to check or to pass on" if gr["pictures_left_out_of_this_build"] else ""))
     for L in layers:
         f = "50" if "50" in L["_arrays"] else "all"
         print(f"  {L['id']:26s} " + "; ".join(f"{c['label']}: {int((L['_arrays'][f] == i).sum()):,}" for i, c in enumerate(L["classes"])))
