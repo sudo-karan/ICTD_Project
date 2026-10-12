@@ -1579,11 +1579,17 @@ again before a later use.
 
     site_is_this_copy = W.J(SITE_CHECK)["copy_run_utc"] == W.J(SHARE_REC)["run_utc"]          # is the copy on disk the one the live site was last checked serving?
     if site_is_this_copy:
+        icon_refused = any(v_ == 404 for v_ in W.J(SITE_CHECK)["the_page"]["status_of_each_address_asked_for"].values())      # did the browser ask the site for an icon it does not have?
         site_now = ("`scripts/check_pages_live.py` fetched the three files from\n"
                     "the site and opened it in Chrome ({pages_checked}): {pages_checks} of {pages_checks} checks passed. The bytes the site\n"
                     "serves are the build's; the map draws every unit; the page logs no script error; and every request goes to the\n"
-                    "site's own host. The browser's own request for an icon, which the site does not have, is refused, and the check\n"
-                    "records it.")
+                    "site's own host. " + ("The browser's own request for an icon, which the site does not have, is refused, and the check\n"
+                                           "records it." if icon_refused else
+                                           "Since 13 October 2026 the page says that it has no icon, so the browser asks the site for none and\n"
+                                           "its log holds no line (§17.6)."))
+        hold(icon_refused or ('<link rel="icon" href="data:,">' in W.use("70_share/odisha_forest_decision_layer/index.html").read_text(encoding="utf-8")
+                              and W.J(SITE_CHECK)["the_page"]["errors_in_the_browsers_log"] == [] and all(v_ == 200 for v_ in W.J(SITE_CHECK)["the_page"]["status_of_each_address_asked_for"].values())),
+             "the check of the live site saw the browser's request for an icon refused; or the copy's page says that it has no icon, every address the browser asked the site for was answered, and the browser's log held no line")
     else:
         site_now = ("**The copy on disk is not yet the one the site serves.** `scripts/check_pages_live.py` last checked the site\n"
                     "on {pages_checked}: {pages_checks} of {pages_checks} checks passed, on the copy made {pages_copy_then}. The copy described\n"
@@ -2548,6 +2554,10 @@ figures) are the account. What bears on this document:
   the copy and reads it (§14). The guide names the development index nowhere.
 - **The checks of the decision view** were run again on the new build and are as §16 gives them. The exercise of
   the layer's other controls gained steps for the Guide and for the loader (`docs/LAYER.md`).
+- **The page says that it has no icon** (§14). The loader lets the page finish loading before the map is drawn, and
+  Chrome then asked the site for a missing icon twice where it had asked once. The check of the live site lets that
+  request stand once, and it failed on the first copy published with the Guide button. One line of the page now tells
+  a browser to ask for none; the copy was built, checked and published again; and no check was changed for it.
 
 ## 18. What this does not show
 

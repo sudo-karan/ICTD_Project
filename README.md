@@ -619,7 +619,9 @@ both written from the build that is on disk. What must not be lost:
   no other site for anything; a link in it opens only when clicked, in a new tab. To change the guide, edit
   `docs/GUIDE.md` and rebuild. `scripts/check_site_copy.py` holds the built guide to that file and traces every figure in it.
 - **A loader says what the page is doing while it opens** (since 13 October 2026): "Loading the map…" while `data.js`
-  arrives, then "Drawing the units…", and it goes when the map is ready. It shows stages, not a percentage.
+  arrives, then "Drawing the units…", and it goes when the map is ready. It shows stages, not a percentage. With it
+  the page says that it has no icon, so that a browser asks the site for none (`docs/LAYER.md`, its section on the
+  Guide button and the loader, says why).
 - **Not run by any other stage.** Rebuild with `.venv/bin/python scripts/06_build_layer.py`, then `scripts/verify_layer.py`.
 
 ### The decision view — `55_decision/`, a view in `60_layer/`, and the copy in `70_share/odisha_forest_decision_layer/` (8 to 10 October 2026)

@@ -611,10 +611,19 @@ out in the check itself.
 The button stands after About this map and Sources and opens the guide in the window those two use; Close, or a
 click outside, shuts it; an address that ends in `#open=guide` opens it. `index.html` changed in {places} places, each
 written out in `scripts/check_site_copy.py`; with every one put back, the page is byte for byte the page kept before.
-Beyond the button and the loader themselves, two small things are among them: each of the three texts now opens at its
-top, and the three buttons have a little less padding, so that they stay on one line beside a scroll bar in a window
-{w_wide} px wide. In one {w_narrow} px wide the side panel has no room for three, and Guide stands on a second line,
-under the other two. At a phone's width the legend lies over it (section 10).
+Beyond the button and the loader themselves, three small things are among them. Each of the three texts now opens at
+its top. The three buttons have a little less padding, so that they stay on one line beside a scroll bar in a window
+{w_wide} px wide; in one {w_narrow} px wide the side panel has no room for three, and Guide stands on a second line,
+under the other two; at a phone's width the legend lies over it (section 10). And the page says that it has no icon
+(`<link rel="icon" href="data:,">`), so that a browser asks the site for none.
+
+**Why the page says it has no icon.** A browser asks every site for `/favicon.ico` by itself, and this site has none.
+`scripts/check_pages_live.py` lets that refused request stand once. The loader lets the page finish loading before the
+map is drawn, so the address the page writes its state into changes after the load, and Chrome then asked for the
+missing icon a second time. The first copy published with the Guide button failed that one check of the live site for
+it, twice, with every other check passed. The line was added, both builds were made again, every check and every
+picture of this document was made again on them, and the copy was published again. No check was changed for it;
+`scripts/check_site_copy.py` holds the line (check `g2`) and plants its removal.
 
 **The guide.** `docs/GUIDE.md` is the owner's text ({g_bytes} bytes) and the one source of that window.
 `scripts/_guide.py`, a converter of its own for what the guide uses, with no package, turns it into HTML when the

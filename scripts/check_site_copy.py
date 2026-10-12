@@ -27,10 +27,10 @@ itself: the governance prompt, a cell's definition, and the Hansen row of Source
 THE GUIDE AND THE LOADER. On 13 October 2026 the owner had a third button put on the page, Guide, which opens
 docs/GUIDE.md in the window the About and Sources texts use, and a loader that says what the page is doing while it
 opens. The guide is carried in data.js as one more key, `guide_html` (scripts/_guide.py turns the Markdown into HTML
-when the layer is built; its five pictures go inside it), and index.html changed in ten places. Three checks that held
+when the layer is built; its five pictures go inside it), and index.html changed in eleven places. Three checks that held
 "nothing else was added" had therefore to be widened, each by exactly what was added and no more: a2 allows the one new
 key; f1 allows four new strings on the page itself, written out (the button's label and hover text, the loader's two
-messages), and fails unless all four are there; f2 holds index.html to the kept page with the ten places put back,
+messages), and fails unless all four are there; f2 holds index.html to the kept page with the eleven places put back,
 each written out and each found exactly once. Group g holds what was added. No check was taken out, and no expected
 number or count was changed.
 
@@ -78,6 +78,9 @@ WHAT IT CHECKS
         the bytes of their files under docs/guide/.
     g2  The button and the loader, read in index.html as text: where they stand, what they say, in what order the
         page changes the message and draws the map; the loader's words carry no figure and pass the voice rules.
+        And the page says, once and in its head, that it has no icon, so that a browser asks the site for none
+        (the eleventh place: with the loader the page finishes loading before it draws, and Chrome then asked the
+        site for the missing icon twice, which scripts/check_pages_live.py does not let pass).
     g3  The guide's words: none of the phrases of group b, no finding of the audit marked fixed, no block that opens
         "This shows", and the development index named nowhere.
     g4  THE GATE ON THE GUIDE'S FIGURES. The guide is cut into sentences and table cells. For each one that holds a
@@ -115,7 +118,7 @@ a temporary folder beside a link to its data.js - never on the real files, runs 
 error as caught only if a check that is MEANT to catch it fails. The eight errors the owner named are the first eight;
 the four he named with the six lines, each of which puts an old line back, are numbers 23 to 26; the two he named with
 the guide, a changed figure and a figure found nowhere, are 28 and 29, each planted on a copy of the guide's text held
-in memory. Numbers 30 to 35 try the other checks of group g and the widened f2.
+in memory. Numbers 30 to 36 try the other checks of group g and the widened f2.
 
 Reads   60_layer/: index.html, data.js, layer_by_unit.csv, layer.provenance.json, site_copy_audit.csv,
                    site_copy_check_changes.csv, and (the check only) site_copy_trials.json
@@ -803,6 +806,13 @@ ADDED_13_OCT = [("index.html, <button>", "Guide"), ("index.html, title=", "What 
 ADDED_NOTE = "added with the Guide button and the loader (the owner's handoff of 13 October 2026)"
 # The places where the Guide button and the loader changed index.html, each written out: (the page as it is, the page as it was). Each is found exactly once; with every one put back, the page is byte for byte the one kept.
 PAGE_13_OCT = [
+    ("""<!--
+  Added 13 Oct 2026. This page has no icon, and the line below says so: with it a browser asks the site for none. Without it a browser
+  asks every site for /favicon.ico by itself; and since the loader lets this page finish loading before the map is drawn, the address this
+  page writes its state into changes after the load, and Chrome then asked for the missing icon a second time.
+-->
+<link rel="icon" href="data:,">
+""", ""),      # the page declares that it has no icon (see the clause of g2)
     ("""/* the guide (added 13 Oct 2026): docs/GUIDE.md as the builder turned it into HTML, shown in the window the About and Sources texts use. A picture is as wide as the text; a table wider than the window scrolls sideways inside it */
 .guide h2 { font-size: 15px; text-transform: none; letter-spacing: 0; color: #1c1c1c; margin: 22px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #ddd; }
 .guide img { display: block; width: 100%; height: auto; border: 1px solid #bbb; box-sizing: border-box; }
@@ -1258,6 +1268,9 @@ def loader_and_button_wrong(page, phrases):
         wrong.append("the loader is not put away in the line before the page says it is ready")
     if "@keyframes loadbar" not in page or not re.search(r"#loadbar span \{[^}]*animation: loadbar", page) or re.search(r"<progress|aria-valuenow|loadbar[^\n]{0,80}\.style\.width", page):
         wrong.append("the bar is not one that only moves: it must have an animation of its own and nothing that sets its width")
+    icon = '<link rel="icon" href="data:,">'
+    if page.count(icon) != 1 or len(re.findall(r"<link\b", page)) != 1 or not page.index("<title>") < page.index(icon) < page.index("</head>"):
+        wrong.append("the page does not declare, once, in its head and with no other link beside it, that it has no icon (an empty data: address), so that a browser asks the site for none")
     for words in (LOADING, DRAWING):
         if len(words.split()) > 6 or "?" in words or ";" in words or re.search(r"\d", words) or any(has_phrase(ph, words) for ph in phrases):
             wrong.append(f"the loader's words '{words}' carry a figure, a '?' or a ';', more than six words, or a phrase of the lists")
@@ -1595,7 +1608,9 @@ def run_checks(before, now, extra, browser):
     check("g2", "the Guide button and the loader, in the index.html of both builds, read as text: the button stands once, right after About this map and Sources, with the owner's label and hover text; the button and #open=guide "
           "both open `guide_html` in the window the other two texts use; 'Loading the map...' is plain markup in the map's area, before the tag that asks for data.js; 'Drawing the units...' is set once the data is in, after the "
           "message for data that did not load, and the browser is given a frame to paint it before the map is drawn; the loader is put away in the line before the page says it is ready; its bar only moves, and nothing "
-          "sets its width; and its two messages have no figure, no '?' or ';', at most six words, and no phrase of the lists. (What a browser then does is scripts/exercise_layer.py's to show.)",
+          "sets its width; and its two messages have no figure, no '?' or ';', at most six words, and no phrase of the lists. And the page declares, once and in its head, that it has no icon - an empty data: address, the page's only "
+          "link - so that a browser asks the site for none: with the loader the page finishes loading before it draws, and Chrome then asked for the missing icon twice (scripts/check_pages_live.py holds what the live site is "
+          "asked for). (What a browser then does is scripts/exercise_layer.py's to show.)",
           not bad, f"'{LOADING}' and '{DRAWING}', in both builds" if not bad else "WRONG: " + " | ".join(bad[:4]))
     g_blocks = blocks(htmls["copy"] or "")
     hits = [f"'{ph}' in block {n_ + 1}" for n_, t in enumerate(g_blocks) for ph in lists if has_phrase(ph, unquoted(t, quoted))]
@@ -1920,6 +1935,7 @@ def planted(before, now, extra):
          lambda: page_text("layer", "Jump to a district&hellip;", "Go to a district&hellip;"), ["f2 (layer)"]),
         ("34. the loader's first message with a figure in it ('Loading 23 MB...')", "a copy of the copy's index.html, as text", lambda: page_text("copy", "Loading the map&hellip;", "Loading 23 MB&hellip;"), ["g2"]),
         ("35. a figure of the guide that comes from another by a listed rule, changed: 72.07 crore to 72.70 crore", "a copy of the guide", lambda: guide("\u20b972.07 crore", "\u20b972.70 crore"), ["g4"]),
+        ("36. the line that says the page has no icon taken out (a browser would ask the site for one again)", "a copy of the copy's index.html, as text", lambda: page_text("copy", '<link rel="icon" href="data:,">\n', ""), ["g2"]),
     ]
 
 
