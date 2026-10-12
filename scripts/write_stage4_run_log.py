@@ -29,6 +29,14 @@ whole history, and the site deployed from the folder `site/` of `main`. Its chec
 third handoff's, and the runner keeps one record; so the table of the third handoff's pass is reprinted from this log
 as it was written at the commit before (`THIRD_RUNS_AT`), and the record on disk is shown under the fourth.
 
+His handoff of 13 October 2026 (a third button on the page, Guide, with its pictures, and a loader) has the fifth
+section. The layer and the copy were built again for it, so the tables of the fourth handoff - the runs of its checks
+and the publication from `main` - and the times of the copies the third and fourth speak of are read from what was
+kept before the Guide button (`KEPT_GUIDE_LAYER`, `KEPT_GUIDE_SHARE`). The second handoff's sentence on the figures of
+`docs/RESULTS.md` is read from the list kept from that handoff, and no longer from the list on disk, which each later
+handoff has made again: between 11 and 13 October 2026 that sentence gave a later handoff's counts under the second's
+heading.
+
 Writes one file, `docs/stage4_run_log.md`. The stage outputs it reads are not in git: if `50_gap/` is empty, run the
 builders in the order the log gives under "To rebuild" and then this script.
 """
@@ -49,6 +57,7 @@ KEPT = ROOT / ".session_scratch_2026-10-05"                       # working file
 KEPT_SIX_LAYER, KEPT_SIX_SHARE = KEPT / "60_layer_2026-10-11_before_six_fixes", KEPT / "70_share_2026-10-11_before_six_fixes"   # the two builds as they stood before the owner's six lines (his third handoff of 11 October 2026)
 KEPT_GAP_WORDS = KEPT / "50_gap_2026-10-11_site_words_step5"       # the comparison of the second handoff's Step 5, as it stood before stage 4 followed the layer once more
 KEPT_LAYER, KEPT_SHARE = KEPT / "60_layer_2026-10-11_before_words", KEPT / "70_share_2026-10-11_before_words"      # the two builds as they stood before the page's words were rewritten
+KEPT_GUIDE_LAYER, KEPT_GUIDE_SHARE = KEPT / "60_layer_2026-10-13_before_guide", KEPT / "70_share_2026-10-13_before_guide"   # the two builds, with their records, as they stood before the Guide button (the handoff of 13 October 2026)
 
 # One entry per phase: (number, title, the gate files it wrote, the provenance sections it wrote, the notes).
 # A phase appears in the log once its first gate file exists. NOTES is typed prose; it carries no figure.
@@ -710,7 +719,7 @@ def mask(s) -> str:
     return str(s).replace(str(ROOT), "<repository>")
 
 
-def publication(folder: Path | None = None) -> list[str]:
+def publication(folder: Path | None = None, before: str = "for the page's words") -> list[str]:
     """The two records of the published copy: of the copy as it stands (`70_share/`), or, given a folder, the records kept there. A record of the first publication is of
     the branch `gh-pages`, and gives the commit at its head; a record made since the owner's handoff of 11 October 2026 ("One branch: main") is of the folder `site/` of `main`,
     and gives the commit at the head of `main` and the last commit to change `site/`. Either kind is read as it is."""
@@ -730,7 +739,7 @@ def publication(folder: Path | None = None) -> list[str]:
     out += [f"| {esc(x['check'])} | {esc(x['expected'])} | {esc(x['found'])} | {'yes' if x['pass'] else 'NO'} |" for x in c["checks"]]
     if folder is not None:
         return out + ["", f"*From the two records of that publication, `pages_publication.json` and `pages_live_check.json`, as they were kept in `{folder.relative_to(ROOT)}/` (working files, not in git) "
-                          "before the copy was built again for the page's words.*", ""]
+                          f"before the copy was built again {before}.*", ""]
     return out + ["", "*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*", ""]
 
 
@@ -833,13 +842,15 @@ lines that give what each verifier printed, which a draft does not run. It diffe
 
 def second_step_7() -> list[str]:
     """Step 7 of the second handoff: the documents. The counts are read from the list of the figures of docs/RESULTS.md that changed."""
-    p = ROOT / "60_layer" / "site_copy_results_changes.json"
+    kept = KEPT_SIX_LAYER / "site_copy_results_changes.json"       # the list as that step left it, kept before the six lines: the list on disk is of the latest handoff that wrote the document again
+    p = kept if kept.exists() else ROOT / "60_layer" / "site_copy_results_changes.json"
     if not (STEP_7_DONE and p.exists()):
         return []
     r = json.loads(p.read_text(encoding="utf-8"))
     results = (f"Of the {r['figures_in_the_text_now']} figures of its text, {r['figures_printed_differently']} are printed differently, {r['figures_gone']} are gone and {r['figures_added']} are new, "
                f"against the document of commit `{r['before_is_the_document_of_commit']}`; {r['lines_of_the_text_above_section_13_gone_or_changed']} lines of its text differ, each in those figures alone. "
-               "They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`.")
+               + ("That list was kept with the session's working files (`" + str(p.relative_to(ROOT)) + "`); `docs/SITE_COPY.md`, in its section on the documents, lists the figures that changed when the document was last written again."
+                  if p == kept else "They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`."))
     if r["no_sentence_was_changed"] is not True:
         raise SystemExit("60_layer/site_copy_results_changes.json does not say that no sentence of docs/RESULTS.md was changed")
     return ["### Step 7 of the second handoff: the documents", "", SECOND_STEP_7.strip().format(results=results), ""]
@@ -939,7 +950,8 @@ def third_handoff() -> list[str]:
     """The owner's third handoff of 11 October 2026 (publish what is waiting; six lines of the page in his words; publish again): its steps, and what of it bears on stage 4."""
     if not (KEPT_SIX_LAYER / "decision_runs.json").exists():
         return []
-    share, check = ROOT / "70_share" / "share.provenance.json", ROOT / "70_share" / "pages_live_check.json"
+    then = KEPT_GUIDE_SHARE if (KEPT_GUIDE_SHARE / "share.provenance.json").exists() else ROOT / "70_share"      # the copy with the six lines: on disk until the Guide button, kept since
+    share, check = then / "share.provenance.json", then / "pages_live_check.json"
     made = json.loads(share.read_text(encoding="utf-8"))["run_utc"] if share.exists() else ""
     live = json.loads(check.read_text(encoding="utf-8")) if check.exists() else {}
     published = bool(made) and live.get("copy_run_utc") == made and live.get("passed") is True
@@ -1072,10 +1084,12 @@ def fourth_handoff() -> list[str]:
     if not (ROOT / ".github" / "workflows" / "pages.yml").exists():
         return []
     join = subprocess.run(["git", "log", "--first-parent", "--merges", "-1", "--format=%h %p"], capture_output=True, text=True, cwd=ROOT).stdout.split()
-    share, check = ROOT / "70_share" / "share.provenance.json", ROOT / "70_share" / "pages_live_check.json"
+    fifth = (KEPT_GUIDE_SHARE / "share.provenance.json").exists() and (KEPT_GUIDE_LAYER / "decision_runs.json").exists()      # the handoff of 13 October 2026 has begun: this one's builds and records were kept before the Guide button
+    then = KEPT_GUIDE_SHARE if fifth else ROOT / "70_share"
+    share, check = then / "share.provenance.json", then / "pages_live_check.json"
     made = json.loads(share.read_text(encoding="utf-8"))["run_utc"] if share.exists() else ""
     live = json.loads(check.read_text(encoding="utf-8")) if check.exists() else {}
-    pub = json.loads((ROOT / "70_share" / "pages_publication.json").read_text(encoding="utf-8")) if (ROOT / "70_share" / "pages_publication.json").exists() else {}
+    pub = json.loads((then / "pages_publication.json").read_text(encoding="utf-8")) if (then / "pages_publication.json").exists() else {}
     published = bool(made) and live.get("copy_run_utc") == made and live.get("passed") is True and pub.get("branch") == "main"
     stage4 = FOURTH_STEP_7_DONE and (GAP / "gates_one_branch.csv").exists()
     steps = [(0, "where things stand", "done"), (1, "`main` takes the history", "done, by the owner: the session's permission check refused the commands"), (2, "the workflow and the publish script", "done"),
@@ -1089,14 +1103,157 @@ def fourth_handoff() -> list[str]:
     out += ["", "### Step 1 of the fourth handoff: `main` takes the history", "",
             FOURTH_STEP_1.strip().format(join=f"`{join[0]}`" if join else "not found", parents=" and ".join(f"`{x}`" for x in join[1:]) if join else "not found"), "",
             "### Step 3 of the fourth handoff: the scripts that describe the publication", "", FOURTH_STEP_3.strip(), "",
-            "### Step 4 of the fourth handoff: `site/`, and the checks", "", FOURTH_STEP_4.strip(), ""] + browser_runs()
+            "### Step 4 of the fourth handoff: `site/`, and the checks", "", FOURTH_STEP_4.strip(), ""] + (browser_runs(KEPT_GUIDE_LAYER, "for the Guide button") if fifth else browser_runs())
     if published:
-        out += ["### Steps 5 and 6 of the fourth handoff: the copy on the site, from `main`", "", FOURTH_STEP_5.strip(), ""] + publication()
+        out += ["### Steps 5 and 6 of the fourth handoff: the copy on the site, from `main`", "", FOURTH_STEP_5.strip(), ""] + (publication(KEPT_GUIDE_SHARE, "for the Guide button") if fifth else publication())
     if stage4:
         out += ["### Step 7 of the fourth handoff: the documents, and stage 4 after `docs/DATA_NOTES.md`", "", FOURTH_STEP_7.strip(), ""] + rebuild("one_branch")
     if FOURTH_STEP_8_DONE:
         out += ["### Step 8 of the fourth handoff: the other branches", "", FOURTH_STEP_8.strip(), ""]
     return out
+
+
+FIFTH_STEP_7_DONE = False                                          # the handoff of 13 October 2026, its Step 7 (the documents): set when the step is done
+FIFTH_1_TO_4 = """
+`docs/GUIDE.md` is the owner's guide to the map, copied in as he wrote it, and the one source of the page's Guide
+window. `scripts/_guide.py`, a converter of its own for what the guide uses, turns it into HTML when
+`scripts/06_build_layer.py` builds the page; the HTML is carried in `data.js` as `guide_html`, with each of the guide's
+pictures inside it as its own bytes, and the layer's run record gives the SHA-256 of the guide and of each picture.
+`scripts/07_build_share.py` carries the guide into the copy unchanged. The page (`scripts/layer_template.html`) has a
+third button, Guide, after About this map and Sources, which opens the guide in the window those two use, as does an
+address that ends in `#open=guide`; and a loader, which says "Loading the map…" over the map's area until `data.js` has
+arrived, then "Drawing the units…", and goes when the map is ready. The loader shows stages and no percentage.
+
+The pictures are of the published copy with the Guide button in it. A build was made with the guide's picture lines
+left out; the pictures were taken of that copy in a headless Chrome, captured as WebP; and both builds were made again
+with them. None of the pictures shows the Guide window, and taken again of the build that carries them each came out
+byte for byte the same. Each was opened and looked at (`docs/SITE_COPY.md`).
+
+**The sizes.** {sizes}
+"""
+FIFTH_5 = """
+The checks were changed and committed before they were run. No check was taken out and no expected number or count
+was changed. Counts rose by the steps this handoff added and by nothing else, and every changed block of a check is a
+row of `60_layer/site_copy_check_changes.csv`. `scripts/exercise_layer.py` gained steps for the loader and for the
+Guide (its button, its pictures, its scrolling, its Close, a narrow window, `#open=guide`); `scripts/exercise_share.py`
+one that opens the Guide in the copy; `scripts/check_site_copy.py` a group of its own, among them a gate that traces
+every figure of the guide to a passage of a named file where it is written the same way, or to a listed rule by which
+it comes from one. Three of that script's checks, which held that nothing else had been added, were widened by exactly
+what was added, each written out. `scripts/verify_decision.py`'s check of the data's top keys names the new key.
+`scripts/verify_layer.py` is unedited and passed, the size of the two files among its checks. `docs/SITE_COPY.md` has
+the counts, the planted errors and the gate's lists. The table is the runner's record of the pass on these builds.
+"""
+FIFTH_5_STAGE4 = """
+Stage 4 reads two files of the layer: `60_layer/data.js`, for the layer's own row of sources for the development index,
+and `60_layer/layer_by_unit.csv`. Its records hold the bytes and SHA-256 of those two and of
+`scripts/06_build_layer.py`. The guide changed the first and the third; the second, the table of figures, is byte for
+byte what it was. {verifier} `scripts/08_gap_inputs.py` and `scripts/08_build_gap_districts.py` were run again in the
+stage-4 environment, in that order, and no other step. **No table of figures moved**: the comparison below sets every
+output beside a copy kept just before (`50_gap/before_guide_button/`). The verifier then passed every check.
+`scripts/08_gap_closing_checks.py` and `scripts/08_gap_leftovers_check.py` were not run again.
+"""
+FIFTH_6 = """
+The guide's table "How it was checked" gives each check's result. Its counts were set to the results of the runs on
+this build, and one figure of its text followed the copy's size. No word of the guide was changed: apart from the
+figures below, `docs/GUIDE.md` is the file the owner wrote (the first commit of this handoff).
+`scripts/check_site_copy.py` holds each count to the record of its run and the megabytes to the bytes of the copy's
+two files.
+"""
+FIFTH_7 = """
+`README.md` was edited by hand: the guide and its pictures in the layout, the Guide button and the loader in the
+layer's section, and the rows of the scripts this handoff touched. `docs/LAYER.md` (its section on the Guide button
+and the loader) and `docs/SITE_COPY.md` (its section on the guide, its pictures and the gate on its figures) were
+written by their scripts, as the owner listed. The other documents that are written by scripts cite the records of
+the checks, which this handoff made again on new builds; so `docs/RESULTS.md`, `docs/DECISION_LAYER.md`, this log and
+`docs/GAP.md` were written again too, in the usual order, `docs/GAP.md` last. {results}
+"""
+
+
+def guide_figures_changed() -> list[str]:
+    """The figures of docs/GUIDE.md that are not the ones the owner wrote: the file of the handoff's first commit set against the file as it is, line by line."""
+    first = subprocess.run(["git", "log", "--diff-filter=A", "--format=%h", "--", "docs/GUIDE.md"], capture_output=True, text=True, cwd=ROOT).stdout.split()
+    if not first:
+        return []
+    was = subprocess.run(["git", "show", f"{first[-1]}:docs/GUIDE.md"], capture_output=True, text=True, cwd=ROOT).stdout.splitlines()
+    now = (ROOT / "docs" / "GUIDE.md").read_text(encoding="utf-8").splitlines()
+    if len(was) != len(now):
+        raise SystemExit("docs/GUIDE.md does not have the lines the owner's file has: more than figures changed")
+    import re
+    out = ["| line | the owner's file | now |", "|---|---|---|"]
+    for n, (a, b) in enumerate(zip(was, now), 1):
+        if a != b:
+            if re.sub(r"\d", "", a) != re.sub(r"\d", "", b):
+                raise SystemExit(f"docs/GUIDE.md, line {n}: more than a figure differs from the owner's file")
+            fa, fb = re.findall(r"\d[\d,.]*\d|\d", a), re.findall(r"\d[\d,.]*\d|\d", b)
+            k = [i for i in range(len(fa)) if fa[i] != fb[i]]
+            words = lambda t, i: " ".join(re.search(r"(?:\S+\s+){0,2}" + re.escape(t[i]) + r"(?:\s+\S+){0,4}", (a if t is fa else b)).group(0).split())
+            out.append(f"| {n} | {esc('; '.join(dict.fromkeys(words(fa, i) for i in k)))} | {esc('; '.join(dict.fromkeys(words(fb, i) for i in k)))} |")
+    return [f"*`docs/GUIDE.md` as it is, set against the file of commit `{first[-1]}`, line by line; every other line is the same.*", ""] + out + [""]
+
+
+def fifth_handoff() -> list[str]:
+    """The owner's handoff of 13 October 2026 (a Guide button on the page, with its pictures, and a loader): its steps, and what of it bears on stage 4."""
+    if not ((ROOT / "docs" / "GUIDE.md").exists() and (KEPT_GUIDE_LAYER / "layer.provenance.json").exists()):
+        return []
+    L0, L1 = json.loads((KEPT_GUIDE_LAYER / "layer.provenance.json").read_text(encoding="utf-8")), json.loads((ROOT / "60_layer" / "layer.provenance.json").read_text(encoding="utf-8"))
+    share, check = ROOT / "70_share" / "share.provenance.json", ROOT / "70_share" / "pages_live_check.json"
+    made = json.loads(share.read_text(encoding="utf-8"))["run_utc"] if share.exists() else ""
+    live = json.loads(check.read_text(encoding="utf-8")) if check.exists() else {}
+    published = bool(made) and live.get("copy_run_utc") == made and live.get("passed") is True
+    stage4 = (GAP / "gates_guide_button.csv").exists()
+    sizes = (f"The layer's two files were {L0['outputs']['both_bytes']:,} bytes together before the guide ({L0['outputs']['both_bytes'] / 1e6:.2f} MB; the layer built {L0['run_utc']}) and are "
+             f"{L1['outputs']['both_bytes']:,} bytes with it ({L1['outputs']['both_bytes'] / 1e6:.2f} MB; built {L1['run_utc']}), against the {L1['outputs']['limit_bytes'] / 1e6:.0f} MB that `scripts/verify_layer.py` allows. "
+             f"The guide's {len(L1['guide']['pictures'])} pictures are {sum(q['bytes'] for q in L1['guide']['pictures']):,} bytes as files.")
+    steps = [(1, "the source", "done"), (2, "the button", "done"), (3, "the loader", "done"), (4, "the pictures", "done"), (5, "the checks", "done" if stage4 else "not yet"), (6, "the guide's own counts", "done"),
+             (7, "the documents", "done" if FIFTH_STEP_7_DONE else "not yet"), (8, "publish", "done" if published else "not yet")]
+    out = ["## The owner's handoff of 13 October 2026: a Guide button, its pictures, and a loader", "",
+           "On 13 October 2026 the owner asked for a third button on the page, Guide, which opens his guide to the map with its pictures, for a loader that says what the page is doing while it opens, and for the site "
+           "to be published with them (`.session_scratch_2026-10-05/handoff/2026-10-13_guide_button.md`, with the guide beside it; not in git). His yes to publishing was in the note.", "",
+           "| step | what | state |", "|---|---|---|"]
+    out += [f"| {n} | {what} | {state} |" for n, what, state in steps]
+    out += ["", "### Steps 1 to 4 of the handoff of 13 October: the guide, the button, the loader, the pictures", "", FIFTH_1_TO_4.strip().format(sizes=sizes), "",
+            "### Step 5 of the handoff of 13 October: the checks", "", FIFTH_5.strip(), ""] + browser_runs()
+    if stage4:
+        out += ["**Stage 4 follows the layer.**", "", FIFTH_5_STAGE4.strip().format(verifier=fifth_verifier()), ""] + rebuild("guide_button")
+    out += ["### Step 6 of the handoff of 13 October: the guide's own counts", "", FIFTH_6.strip(), ""] + guide_figures_changed()
+    if FIFTH_STEP_7_DONE:
+        p = ROOT / "60_layer" / "site_copy_results_changes.json"
+        r = json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+        if r is None or r["no_sentence_was_changed"] is not True:
+            raise SystemExit("60_layer/site_copy_results_changes.json is not there, or does not say that no sentence of docs/RESULTS.md was changed")
+        results = (f"In `docs/RESULTS.md` no sentence was changed: of the {r['figures_in_the_text_now']} figures of its text, {r['figures_printed_differently']} are printed differently, {r['figures_gone']} are gone and "
+                   f"{r['figures_added']} are new, against the document of commit `{r['before_is_the_document_of_commit']}` (`docs/SITE_COPY.md` lists them).")
+        out += ["### Step 7 of the handoff of 13 October: the documents", "", FIFTH_7.strip().format(results=results), ""]
+    out += ["### Step 8 of the handoff of 13 October: the copy on the site", ""]
+    if published:
+        out += [f"The copy with the Guide button (made {made}) was published with the owner's script, `scripts/publish_site.sh`, on his word given in the handoff: the script held the copy's three files to the gated build, "
+                "filled `site/`, committed it and pushed `main`, and the workflow deployed that folder. The live site was then checked against the build:", ""] + publication()
+    else:
+        out += [f"**Not yet published when this was written.** The copy with the Guide button (made {made}) is built and checked. The site still serves the copy of the fourth handoff, and the two records in `70_share/` "
+                "are that publication's, put back beside the new copy after it was built. Publishing is the next step: `bash scripts/publish_site.sh`, then `.venv/bin/python scripts/check_pages_live.py --wait 10`; "
+                "`docs/DECISION_LAYER.md`, this log and `docs/GAP.md` are then written once more, to say what the site serves.", ""]
+    return out
+
+
+FIFTH_LOGS = KEPT / "guide" / "logs"                               # what the verifier printed on 13 October 2026, kept with the session's working files (not in git)
+
+
+def fifth_verifier() -> str:
+    """What `scripts/verify_gap.py` found before the two steps were run again, read from what it printed then: its first run, which ended early, and the run made at once after it."""
+    first, second, after = (FIFTH_LOGS / n for n in ("verify_gap_before_stage4_follows.log", "verify_gap_before_stage4_follows_run2.log", "verify_gap_after_stage4_follows.log"))
+    if not (first.exists() and second.exists() and after.exists()):
+        raise SystemExit("the verifier's printed lines of 13 October 2026 are not where they were kept: " + str(FIFTH_LOGS.relative_to(ROOT)))
+    lines = {k: [l for l in f.read_text(encoding="utf-8").splitlines() if l.strip()] for k, f in (("first", first), ("second", second), ("after", after))}
+    count = lambda k, w: sum(1 for l in lines[k] if l.startswith(w))
+    failed = [l for l in lines["second"] if l.startswith("FAIL")]
+    n_all = count("second", "PASS") + count("second", "FAIL")
+    if not (lines["second"][-1] == f"{count('second', 'PASS')} of {n_all} checks passed" and lines["after"][-1] == f"{n_all} of {n_all} checks passed" and len(failed) == 2
+            and all("60_layer/data.js" in l or "scripts/06_build_layer.py" in l for l in failed) and all("`sha256`" in l for l in failed)
+            and [l for l in lines["first"] if l.startswith("FAIL")] == failed[:count("first", "FAIL")] and not lines["first"][-1].endswith("checks passed")):
+        raise SystemExit("the verifier's printed lines of 13 October 2026 do not say what the log says of them")
+    return (f"Before those steps were run the verifier passed {count('second', 'PASS')} of its {n_all} checks. The {len(failed)} that failed are the ones that hold each recorded input to its bytes and SHA-256 as they are now, "
+            "in the listing of inputs and in the run record, and they failed on those two files and on no other. (That is its second run. The first ended early: the interpreter stopped with a segmentation fault after "
+            f"{count('first', 'PASS')} checks had passed and the same {count('first', 'FAIL')} had failed, and printed no result. Run again at once, with nothing changed, it ran to its end; it has not happened again.)")
 
 
 def rebuild(name: str, folder: Path | None = None) -> list[str]:
@@ -1359,7 +1516,7 @@ def main() -> None:
                 "the section \"To rebuild\" at the end gives the order.", ""]
         if not (GAP / "gates_phase6.csv").exists():
             doc += [STOPPED_IN_PHASE_6.strip(), ""]
-        doc += handoff() + second_handoff() + third_handoff() + fourth_handoff()
+        doc += handoff() + second_handoff() + third_handoff() + fourth_handoff() + fifth_handoff()
     for number, title, gate_files, steps, notes in done:
         doc += [f"## Phase {number}: {title}", "", notes.strip(), ""]
         for g in gate_files:

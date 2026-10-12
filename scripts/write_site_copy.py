@@ -31,6 +31,14 @@ and a section of their own sets each string beside what it was in the build kept
 scripts/check_site_copy.py (its group f). That section also lists, by `git grep`, where his eight phrases still
 stand in the tracked files this task does not write.
 
+THE GUIDE BUTTON AND THE LOADER. On 13 October 2026 the owner had a third button put on the page, Guide, which opens
+docs/GUIDE.md with its pictures, and a loader. A section of its own says what was added, sets the guide's pictures
+beside what was seen in each, gives the gate on the guide's figures with every figure it lists as coming from another,
+and lists the figures of the guide that are not the ones the owner wrote, from git. For it the script also reads
+docs/GUIDE.md and its pictures, and the record of the layer as it was kept before the Guide button. The run stops
+unless the checks of group g passed, the two planted errors the owner named with the guide were caught by the gate,
+and every picture of the guide is the one that was looked at.
+
 Output: docs/SITE_COPY.md and nothing else; its inputs, their sha256 and the UTC time of the run are at its end.
 """
 import csv
@@ -156,9 +164,26 @@ def main():
         stop("70_share/exercise_share_chrome.json is not a pass of the copy on disk")
     if not (seen["builds"] == now and all(sha(p) == h for p, h in seen["files_sha256"].items()) and all(p["seen"].strip() for p in seen["pictures"])):
         stop("60_layer/site_copy_looked_at.json is of other builds than the ones on disk, or a picture has no note")
-    pics = seen.get("against_the_pictures_kept_before_the_six_lines")
-    if not pics or pics["pictures"] != len(seen["pictures"]) or pics["byte_for_byte_the_same"] + pics["differ_or_are_new"] != pics["pictures"]:
-        stop("60_layer/site_copy_looked_at.json does not say which pictures are the ones kept before the six lines and which were looked at again")
+    pics = seen.get("against_the_pictures_kept_before_the_guide")
+    if not pics or pics["pictures"] != len(seen["pictures"]) or pics["byte_for_byte_the_same"] + pics["differ_only_inside_the_row_of_the_three_buttons"] + pics["differ_elsewhere_and_were_looked_at_again"] + pics["new_and_were_looked_at"] != pics["pictures"]:
+        stop("60_layer/site_copy_looked_at.json does not say, for every picture, how it stands to the picture kept before the Guide button")
+    gp = seen.get("the_guides_pictures") or {}
+    if not (gp.get("each_is_byte_for_byte_the_picture_in_docs_guide") is True and gp.get("builds") == now and len(gp.get("pictures", [])) == GUIDE_PICTURES
+            and all(q["seen"].strip() and q["sha256"] == hashlib.sha256(use(q["file"]).read_bytes()).hexdigest() for q in gp["pictures"])):
+        stop("60_layer/site_copy_looked_at.json does not hold the guide's pictures as they are in docs/guide/, each taken again of the builds on disk and each with what was seen in it")
+    row = (seen.get("the_row_of_the_three_buttons") or {}).get("measured") or {}
+    for b_ in ("full layer", "published copy"):                 # what section 14 says of the row of the three buttons, as it was measured in a browser
+        phone = next((x for x in row.get(f"{b_} | 390x844", {}).get("buttons", []) if x["button"] == "Guide"), {})
+        if [row.get(f"{b_} | {size}", {}).get("lines_of_the_row") for size in ("1280x800", "1000x700")] != [1, 2] or phone.get("what_lies_on_top_of_its_middle") != "the legend":
+            stop("the three buttons were not measured on one line at 1280 px, on two at 1000 px and, at a phone's width, with the legend over Guide, as section 14 says")
+    g_checks = [c for c in chk["checks"] if c["id"].startswith("g")]
+    tg = chk.get("the_guide") or {}
+    if not (len(g_checks) == len(G_CHECKS) and all(c["pass"] for c in g_checks) and tg.get("sha256") == hashlib.sha256(use("docs/GUIDE.md").read_bytes()).hexdigest()
+            and L.get("guide", {}).get("source", {}).get("sha256") == tg.get("sha256") and len(L["guide"]["pictures"]) == GUIDE_PICTURES):
+        stop("60_layer/site_copy_check.json does not carry the guide of docs/GUIDE.md with its group g passed, or the layer was not built from that guide")
+    named = [t for t in tri["trials"] if t["planted"].split(".")[0] in GUIDE_TRIALS]
+    if len(named) != len(GUIDE_TRIALS) or not all(t["caught"] and "g4" in t["checks_that_failed"] for t in named):
+        stop("the two errors the owner named with the guide - a changed figure, and a figure found nowhere - were not both caught by the gate on the guide's figures")
     six = chk.get("the_six_lines", {}).get("strings_that_differ_from_the_kept_builds") or []
     f_checks = [c for c in chk["checks"] if c["id"].startswith("f")]
     if not (six and len(f_checks) == len(F_CHECKS) and all(c["pass"] for c in f_checks) and {x["fix"] for x in six} == set(FIXES)):
@@ -238,11 +263,17 @@ again in Chrome and in WebKit with their expected words brought up to date, no e
 (section 8). And every "i" was opened in a browser at three window sizes and looked at (section 10).
 
 **What one data key was added.** `data.js` gained one key at its top, `tips`, which holds the words of every "i".
-Nothing else was added to the data.
+Nothing else was added to the data that day. (On 13 October 2026 a second key was added, `guide_html`, the guide that
+the page's third button opens: section 14.)
 
 **Six lines were corrected later the same day.** The audit had listed them for the owner with nothing changed; in his
 third handoff of 11 October 2026 he gave his words for each and asked that every other string stay as it is. They
 are the last {n_six} rows of section 2, with his ruling, and section 13 sets each string beside what it was.
+
+**A Guide button and a loader were added on 13 October 2026.** A third button opens the owner's guide to the map,
+with its pictures, in the window the other two texts use; and the map's area says what the page is doing while it
+opens. No word that this document describes was changed by it. Its account is section 14: what was added, the
+pictures, and the gate that traces every figure of the guide.
 """).format(written=written, layer_run=L["run_utc"], copy_run=S["run_utc"], n_checks=chk["checks_made"], n_trials=tri["planted"], n_six=len(by_owner)))
 
     D.append(typed("""
@@ -326,15 +357,18 @@ fact; no expected number, count or tolerance was changed and no check was taken 
   The note is read by `scripts/exercise_decision.py` in Chrome and in WebKit and by `scripts/verify_decision.py`.
 
 `scripts/verify_layer.py` is unchanged: `scripts/check_site_copy.py` holds it byte for byte to the commit the stage
-four checks hold it to. `scripts/exercise_layer.py` was changed only where it pinned reworded words.
+four checks hold it to. `scripts/exercise_layer.py` was changed only where it pinned reworded words, until
+13 October 2026, when it gained the steps of the Guide button and the loader (section 14).
 `scripts/exercise_layer_safari.py` pins none of them in its own lines and did not change; what it expects of a unit's
 panel comes from `scripts/exercise_layer.py`.
 
 Every block of lines that differs from the commit before the checks were changed (`{before}`) is a row below, for
 each check and for the two document writers whose holds and quotations follow the page's words: {n_changes} rows in
 {n_files} files. The table is `60_layer/site_copy_check_changes.csv`, where the old and the new words stand whole;
-here each is cut after its first {cut} characters.
-""").format(before=chk["checks_were_changed_since_commit"], n_changes=len(changes), n_files=len(ch_by_file), cut=CUT))
+here each is cut after its first {cut} characters. Since 13 October 2026 the rows of `scripts/check_site_copy.py`
+itself are in the table too, against the last commit before the Guide button (`{before_guide}`): that script did not
+exist at the commit the other files are set against.
+""").format(before=chk["checks_were_changed_since_commit"], n_changes=len(changes), n_files=len(ch_by_file), cut=CUT, before_guide=BEFORE_THE_GUIDE))
     D.append(table(["File", "Blocks changed"], [[cellmd(f"`{f}`"), str(n)] for f, n in ch_by_file.items()]))
     D.append("\n" + table(["File", "Check", "Was", "Now", "The fact it checks"], [[cellmd("`" + c["file"].split("/")[-1] + "`"), cellmd(c["check"]), cellmd(c["was"], CUT), cellmd(c["now"], CUT), cellmd(c["the_fact_it_checks"])] for c in changes]))
 
@@ -384,7 +418,9 @@ sight wherever its panel can scroll; and the last of the planted errors below is
 
 {caught} of {planted} errors, each planted on a copy and never on the real files, were caught by a check meant to
 catch them (run {tri_run}). The first eight are the ones the owner named; those numbered from twenty-three to
-twenty-six are the four he named with the six lines, each of which puts an old line back.
+twenty-six are the four he named with the six lines, each of which puts an old line back; and those numbered
+twenty-eight and twenty-nine are the two he named with the guide, a changed figure and a figure found nowhere, each
+planted on a copy of the guide's text. The ones after them try the other checks of the guide and the loader.
 """).format(caught=tri["caught"], planted=tri["planted"], tri_run=tri["run_utc"]))
     D.append(table(["Planted", "On", "Checks meant to catch it", "Checks that failed", "Caught"],
                    [[cellmd(t["planted"]), cellmd(t["on"]), cellmd(", ".join(t["checks_meant_to_catch_it"])), cellmd(", ".join(t["checks_that_failed"])), "yes" if t["caught"] else "NO"] for t in tri["trials"]]))
@@ -393,20 +429,26 @@ twenty-six are the four he named with the six lines, each of which puts an old l
 ## 10. What was seen
 
 The pictures were taken {shots_utc} in a headless Chrome, of both builds at three window sizes, each with an "i"
-opened by the pointer, and every one was opened and looked at. The measurements are the script's; "seen" is what the
-picture shows. The pictures are in `60_layer/site_copy_shots/`, outside git like the rest of that folder.
+opened by the pointer. Every one was opened and looked at when it was first taken, and again whenever it came out
+different outside the row of the three buttons; the paragraph below says which were looked at on these builds. The
+measurements are the script's; "seen" is what the picture shows. The pictures are in `60_layer/site_copy_shots/`,
+outside git like the rest of that folder.
 
-**The pictures are of the builds with the six lines.** They were all taken again, and four more were taken of each
-build at the largest size, the ones the owner asked for with the six lines: a ranked list with an East Coast badge
-in view, the prompt of a unit outside villages, the comparison section's "i" in the panel of an East Coast unit, and
-the grid of "why this tier". Each picture was compared, byte for byte, with the picture of the same name kept from
-before the six lines: of {pic_n} pictures, {pic_same} are the same and {pic_diff} differ or are new. {pic_how}
+**The pictures are of the builds with the Guide button.** With the six lines, four more had been taken of each
+build at the largest size: a ranked list with an East Coast badge in view, the prompt of a unit outside villages, the
+comparison section's "i" in the panel of an East Coast unit, and the grid of "why this tier". On 13 October 2026
+every picture was taken again, since each shows the side panel and the side panel has a third button; and more were
+taken of the published copy, of the Guide's window and of the loader. Each picture was then held, pixel for pixel,
+against the picture of the same name that had been kept, and looked at, before the Guide button. Of {pic_n} pictures,
+byte for byte the kept one: {pic_same}; differing only inside the row of the three buttons, and so showing everywhere
+else exactly what was looked at before: {pic_row}; differing elsewhere too, each opened and looked at again:
+{pic_else}; new, and looked at: {pic_new}. {pic_how}
 
 **Overall.** {overall}
 
 **At a phone's width.** {phone}
 """).format(shots_utc=seen["pictures_taken_utc"], overall=seen["overall"], phone=seen["what_breaks_at_a_phones_width"], pic_n=pics["pictures"], pic_same=pics["byte_for_byte_the_same"],
-            pic_diff=pics["differ_or_are_new"], pic_how=pics["how"][0].upper() + pics["how"][1:] + "."))
+            pic_row=pics["differ_only_inside_the_row_of_the_three_buttons"], pic_else=pics["differ_elsewhere_and_were_looked_at_again"], pic_new=pics["new_and_were_looked_at"], pic_how=pics["how"][0].upper() + pics["how"][1:] + "."))
 
     def measured(m):
         if "box" in m and not m.get("shown"):
@@ -488,9 +530,11 @@ halves: that the page shows the new words, and that the table still carries the 
 
 **Every string that differs from the builds kept before the six lines.** Both builds were copied aside before a
 line was changed, as they were before the words were first rewritten. `scripts/check_site_copy.py` holds the builds
-on disk against those copies (its group `f`): no string was added or dropped; each string below differs by exactly
-the owner's replacement and by nothing else; no place of a fix still holds its old words; and no other part of
-`data.js` or of `index.html` differs but the build's own time. In the full layer {six_layer} strings differ, in the
+on disk against those copies (its group `f`): no string was dropped, and none was added but the four that the Guide
+button and the loader put on the page on 13 October 2026 (section 14); each string below differs by exactly the
+owner's replacement and by nothing else; no place of a fix still holds its old words; no other part of `data.js`
+differs but the build's own time and the guide's key; and `index.html` differs only in the places the Guide button
+and the loader changed, each written out in the check. In the full layer {six_layer} strings differ, in the
 copy {six_copy}. Where the same string differs in both builds it is one row. A long string is shown by the stretch
 that differs and what stands on either side of it, with a mark where it is cut; the record of the check holds each
 whole.
@@ -533,8 +577,125 @@ construction: the owner asked that it be left.
 """))
     D.append(table(["The owner's phrase", "File", "Times it stands there"], grep))
 
+    # ---- section 14: the Guide button and the loader (the owner's handoff of 13 October 2026)
+    G, L0 = L["guide"], J(BEFORE_GUIDE_RECORD)
+    first = subprocess.run(["git", "-C", str(ROOT), "log", "--diff-filter=A", "--format=%h", "--", "docs/GUIDE.md"], capture_output=True, text=True, check=True).stdout.split()[-1]
+    was = subprocess.run(["git", "-C", str(ROOT), "show", f"{first}:docs/GUIDE.md"], capture_output=True, text=True, check=True).stdout.splitlines()
+    is_ = (ROOT / "docs" / "GUIDE.md").read_text(encoding="utf-8").splitlines()
+    if len(was) != len(is_) or any(re.sub(r"\d", "", a) != re.sub(r"\d", "", b) for a, b in zip(was, is_)):
+        stop("docs/GUIDE.md differs from the file the owner wrote in more than figures")
+    not_his = []
+    for n_, (a, b) in enumerate(zip(was, is_), 1):
+        if a != b:
+            fa, fb = re.findall(r"\d[\d,.]*\d|\d", a), re.findall(r"\d[\d,.]*\d|\d", b)
+            ks = [i for i in range(len(fa)) if fa[i] != fb[i]]
+            near = lambda line, t, i: " ".join(re.search(r"(?:\S+\s+){0,3}" + re.escape(t[i]) + r"(?:\s+\S+){0,5}", line).group(0).split())
+            why = WHY_MEGABYTES if " MB" in near(b, fb, ks[0]) else WHY_COUNT
+            not_his.append([str(n_), cellmd("; ".join(dict.fromkeys(near(a, fa, i) for i in ks))), cellmd("; ".join(dict.fromkeys(near(b, fb, i) for i in ks))), cellmd(why)])
+    by_how = tg["figures_table"]["by_how"]
+    how_n = lambda start: sum(v for k, v in by_how.items() if k.startswith(start))
+    if how_n("found") + how_n("comes from") + how_n("a count") != tg["figures_table"]["rows"]:
+        stop("the rows of the table of the guide's figures are not all of the three kinds section 14 names")
+    lay_runs = {c["check"]: c["runs"][-1]["last_line"] for c in runs["checks"]}
     D.append(typed("""
-## 14. What this document was written from
+## 14. The Guide button and the loader (13 October 2026)
+
+On 13 October 2026 the owner asked for three things: a third button on the page, Guide, which opens his guide to the
+map with its pictures; a loader, which says what the page is doing while it opens; and the site published with them.
+Nothing that section 2 to section 13 describe was changed by it, and no figure, class, count or colour of the page
+moved: the checks of section 9 still hold both builds against the copies kept before, with what was added written
+out in the check itself.
+
+**What was added to the page.** These strings, and no other, are new in `index.html`, the same in both builds:
+""") + table(["Where", "The string"], [[cellmd(x["where"]), cellmd(x["string"])] for x in tg["strings_added_to_the_page_itself"]]) + typed("""
+The button stands after About this map and Sources and opens the guide in the window those two use; Close, or a
+click outside, shuts it; an address that ends in `#open=guide` opens it. `index.html` changed in {places} places, each
+written out in `scripts/check_site_copy.py`; with every one put back, the page is byte for byte the page kept before.
+Beyond the button and the loader themselves, two small things are among them: each of the three texts now opens at its
+top, and the three buttons have a little less padding, so that they stay on one line beside a scroll bar in a window
+{w_wide} px wide. In one {w_narrow} px wide the side panel has no room for three, and Guide stands on a second line,
+under the other two. At a phone's width the legend lies over it (section 10).
+
+**The guide.** `docs/GUIDE.md` is the owner's text ({g_bytes} bytes) and the one source of that window.
+`scripts/_guide.py`, a converter of its own for what the guide uses, with no package, turns it into HTML when the
+layer is built; a tag of the source is never passed through. The HTML is carried in `data.js` as one more key,
+`guide_html`, beside `about_html` and `sources_html`: {html_bytes} bytes, of which {pic_b64} are its pictures. A link
+in it opens only when clicked, in a new tab, and nothing else in it carries an address. The copy carries the same
+guide, unchanged: the guide describes the published copy, and the full layer shows that same text.
+
+**Its pictures.** {n_pics} pictures of the published copy, in a window of {pw} × {ph}, taken {gp_taken} in
+{gp_browser} and captured by the browser itself as WebP at quality {gp_quality}; no note is open but the one the last
+picture asks for. Each goes into the guide's HTML as its own bytes, so the window opens without a connection; the
+build stops if one the guide names is missing. They could not be in the build before they existed, so they were taken
+of a build made with the guide's picture lines left out. None of them shows the Guide's window, so that build looks
+the same; and taken again of the builds on disk ({gp_again}), each came out byte for byte the picture in
+`docs/guide/`. Each was opened and looked at. "Its caption" is the guide's own line under the picture.
+""").format(w_wide=row["full layer | 1280x800"]["window"][0], w_narrow=row["full layer | 1000x700"]["window"][0], places=tg["places_of_index_html_changed"], g_bytes=f"{G['source']['bytes']:,}", html_bytes=f"{G['html']['bytes']:,}", pic_b64=f"{G['html']['of_them_the_pictures_as_base64']:,}", n_pics=len(gp["pictures"]),
+            pw=G["pictures"][0]["width"], ph=G["pictures"][0]["height"], gp_taken=gp["first_taken_utc"], gp_browser=gp["browser"], gp_quality=gp["webp_quality"], gp_again=gp["taken_again_utc"]))
+    D.append(table(["Picture", "Bytes", "What was done", "Its caption", "Seen"],
+                   [[cellmd("`" + q["file"] + "`"), f"{q['bytes']:,}", cellmd(q["what_was_done"]), cellmd(q["caption_in_the_guide"]), cellmd(q["seen"])] for q in gp["pictures"]]))
+    D.append(typed("""
+**The loader.** While the page opens, the map's area says "{loading}" until `data.js` has arrived, then
+"{drawing}", and the message goes when the map is ready. The first message is plain markup placed before the tag that
+asks for `data.js`; once the data is in, the page changes the message, gives the browser a frame to paint it, and only
+then draws the units. Its bar moves and counts nothing: `scripts/verify_layer.py`, which is unedited, holds that the
+page's script never uses `fetch` or `XMLHttpRequest`, and without them a browser reports no progress for `data.js`. If
+the data never arrives, the page says so as it did. What a reader sees while the page loads was looked at in two of
+the frames the browser painted (the last two pictures of section 10).
+
+**The sizes.** In `60_layer/` the two files were {b0} bytes together before the guide (`index.html` {i0}, `data.js`
+{d0}; the layer built {t0}) and are {b1} bytes with it (`index.html` {i1}, `data.js` {d1}), against the {limit}
+bytes that `scripts/verify_layer.py` allows. The guide's pictures are {pic_bytes} bytes as files.
+""").format(loading=next(x["string"] for x in tg["strings_added_to_the_page_itself"] if x["where"] == "index.html, markup"), drawing=next(x["string"] for x in tg["strings_added_to_the_page_itself"] if "script" in x["where"]),
+            b0=f"{L0['outputs']['both_bytes']:,}", i0=f"{L0['outputs']['index.html']:,}", d0=f"{L0['outputs']['data.js']:,}", t0=L0["run_utc"], b1=f"{L['outputs']['both_bytes']:,}", i1=f"{L['outputs']['index.html']:,}",
+            d1=f"{L['outputs']['data.js']:,}", limit=f"{L['outputs']['limit_bytes']:,}", pic_bytes=f"{sum(q['bytes'] for q in G['pictures']):,}"))
+    D.append(typed("""
+**What the checks gained.** No check was taken out, and no expected number or count was changed; counts rose only by
+what this handoff added, and every changed block is a row of section 8. The layer's exercise now ends, in Chrome,
+"{lay_c}" and, in WebKit, "{lay_w}"; the gate on the copy has {share_n} steps. `scripts/check_site_copy.py` gained a
+group of its own, `g`, and three of its checks that held "nothing else was added" were widened by exactly what was
+added, each written out: `a2` by the one key; `f1` by the strings above, all of which must be there; `f2` by the
+places of `index.html`, each found exactly once.
+""").format(lay_c=mask(lay_runs["exercise_layer in Chrome"]), lay_w=mask(lay_runs["exercise_layer in WebKit"]), share_n=len(share["steps"])))
+    D.append(table(["", "Check", "What it found"], [[cellmd(c["id"]), cellmd(c["check"]), cellmd(c["detail"])] for c in g_checks]))
+    D.append(typed("""
+**The gate on the guide's figures** (check `g4`). The guide is cut into sentences and table cells. For each one that
+holds a figure, all its figures must stand together, each written the same way, in one passage of one of the files
+the owner named, a passage that shares a word with the sentence. Allowed, and nothing else: thousands separators, a
+space before the per cent sign, the minus sign, and the letter for the multiplication sign. {n_units} sentences and
+cells hold a figure. Their traces are {n_rows} rows of a table, since a sentence that draws on two passages has two:
+{n_found} found so, {n_from} figures that come from a figure of a named file by a rule written out in the check, and
+{n_runs} counts of this build's own runs, which other checks of the group hold to the records of those runs. Every
+trace is in `{g_table}`, with the passage beside the sentence.
+
+The files: {files}. The last is not among the files the owner named. It is the registered page of the University of
+Maryland, which the record of the provider's cautions names as its input, and it is used for one sentence only: the
+citation of the paper behind Hansen's data. The record this check itself writes was among the files he named; only
+the count of its own checks is held to it, and to the run that writes it.
+
+**What the gate does not show.** That a passage says what the sentence says. A sentence with several figures, or
+with a large one, is held tightly, because another passage would have to hold them all. A lone small figure can stand
+beside a shared word in a passage about something else. Every trace was read once, by eye, on 13 October 2026; where
+the passage found for a lone figure was not the right one, the right one is named in the check.
+
+**Every figure that stands in no named file as the guide writes it**, with how it comes from one that does. The gate
+works each out again from the file's own figure and fails if the guide's differs:
+""").format(n_units=tg["figures_table"]["sentences_and_cells_with_a_figure"], n_rows=tg["figures_table"]["rows"], n_found=how_n("found"), n_from=how_n("comes from"), n_runs=how_n("a count"), g_table=tg["figures_table"]["path"],
+            files="; ".join("`" + f + "`" if "/" in f or f.endswith(".md") else f for f in tg["files_its_figures_are_traced_to"])))
+    D.append(table(["The guide's words", "The figure", "How it comes from the file's", "From"],
+                   [[cellmd(x["the_guides_words"], LONG), cellmd(x["figure"]), cellmd(x["how"].split(": ", 1)[1]), cellmd(x["from"])] for x in tg["figures_that_come_from_a_figure_of_a_named_file"]]))
+    D.append(typed("""
+**Sentences whose figures stand in two passages**, and **sentences whose passage is named** in the check because
+many passages hold their one small figure:
+""") + table(["The sentence begins", "What is listed", "The passage must hold"],
+             [[cellmd(x["sentence_begins"]), cellmd("these figures stand in a passage of their own: " + ", ".join(x["figures_in_a_passage_of_their_own"])), cellmd(x["that_passage_holds"])] for x in tg["sentences_whose_figures_stand_in_two_passages"]]
+             + [[cellmd(x["sentence_begins"].replace("`", "")), "its passage is named", cellmd(x["the_passage_holds"])] for x in tg["sentences_whose_passage_is_named"]]))
+    D.append(typed("""
+**The figures of the guide that are not the ones the owner wrote.** No word of the guide was changed. Its file was set,
+line by line, against the file of the commit that added it (`{first}`); these lines differ, each in figures alone:
+""").format(first=first) + table(["Line", "The owner's file", "Now", "Why"], not_his))
+    D.append(typed("""
+## 15. What this document was written from
 
 | File | Bytes | SHA-256 |
 |---|---|---|
@@ -553,6 +714,13 @@ SIX_DONE = "fixed (the owner's words of 11 October 2026, his third handoff"     
 FIXES = {1: "our placebo test, not CoRE Stack's own check", 2: "Hansen does see loss on open land", 3: "little or no loss", 4: "outside villages: the question kept, the claim dropped", 5: "the Hansen row of Sources",
          6: "block rasters, not a dashboard"}                                             # the six lines, by the number the check gives each
 F_CHECKS = ("f0", "f1 (layer)", "f2 (layer)", "f1 (copy)", "f2 (copy)")
+G_CHECKS = ("g0", "g1", "g2", "g3", "g4", "g5", "g6", "g7")                              # the group of the Guide button and the loader (13 October 2026)
+GUIDE_TRIALS = ("28", "29")                                                               # the two planted errors the owner named with the guide
+GUIDE_PICTURES = 5                                                                        # the guide's pictures, as the owner listed them
+BEFORE_THE_GUIDE = "6607784"                                                              # the last commit before the Guide button
+BEFORE_GUIDE_RECORD = ".session_scratch_2026-10-05/60_layer_2026-10-13_before_guide/layer.provenance.json"      # the record of the layer as it was kept before the Guide button
+WHY_MEGABYTES = "with the guide and its pictures inside, the published copy's two files come to that many megabytes; the gate works it out from their bytes (check `g4`)"
+WHY_COUNT = "the count of the run on these builds: the check gained the steps or the checks this handoff added (checks `g5` and `g7` hold the guide to the runs)"
 OLD_WORDS = ["CoRE Stack's own check", "already open in 2000", "fairly closed", "No forest loss in the window", "is none: under", "no village plan", "own dashboard", "state totals reconciled"]   # the owner's eight phrases, as he wrote them
 NOT_SEARCHED = ["00_raw", "docs/SITE_COPY.md", "docs/DECISION_LAYER.md", "docs/LAYER.md", "docs/RESULTS.md", "docs/GAP.md", "docs/stage4_run_log.md"]      # registered inputs, and the documents this task writes by script
 NIRV_NOW = "stopped; not a measure (ruling of 7 Oct 2026); nothing queued; its columns are blank (`nirv_status` reads `pending`)"    # the owner's words for the state of NIRv, row 11 of his table
