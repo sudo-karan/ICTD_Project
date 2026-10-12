@@ -1,6 +1,6 @@
 # Results: the state of the pipeline, and every headline number with its caveat
 
-*Written 2026-10-12T06:01:41Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
+*Written 2026-10-12T22:56:53Z by `scripts/write_results.py`. No figure in this document was typed. Each was read by that script
 from the file named for it in the appendix (§13), and each conclusion drawn from figures was tested against them before
 it was written. The figures change only when the files do.*
 
@@ -25,8 +25,8 @@ where money went relative to where forest was lost, and it says nothing about wh
 | forest: NIRv greenness trend | columns of `20_degradation/degradation_by_unit.csv` | **blank: the run was stopped, and it is not a measure** | replicated independently and found unfit (§6) |
 | need | `30_need/need_by_unit.csv` | built, 2026-10-05T20:22:49Z | census rows re-added to the published state totals (§7) |
 | allocation | `40_allocation/allocation_by_unit.csv` | built, 2026-10-05T20:25:06Z | district-by-year sums equal a separate aggregation to the rupee; `scripts/verify_r620.py`: passed (§8) |
-| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, 2026-10-12T05:52:15Z | the figures of every table its steps write, recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: 338 of 338 checks passed (§14) |
-| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, 2026-10-11T15:01:22Z | `scripts/verify_layer.py`: 92 of 92 checks passed; every control exercised in two browser engines, and the page last opened and read in the Safari application on an earlier build, not on this one (§10) |
+| the comparison of the three | `50_gap/need_vs_allocation_summary.csv` and the tables beside it | built, 2026-10-12T22:54:28Z | the figures of every table its steps write, recomputed by `scripts/verify_gap.py`, which imports nothing from the builders: 338 of 338 checks passed (§14) |
+| map layer for discussion | `60_layer/index.html`, `60_layer/data.js` | built, 2026-10-12T22:00:54Z | `scripts/verify_layer.py`: 92 of 92 checks passed; every control exercised in two browser engines, and the page last opened and read in the Safari application on an earlier build, not on this one (§10) |
 
 Three statements carry most of what follows.
 
@@ -462,21 +462,21 @@ stands whatever stage 4 turns out to be.
 
 ## 10. The map layer
 
-**What it is.** Two files, `60_layer/index.html` and `60_layer/data.js` (22.5 MB together, 6.0 MB
+**What it is.** Two files, `60_layer/index.html` and `60_layer/data.js` (23.4 MB together, 6.7 MB
 zipped), that open from disk in a browser and fetch nothing from the network: a map of the 11,468 units with a layer
 for each measure above, a panel of 44 figures for a clicked unit, a search, filters by kind of unit and by
 district, and a minimum of forest below which a unit is drawn grey (100 ha unless changed). It is a demonstration
 for discussion with people who know the places. It is not a verdict on any place.
 
 - **Checked against the stage tables** by `scripts/verify_layer.py`: 92 of 92 checks passed.
-- **Every control exercised on the build that is on disk** (2026-10-11T15:01:22Z), by `scripts/exercise_layer.py`, which writes
+- **Every control exercised on the build that is on disk** (2026-10-12T22:00:54Z), by `scripts/exercise_layer.py`, which writes
   `60_layer/exercise_chrome.json` and `60_layer/exercise_webkit.json`. In Chrome (Chrome/154.0.8037.99), opened from disk
-  and driven with real mouse and keyboard events: 53 of 53 actions did what they should, and for
+  and driven with real mouse and keyboard events: 60 of 60 actions did what they should, and for
   29 units clicked on the map 1,276 of 1,276 displayed values equalled the stage tables. In
-  WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine), with events made in script: 53 of 53, and for 29
+  WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine), with events made in script: 60 of 60, and for 29
   units 1,276 of 1,276. `docs/LAYER.md` lists each action and what happened.
 - **Not opened in the Safari application on this build.** That check was left out of this build's checks, and their
-  record gives the reason: "the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published". The last run of `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application), was on
+  record gives the reason: "the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch adds the Guide button, its pictures and a loader". The last run of `scripts/exercise_layer_safari.py`, in Safari 27.0 (the application), was on
   the layer built 2026-10-08T22:42:59Z, not the one on disk: there the page was driven by its address alone and its text read
   back, nothing was clicked, 48 of 48 addresses showed what they should (every layer, every minimum of
   forest, the search, the two text panels), and for the same 29 units 1,265 of 1,265 values the
@@ -614,7 +614,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-12T06:01:41Z | this run | the UTC time at which this script ran |
+| 2026-10-12T22:56:53Z | this run | the UTC time at which this script ran |
 | 2026-10-05T20:11:19Z | `10_units/units.provenance.json` | key `run_utc` |
 | 2026-10-05T20:44:23Z | `20_degradation/hansen.provenance.json` | key `run_utc` |
 | 2026-10-05T21:40:02Z | `20_degradation/corestack.provenance.json` | key `run_utc` |
@@ -623,9 +623,9 @@ This section is the script's own record of what it read. Paths are relative to t
 | 2026-10-05T20:22:49Z | `30_need/need.provenance.json` | key `run_utc` |
 | 2026-10-05T20:25:06Z | `40_allocation/allocation.provenance.json` | key `run_utc` |
 | passed | `scripts/verify_r620.py` | its exit status and last line, run by this script as it wrote the document |
-| 2026-10-12T05:52:15Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
+| 2026-10-12T22:54:28Z | `50_gap/gap.provenance.json` | key `steps` → `08_build_gap_districts` → `run_utc` |
 | 338 of 338 checks passed | `scripts/verify_gap.py` | its exit status and last line, run by this script as it wrote the document |
-| 2026-10-11T15:01:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
+| 2026-10-12T22:00:54Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 92 of 92 checks passed | `scripts/verify_layer.py` | its exit status and last line, run by this script as it wrote the document |
 | and the page last opened and read in the Safari application on an earlier build, not on this one | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: the check in the Safari application is named there |
 | 26.7 | `10_units/units.provenance.json` | computed here: outside-village km² ÷ km² of all units × 100. From: key `counts` → `km2_outside_any_revenue_village`; key `counts` → `km2` |
@@ -828,22 +828,22 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1,048 | `40_allocation/allocation.provenance.json` | key `join` → `units_with_no_works` |
 | 804 | `40_allocation/allocation.provenance.json` | key `join` → `units_with_no_works_by_level` → `outside_village` |
 | 40.6 | `20_degradation/hansen_by_unit_level.csv` | computed here: read as it stands. From: column `share_of_all_forest_pct`; row where `unit_level` is 'lgd_panchayat' |
-| 22.5 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
-| 6.0 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
+| 23.4 | `60_layer/layer.provenance.json` | key `outputs` → `both_bytes` |
+| 6.7 | `60_layer/layer.provenance.json` | key `outputs` → `both_zipped_bytes` |
 | 44 | `60_layer/layer.provenance.json` | key `table` → `fields_per_unit_in_the_panel` |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
-| 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_as_expected` |
-| 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
+| 60 | `60_layer/exercise_chrome.json` | key `summary` → `controls_as_expected` |
+| 60 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_chrome.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_chrome.json` | key `summary` → `values_equal` |
 | 1,276 | `60_layer/exercise_chrome.json` | key `summary` → `values_compared` |
 | WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | `60_layer/exercise_webkit.json` | key `summary` → `browser` |
-| 53 | `60_layer/exercise_webkit.json` | key `summary` → `controls_as_expected` |
-| 53 | `60_layer/exercise_webkit.json` | key `summary` → `controls_exercised` |
+| 60 | `60_layer/exercise_webkit.json` | key `summary` → `controls_as_expected` |
+| 60 | `60_layer/exercise_webkit.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_webkit.json` | key `summary` → `units_clicked` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_equal` |
 | 1,276 | `60_layer/exercise_webkit.json` | key `summary` → `values_compared` |
-| the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
+| the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch adds the Guide button, its pictures and a loader | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` of the check in the Safari application |
 | Safari 27.0 (the application) | `60_layer/exercise_safari.json` | key `summary` → `browser` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_as_expected` |
@@ -937,15 +937,15 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `40_allocation/assets_district_fy.csv` | 65,174 | `5e8dcd030f973f36` | - |
 | `40_allocation/panchayat_of_record_check.csv` | 363 | `f36e1bd24b73ce67` | - |
 | `40_allocation/state_fy_r620_vs_dump.csv` | 2,707 | `bd845de7118bc579` | - |
-| `50_gap/gap.provenance.json` | 48,350 | `63329e284e5f5545` | - |
+| `50_gap/gap.provenance.json` | 48,350 | `4e7f8a0514eaa156` | - |
 | `50_gap/need_vs_allocation_summary.csv` | 5,000 | `77831ac32e2c5717` | - |
 | `50_gap/panel_models.csv` | 5,072 | `a8c7ef7ef69aa7dd` | - |
 | `50_gap/unit_history_models.csv` | 6,920 | `f2684839d7db5310` | - |
-| `60_layer/decision_runs.json` | 7,656 | `58d78dc0cfe59e01` | - |
-| `60_layer/exercise_chrome.json` | 26,772 | `185ef4f92d9dd3a5` | 2026-10-11T18:15:26Z |
+| `60_layer/decision_runs.json` | 5,751 | `d1c7dd095bf899e1` | - |
+| `60_layer/exercise_chrome.json` | 29,059 | `42e5cf7ccb165dec` | 2026-10-12T22:06:50Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,265 | `7174d05b8896a1e4` | 2026-10-11T18:21:03Z |
-| `60_layer/layer.provenance.json` | 24,384 | `f139fc0a19c6ef6b` | 2026-10-11T15:01:22Z |
+| `60_layer/exercise_webkit.json` | 29,623 | `4ae79cc599a0a6b0` | 2026-10-12T22:11:09Z |
+| `60_layer/layer.provenance.json` | 29,131 | `8a8f2fec215ad988` | 2026-10-12T22:00:54Z |
 
 ### 13.4 Statements tested before they were written
 
@@ -1055,7 +1055,7 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*272 figures and 10 tables (330 cells) from 38 files; 64 statements tested; 32 totals compared. Written 2026-10-12T06:01:41Z by `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*272 figures and 10 tables (330 cells) from 38 files; 64 statements tested; 32 totals compared. Written 2026-10-12T22:56:53Z by `scripts/write_results.py` (sha256 `b918073042879cfc`).*
 
 ## 14. Stage 4: need against allocation
 
