@@ -24,6 +24,16 @@ open in 2000", "fairly closed", "No forest loss in the window", "is none: under"
 "state totals reconciled"); and three kinds of string are no longer outside that list, because the page now words them
 itself: the governance prompt, a cell's definition, and the Hansen row of Sources.
 
+THE GUIDE AND THE LOADER. On 13 October 2026 the owner had a third button put on the page, Guide, which opens
+docs/GUIDE.md in the window the About and Sources texts use, and a loader that says what the page is doing while it
+opens. The guide is carried in data.js as one more key, `guide_html` (scripts/_guide.py turns the Markdown into HTML
+when the layer is built; its five pictures go inside it), and index.html changed in ten places. Three checks that held
+"nothing else was added" had therefore to be widened, each by exactly what was added and no more: a2 allows the one new
+key; f1 allows four new strings on the page itself, written out (the button's label and hover text, the loader's two
+messages), and fails unless all four are there; f2 holds index.html to the kept page with the ten places put back,
+each written out and each found exactly once. Group g holds what was added. No check was taken out, and no expected
+number or count was changed.
+
 WHAT IT CHECKS
  a. THE NUMBERS. The saved copies still have the sha256 listed when they were made. `layer_by_unit.csv` is byte for
     byte the saved one. In both data.js files every part is the saved copy's but three kinds: parts that hold words
@@ -59,13 +69,53 @@ WHAT IT CHECKS
     is one of his six lines and differs by exactly his replacement; no place of a fix still holds its old words; every
     fix is found in the build. And no part of data.js differs but the parts those strings are in and the build time;
     index.html is byte for byte the kept one.
+ g. THE GUIDE AND THE LOADER (the owner's handoff of 13 October 2026).
+    g0  In both builds `guide_html` is docs/GUIDE.md as the converter turns it into HTML now, character for character,
+        with its five pictures; the copy's is the full layer's; the layer's run record gives the sha256 of the guide
+        and of each picture as they are on disk.
+    g1  The same HTML held to the Markdown WITHOUT the converter: the words read the same; no tag or attribute but
+        the few the converter writes; the links are the guide's own, each opened in a new tab; the five pictures are
+        the bytes of their files under docs/guide/.
+    g2  The button and the loader, read in index.html as text: where they stand, what they say, in what order the
+        page changes the message and draws the map; the loader's words carry no figure and pass the voice rules.
+    g3  The guide's words: none of the phrases of group b, no finding of the audit marked fixed, no block that opens
+        "This shows", and the development index named nowhere.
+    g4  THE GATE ON THE GUIDE'S FIGURES. The guide is cut into sentences and table cells. For each one that holds a
+        figure, all its figures must stand together, each written the same way, in ONE passage of ONE of the files
+        the owner named - the page's own strings in data.js, docs/GAP.md, docs/DECISION_LAYER.md, README.md,
+        60_layer/decision_runs.json, 70_share/exercise_share_chrome.json,
+        00_raw/05_forest_reference/provider_cautions.json and 60_layer/site_copy_looked_at.json - and that passage
+        must share a word with the sentence. A passage is a paragraph, an item of a list or a row of a table; in a
+        record, the plain values of one object; on the page, the strings of one place. Allowed, and nothing else:
+        thousands separators, a space before %, the minus sign, and x for the multiplication sign. A figure that
+        stands in no named file as the guide writes it may stand only as one of the cases listed in `GUIDE_DERIVED`,
+        each worked out again from the file's own figure (bytes to megabytes, lakh to crore, 13.8 pixels to "about
+        14", "per cent" in words, a shortened month, a shortened page number). Three short lists beside it are also
+        written out: sentences whose figures stand in two passages, sentences whose passage is named because many
+        passages hold their one small figure, and the two parts of the guide traced to one file only. One of those
+        is a tenth file, used for one sentence: the registered page of the University of Maryland, for the citation
+        of the paper behind Hansen's data. 60_layer/site_copy_check.json, the ninth of the owner's files, is the
+        record this script itself writes: only the count of its own checks is held to it, by g7, and to the run
+        that writes it. Picture file names, and the addresses links point to, are not figures.
+        WHAT g4 DOES NOT SHOW: that a passage says what the sentence says. A sentence with several figures, or with
+        a large one, is held tightly; a lone small figure can stand beside a shared word in a passage about
+        something else. Every trace is written to 60_layer/site_copy_guide_figures.csv to be read, and was read by
+        eye once, on 13 October 2026.
+    g5  The guide's own counts: in its table "How it was checked", each result that is a count of this build's own
+        runs is the result on record for that run, and is "N of N".
+    g6  Those records are of the builds on disk, and of runs that passed. So this check is run AFTER the runner,
+        the copy's check and the pictures: scripts/run_decision_checks.py, scripts/exercise_share.py, then the
+        screenshots, then this.
+    g7  The guide's count for this check itself is the number of checks this run makes.
  t. THE PLANTED ERRORS. The record of the trials (below) is of this script as it is and of the builds on disk, the
     builds as they are passed every check in it, and every planted error was caught by a check meant to catch it.
 
 --trials plants each error on a COPY - a copy of a build's data held in memory, or a copy of its index.html written to
 a temporary folder beside a link to its data.js - never on the real files, runs the checks on the copy, and counts the
 error as caught only if a check that is MEANT to catch it fails. The eight errors the owner named are the first eight;
-the four he named with the six lines, each of which puts an old line back, are numbers 23 to 26.
+the four he named with the six lines, each of which puts an old line back, are numbers 23 to 26; the two he named with
+the guide, a changed figure and a figure found nowhere, are 28 and 29, each planted on a copy of the guide's text held
+in memory. Numbers 30 to 35 try the other checks of group g and the widened f2.
 
 Reads   60_layer/: index.html, data.js, layer_by_unit.csv, layer.provenance.json, site_copy_audit.csv,
                    site_copy_check_changes.csv, and (the check only) site_copy_trials.json
@@ -73,10 +123,17 @@ Reads   60_layer/: index.html, data.js, layer_by_unit.csv, layer.provenance.json
         the two saved copies named above, and the two kept before the six lines, with their lists of sha256
         20_degradation/agreement_summary.csv (the interval one caution quotes),
         00_raw/05_forest_reference/provider_cautions.json (the provider's sentences the About text quotes)
-        git: the check scripts as they were at `CHECKS_BEFORE`, and scripts/verify_layer.py at 16b1efd
-Writes  the check:   60_layer/site_copy_check.json and 60_layer/site_copy_strings.csv, and nothing else. The second
-                     holds every visible string and every "i" of both builds, before and after, with where each
-                     one is; and one row for each figure that left or joined a place, with why.
+        docs/GUIDE.md, docs/guide/*.webp, scripts/_guide.py (the guide, its pictures and its converter)
+        the files the guide's figures are traced to: docs/GAP.md, docs/DECISION_LAYER.md, README.md,
+        60_layer/decision_runs.json, 70_share/exercise_share_chrome.json, 60_layer/site_copy_looked_at.json, and
+        00_raw/05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html
+        git: the check scripts as they were at `CHECKS_BEFORE`, this script at `BEFORE_THE_GUIDE`, and
+        scripts/verify_layer.py at 16b1efd
+Writes  the check:   60_layer/site_copy_check.json, 60_layer/site_copy_strings.csv and
+                     60_layer/site_copy_guide_figures.csv, and nothing else. The second holds every visible string
+                     and every "i" of both builds, before and after, with where each one is, the guide's words
+                     block by block, and one row for each figure that left or joined a place, with why. The third
+                     holds every sentence and cell of the guide that has a figure, with the passage it stands in.
         --trials:    60_layer/site_copy_trials.json, and nothing else.
         With --out FOLDER the same files go to that folder instead (a dry run).
 Exit status 0 only if every check passed (the check), or every planted error was caught (--trials).
@@ -116,6 +173,7 @@ VERIFY_LAYER_AT = "16b1efd"          # the commit the stage-4 checks hold script
 CHECK_FILES = ["scripts/verify_decision.py", "scripts/exercise_layer.py", "scripts/exercise_decision.py", "scripts/exercise_share.py", "scripts/exercise_layer_safari.py", "scripts/exercise_decision_safari.py",
                "scripts/run_decision_checks.py", "scripts/check_pages_live.py", "scripts/write_decision_layer.py", "scripts/write_results.py"]
 OUTSIDE_GIT = {".session_scratch_2026-10-05/make_layer_md.py": ".session_scratch_2026-10-05/site_copy/make_layer_md.before_site_words.py"}    # a writer git does not hold: the file as it was, saved beside the audit's working files
+THIS_SCRIPT, BEFORE_THE_GUIDE = "scripts/check_site_copy.py", "6607784"      # this script did not exist at CHECKS_BEFORE: its own changes are tabled against the last commit before the Guide button (13 October 2026)
 STANDING_IS = "the forest of 2000 with no loss recorded since; not a measure of tree cover today"       # the owner's wording of 9 October 2026
 OVERLAY_SAYS = "Not in this copy, while we check the tile provider's terms of use."                      # his words for the copy's greyed box, 11 October 2026
 INPUTS = []
@@ -733,6 +791,553 @@ def squeeze(s):
     return " ".join(s.split())
 
 
+# ---- g. the guide and the loader (the owner's handoff of 13 October 2026) ----------------------------------------------------------------------------
+GUIDE_MD = "docs/GUIDE.md"
+GUIDE_PICTURES = 5                                              # the owner's five: docs/guide/01_page.webp to 05_note.webp
+GUIDE_BUTTON = ('<button id="b_sources" title="Where the data comes from, and under what licence">Sources</button>'
+                '<button id="b_guide" title="What every control does, and how the map was made and checked">Guide</button></p>')      # the third button, after the other two, with his label and his hover text
+LOADING, DRAWING = "Loading the map\u2026", "Drawing the units\u2026"      # the loader's two messages, in his words
+# The strings a reader can see that the Guide button and the loader added to the page itself (index.html), each written out: (where it is, the string).
+ADDED_13_OCT = [("index.html, <button>", "Guide"), ("index.html, title=", "What every control does, and how the map was made and checked"), ("index.html, markup", LOADING),
+                ("index.html, a string of its script", DRAWING)]
+ADDED_NOTE = "added with the Guide button and the loader (the owner's handoff of 13 October 2026)"
+# The places where the Guide button and the loader changed index.html, each written out: (the page as it is, the page as it was). Each is found exactly once; with every one put back, the page is byte for byte the one kept.
+PAGE_13_OCT = [
+    ("""/* the guide (added 13 Oct 2026): docs/GUIDE.md as the builder turned it into HTML, shown in the window the About and Sources texts use. A picture is as wide as the text; a table wider than the window scrolls sideways inside it */
+.guide h2 { font-size: 15px; text-transform: none; letter-spacing: 0; color: #1c1c1c; margin: 22px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #ddd; }
+.guide img { display: block; width: 100%; height: auto; border: 1px solid #bbb; box-sizing: border-box; }
+.guide p.pic { margin: 12px 0 2px; }
+.guide p.pic + p { color: #555; font-size: 12.5px; margin-top: 2px; }
+.guide .wide { overflow-x: auto; margin: 8px 0; }
+.guide code { font-size: 12.5px; background: #f3f3f0; border-radius: 2px; padding: 0 3px; }
+.guide li { margin: 3px 0; }
+#b_about, #b_sources, #b_guide { padding: 4px 8px; margin-right: 3px; }       /* the three buttons stay on one line in the side panel, also beside a scroll bar */
+/* the loader (added 13 Oct 2026): over the map area from the moment the page opens until it is ready. Its bar moves and counts nothing: the page cannot know how much of data.js has arrived */
+#loading { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 1100; background: #e9eef2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#loadmsg { margin: 0 0 10px; font-size: 15px; color: #333; }
+#loadbar { width: 180px; height: 4px; border-radius: 2px; background: #c9d3da; overflow: hidden; }
+#loadbar span { display: block; width: 40%; height: 100%; border-radius: 2px; background: #47657a; animation: loadbar 1.1s ease-in-out infinite alternate; }
+@keyframes loadbar { from { transform: translateX(0); } to { transform: translateX(150%); } }
+""", ""),
+    ('<button id="b_guide" title="What every control does, and how the map was made and checked">Guide</button>', ""),
+    ('<div id="loading" role="status"><p id="loadmsg">Loading the map&hellip;</p><div id="loadbar"><span></span></div></div>', ""),
+    ("""  // ---- the loader (added 13 Oct 2026) ---------------------------------------------------------------------------------------------
+  // The page opens with a message over the map area. It is written in the markup above, so it shows while data.js is still arriving.
+  // Here the data is in. The message changes, the browser is given one frame to paint it, and only then is the map drawn: by start(),
+  // which is the rest of this script. A timer stands behind the frame, for a window that is given no frames (a tab in the background).
+  // The message goes where the page says it is ready, at the end of start().
+  document.getElementById("loadmsg").innerHTML = "Drawing the units&hellip;";
+  var begun = false;
+  function begin() { if (!begun) { begun = true; start(); } }
+  if (window.requestAnimationFrame) { window.requestAnimationFrame(function () { setTimeout(begin, 0); }); }
+  setTimeout(begin, 300);
+  function start() {       // everything from here to the end of this script is this one function: its lines keep the indentation they had before 13 Oct 2026
+""", ""),
+    ("""$("modal").style.display = "block"; $("modalbody").parentNode.scrollTop = 0; }       // each text opens at its top (13 Oct 2026: the guide is long)
+""", """$("modal").style.display = "block"; }
+"""),
+    ("""  $("b_guide").onclick = function () { modal(D.guide_html); };       // the guide (added 13 Oct 2026): docs/GUIDE.md as the builder turned it into HTML, in the same window
+""", ""),
+    ("open=about|sources|guide.", "open=about|sources."),
+    (' else if (h0.open === "guide") { modal(D.guide_html); }', ""),
+    ("""  $("loading").style.display = "none";       // the map is drawn: the loader goes (added 13 Oct 2026)
+""", ""),
+    ("""  }                        // the end of start()
+""", ""),
+]
+
+
+def page_before_13_oct(page):
+    """index.html with every place the Guide button and the loader changed put back as it was: (the page, what could not be put back - a list, empty when nothing)."""
+    wrong = []
+    for is_, was in PAGE_13_OCT:
+        if page.count(is_) != 1:
+            wrong.append(f"'{squeeze(is_)[:60]}' stands {page.count(is_)} time(s), not once")
+        page = page.replace(is_, was)
+    return page, wrong
+
+
+# -- the gate on the guide's figures --
+# A figure, as the guide or a file writes it: digits, with their thousands separators and decimals; a minus sign before them; a per cent sign after them, with or without a space; ha, km², MB, crore or lakh
+# after them. Each of these is one figure, taken whole: a date (9 October 2026), a financial year (FY2018-19), a version (1.9.4), two figures joined by a multiplication sign (1280 × 800), a word with a digit
+# in it (R6.20, v1.13, ACT4D, 21st-century, 2-Clause: compared without regard to capitals), and in the guide a code span with a digit in it (a file's or a command's name). A number written as a word is not
+# a figure. The owner's four allowances, and no other, are made by g_norm(): thousands separators, a space before %, the minus sign, and × against x.
+G_MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
+G_NUMBER = r"\d+(?:,\d{3})*(?:\.\d+)?"
+G_TOK = re.compile(rf"""`[^`]*\d[^`]*`
+  | \d{{4}}-\d\d-\d\dT\d\d:\d\d:\d\dZ
+  | \d{{1,2}}\s(?:{G_MONTHS})\s\d{{4}}
+  | FY\d{{4}}-\d{{2}}
+  | (?<![\w.])\d+(?:\.\d+){{2,}}(?![\w])
+  | (?<![\w.])(?=[\w.-]*[A-Za-z])(?=[\w.-]*\d)[A-Za-z0-9_][\w.-]*[A-Za-z0-9_]
+  | {G_NUMBER}\s[\u00d7x]\s{G_NUMBER}
+  | (?:\u2212|(?<![\w)\u2212-])-)?{G_NUMBER}(?:\s?%|\s(?:ha|km\u00b2|km2|MB|crore|lakh)(?![A-Za-z]))?""", re.X)
+G_WORD = re.compile(r"[A-Za-z]+(?:'[a-z]+)?")
+G_SENTENCE = re.compile(r"""(?<=[.?!])(?<!\bSl\.)(?<!S\.O\.)(?<!\bal\.)(?<!Prof\.)\s+(?=[A-Z0-9\u201c"(`])""")      # where one sentence ends and the next begins; not after Sl., S.O., et al. or Prof.
+G_NUMERIC_CELL = re.compile(r"[\d,.\s%\u2212-]+")
+RULE_LINE = re.compile(r"\|(\s*:?-+:?\s*\|)+")
+
+
+def g_norm(t):
+    """A figure for comparing: the owner's four allowances and no other. A word with a digit in it is compared without regard to capitals."""
+    if t.startswith("`"):
+        return t
+    if re.search(r"[A-Za-z]", re.sub(r"(?:\s?%|\s(?:ha|km\u00b2|km2|MB|crore|lakh)|\s[\u00d7x]\s|" + G_MONTHS + r"|^FY)", "", t)):
+        return t.lower()
+    t = t.replace("\u2212", "-").replace("\u00d7", "x").replace("km\u00b2", "km2")
+    t = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", t)
+    return re.sub(r"(?<=\d)\s+%", "%", t)
+
+
+def g_figures(text):
+    """The figures of a text, each as g_norm() writes it, in order."""
+    return [g_norm(m.group(0)) for m in G_TOK.finditer(text)]
+
+
+def g_pairs(text):
+    """Each figure of a text with the word before it and with the word after it: what stands beside a figure is part of how it is written ("30 districts", "tier 2")."""
+    seq, pos = [], 0
+    for m in G_TOK.finditer(text):
+        seq += [("w", w.lower()) for w in G_WORD.findall(text[pos:m.start()])] + [("f", g_norm(m.group(0)))]
+        pos = m.end()
+    seq += [("w", w.lower()) for w in G_WORD.findall(text[pos:])]
+    return {(seq[i][1], seq[i + 1][1]) for i in range(len(seq) - 1) if "f" in (seq[i][0], seq[i + 1][0]) and not seq[i][1].startswith("`") and not seq[i + 1][1].startswith("`")}
+
+
+def g_words(text):
+    return set(re.findall(r"[a-z]{4,}", text.lower()))
+
+
+def g_md(s):
+    """A line of Markdown without what is not its words: a picture leaves nothing (its file's name and the numbers in it are not figures), a link leaves its words (the address it points to is not a figure), bold loses its marks."""
+    s = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", s)
+    s = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", s)
+    return s.replace("**", "")
+
+
+def guide_units(md):
+    """The guide cut into the pieces its figures are held by: a sentence of a paragraph, of a list item or of a table's cell. Each: line, section, text, `beside` (for a cell that is only a figure:
+    the other cells of its row, one of which the passage must hold too), and for a row of a table its first cell (`row`), the cell's place (`column`) and the whole row (`with`), whose words help
+    to choose among the passages that hold the cell's figures."""
+    out, section = [], ""
+    for n, line in enumerate(md.splitlines(), 1):
+        if not line.strip() or RULE_LINE.fullmatch(line.strip()):
+            continue
+        if line.startswith("#"):
+            section = line.lstrip("#").strip()
+        plain_ = g_md(line).strip()
+        if not plain_:
+            continue
+        if plain_.startswith("|"):
+            cells = [c.strip() for c in plain_.strip("|").split("|")]
+            words_ = [c for c in cells if c and not G_NUMERIC_CELL.fullmatch(c)]
+            for k, c in enumerate(cells):
+                for s in G_SENTENCE.split(c):
+                    if g_figures(s):
+                        out.append({"line": n, "section": section, "text": s.strip(), "beside": words_ if G_NUMERIC_CELL.fullmatch(c) else None, "row": cells[0], "column": k, "with": " ".join(cells)})
+        else:
+            for s in G_SENTENCE.split(re.sub(r"^(#{1,3} |- |\d+\. )", "", plain_)):
+                if g_figures(s):
+                    out.append({"line": n, "section": section, "text": s.strip(), "beside": None, "row": None, "column": None, "with": ""})
+    return out
+
+
+def g_passage(where, text):
+    text = text.replace("`", "").replace("**", "").replace("*", "")
+    return {"where": where, "text": text, "figures": set(g_figures(text)), "pairs": g_pairs(text), "words": g_words(text), "norm": norm(text)}
+
+
+def passages_of_markdown(text):
+    """A document's passages: a paragraph, an item of a list, or a row of a table."""
+    out = []
+    for block in re.split(r"\n\s*\n", text):
+        ls = [l.strip() for l in block.splitlines() if l.strip()]
+        if ls and all(l.startswith("|") for l in ls):
+            out += [g_passage("a row of a table", l) for l in ls if not RULE_LINE.fullmatch(l)]
+            continue
+        item = []
+        for l in ls:
+            if re.match(r"(- |\d+\. |#)", l) and item:           # a new item of a list, or a heading, ends the passage before it
+                out.append(g_passage("an item of a list" if re.match(r"(- |\d+\. )", item[0]) else "a paragraph", " ".join(item)))
+                item = []
+            item.append(l)
+        if item:
+            out.append(g_passage("an item of a list" if re.match(r"(- |\d+\. )", item[0]) else "a paragraph", " ".join(item)))
+    return out
+
+
+def passages_of_json(x, path=""):
+    """A record's passages: the plain values of one object, or of one list, read together."""
+    out = []
+    if isinstance(x, dict):
+        scal = "; ".join(f"{k}: {v}" for k, v in x.items() if isinstance(v, (str, int, float)) and not isinstance(v, bool))
+        if scal:
+            out.append(g_passage(path or "(the top)", scal))
+        for k, v in x.items():
+            out += passages_of_json(v, f"{path}/{k}" if path else k)
+    elif isinstance(x, list):
+        scal = "; ".join(str(v) for v in x if isinstance(v, (str, int, float)) and not isinstance(v, bool))
+        if scal:
+            out.append(g_passage(path, scal))
+        for k, v in enumerate(x):
+            out += passages_of_json(v, f"{path}[{k}]")
+    return out
+
+
+def passages_of_html(text):
+    """A registered web page's passages: the words between one block tag and the next."""
+    parts = re.split(r"</?(?:p|div|li|ul|ol|blockquote|h[1-6]|br|tr|table|pre|section|article|header|footer)(?:\s[^>]*)?>", re.sub(r"(?s)<(script|style)\b.*?</\1>", " ", text))
+    return [g_passage("a block of the page", t) for t in (plain(p) for p in parts) if t]
+
+
+def passages_of_the_page(b):
+    """The page's own strings in data.js, as a reader meets them: the strings of one place read together - a layer's name, legend title, notes, "i" and the count beside each class; a section of the unit
+    panel with its "i"; a cell with its definition, its reason, its work types, its count in each window and its label in the provisional order; a row of Sources - and every other string by itself.
+    Not among them: the guide itself, the build's own date, and the values of the units' rows."""
+    D, V = b["D"], b["D"]["decision"]
+    groups = {}
+
+    def put(key, text):
+        groups.setdefault(key, []).append(text)
+    for r in strings({**b, "readme": None}):
+        w = r["where"]
+        if (w.startswith("f[][") and ": " in w) or w in BUILD_SPECIFIC:      # a value of a unit's row, its figures written N: not a string with a figure. The small-forest warning, which is one, stays
+            continue
+        m = re.match(r"layers\[(\w+)\]\.|tips\.layer:(\w+)$", w)
+        key = (f"the layer {m.group(1) or m.group(2)}" if m else None)
+        m = key is None and re.match(r"panel\[(\d+)\]\.|tips\.panel:(\d+)$", w)
+        key = key or (f"section {m.group(1) or m.group(2)} of the unit panel" if m else None)
+        m = key is None and re.match(r"decision\.cells\[(\w+)\]\.|decision\.tier_why\[(\w+)\]$", w)
+        key = key or (f"the cell {m.group(1) or m.group(2)}" if m else None)
+        m = key is None and re.match(r"decision\.windows\[(\w+)\]\.", w)
+        key = key or (f"the window {m.group(1)}" if m else None)
+        m = key is None and re.match(r"sources_html, row (\d+), cell", w)
+        key = key or (f"row {m.group(1)} of Sources" if m else None)
+        key = key or ("the minimum-forest choice" if w.startswith("floors[") or w == "tips.floors" else "the kinds of unit" if w.startswith("unit_types.") or w == "tips.units" else w)
+        put(key, r["text"])
+    for l in D["layers"]:
+        for s, counts in (l.get("counts") or {}).items():
+            put(f"the layer {l['id']}", "; ".join(f"{c['label']}: {counts[i]}" for i, c in enumerate(l["classes"])) + ("" if s == "all" else f" (minimum forest {s} ha)"))
+    for k, cid in enumerate(V["tiers"]):                        # a tier's label as the page draws it in the legend and the list: its own words for a tier, filled with the cell's place in the provisional order
+        c = next(c for c in V["cells"] if c["id"] == cid)
+        put(f"the cell {cid}", V["t"]["tier"].replace("{k}", str(k + 1)).replace("{name}", c["name"]))
+    for w in V["windows"]:
+        for i, c in enumerate(V["cells"]):
+            put(f"the cell {c['id']}", f"{w['label']}: {V['counts'][w['id']][i]}")
+    return [g_passage(k, " | ".join(v)) for k, v in groups.items()]
+
+
+GUIDE_FILES = ["the page's own strings in data.js", "docs/GAP.md", "docs/DECISION_LAYER.md", "README.md", "60_layer/decision_runs.json", "60_layer/site_copy_check.json", "70_share/exercise_share_chrome.json",
+               "00_raw/05_forest_reference/provider_cautions.json", "60_layer/site_copy_looked_at.json"]      # the owner's nine, in his order
+UMD_PAGE = "00_raw/05_forest_reference/umd_global_forest_change_2025_v1_13_page_2026-10-08.html"      # a tenth, for one sentence: see GUIDE_ONLY_FROM
+# Where a part of the guide may be traced to one file only. The analysis: the guide says its full account is docs/GAP.md. The citation of the paper behind Hansen's data: the registered page of the University of
+# Maryland, which 00_raw/05_forest_reference/provider_cautions.json names as its input with its sha256 - the one file beyond the owner's nine, and for this one sentence only.
+GUIDE_ONLY_FROM = [(lambda u: u["section"] == "What the analysis behind it found", ["docs/GAP.md"]), (lambda u: u["text"].startswith("Hansen et al. 2013, High-resolution global maps"), [UMD_PAGE])]
+# The record this check itself writes is among the owner's nine for one thing, the count of its own checks: that count is held to the run that writes the record (g7), and no other figure is traced to the record of an earlier run.
+NOT_SEARCHED = ["60_layer/site_copy_check.json"]
+# The two tables of the guide whose rows are each about one file, named in the row's first cell: a figure of such a row is looked for only in passages that name that file.
+ROWS_NAME_A_FILE = ["How it was checked", "The code and the documents"]
+
+
+def _mb(x):
+    f = {i["path"].split("/")[-1]: i["bytes"] for i in (x["json"].get("70_share/exercise_share_chrome.json") or {}).get("inputs", []) if i["path"].startswith(f"70_share/{NAME}/") and i["path"].endswith(("index.html", "data.js"))}
+    if set(f) != {"index.html", "data.js"}:
+        return None, "70_share/exercise_share_chrome.json does not give the bytes of the copy's index.html and data.js", None
+    return f"{round(sum(f.values()) / 1e6)} MB", f"70_share/exercise_share_chrome.json, its inputs: index.html {f['index.html']:,} bytes and data.js {f['data.js']:,} bytes, {sum(f.values()):,} bytes together", None
+
+
+def _from(file, must_hold, make):
+    """A source for a derived figure: the one passage of `file` that holds every one of `must_hold` (words as they stand there); make() gives the figure the guide may then write.
+    Gives (the figure, where it comes from in words, the passage)."""
+    def source(x):
+        hits = [p for p in x["passages"].get(file, []) if all(norm(w) in p["norm"] for w in must_hold)]
+        if not hits:
+            return None, f"{file}: no passage holds " + " ... ".join(must_hold), None
+        return make(), f"{file}: '... " + " ... ".join(must_hold) + " ...'", hits[0]
+    return source
+
+
+# Every figure of the guide that stands in none of the named files as the guide writes it, with how it comes from one that does: (the first words of the guide's sentence, the figure as the guide writes it,
+# how it comes from the file's, the source). The gate finds the source in the file, works the figure out again, and fails if the guide's differs. The megabytes are the one figure this build itself sets.
+GUIDE_DERIVED = [
+    ("The page carries about", "{megabytes}", "bytes to megabytes: the bytes of the published copy's index.html and data.js, as the record of the copy's own check gives them, added, divided by 1,000,000 and rounded to a whole number", _mb),
+    ("1 ha is the smallest patch the Forest Survey of India counts as forest cover, and about", "14", "13.8 pixels, rounded to a whole number and said with 'about'",
+     _from("docs/DECISION_LAYER.md", ["The proposal, 1 ha, is 13.8 pixels"], lambda: str(round(13.8)))),
+    ("Splitting the same money by need would move", "72.07 crore", "lakh to crore: 7,207.11 lakh rupees, divided by 100 and rounded to two decimals",
+     _from("docs/GAP.md", ["The same money distributed by need", "would move 7,207.11 lakh rupees"], lambda: f"{7207.11 / 100:.2f} crore")),
+    ("Splitting the same money by need would move", "139.16 crore", "lakh to crore: 13,915.72 lakh, divided by 100 and rounded to two decimals",
+     _from("docs/GAP.md", ["R6.20 plantation expenditure", "13,915.72 lakh over FY2018-19 to FY2025-26"], lambda: f"{13915.72 / 100:.2f} crore")),
+    ("67.1 % of it lies in 5 districts", "67.1%", "the same figure: the file writes 'per cent' in words", _from("docs/GAP.md", ["67.1 per cent of the state's N1 lies in 5 districts"], lambda: "67.1%")),
+    ("66,060 ha, 74 % of the need", "74%", "the same figure: the file writes 'per cent' in words", _from("docs/GAP.md", ["The finding, in volumes first", "66,060 ha of N1, 74 per cent of it, lie in districts"], lambda: "74%")),
+    ("The 8 districts where over half the people are Scheduled Tribe", "78.1%", "the same figure: the file writes 'per cent' in words", _from("docs/GAP.md", ["The 8 districts in the class", "hold 78.1 per cent of the need"], lambda: "78.1%")),
+    ("The 8 districts where over half the people are Scheduled Tribe", "57.7%", "the same figure: the file writes 'per cent' in words",
+     _from("docs/GAP.md", ["The 8 districts in the class", "received 57.7 per cent of the post-period plantation money"], lambda: "57.7%")),
+    ("The minimum forest of 100 ha for any loss rate was set on", "7 October 2026", "the same date: the file shortens the month, '7 Oct 2026'",
+     _from("README.md", ["The floor for a rate is 100 ha, by ruling of the project owner (7 Oct 2026)"], lambda: "7 October 2026")),
+    ("Hansen et al. 2013, High-resolution global maps", "853", "the same pages: the file shortens the last page, '850-53'",
+     _from(UMD_PAGE, ["High-Resolution Global Maps of 21st-Century Forest Cover Change. Science 342 (15 November): 850-53"], lambda: "853")),
+]
+# The sentences of the guide whose figures stand in two passages: (the first words of the sentence, the figures that stand in a passage of their own, words that passage must hold). Each part must stand, whole, in one passage.
+GUIDE_SPLIT = [
+    ("A fixed 1 ha bar is easier for a large forest to cross", ["2"], "Tier 2: Closed forest, loss recorded - find the cause first"),      # "tier 2": the cell's place in the provisional order, which the page counts; the count of units and the share stand in the About text
+    ("It does not track the Survey's net change in forest cover from 2021 to 2023", ["2023"], "India State of Forest Report 2023"),      # the year of the Survey's report; the correlation, and the year the change is measured from, stand in a row of a table
+]
+# The sentences of the guide that hold one small figure, where the passage is named here because many passages hold that figure: (the first words of the sentence, words the passage must hold).
+GUIDE_PIN = [
+    ("The other is a layer of 2011 that no file we share carries", "The development index of 2011 is left out of the copy"),
+    ("`07_build_share.py` makes this copy from the full version: it leaves one 2011 layer out", "The development index of 2011 is left out of the copy"),
+    ("Hansen's record changed method in 2011", "the 2011-2025 update"),
+]
+# The rows of the guide's table "How it was checked" whose result is a count of this build's own runs: the row (its first cell). Their result cells are not searched for: g5 holds them to the records of the runs, and g7 this check's own.
+GUIDE_PINNED_ROWS = ["verify_layer.py", "verify_decision.py", "exercise_layer.py, in Chrome and in WebKit", "exercise_decision.py, in Chrome and in WebKit", "exercise_share.py", "check_site_copy.py"]
+
+
+def trace_guide_figures(md, x):
+    """Every figure of the guide, traced. x: {"passages": {file: [passage]}, "json": {file: its content}}. Returns (rows, wrong): a row for each sentence or cell with a figure, saying where its
+    figures stand; and what is wrong (a list, empty when nothing is)."""
+    units, rows, wrong = guide_units(md), [], []
+    used = {"derived": set(), "split": set(), "pin": set()}
+    for u in units:
+        figs = list(dict.fromkeys(g_figures(u["text"])))
+        row = {"line": u["line"], "section": u["section"], "the_guides_words": u["text"], "its_figures": "; ".join(f.strip("`") for f in figs)}
+        if u["section"] == "How it was checked" and u["column"] == 2 and u["row"].replace("`", "") in GUIDE_PINNED_ROWS:
+            rows.append({**row, "how": "a count of this build's own runs", "file": "the record of the run (checks g5 and g7)", "passage": ""})
+            continue
+        derived, first = [], []                                 # first: the passages the derived figures come from, where the sentence's other figures are looked for first
+        for n_, (start, fig, how, source) in enumerate(GUIDE_DERIVED):
+            if start not in u["text"]:
+                continue
+            used["derived"].add(n_)
+            got, said, passage = source(x)
+            if fig == "{megabytes}":                            # whatever megabytes the guide writes, they must be the megabytes of the copy on record
+                mine = next((f for f in figs if f.endswith(" MB")), None)
+                if mine is None or got is None or mine != got:
+                    wrong.append(f"line {u['line']}: the guide writes '{mine}' and the copy's two files come to '{got}' ({said})")
+                derived.append((mine, how, said))
+            elif fig not in figs:
+                wrong.append(f"line {u['line']}: the listed figure '{fig}' is not a figure of the sentence that begins '{start[:40]}'")
+            elif got is None or g_norm(got) != fig:
+                wrong.append(f"line {u['line']}: '{fig}' does not come from the file as listed ({said})" + ("" if got is None else f": it gives '{got}'"))
+            else:
+                derived.append((fig, how, said))
+                first.append((said.split(":")[0], passage))
+        for d in derived:
+            rows.append({**row, "its_figures": (d[0] or "").strip("`"), "how": "comes from a figure of a named file: " + d[1], "file": d[2].split(":")[0].split(",")[0], "passage": d[2]})
+        rest = [f for f in figs if f not in {d[0] for d in derived}]
+        if not rest:
+            continue
+        only = next((files for test, files in GUIDE_ONLY_FROM if test(u)), None)
+        files = [f for f in (only or GUIDE_FILES) if f not in NOT_SEARCHED]
+        names = [f for f in rest if f.startswith("`")]          # a file's or a command's name stands whole, by itself: each is looked for in a passage of its own
+        rest = [f for f in rest if not f.startswith("`")]
+        parts, must = ([rest] if rest else []), {}
+        for n_, (start, own, holds_) in enumerate(GUIDE_SPLIT):
+            if u["text"].startswith(start):
+                used["split"].add(n_)
+                if not set(own) < set(rest):
+                    wrong.append(f"line {u['line']}: the listed split {own} is not a part of this sentence's figures {rest}")
+                parts = [[f for f in rest if f not in own], list(own)]
+                must[tuple(own)] = [norm(holds_)]
+        for n_, (start, holds_) in enumerate(GUIDE_PIN):
+            if u["text"].startswith(start):
+                used["pin"].add(n_)
+                must[tuple(rest)] = [norm(holds_)]
+        parts += [[f] for f in names]
+        row_names = [norm(c) for c in re.findall(r"`([^`]+)`", u["row"] or "")] if u["section"] in ROWS_NAME_A_FILE and u["column"] else []
+        mine_words, mine_pairs = g_words(u["text"]) | g_words(u["with"]), g_pairs(u["text"])
+        for part in parts:
+            def holds(p):
+                return all((t.strip("`") in p["text"]) if t.startswith("`") else (t in p["figures"]) for t in part) and (u["beside"] is None or any(norm(c) in p["norm"] for c in u["beside"])) \
+                    and all(w in p["norm"] for w in must.get(tuple(part), [])) and (part[0].startswith("`") or all(n_ in p["norm"] for n_ in row_names))
+            best = None                                         # a passage that one of this sentence's figures comes from is taken if it holds the part. Otherwise, of the passages that hold every figure of
+            for k, f in enumerate([q[0] for q in first] + files):      # the part: first by how many figures stand beside the same word as in the sentence, then by the files' order (the owner's), then by how
+                if k == len(first) and best is not None:                # like the sentence the passage is (the words they share, over the words of either)
+                    break
+                for p in ([first[k][1]] if k < len(first) else x["passages"].get(f, [])):
+                    if p is not None and holds(p):
+                        shared = len(mine_words & p["words"])
+                        beside = len({q for q in mine_pairs if q[0] in part or q[1] in part} & p["pairs"])
+                        key = (beside, -k, shared / max(1, len(mine_words | p["words"])))
+                        if (shared or beside or u["beside"] or part[0].startswith("`")) and (best is None or key > best[0]):
+                            best = (key, f, p, shared, beside)
+            if best is None:
+                wrong.append(f"line {u['line']}: {[t.strip('`') for t in part]} of '{u['text'][:70]}' stand together in no passage of " + ("; ".join(files) if only else "a named file") + " that shares a word with it"
+                             + (f" and names {row_names}" if row_names and not part[0].startswith("`") else ""))
+                rows.append({**row, "its_figures": "; ".join(t.strip("`") for t in part), "how": "NOT FOUND", "file": "", "passage": ""})
+            else:
+                rows.append({**row, "its_figures": "; ".join(t.strip("`") for t in part), "how": "found, written the same way, in one passage" + (" (one of the passages this sentence draws on)" if len(parts) > 1 else ""),
+                             "file": best[1], "passage": f"[{best[2]['where']}] " + best[2]["text"][:400], "words_shared_with_the_passage": best[3], "figures_beside_the_same_word": best[4]})
+    for kind, table in (("derived", GUIDE_DERIVED), ("split", GUIDE_SPLIT), ("pin", GUIDE_PIN)):
+        wrong += [f"a listed case ({kind}) is of no sentence of the guide: '{table[n_][0][:60]}'" for n_ in range(len(table)) if n_ not in used[kind]]
+    return rows, wrong
+
+
+def guide_sources(page_build, read_):
+    """What the guide's figures are traced to: the passages of each named file, and the content of the records. read_(path): the file, recorded among this check's inputs; a file that is not there gives no passage."""
+    x = {"passages": {GUIDE_FILES[0]: passages_of_the_page(page_build)}, "json": {}, "missing": []}
+    for f in GUIDE_FILES[1:] + [UMD_PAGE]:
+        if f in NOT_SEARCHED:
+            continue
+        if not (ROOT / f).is_file():
+            x["missing"].append(f)
+            x["passages"][f] = []
+            continue
+        text = read_(ROOT / f).read_text(encoding="utf-8", errors="replace")
+        if f.endswith(".json"):
+            x["json"][f] = json.loads(text)
+            x["passages"][f] = passages_of_json(x["json"][f])
+        else:
+            x["passages"][f] = passages_of_html(text) if f.endswith(".html") else passages_of_markdown(text)
+    return x
+
+
+def words_of_markdown(md):
+    """The guide's words as its Markdown gives them, with every mark and all spacing taken out: for holding the HTML to them without the converter."""
+    out = []
+    for line in md.splitlines():
+        if RULE_LINE.fullmatch(line.strip()) or re.fullmatch(r"!\[[^\]]*\]\([^)\s]*\)", line.strip()):
+            continue
+        t = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", re.sub(r"^(#{1,3} |- |\d+\. )", "", line))
+        out.append((t.replace("|", " ") if line.startswith("|") else t).replace("**", "").replace("*", "").replace("`", ""))
+    return "".join(" ".join(out).split())
+
+
+def words_of_html(h):
+    return "".join(html.unescape(re.sub(r"<[^>]+>", " ", h)).split())
+
+
+GUIDE_TAGS = {"div", "h1", "h2", "h3", "p", "ul", "ol", "li", "table", "tr", "th", "td", "strong", "em", "code", "a", "img"}
+GUIDE_ATTRS = {"class", "href", "target", "rel", "src", "alt", "width", "height"}
+
+
+def guide_html_wrong(h, md, pictures):
+    """What is wrong with the guide's HTML, held to the guide's Markdown without the converter (a list, empty when nothing is). pictures: {address as the guide names it: sha256 of the file under docs/}."""
+    wrong = []
+    if words_of_html(h) != words_of_markdown(md):
+        a, b = words_of_html(h), words_of_markdown(md)
+        k = next((i for i in range(min(len(a), len(b))) if a[i] != b[i]), min(len(a), len(b)))
+        wrong.append(f"its words are not the guide's: they part at '{a[max(0, k - 30):k + 30]}' against '{b[max(0, k - 30):k + 30]}'")
+    tags = set(re.findall(r"</?([a-zA-Z0-9]+)", h))
+    if not tags <= GUIDE_TAGS:
+        wrong.append(f"a tag the converter does not write: {sorted(tags - GUIDE_TAGS)}")
+    attrs = set(re.findall(r"""\s([a-zA-Z-]+)=["']""", " ".join(re.findall(r"<[a-zA-Z][^>]*>", h))))
+    if not attrs <= GUIDE_ATTRS or re.search(r"javascript:|<script|<style|<iframe|<link|<object|<embed|<form", h, re.I):
+        wrong.append(f"an attribute or a thing the converter does not write: {sorted(attrs - GUIDE_ATTRS)}")
+    links = [html.unescape(u) for u in re.findall(r'<a href="([^"]*)" target="_blank" rel="noopener">', h)]
+    if h.count("<a ") != len(links) or links != re.findall(r"(?<!!)\[[^\]]+\]\(([^)\s]+)\)", md) or not all(u.startswith("https://") for u in links):
+        wrong.append(f"its links are not the guide's, each opened in a new tab: {len(links)} of {h.count('<a ')} written so")
+    named = re.findall(r"(?m)^!\[([^\]]*)\]\(([^)\s]+)\)$", md)
+    imgs = re.findall(r'<img src="data:image/webp;base64,([A-Za-z0-9+/=]+)" alt="([^"]*)" width="(\d+)" height="(\d+)">', h)
+    if h.count("<img") != len(imgs) or len(imgs) != len(named) or len(named) != GUIDE_PICTURES or re.search(r"""(?:src|href)=["'](?!data:image/webp;base64,|https://)""", h):
+        wrong.append(f"{len(imgs)} pictures carried as their own bytes, of {h.count('<img')} in the HTML and {len(named)} the guide names: {GUIDE_PICTURES} are expected")
+    else:
+        for (b64, alt, w, hgt), (want_alt, address) in zip(imgs, named):
+            if hashlib.sha256(__import__("base64").b64decode(b64)).hexdigest() != pictures.get(address) or html.unescape(alt) != want_alt or (w, hgt) != ("1280", "800"):
+                wrong.append(f"the picture {address} is not carried as the bytes of its file, with the guide's words for it, at 1280 x 800")
+    return wrong
+
+
+def loader_and_button_wrong(page, phrases):
+    """What is wrong with the Guide button and the loader in one build's index.html, read as text (a list, empty when nothing is). What a browser does with them is scripts/exercise_layer.py's to show."""
+    wrong = []
+    if page.count(GUIDE_BUTTON) != 1 or page.count('id="b_guide"') != 1:
+        wrong.append("the button Guide, with the owner's label and hover text, does not stand once, right after About this map and Sources")
+    if page.count('$("b_guide").onclick = function () { modal(D.guide_html); };') != 1 or page.count('else if (h0.open === "guide") { modal(D.guide_html); }') != 1:
+        wrong.append("the button, or #open=guide in the address, does not open guide_html in the window the other two texts use")
+    first = '<div id="loading" role="status"><p id="loadmsg">Loading the map&hellip;</p><div id="loadbar"><span></span></div></div>'
+    tag = '<script src="data.js">'
+    if page.count(first) != 1 or page.count(tag) != 1 or not page.index('<div id="mapwrap">') < page.index(first) < page.index(tag) or page.count("Loading the map") != 1:
+        wrong.append("'Loading the map...' does not stand once, as plain markup in the map's area, before the tag that asks for data.js")
+    own = page[page.rindex("<script>"):]
+    second, fatal = 'document.getElementById("loadmsg").innerHTML = "Drawing the units&hellip;";', "The map\\'s data didn\\'t load."
+    if own.count(second) != 1 or page.count("Drawing the units") != 1 or own.count(fatal) != 1 or "function start() {" not in own or not own.index(fatal) < own.index(second) < own.index("function start() {"):
+        wrong.append("'Drawing the units...' is not set once, after the message for data that did not load and before the map is drawn")
+    if not re.search(r"window\.requestAnimationFrame\(function \(\) \{ setTimeout\(begin, 0\); \}\);", own) or own.count("function begin() { if (!begun) { begun = true; start(); } }") != 1:
+        wrong.append("the page does not give the browser a frame to paint the second message before it draws the map")
+    if not re.search(r'\$\("loading"\)\.style\.display = "none";[^\n]*\n\s*window\.ICTD_READY = true;', own) or own.count("ICTD_READY = true") != 1:
+        wrong.append("the loader is not put away in the line before the page says it is ready")
+    if "@keyframes loadbar" not in page or not re.search(r"#loadbar span \{[^}]*animation: loadbar", page) or re.search(r"<progress|aria-valuenow|loadbar[^\n]{0,80}\.style\.width", page):
+        wrong.append("the bar is not one that only moves: it must have an animation of its own and nothing that sets its width")
+    for words in (LOADING, DRAWING):
+        if len(words.split()) > 6 or "?" in words or ";" in words or re.search(r"\d", words) or any(has_phrase(ph, words) for ph in phrases):
+            wrong.append(f"the loader's words '{words}' carry a figure, a '?' or a ';', more than six words, or a phrase of the lists")
+    for said in re.findall(r'<p id="loadmsg">(.*?)</p>', page) + re.findall(r'getElementById\("loadmsg"\)\.innerHTML = "(.*?)";', own):
+        if html.unescape(said) not in (LOADING, DRAWING):
+            wrong.append(f"the loader says '{html.unescape(said)}', which is neither of the owner's two messages")
+    return wrong
+
+
+def guide_table_of_checks(md):
+    """The guide's table "How it was checked": {the row's first cell without its code marks: its result cell}."""
+    out, inside = {}, False
+    for line in md.splitlines():
+        if line.startswith("## "):
+            inside = line[3:].strip() == "How it was checked"
+        elif inside and line.startswith("|") and not RULE_LINE.fullmatch(line.strip()):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) == 3:
+                out[cells[0].replace("`", "")] = cells[2]
+    return out
+
+
+OF = re.compile(r"(\d[\d,]*) of (\d[\d,]*)")
+counts_of = lambda text: [(int(a.replace(",", "")), int(b.replace(",", ""))) for a, b in OF.findall(text)]
+
+
+def guide_counts_wrong(md, x):
+    """What is wrong with the counts the guide's table of checks gives for this build's own runs, each held to the record of the run (a list, empty when nothing is). The count of this check's own
+    checks is held to the run itself, at its end (g7)."""
+    T, wrong = guide_table_of_checks(md), []
+    runs = {e["check"]: e for e in (x["json"].get("60_layer/decision_runs.json") or {}).get("checks", [])}
+    line = lambda name: (runs[name]["runs"][-1]["last_line"] if name in runs and runs[name]["runs"][-1]["exit"] == 0 else "")
+
+    def row(name):
+        if name not in T:
+            wrong.append(f"the table has no row for {name}")
+        return T.get(name, "")
+    for name, check in (("verify_layer.py", "verify_layer"), ("verify_decision.py", "verify_decision")):
+        cell, said = row(name), line(check)
+        if not said or not counts_of(cell) or not counts_of(said) or counts_of(cell)[0] != counts_of(said)[0] or counts_of(cell)[0][0] != counts_of(cell)[0][1] or not set(g_figures(cell)) <= set(g_figures(said)):
+            wrong.append(f"{name}: the guide says '{cell}' and the run on record ended '{said[:110]}'")
+    cell = row("exercise_layer.py, in Chrome and in WebKit")
+    for browser in ("Chrome", "WebKit"):
+        said = line(f"exercise_layer in {browser}")
+        m = re.search(r"(\d+) of (\d+) control actions did what they should; .*?; (\d+) of (\d+) displayed values equal the stage tables; script errors: none", said)
+        if not m or len(counts_of(cell)) != 2 or counts_of(cell) != [(int(m.group(1)), int(m.group(2))), (int(m.group(3)), int(m.group(4)))] or any(a != b for a, b in counts_of(cell)) or "in each browser" not in cell or "no script error" not in cell:
+            wrong.append(f"exercise_layer.py in {browser}: the guide says '{cell}' and the run on record ended '{said[:150]}'")
+    cell = row("exercise_decision.py, in Chrome and in WebKit")
+    got = {}
+    for browser in ("Chrome", "WebKit"):
+        said = line(f"exercise_decision in {browser}")
+        m = re.search(r"(\d+) of (\d+) steps did what they should; .*?; (\d+) of (\d+) lines of 'why this tier' are as the tables give them; exports: (\d+) of (\d+) cells", said)
+        got[browser] = [int(v) for v in m.groups()] if m else None
+        if not m or m.group(5) != m.group(6):
+            wrong.append(f"exercise_decision.py in {browser}: the run on record ended '{said[:150]}'")
+    m = re.search(r"(\d+) of (\d+) steps in Chrome, (\d+) of (\d+) in WebKit; ([\d,]+) of ([\d,]+) lines of", cell)
+    if all(got.values()) and (not m or [int(v.replace(",", "")) for v in m.groups()] != got["Chrome"][:2] + got["WebKit"][:2] + got["Chrome"][2:4] or got["Chrome"][2:4] != got["WebKit"][2:4]
+                              or any(a != b for a, b in counts_of(cell)) or "every cell of both downloads correct" not in cell):
+        wrong.append(f"exercise_decision.py: the guide says '{cell}' and the runs on record gave {got}")
+    cell, S = row("exercise_share.py"), (x["json"].get("70_share/exercise_share_chrome.json") or {}).get("summary", {})
+    if not counts_of(cell) or counts_of(cell)[0] != (S.get("steps_as_expected"), S.get("steps")) or S.get("steps_as_expected") != S.get("steps") or S.get("requests_to_the_network") != 0 or "no request to the network" not in cell:
+        wrong.append(f"exercise_share.py: the guide says '{cell}' and the record gives {S.get('steps_as_expected')} of {S.get('steps')} steps and {S.get('requests_to_the_network')} requests to the network")
+    return wrong
+
+
+def records_wrong(x, now_sha, layer_run, copy_run):
+    """What is wrong with the records the guide's counts and megabytes are read from: each must be of the builds on disk, and of runs that passed (a list, empty when nothing is)."""
+    wrong = [f"{f} is not there" for f in x["missing"]]
+    R = x["json"].get("60_layer/decision_runs.json")
+    if R is not None and (R.get("unfinished") or R.get("layer_run_utc") != layer_run or any(R.get("files_sha256", {}).get(f) != now_sha[f"60_layer/{f}"] for f in ("index.html", "data.js")) or not R.get("every_check_passed_on_its_last_run")):
+        wrong.append(f"60_layer/decision_runs.json is not the record of a finished pass on the layer on disk in which every check passed on its last run (it is of the layer built {R.get('layer_run_utc')})")
+    S = x["json"].get("70_share/exercise_share_chrome.json")
+    if S is not None and (S.get("copy_run_utc") != copy_run or any(i["sha256"] != now_sha.get(i["path"]) for i in S.get("inputs", []) if i["path"] in now_sha) or not all(s_["ok"] for s_ in S.get("steps", [{"ok": False}]))):
+        wrong.append(f"70_share/exercise_share_chrome.json is not the record of a run on the copy on disk in which every step did what it should (it is of the copy made {S.get('copy_run_utc')})")
+    K = x["json"].get("60_layer/site_copy_looked_at.json")
+    if K is not None and (K.get("builds") != {"layer_run_utc": layer_run, "copy_run_utc": copy_run} or any(v != now_sha.get(k) for k, v in K.get("files_sha256", {}).items())):
+        wrong.append(f"60_layer/site_copy_looked_at.json is not of the builds on disk (it is of {K.get('builds')})")
+    return wrong
+
+
 # ---- the checks -----------------------------------------------------------------------------------------------------------------------------------------
 def run_checks(before, now, extra, browser):
     """Every check, on the builds given. before, now: {"layer": build, "copy": build}; extra: the audit's rows, the table of the checks' changes, the csv's sha256 pair, the
@@ -753,10 +1358,11 @@ def run_checks(before, now, extra, browser):
         d = []
         differ({x: v for x, v in A.items() if x not in ("f", "panel")}, {x: v for x, v in B.items() if x not in ("f", "panel")}, "", d)
         allowed = WORDS + TIMES + (IN_THE_COPY if k == "copy" else [])
-        other = [(p, how) for p, how in d if not (p == ".tips" and how == "added") and not any(re.fullmatch(a, p) for a in allowed)]
+        other = [(p, how) for p, how in d if (p, how) not in ((".tips", "added"), (".guide_html", "added")) and not any(re.fullmatch(a, p) for a in allowed)]
         check(f"a2 ({k})", f"in the data.js of {CALLED[k]} every part is the saved copy's but the parts that hold words this task reworded (each written out in this check), the two build times, the new key `tips`"
-              + (", and the overlay's part" if k == "copy" else "") + ": no class, count, colour, shape or figure array differs, and no key but `tips` was added or taken out",
-              not other and set(B) == set(A) | {"tips"}, f"{len(d)} parts differ, all of them allowed" if not other else "NOT ALLOWED: " + "; ".join(f"{p} ({how})" for p, how in other[:6]))
+              + (", and the overlay's part" if k == "copy" else "") + ", and - since 13 October 2026 - the new key `guide_html`, the guide the page's third button opens, which check g0 holds to docs/GUIDE.md: no class, count, colour, "
+              "shape or figure array differs, and no key but those two was added or taken out",
+              not other and set(B) == set(A) | {"tips", "guide_html"}, f"{len(d)} parts differ, all of them allowed" if not other else "NOT ALLOWED: " + "; ".join(f"{p} ({how})" for p, how in other[:6]))
         pa, pb = A["panel"], B["panel"]
         shape = lambda sec: ([r[1] for r in sec.get("rows", [])], sec.get("heading_field"), sec.get("flag_field"), bool(sec.get("top")), sec.get("bar"))
         check(f"a2 panel ({k})", f"the unit panel of {CALLED[k]} points at the same fields in the same order as the saved copy's: its first seven sections have the same rows of fields, the same heading field, warning field and bar; "
@@ -922,7 +1528,8 @@ def run_checks(before, now, extra, browser):
     for k in ("layer", "copy"):
         kept = extra["six"][k]
         pp = paired(strings(kept), S[("after", k)])
-        added = [b["where"] for a, b in pp if a is None]
+        new_ = [(b["where"], b["text"]) for a, b in pp if a is None]
+        added = [w + ": " + t[:50] for w, t in new_ if (w, t) not in ADDED_13_OCT] + [f"NOT THERE, of the four of 13 October 2026: {t}" for w, t in ADDED_13_OCT if (w, t) not in new_]
         dropped = [a["where"] for a, b in pp if b is None]
         stray, back, used = [], [], Counter()
         for a, b in pp:
@@ -947,19 +1554,80 @@ def run_checks(before, now, extra, browser):
                 extra["six_changes"].append({"build": CALLED[k], "fix": fixes[0], "part": b["part"], "where": b["where"], "kind": b["kind"], "as_it_was": a["text"], "as_it_is": b["text"]})
         unused = [f"fix {x[0]} ({x[1]})" for n_, x in enumerate(SIX) if (k == "copy" or not x[1].startswith("README")) and not used[(x[0], n_)]]
         n_changed = sum(1 for c_ in extra["six_changes"] if c_["build"] == CALLED[k])
-        check(f"f1 ({k})", f"against {CALLED[k]} as it was kept before the owner's six lines of 11 October 2026 (his third handoff): no string was added or dropped; every string that differs is one of the six lines and differs by exactly "
-              "his replacement, written out in this check, and by nothing else; no place of a fix still holds its old words; and every fix is found in the build. The build's own date and, in the copy's README, its section on "
-              "this copy's files are left out", not added and not dropped and not stray and not back and not unused,
+        check(f"f1 ({k})", f"against {CALLED[k]} as it was kept before the owner's six lines of 11 October 2026 (his third handoff): no string was dropped, and none was added but the four the Guide button and the loader put on the page "
+              "on 13 October 2026, each written out in this check (the button's label and its hover text, and the loader's two messages), all four of which are there; every string that differs is one of the six lines and differs "
+              "by exactly his replacement, written out in this check, and by nothing else; no place of a fix still holds its old words; and every fix is found in the build. The build's own date and, in the copy's README, its "
+              "section on this copy's files are left out. The guide's own words are not among these strings: group g holds them", not added and not dropped and not stray and not back and not unused,
               f"{n_changed} strings differ, all of them his: " + "; ".join(f"fix {f_}: {sum(1 for c_ in extra['six_changes'] if c_['build'] == CALLED[k] and c_['fix'] == f_)}" for f_ in range(1, 7))
               if not (added or dropped or stray or back or unused) else "ADDED: " + "; ".join(added[:3]) + " | DROPPED: " + "; ".join(dropped[:3]) + " | DIFFERS OTHERWISE: " + "; ".join(stray[:4]) + " | OLD WORDS STILL THERE: "
               + "; ".join(back[:4]) + " | FIX NOT FOUND: " + "; ".join(unused[:4]))
         d6 = []
         differ(kept["D"], now[k]["D"], "", d6)
-        other6 = [(p_, how) for p_, how in d6 if not any(re.fullmatch(x, p_) for x in SIX_PARTS)]
+        other6 = [(p_, how) for p_, how in d6 if not any(re.fullmatch(x, p_) for x in SIX_PARTS) and (p_, how) != (".guide_html", "added")]
+        was_page, not_put_back = page_before_13_oct(now[k]["page"])
+        same_page = not not_put_back and was_page == kept["page"]
         check(f"f2 ({k})", f"against the same kept build, no part of the data.js of {CALLED[k]} differs - no row of a unit, class, count, colour, shape or figure array, and no other text - but the parts the six lines are in (the About "
-              "and Sources texts, three cells' definitions, the four East Coast badges, the prompt, the head of the grid's first column, four 'i') and the build time; and index.html is byte for byte the kept one",
-              not other6 and kept["page"] == now[k]["page"], f"{len(d6)} parts differ, all of them the six lines' or the build time; index.html the same" if not other6 and kept["page"] == now[k]["page"]
-              else "NOT THE SIX LINES': " + "; ".join(f"{p_} ({how})" for p_, how in other6[:6]) + ("" if kept["page"] == now[k]["page"] else " | index.html differs"))
+              "and Sources texts, three cells' definitions, the four East Coast badges, the prompt, the head of the grid's first column, four 'i'), the build time, and the key `guide_html`, added on 13 October 2026 (check g0); "
+              f"and index.html is the kept one but for the {len(PAGE_13_OCT)} places where the Guide button and the loader changed it that day, each written out in this check and each found exactly once: with every one put back "
+              "as it was, the page is byte for byte the kept one",
+              not other6 and same_page, f"{len(d6)} parts differ, all of them the six lines', the build time or the guide; index.html, with its {len(PAGE_13_OCT)} places put back, the same" if not other6 and same_page
+              else "NOT THE SIX LINES': " + "; ".join(f"{p_} ({how})" for p_, how in other6[:6]) + ("" if same_page else " | index.html differs otherwise: " + ("; ".join(not_put_back[:3]) or "after its places were put back it is not the kept page")))
+
+    # g. the guide and the loader (the owner's handoff of 13 October 2026)
+    G = extra["guide"]
+    md, lists = G["md"], PHRASES + PHRASES_OF_THE_SIX + PHRASES_COPY_ONLY
+    htmls = {k: now[k]["D"].get("guide_html") for k in ("layer", "copy")}
+    rec, on_disk = G["layer_record"] or {}, G["on_disk"]
+    rec_ok = bool(rec) and rec.get("source", {}).get("sha256") == on_disk[GUIDE_MD] and not rec.get("pictures_left_out_of_this_build") and len(rec.get("pictures", [])) == GUIDE_PICTURES \
+        and all(q["sha256"] == on_disk.get(q["path"]) for q in rec.get("pictures", []))
+    check("g0", f"the guide in the data: in both builds `guide_html` is docs/GUIDE.md as scripts/_guide.py turns it into HTML now, character for character, with its {GUIDE_PICTURES} pictures inside it; the copy's is the full layer's; "
+          "and the layer's run record gives the sha256 of the guide and of each picture as they are on disk, and says no picture was left out of the build",
+          all(isinstance(h, str) and h == G["again"] for h in htmls.values()) and htmls["layer"] == htmls["copy"] and not G["would_stop_the_build"] and rec_ok,
+          f"{len(G['again']):,} characters; the layer's record: guide {rec.get('source', {}).get('sha256', '')[:16]}..., {len(rec.get('pictures', []))} pictures" if rec_ok and all(h == G["again"] for h in htmls.values())
+          else "NOT SO: " + "; ".join([f"{CALLED[k]}'s guide_html is not the guide as converted now" for k, h in htmls.items() if h != G["again"]] + ([] if rec_ok else ["the layer's run record is not of the guide and the pictures on disk"])
+                                      + G["would_stop_the_build"][:2]))
+    bad = [f"{CALLED[k]}: {w}" for k, h in htmls.items() for w in guide_html_wrong(h or "", md, G["pictures"])]
+    check("g1", f"the guide's HTML held to docs/GUIDE.md without the converter, in both builds: with the marks of Markdown taken out of the one and the tags out of the other, the two read the same, character for character but for "
+          "spacing; the HTML has no tag and no attribute but the few the converter writes, and no script; its links are the guide's own, in order, each an https address opened in a new tab; nothing else in it carries an address; "
+          f"and it holds the {GUIDE_PICTURES} pictures the guide names, in the guide's order, each as the bytes of its file under docs/guide/, with the guide's words for it, at 1280 x 800",
+          not bad, f"{len(words_of_markdown(md)):,} characters of words; {len(re.findall(r'<a ', htmls['copy'] or ''))} links; {len(re.findall(r'<img', htmls['copy'] or ''))} pictures" if not bad else "WRONG: " + " | ".join(bad[:4]))
+    bad = [f"{CALLED[k]}: {w}" for k in ("layer", "copy") for w in loader_and_button_wrong(now[k]["page"], lists)]
+    check("g2", "the Guide button and the loader, in the index.html of both builds, read as text: the button stands once, right after About this map and Sources, with the owner's label and hover text; the button and #open=guide "
+          "both open `guide_html` in the window the other two texts use; 'Loading the map...' is plain markup in the map's area, before the tag that asks for data.js; 'Drawing the units...' is set once the data is in, after the "
+          "message for data that did not load, and the browser is given a frame to paint it before the map is drawn; the loader is put away in the line before the page says it is ready; its bar only moves, and nothing "
+          "sets its width; and its two messages have no figure, no '?' or ';', at most six words, and no phrase of the lists. (What a browser then does is scripts/exercise_layer.py's to show.)",
+          not bad, f"'{LOADING}' and '{DRAWING}', in both builds" if not bad else "WRONG: " + " | ".join(bad[:4]))
+    g_blocks = blocks(htmls["copy"] or "")
+    hits = [f"'{ph}' in block {n_ + 1}" for n_, t in enumerate(g_blocks) for ph in lists if has_phrase(ph, unquoted(t, quoted))]
+    whole_guide = norm(" \n ".join(g_blocks))
+    hits += [f"a finding of the audit marked fixed: '{a['said'][:60]}'" for a in extra["audit"] if a["done"].startswith("fixed") and a["said"].strip() and norm(a["said"]) in whole_guide]
+    hits += [f"block {n_ + 1} opens 'This shows'" for n_, t in enumerate(g_blocks) if norm(t).startswith("this shows")]
+    index_title = next((l["title"] for l in now["layer"]["D"]["layers"] if l["id"] == "adi_2011"), None)
+    hits += [f"the development index is named: '{w}'" for w in ("adi_2011", index_title) if w and w in (htmls["copy"] or "")] + (["the words 'development index'"] if re.search("development index", htmls["copy"] or "", re.I) else [])
+    check("g3", "the guide's words, as both builds carry them: none of the phrases the deck lists, none of the eight the owner added with his six lines, and not 'is not beside this page'; no finding of the audit that is marked fixed; "
+          "no block that opens 'This shows'; and the development index is named nowhere in it - not by the words in any case, not by its key, not by the name of its layer",
+          not hits and len(g_blocks) > 100, f"{len(lists)} phrases and {sum(1 for a in extra['audit'] if a['done'].startswith('fixed'))} fixed findings looked for in {len(g_blocks)} blocks of the guide" if not hits else "FOUND: " + "; ".join(hits[:6]))
+    rows_, bad = trace_guide_figures(md, G["x"])
+    extra["guide_rows"] = rows_
+    n_found, n_derived, n_runs = (sum(1 for r in rows_ if r["how"].startswith(w)) for w in ("found", "comes from", "a count"))
+    check("g4", "every figure of docs/GUIDE.md is traced. The guide is cut into sentences and table cells; for each one that holds a figure, all its figures must stand together, each written the same way, in one passage of one "
+          "of the named files (the page's own strings in data.js, docs/GAP.md, docs/DECISION_LAYER.md, README.md, the records of the runner, of the copy's check and of the pictures looked at, and the provider's "
+          "cautions), and that passage must share a word with the sentence; for a cell that is only a figure it must hold another cell of the same row, and for a row about one file it must name the file. Allowed, and "
+          "nothing else: thousands separators, a space before %, the minus sign, and x for the multiplication sign. A figure that stands in no named file as the guide writes it must be one of the cases listed in this check, "
+          "each worked out again from the file's own figure; a sentence whose figures stand in two passages must be listed too. A picture's file name and the address a link points to are not figures; a file's or a "
+          "command's name with a digit in it must stand whole in a named file. The counts of this build's own runs are held by g5 and g7. (What this does not show: that the passage says what the sentence says. A lone small "
+          "figure can stand, beside a shared word, in a passage about something else; every trace is in 60_layer/site_copy_guide_figures.csv to be read.)",
+          not bad and n_found > 100, f"{len(guide_units(md))} sentences and cells with a figure: {n_found} found in one passage, {n_derived} that come from a figure of a named file by a listed rule, {n_runs} counts of this build's own runs; "
+          f"{len(GUIDE_SPLIT)} sentences listed as standing in two passages" if not bad else "NOT TRACED: " + " | ".join(bad[:5]) + (f" ... {len(bad)} in all" if len(bad) > 5 else ""))
+    bad = guide_counts_wrong(md, G["x"])
+    check("g5", "the guide's own counts: in its table 'How it was checked', the result of each row that is a count of this build's own runs is the result on record - verify_layer.py and verify_decision.py as the runner's record "
+          "ends them; the layer's exercise in Chrome and in WebKit, the same count in both; the decision view's exercise, each browser's own count of steps, and the same lines and cells in both; and the copy's check, its "
+          "steps and no request to the network. Each is 'N of N'. (The count of this check's own checks is held at the end of the run, by g7.)",
+          not bad, "; ".join(f"{k}: {v}" for k, v in guide_table_of_checks(md).items() if k in GUIDE_PINNED_ROWS)[:330] if not bad else "NOT AS ON RECORD: " + " | ".join(bad[:4]))
+    bad = records_wrong(G["x"], G["now_sha"], G["layer_run"], G["copy_run"])
+    check("g6", "the records the guide's counts, megabytes and window size are read from are of the builds on disk: the runner's is of a finished pass on this layer in which every check passed on its last run; the copy's check "
+          "is of this copy, and every step did what it should; the record of the pictures looked at is of these two builds; and none of the named files is missing",
+          not bad, "60_layer/decision_runs.json, 70_share/exercise_share_chrome.json and 60_layer/site_copy_looked_at.json are of the builds on disk" if not bad else "NOT SO: " + " | ".join(bad[:4]))
 
     # e. the checks' own changes
     vl = subprocess.run(["git", "-C", str(ROOT), "diff", "--quiet", VERIFY_LAYER_AT, "--", "scripts/verify_layer.py"], capture_output=True).returncode
@@ -967,10 +1635,10 @@ def run_checks(before, now, extra, browser):
     uncovered, unreal, n_blocks, per_file = [], [], 0, {}
     table = extra["changes"]
     used = set()
-    for path in CHECK_FILES + list(OUTSIDE_GIT):
-        old = (ROOT / OUTSIDE_GIT[path]).read_text(encoding="utf-8") if path in OUTSIDE_GIT else git_show(CHECKS_BEFORE, path)
+    for path in CHECK_FILES + list(OUTSIDE_GIT) + [THIS_SCRIPT]:
+        old = (ROOT / OUTSIDE_GIT[path]).read_text(encoding="utf-8") if path in OUTSIDE_GIT else git_show(BEFORE_THE_GUIDE if path == THIS_SCRIPT else CHECKS_BEFORE, path)
         if old is None:
-            uncovered.append(f"{path}: git has no such file at {CHECKS_BEFORE}")
+            uncovered.append(f"{path}: git has no such file at {BEFORE_THE_GUIDE if path == THIS_SCRIPT else CHECKS_BEFORE}")
             continue
         bl = changed_blocks(old, (ROOT / path).read_text(encoding="utf-8"))
         rows_ = [(n_, r) for n_, r in enumerate(table) if r["file"] == path]
@@ -983,7 +1651,8 @@ def run_checks(before, now, extra, browser):
                 uncovered.append(f"{path}: '{squeeze(o)[:60]}' -> '{squeeze(w)[:60]}'")
     unreal = [f"{r['file']}: '{squeeze(r['was'])[:50]}' -> '{squeeze(r['now'])[:50]}'" for n_, r in enumerate(table) if n_ not in used]
     check("e2", f"every block of lines that differs from commit {CHECKS_BEFORE} in a check or a document writer this task changed has a row in {CHANGES} (the row's old words are in the block as it was, its new words in "
-          "the block as it is), and every row of that table is such a change", not uncovered and not unreal and n_blocks > 0,
+          f"the block as it is), and every row of that table is such a change. Since 13 October 2026 this script's own changes are tabled there too, against commit {BEFORE_THE_GUIDE}, the last before the Guide button: the "
+          "checks that handoff added, and the three it had to widen, can be read off the table", not uncovered and not unreal and n_blocks > 0,
           f"{n_blocks} blocks in {sum(1 for v in per_file.values() if v)} files, {len(table)} rows; files with no change: {', '.join(p.split('/')[-1] for p, v in per_file.items() if not v) or 'none'}" if not uncovered and not unreal
           else "NO ROW FOR: " + " | ".join(uncovered[:4]) + " || NOT A CHANGE IN THE FILE: " + " | ".join(unreal[:4]))
     return results, pairs, S
@@ -1036,6 +1705,8 @@ def strings_table(pairs, figures_listed):
             if b and b["kind"].startswith("i") and not a:
                 status = "new: an i"
             note = came_from(r["where"]) if (b and not a) else next((why for start, why in GONE.items() if a["text"].startswith(start)), "") if (a and not b) else ""
+            if b and not a and (b["where"], b["text"]) in ADDED_13_OCT:
+                note = ADDED_NOTE
             if b and b["exempt"]:
                 note = (note + "; " if note else "") + "outside the deck's list of phrases: " + b["exempt"]
             out.append({"build": CALLED[k], "part": r["part"], "where": r["where"], "kind": r["kind"], "before": a["text"] if a else "", "after": b["text"] if b else "", "status": status, "note": note})
@@ -1043,6 +1714,20 @@ def strings_table(pairs, figures_listed):
         out.append({"build": f["build"], "part": "figures", "where": f["place"], "kind": "a figure that is not where it was", "before": f"{f['figure']}: {f['times_before']} time(s)", "after": f"{f['figure']}: {f['times_after']} time(s)",
                     "status": "listed", "note": f["why"]})
     return out
+
+
+def gather_guide(now, builds):
+    """What group g needs: the guide and its pictures as they are on disk, the guide converted again, the layer's record of it, and the passages of the named files."""
+    import _guide
+    md = read(ROOT / GUIDE_MD).read_text(encoding="utf-8")
+    named = [a for _, a in re.findall(r"(?m)^!\[([^\]]*)\]\(([^)\s]+)\)$", md)]
+    stops = []
+    again = _guide.build(ROOT, None, stops, pictures=True)
+    read(ROOT / "scripts/_guide.py")
+    pictures = {a: sha(read(ROOT / "docs" / a)) for a in named if (ROOT / "docs" / a).is_file()}
+    return {"md": md, "again": again["html"], "would_stop_the_build": stops, "pictures": pictures, "on_disk": {GUIDE_MD: sha(ROOT / GUIDE_MD), **{"docs/" + a: v for a, v in pictures.items()}},
+            "layer_record": json.loads((ROOT / "60_layer/layer.provenance.json").read_text(encoding="utf-8")).get("guide"), "x": guide_sources(now["copy"], read),
+            "now_sha": builds["files_sha256"], "layer_run": builds["layer_run_utc"], "copy_run": builds["copy_run_utc"]}
 
 
 def gather():
@@ -1088,9 +1773,33 @@ def with_data(b, **parts):
     return n
 
 
-def planted(before, now):
-    """The errors to plant: (what, the build it is planted on, a function giving (the builds with the error in, a folder to open in a browser or None), the checks meant to catch it)."""
+def planted(before, now, extra):
+    """The errors to plant: (what, the build it is planted on, a function giving (the builds with the error in, a folder to open in a browser or None[, a copy of the guide's text with the error in]),
+    the checks meant to catch it)."""
     L, C = now["layer"]["D"], now["copy"]["D"]
+    guide_md = extra["guide"]["md"]
+
+    def guide(old, new, nowhere=None):
+        """An error planted on a copy of the guide's text, held in memory: docs/GUIDE.md is not touched."""
+        if guide_md.count(old) != 1:
+            raise SystemExit(f"a planted error could not be planted: the guide has '{old[:50]}' {guide_md.count(old)} times")
+        if nowhere is not None and any(nowhere in p_["figures"] for ps in extra["guide"]["x"]["passages"].values() for p_ in ps):
+            raise SystemExit(f"a planted error could not be planted: the figure {nowhere} does stand in a named file")
+        return now, None, guide_md.replace(old, new)
+
+    def page_text(k, old, new):
+        """An error planted on a copy of a build's index.html held in memory, for the checks that read the page as text: nothing is opened in a browser."""
+        if now[k]["page"].count(old) != 1:
+            raise SystemExit(f"a planted error could not be planted: the page of {k} has '{old[:50]}' {now[k]['page'].count(old)} times")
+        b = dict(now[k])
+        b["page"] = now[k]["page"].replace(old, new)
+        return {**now, k: b}, None
+
+    def a_picture_for_another():
+        pics = re.findall(r"data:image/webp;base64,[A-Za-z0-9+/=]+", C["guide_html"])
+        if len(pics) < 2 or pics[0] == pics[1]:
+            raise SystemExit("a planted error could not be planted: the guide in the copy does not hold two different pictures")
+        return copy_(guide_html=C["guide_html"].replace(pics[0], pics[1], 1))
 
     def layer(**parts):
         return {"layer": with_data(now["layer"], **parts), "copy": now["copy"]}, None
@@ -1197,6 +1906,19 @@ def planted(before, now):
          lambda: copy_(decision={**C["decision"], "governance": "No revenue village \u2014 this land is in no village plan. Whose plan covers it?"}), ["b1 (copy)", "f1 (copy)"]),
         ("27. a seventh line: one word changed in a string the owner did not reword (the line under a ranked list for the units outside it)", "the full layer's data",
          lambda: layer(decision=t_of(L, rank_unranked=L["decision"]["t"]["rank_unranked"].replace("on the map but outside the list", "on the map and outside the list"))), ["f1 (layer)", "f2 (layer)"]),
+        ("28. a figure of the guide changed: 59 % to 95 %, in 'hold 59 % of its forest' (95 % does stand in the named files, as the level of an interval: a search for the figure alone would have passed it)", "a copy of the guide",
+         lambda: guide("but hold 59 % of its forest", "but hold 95 % of its forest"), ["g4"]),
+        ("29. a figure found nowhere: a sentence added to the guide, 'The first build took 73,519 seconds.'", "a copy of the guide",
+         lambda: guide("not a verdict on any place.\n\n## What the map is for", "not a verdict on any place. The first build took 73,519 seconds.\n\n## What the map is for", nowhere="73519"), ["g4"]),
+        ("30. a phrase of the deck's list in the guide ('the project owner')", "the copy's data",
+         lambda: copy_(guide_html=C["guide_html"].replace("so which rows bear on a cell is this project's proposal", "so which rows bear on a cell is the project owner's proposal", 1)), ["g3"]),
+        ("31. a count of the guide's own table of checks raised by one: verify_decision.py's", "a copy of the guide",
+         lambda: guide(guide_table_of_checks(guide_md)["verify_decision.py"], re.sub(r"\d+ of \d+", lambda m: "{0} of {0}".format(int(m.group(0).split()[0]) + 1), guide_table_of_checks(guide_md)["verify_decision.py"], count=1)), ["g5"]),
+        ("32. one picture of the guide carried twice, in place of another", "the copy's data", a_picture_for_another, ["g1"]),
+        ("33. a line of index.html changed that the Guide button and the loader did not add (the first line of the district list)", "a copy of the full layer's index.html, as text",
+         lambda: page_text("layer", "Jump to a district&hellip;", "Go to a district&hellip;"), ["f2 (layer)"]),
+        ("34. the loader's first message with a figure in it ('Loading 23 MB...')", "a copy of the copy's index.html, as text", lambda: page_text("copy", "Loading the map&hellip;", "Loading 23 MB&hellip;"), ["g2"]),
+        ("35. a figure of the guide that comes from another by a listed rule, changed: 72.07 crore to 72.70 crore", "a copy of the guide", lambda: guide("\u20b972.07 crore", "\u20b972.70 crore"), ["g4"]),
     ]
 
 
@@ -1212,6 +1934,7 @@ def main():
     builds = {"layer_run_utc": json.loads(read(ROOT / "60_layer/layer.provenance.json").read_text())["run_utc"], "copy_run_utc": json.loads(read(ROOT / "70_share/share.provenance.json").read_text())["run_utc"],
               "files_sha256": {rel(NOW[k] / f): sha(NOW[k] / f) for k in NOW for f in ("index.html", "data.js")} | {rel(NOW["copy"] / "README.txt"): sha(NOW["copy"] / "README.txt")}}
     me = {"script": "scripts/check_site_copy.py", "script_sha256": sha(__file__)}
+    extra["guide"] = gather_guide(now, builds)
     browser = {k: in_a_browser_with_runs(NOW[k], now[k]["D"]) for k in NOW}
     results, pairs, S = run_checks(before, now, extra, browser)
     ok = all(r["pass"] for r in results)
@@ -1219,7 +1942,7 @@ def main():
     if a.trials:
         failed0 = [r["id"] for r in results if not r["pass"]]
         trials = []
-        for what, on, make, meant in planted(before, now):
+        for what, on, make, meant in planted(before, now, extra):
             ex = dict(extra)
             ex.pop("figures_listed", None)
             if make is None:                                     # the table: a copy with one byte changed, hashed
@@ -1231,7 +1954,10 @@ def main():
                 shutil.rmtree(tmp.parent, ignore_errors=True)
                 res, _, _ = run_checks(before, now, ex, browser)
             else:
-                builds_, folder = make()
+                made = make()
+                builds_, folder = made[0], made[1]
+                if len(made) > 2:                                # a copy of the guide's text with the error in
+                    ex["guide"] = {**extra["guide"], "md": made[2]}
                 br = dict(browser)
                 if folder is not None:
                     k = "layer" if "full layer" in on else "copy"
@@ -1258,20 +1984,34 @@ def main():
     if tr.is_file():
         T = json.loads(read(tr).read_text(encoding="utf-8")) if tr.resolve().is_relative_to(ROOT) else json.loads(tr.read_text(encoding="utf-8"))
         the_four = [t_ for t_ in T.get("trials", []) if t_["planted"].split(".")[0] in ("23", "24", "25", "26")]      # the four the owner named with his six lines: each puts an old line back
+        the_two = [t_ for t_ in T.get("trials", []) if t_["planted"].split(".")[0] in ("28", "29")]                    # the two he named with the guide: a changed figure, and a figure found nowhere
         t_ok = T.get("script_sha256") == me["script_sha256"] and T.get("builds") == builds and T.get("planted", 0) >= 8 and T.get("every_planted_error_caught") is True and T["the_builds_as_they_are"]["failed"] == [] \
-            and len(the_four) == 4 and all(t_["caught"] for t_ in the_four)
+            and len(the_four) == 4 and all(t_["caught"] for t_ in the_four) and len(the_two) == 2 and all(t_["caught"] and "g4" in t_["checks_that_failed"] for t_ in the_two)
         detail = f"{T.get('caught')} of {T.get('planted')} caught, run {T.get('run_utc')}" + ("" if t_ok else "; NOT of this script as it is, or not of these builds, or an error was not caught")
     else:
         t_ok, detail = False, "there is no record of the trials: run this script with --trials first"
     results.append({"id": "t1", "check": f"the planted errors: the record of the trials (60_layer/{TRIALS}) is of this script as it is and of the builds on disk, the builds as they are passed every check in it, at least eight errors were "
-                                         "planted - the eight the owner named among them, and the four he named with his six lines, each of which puts an old line back - and every one was caught by a check meant to catch it", "pass": t_ok, "detail": detail})
+                                         "planted - the eight the owner named among them, the four he named with his six lines, each of which puts an old line back, and the two he named with the guide, a changed figure and a figure found "
+                                         "nowhere, each caught by the gate on the guide's figures - and every one was caught by a check meant to catch it", "pass": t_ok, "detail": detail})
+    said = guide_table_of_checks(extra["guide"]["md"]).get("check_site_copy.py", "")
+    made_now = len(results) + 1                                  # this check is the last one made
+    results.append({"id": "g7", "check": "the guide's count for this check itself: in its table 'How it was checked' the row of check_site_copy.py gives 'N of N checks', and N is the number of checks this run makes, this one counted "
+                                         "(whether all N pass is the run's own result)", "pass": counts_of(said)[:1] == [(made_now, made_now)], "detail": f"the guide says '{said}'; this run makes {made_now} checks"})
     table = strings_table(pairs, extra.get("figures_listed", []))
+    for k in ("layer", "copy"):                                  # the guide's words, block by block: new on 13 October 2026, and the same in both builds
+        table += [{"build": CALLED[k], "part": "Guide", "where": f"guide_html, block {n_ + 1}", "kind": "text", "before": "", "after": t_, "status": "new", "note": "the guide, docs/GUIDE.md: " + ADDED_NOTE}
+                  for n_, t_ in enumerate(blocks(now[k]["D"].get("guide_html") or ""))]
     out.mkdir(parents=True, exist_ok=True)
     cols = ["build", "part", "where", "kind", "before", "after", "status", "note"]
     with open(out / "site_copy_strings.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols)
         w.writeheader()
         w.writerows(table)
+    g_cols = ["line", "section", "the_guides_words", "its_figures", "how", "file", "passage", "words_shared_with_the_passage", "figures_beside_the_same_word"]
+    with open(out / "site_copy_guide_figures.csv", "w", newline="", encoding="utf-8") as fh:      # every figure of the guide, with where it stands
+        w = csv.DictWriter(fh, fieldnames=g_cols)
+        w.writeheader()
+        w.writerows({c_: r_.get(c_, "") for c_ in g_cols} for r_ in extra.get("guide_rows", []))
     n_by = Counter((r["build"], r["status"]) for r in table)
     for r in results:
         print(("PASS  " if r["pass"] else "FAIL  ") + f"{r['id']:<16}{r['check'][:150]}" + (f"   [{r['detail'][:260]}]" if r["detail"] else ""), flush=True)
@@ -1281,6 +2021,15 @@ def main():
                "checks": results, "checks_passed": sum(r["pass"] for r in results), "checks_made": len(results), "passed": ok,
                "in_a_browser": browser,
                "the_six_lines": {"kept_before_them": {k: rel(BEFORE_SIX[k]) for k in BEFORE_SIX}, "strings_that_differ_from_the_kept_builds": extra.get("six_changes", [])},
+               "the_guide": {"source": GUIDE_MD, "sha256": extra["guide"]["on_disk"][GUIDE_MD], "pictures_sha256": {k_: v_ for k_, v_ in extra["guide"]["on_disk"].items() if k_ != GUIDE_MD},
+                             "strings_added_to_the_page_itself": [{"where": w_, "string": t_} for w_, t_ in ADDED_13_OCT], "places_of_index_html_changed": len(PAGE_13_OCT),
+                             "files_its_figures_are_traced_to": [f_ for f_ in GUIDE_FILES if f_ not in NOT_SEARCHED] + [UMD_PAGE],
+                             "figures_table": {"path": "60_layer/site_copy_guide_figures.csv", "rows": len(extra.get("guide_rows", [])), "columns": g_cols,
+                                               "by_how": dict(Counter(r_["how"].split(":")[0] for r_ in extra.get("guide_rows", [])))},
+                             "figures_that_come_from_a_figure_of_a_named_file": [{"the_guides_words": r_["the_guides_words"], "figure": r_["its_figures"], "how": r_["how"], "from": r_["passage"]}
+                                                                                 for r_ in extra.get("guide_rows", []) if r_["how"].startswith("comes from")],
+                             "sentences_whose_figures_stand_in_two_passages": [{"sentence_begins": a_, "figures_in_a_passage_of_their_own": b_, "that_passage_holds": c_} for a_, b_, c_ in GUIDE_SPLIT],
+                             "sentences_whose_passage_is_named": [{"sentence_begins": a_, "the_passage_holds": b_} for a_, b_ in GUIDE_PIN]},
                "strings_table": {"path": "60_layer/site_copy_strings.csv", "rows": len(table), "columns": cols, "rows_with_no_text_before": sum(1 for r in table if not r["before"]), "rows_with_no_text_after": sum(1 for r in table if not r["after"]),
                                  "by_build_and_status": {f"{b}: {s}": n for (b, s), n in sorted(n_by.items())}}},
               open(out / "site_copy_check.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)

@@ -4,8 +4,15 @@
 
 The layer is opened from disk (file://), on the build that is in 60_layer/.
 Part A works every interactive element - the layer switcher, the minimum of forest, the kinds of unit, the district
-list, the search, the two text panels, the legend, the map's own zoom and drag, the address, two window sizes - and
-after each action reads what the page then shows. Part B clicks a seeded, stratified sample of units ON THE MAP and
+list, the search, the three text panels, the legend, the map's own zoom and drag, the address, two window sizes - and
+after each action reads what the page then shows.
+
+Added 13 October 2026, with the owner's handoff of that day (a third button, Guide, and a loader): seven steps, and
+nothing taken out. The loader is gone once the page says it is ready, having said its second message. The Guide button
+opens the window the other two texts use, with the guide's first heading and a line of its last section, both read
+here from docs/GUIDE.md; the window holds the guide's five pictures, each drawn and each as wide as the text; it
+scrolls; Close shuts it; in a narrow window a table wider than it scrolls sideways inside itself and the window does
+not; and an address that ends in #open=guide opens it. Part B clicks a seeded, stratified sample of units ON THE MAP and
 compares every value the panel displays with the stage tables, rebuilt here without any of the layer builder's code.
 
 chrome: a separate, headless Chrome with an empty profile, driven with real mouse and keyboard events through the
@@ -174,6 +181,11 @@ class InWebKit:
 
 
 URL = "file://" + str(ROOT / "60_layer" / "index.html")
+# the guide (added 13 Oct 2026): what its window must hold is read from its one source, docs/GUIDE.md
+GUIDE = read("docs/GUIDE.md").read_text(encoding="utf-8").splitlines()
+GUIDE_FIRST = next(l[2:].strip() for l in GUIDE if l.startswith("# "))                              # its first heading
+GUIDE_LAST = next(l.strip() for l in GUIDE[max(i for i, l in enumerate(GUIDE) if l.startswith("## ")) + 1:] if l.strip() and l[0] not in "-|!#" and not any(ch in l for ch in "*`["))      # a plain line of its last section
+GUIDE_PICTURES = sum(1 for l in GUIDE if l.startswith("!["))                                         # the pictures it names
 # the sixteen units of the first hand check (6 October 2026): left out, so that this sample is a fresh one
 EARLIER = {"132731", "OUTSIDE_183", "133949", "137247", "OUTSIDE_3185", "137771", "131999", "138534", "132539", "133170", "135472", "OUTSIDE_1855", "131760", "OUTSIDE_1229", "OUTSIDE_3062", "OUTSIDE_3327"}
 log, steps = [], []
@@ -311,6 +323,13 @@ def main():
         say("page", "read the starting state", f"layer {s0['layer']}, floor {s0['floor']} ha, both kinds of unit shown ({s0['drawn_lgd']:,} + {s0['drawn_out']:,} drawn), no unit selected, legend '{s0['legend_title'][:50]}...'",
             s0["layer"] == D["default_layer"] and s0["floor"] == D["default_floor"] == "100" and s0["drawn_lgd"] + s0["drawn_out"] == D["n"] and s0["unit"] is None)
         c.shot(SHOTS / "A00_start.png")
+        # the loader (added 13 Oct 2026): over the map's area while the page opens, gone once the page says it is ready
+        lo = c.js("(function(){var l=document.getElementById('loading'), m=document.getElementById('loadmsg'); return {there:!!l, shown:!!l&&getComputedStyle(l).display!=='none', said:m?m.textContent:null, ready:window.ICTD_READY===true};})()")
+        own_file = read("60_layer/index.html").read_text(encoding="utf-8")
+        first_words = '<p id="loadmsg">Loading the map&hellip;</p>'
+        say("loader", "read the loader once the page said it was ready", f"it is no longer shown; the last thing it said was '{lo['said']}'; in the page's own file its first words, 'Loading the map\u2026', are plain markup "
+            "that stands before the tag that asks for data.js",
+            lo["there"] and not lo["shown"] and lo["ready"] and lo["said"] == "Drawing the units\u2026" and own_file.count(first_words) == 1 and own_file.index(first_words) < own_file.index('<script src="data.js">'))
         selectable = [l for l in D["layers"] if not l["pending"]]
 
         # a large LGD unit to watch the colour of, and a unit between 50 and 100 ha of forest to watch the floor on
@@ -434,23 +453,52 @@ def main():
         s, _ = search("")
         say("search", "emptied the box and pressed Enter", "nothing changed", s["unit"] == prev and not c.errors)
 
-        # ---- A6. the two text panels ----------------------------------------------------------------------------------------------------------
-        for btn, name, must in (("#b_about", "About this map", ["Units, not hectares", "The headline:", "Every unit kept", "Small forests are greyed out"]), ("#b_sources", "Sources", ["ODbL 1.0", "CC BY-NC-SA 4.0", "Leaflet 1.9.4"])):
+        # ---- A6. the three text panels (the third, the Guide, added 13 Oct 2026) ---------------------------------------------------------------
+        for btn, name, must in (("#b_about", "About this map", ["Units, not hectares", "The headline:", "Every unit kept", "Small forests are greyed out"]), ("#b_sources", "Sources", ["ODbL 1.0", "CC BY-NC-SA 4.0", "Leaflet 1.9.4"]),
+                                ("#b_guide", "Guide", [GUIDE_FIRST, GUIDE_LAST])):
             x, y = c.click_on(btn); time.sleep(0.5)
             txt = c.js("document.getElementById('modalbody').textContent")
             s = state(c)
-            say("text panels", f"{c.clicked} the button '{name}' at ({x}, {y})", f"the panel opened ({len(txt):,} characters) and holds {must}", s["modal"] == "block" and all(m in txt for m in must))
+            if btn != "#b_guide":
+                say("text panels", f"{c.clicked} the button '{name}' at ({x}, {y})", f"the panel opened ({len(txt):,} characters) and holds {must}", s["modal"] == "block" and all(m in txt for m in must))
+            else:
+                g = c.js("(function(){var b=document.getElementById('modalbody'), h=b.querySelector('h1'); return {h1:h?h.textContent:'', first:b.textContent.trim().slice(0, 60), top:b.parentNode.scrollTop};})()")
+                say("text panels", f"{c.clicked} the button '{name}' at ({x}, {y})", f"the same panel opened, at its top ({len(txt):,} characters), under the guide's first heading, '{g['h1']}', and it holds a line of the guide's "
+                    f"last section, '{GUIDE_LAST}'", s["modal"] == "block" and all(m in txt for m in must) and g["h1"] == GUIDE_FIRST and g["first"].startswith(GUIDE_FIRST) and g["top"] == 0)
+                pics = []
+                for _ in range(40):                                  # a picture is decoded a moment after its HTML is put into the window
+                    pics = c.js("Array.from(document.querySelectorAll('#modalbody img')).map(function(i){return {done:i.complete, w:i.naturalWidth, h:i.naturalHeight, shown:Math.round(i.getBoundingClientRect().width), "
+                                "text:Math.round(document.getElementById('modalbody').getBoundingClientRect().width), here:(i.getAttribute('src')||'').slice(0, 23)};})")
+                    if pics and all(q["done"] for q in pics):
+                        break
+                    time.sleep(0.25)
+                say("text panels", "read the pictures in the Guide's panel", f"{len(pics)} pictures, as many as docs/GUIDE.md names ({GUIDE_PICTURES}); each is drawn, at its natural size of "
+                    f"{sorted(set((q['w'], q['h']) for q in pics))}, from its own bytes inside the page; each is as wide as the text ({sorted(set(q['shown'] for q in pics))} px of {sorted(set(q['text'] for q in pics))} px)",
+                    len(pics) == GUIDE_PICTURES == 5 and all(q["done"] and q["w"] > 0 and q["h"] > 0 and abs(q["shown"] - q["text"]) <= 2 and q["here"] == "data:image/webp;base64," for q in pics))
             c.shot(SHOTS / f"A6_{btn[3:]}.png")
             bx, by = c.centre("#modal .box")
             c.wheel(bx, by, 600)
             top = c.js("document.querySelector('#modal .box').scrollTop")
             say("text panels", f"{c.wheeled} over the panel" if BROWSER == "chrome" else "scrolled the panel by its own scroll position (script cannot scroll WebKit with a wheel event)", f"it scrolled ({top:.0f} px)", top > 0)
-            if btn == "#b_about":
+            if btn in ("#b_about", "#b_guide"):
                 x, y = c.click_on("#b_close"); time.sleep(0.4)
                 say("text panels", f"{c.clicked} 'Close' at ({x}, {y})", "the panel closed", state(c)["modal"] == "none")
             else:
                 c.click(40, 500); time.sleep(0.4)
                 say("text panels", f"{c.clicked} the dimmed page beside the panel, at (40, 500)", "the panel closed", state(c)["modal"] == "none")
+        # the Guide's panel in a narrow window (added 13 Oct 2026): a table wider than the panel scrolls sideways inside itself, and the panel does not
+        c.resize(380, 700)
+        c.js("(function(){document.getElementById('b_guide').click(); return 0;})()"); time.sleep(0.8)
+        n = c.js("(function(){var b=document.getElementById('modalbody'), box=b.parentNode; return {open:getComputedStyle(document.getElementById('modal')).display, box:[box.clientWidth, box.scrollWidth], "
+                 "tables:Array.from(b.querySelectorAll('.wide')).map(function(w){return [w.clientWidth, w.scrollWidth, getComputedStyle(w).overflowX];}), "
+                 "pics:Array.from(b.querySelectorAll('img')).map(function(i){return [Math.round(i.getBoundingClientRect().width), Math.round(b.getBoundingClientRect().width)];})};})()")
+        wider = [w for w in n["tables"] if w[1] > w[0] + 1]
+        say("text panels", "made the window 380 x 700 and opened the Guide", f"its panel is {n['box'][0]} px wide and does not scroll sideways (its content is {n['box'][1]} px wide); {len(wider)} of its {len(n['tables'])} tables are "
+            f"wider than the panel, and each of those scrolls sideways inside itself; each picture is as wide as the text ({sorted(set(q[0] for q in n['pics']))} px)",
+            n["open"] == "block" and n["box"][1] <= n["box"][0] + 1 and len(wider) >= 1 and all(w[2] in ("auto", "scroll") for w in n["tables"]) and len(n["pics"]) == GUIDE_PICTURES and all(abs(q[0] - q[1]) <= 2 for q in n["pics"]))
+        c.shot(SHOTS / "A6_guide_narrow.png")
+        c.js("(function(){document.getElementById('b_close').click(); return 0;})()"); time.sleep(0.3)
+        c.reset_size()
 
         # ---- A6b. the legend's Hide / Show button ---------------------------------------------------------------------------------------------
         size = lambda: c.js("(function(){var b=document.getElementById('legend').getBoundingClientRect(), m=document.getElementById('map').getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height), Math.round(m.width), Math.round(m.height), document.querySelectorAll('#legend .lr').length, document.getElementById('legend').scrollWidth - document.getElementById('legend').clientWidth];})()")
@@ -510,6 +558,15 @@ def main():
         s = state(c)
         say("address", "closed the page, then opened the file afresh with nonsense in every part of the address", f"the page opened on its defaults: layer {s['layer']}, floor {s['floor']} ha, all {s['drawn_lgd'] + s['drawn_out']:,} units drawn, no unit open, no panel, no error",
             s["layer"] == D["default_layer"] and s["floor"] == "100" and s["unit"] is None and s["drawn_lgd"] + s["drawn_out"] == D["n"] and s["modal"] == "none" and not c.errors)
+        t = c.fresh(URL + "#open=guide")                           # added 13 Oct 2026: an address that ends in #open=guide opens the Guide
+        s = state(c)
+        g = c.js("(function(){var b=document.getElementById('modalbody'), h=b.querySelector('h1'); return {h1:h?h.textContent:'', pics:b.querySelectorAll('img').length, top:b.parentNode.scrollTop, "
+                 "loader:getComputedStyle(document.getElementById('loading')).display};})()")
+        say("address", "closed the page, then opened the file afresh with '#open=guide'", f"the Guide's panel is open, at its top, under the heading '{g['h1']}', with {g['pics']} pictures; the loader is gone; behind it the page is on "
+            f"its defaults (layer {s['layer']}, floor {s['floor']} ha, all {s['drawn_lgd'] + s['drawn_out']:,} units drawn, no unit open); no error",
+            s["modal"] == "block" and g["h1"] == GUIDE_FIRST and g["pics"] == GUIDE_PICTURES and g["top"] == 0 and g["loader"] == "none" and s["layer"] == D["default_layer"] and s["floor"] == "100" and s["unit"] is None
+            and s["drawn_lgd"] + s["drawn_out"] == D["n"] and not c.errors)
+        c.click_on("#b_close"); time.sleep(0.3)
 
         # ---- A9. a smaller window -------------------------------------------------------------------------------------------------------------------------
         for w, h in ((1100, 700), (820, 600)):

@@ -25,6 +25,13 @@ other cuts: `decision.overlay` cut to its three keys, the one paragraph of the A
 the owner's paragraph for the copy, and the first and last cells of the overlay's row of "Sources" replaced by his
 words. A copy that differed from the layer in anything else would fail step 1, as before. The record's key is
 `index_html_and_data_js_are_the_layers_without_the_development_index_and_with_the_overlay_switched_off`.
+THE GUIDE (the owner's handoff of 13 October 2026). The page has a third button, Guide, which opens docs/GUIDE.md as the
+layer's builder turned it into HTML (`guide_html` in data.js, its five pictures inside it). The rule says so in one
+line: the copy's `guide_html` is the layer's, character for character - nothing of the guide is cut on the way into the
+copy and nothing is added. Step 1 holds it, and a ninth step opens the Guide in the copy: its panel holds the guide's
+first heading and a line of its last section, both read here from docs/GUIDE.md, and its five pictures, each drawn from
+its own bytes inside the page; the development index is named nowhere in it; and nothing is asked of the network.
+
 Also checked: that neither "adi_2011" nor the index's names on the page are in the copy's data.js or index.html (the
 README is exempt: it names the index to say that it is absent, and must); and, in the browser, that the ranked list, a
 unit's panel, the list of layers and the two text panels show the index nowhere and show no empty or shifted cell
@@ -48,7 +55,10 @@ docs/SITE_COPY.md):
   8. ranks a district and opens one of its units by the page's address, and reads the ranked list (as many cells in
      every row as heads, the last cell the one the layer's own list ends with, no cell reading "undefined"), the unit's
      panel (every line the layer's panel has for that unit but the index's, the same note in the box above the forest
-     figures), the list of layers, and the texts "About this map" and "Sources": the index is in none.
+     figures), the list of layers, and the texts "About this map" and "Sources": the index is in none;
+  9. (added 13 October 2026) opens the Guide by its button and reads its panel: the guide's first heading and a line
+     of its last section, its pictures - as many as docs/GUIDE.md names, each drawn from its own bytes inside the
+     page -, the development index named nowhere in it, and still no request to the network.
 It also reads the unit count the page shows, so that "opened" means the map is there.
 
 Output: 70_share/exercise_share_chrome.json and nothing else - every step with what happened, the sha256 of the files
@@ -81,6 +91,11 @@ OVERLAY_PARAGRAPH_IN_THE_COPY = ("<p><b>The loss-pixel overlay isn't in this cop
 OVERLAY_ROW = "<tr><td>Loss-pixel overlay (optional, online, off unless ticked; its code is in overlay.js)</td>"      # how the layer's row of Sources for the overlay begins
 OVERLAY_ROW_IN_THE_COPY = ("<tr><td>Loss-pixel overlay (not in this copy)</td><td>{source}</td><td>{attribution}. Terms of use: {terms_url}. "
                            "Two points of them are unresolved, which is why the overlay is not in this copy.</td></tr>")
+# The guide (added 13 October 2026): what its panel must hold is read from its one source, docs/GUIDE.md.
+GUIDE = (ROOT / "docs" / "GUIDE.md").read_text(encoding="utf-8").splitlines()
+GUIDE_FIRST = next(l[2:].strip() for l in GUIDE if l.startswith("# "))
+GUIDE_LAST = next(l.strip() for l in GUIDE[max(i for i, l in enumerate(GUIDE) if l.startswith("## ")) + 1:] if l.strip() and l[0] not in "-|!#" and not any(ch in l for ch in "*`["))
+GUIDE_PICTURES = sum(1 for l in GUIDE if l.startswith("!["))
 
 
 def say(did, happened, ok):
@@ -96,7 +111,8 @@ def data_of(path):
 def expected(S, registered):
     """The rule, written out: what the layer's data must be once the development index is taken out and the overlay is switched off as ruled on
     11 October 2026, and nothing else. registered: the overlay's registration (scripts/layer_overlay.json), for the provider's name, the credit and
-    the address of the terms."""
+    the address of the terms. The guide (`guide_html`, added 13 October 2026) is not named below because nothing is done to it: the copy's is the
+    layer's, character for character, and step 1 says so in words of its own."""
     E = json.loads(json.dumps(S))
     # the overlay: three keys in the data, one paragraph of the About text, one row of Sources
     E["decision"]["overlay"] = {"available": 0, "label": S["decision"]["overlay"]["label"], "unavailable": OVERLAY_SAYS}
@@ -148,12 +164,14 @@ def main():
     differ = sorted(key for key in set(E) | set(C) if E.get(key) != C.get(key))
     whole = c_text == s_text[:s_text.index("{")] + json.dumps(C, ensure_ascii=False, separators=(",", ":")) + s_text[s_text.rindex("}") + 1:]
     overlay_cut = all(overlay_found.values()) and C["decision"]["overlay"] == {"available": 0, "label": S["decision"]["overlay"]["label"], "unavailable": OVERLAY_SAYS} and S["decision"]["overlay"].get("available") == 1
-    same = {"data.js": not differ and whole and overlay_cut and len(head) == 1 and len(C["f"][0]) == len(S["f"][0]) - 1 and len(C["layers"]) == len(S["layers"]) - 1,
+    guide_same = isinstance(S.get("guide_html"), str) and bool(S["guide_html"].strip()) and C.get("guide_html") == S["guide_html"]      # the guide is carried into the copy unchanged (13 October 2026)
+    same = {"data.js": not differ and whole and overlay_cut and guide_same and len(head) == 1 and len(C["f"][0]) == len(S["f"][0]) - 1 and len(C["layers"]) == len(S["layers"]) - 1,
             "index.html": s_page.count(CELL) == 1 and c_page == s_page.replace(CELL, "")}
     held = sorted(p.name for p in COPY.iterdir())
     say("compared the copy's index.html and data.js with 60_layer/'s under the rule (the layer's files with the development index taken out, the overlay switched off as ruled on 11 October 2026, and nothing else), and listed the copy's files",
         f"index.html is the layer's without the one cell that printed the index: {same['index.html']}; data.js is the layer's without the index and with the overlay switched off - its three keys, the About text's one paragraph on it and its one row of Sources: {same['data.js']}"
         + (f" (parts that differ from the rule: {differ})" if differ else "") + ("" if all(overlay_found.values()) else f" (not found exactly once in the layer: {[k_ for k_, v in overlay_found.items() if not v]})")
+        + f"; the guide in the copy is the layer's, character for character: {guide_same} ({len(C.get('guide_html') or ''):,} characters)"
         + f"; the copy holds {held}; overlay.js in it: {'overlay.js' in held}",
         all(same.values()) and held == ["README.txt", "data.js", "index.html"])
     names = [INDEX, title] + head
@@ -167,7 +185,7 @@ def main():
     says = DV["overlay"].get("unavailable", "")                  # what the copy's data gives the greyed box to say: held against the owner's words in step 1
     c = X.InChrome(tempfile.mkdtemp(prefix="ictd_chrome_profile_"), port=9337)
     net = lambda: [u for u in c.requests if u.startswith("http")]
-    asked_for_overlay = lambda: [u.split("/")[-1].split("#")[0] for u in c.requests if "overlay" in u.split("/")[-1].lower()]
+    asked_for_overlay = lambda: [u.split("/")[-1].split("#")[0] for u in c.requests if not u.startswith("data:") and "overlay" in u.split("/")[-1].lower()]      # a picture of the guide is asked for by its own bytes (data:): no file
     box = lambda: c.js("(function(){var e=document.getElementById('c_overlay'), m=document.getElementById('overlaymsg'), p=document.querySelector('.leaflet-sitelevel-pane'), l=e ? e.parentElement : null;"
                        " return {shown: !!(e && e.offsetParent !== null), ticked: !!(e && e.checked), disabled: !!(e && e.disabled), msg: m ? m.textContent : '', tiles: p ? p.querySelectorAll('img').length : 0,"
                        " label: l ? l.textContent.trim() : '', greyed: !!(l && l.classList.contains('off')), tip_beside_it: !!(l && l.querySelector('.tip')),"
@@ -237,9 +255,30 @@ def main():
             f"layers offered: {len(r.get('layers', []))}, the index among them: {INDEX in r.get('layers', [])}; the index named in the list, the panel, 'About this map' or 'Sources': "
             f"{bool(INDEX_WORDS.search(r.get('list_text', '') + r.get('panel_text', '') + ''.join(texts.values())))}; requests to the network since the page opened: {len(net())}",
             list_ok and panel_ok and layers_ok and texts_ok and len(net()) == 0)
+        # The Guide (added 13 October 2026): opened by its button, in the copy.
+        c.click_on("#b_guide"); time.sleep(0.6)
+        g = {}
+        for _ in range(40):                                              # a picture is decoded a moment after its HTML is put into the panel
+            g = c.js("(function(){var b=document.getElementById('modalbody'), h=b.querySelector('h1'); return {open: getComputedStyle(document.getElementById('modal')).display, h1: h ? h.textContent : '', text: b.textContent,"
+                     " pics: [].slice.call(b.querySelectorAll('img')).map(function(i){return {done: i.complete, w: i.naturalWidth, here: (i.getAttribute('src') || '').slice(0, 23)};}),"
+                     " links: [].slice.call(b.querySelectorAll('a')).map(function(a){return [a.getAttribute('href'), a.getAttribute('target')];})};})()")
+            if g["pics"] and all(q["done"] for q in g["pics"]):
+                break
+            time.sleep(0.25)
+        c.shot(SHOTS / "share_guide.png")
+        by_data = [u for u in c.requests if u.startswith("data:")]
+        guide_ok = (g["open"] == "block" and g["h1"] == GUIDE_FIRST and GUIDE_LAST in g["text"] and len(g["pics"]) == GUIDE_PICTURES == 5
+                    and all(q["done"] and q["w"] > 0 and q["here"] == "data:image/webp;base64," for q in g["pics"]) and not INDEX_WORDS.search(g["text"]) and title not in g["text"] and INDEX not in g["text"]
+                    and all(a[0].startswith("https://") and a[1] == "_blank" for a in g["links"]) and all(u.startswith("data:image/webp;base64,") for u in by_data))
+        say("opened the Guide by its button and read its panel",
+            f"the panel is open under the guide's first heading, '{g.get('h1')}', and holds a line of its last section: {GUIDE_LAST in g.get('text', '')}; it holds {len(g.get('pics', []))} pictures, as many as docs/GUIDE.md "
+            f"names ({GUIDE_PICTURES}), each drawn (natural widths {sorted(set(q['w'] for q in g.get('pics', [])))}) from its own bytes inside the page; its {len(g.get('links', []))} links are https addresses that open in a new tab, "
+            f"and none was followed; the development index named in it: {bool(INDEX_WORDS.search(g.get('text', '')) or title in g.get('text', '') or INDEX in g.get('text', ''))}; requests to the network since the page opened: {len(net())}",
+            guide_ok and len(net()) == 0)
+        c.js("document.getElementById('b_close').click()"); time.sleep(0.3)
         other = list(c.errors or [])
         if other:
-            say("read the page's script errors once more, after the list and the panel", f"errors: {other}", False)
+            say("read the page's script errors once more, after the list, the panel and the Guide", f"errors: {other}", False)
     finally:
         c.close()
     ok = all(s["ok"] for s in steps)
@@ -251,6 +290,7 @@ def main():
                "summary": {"steps": len(steps), "steps_as_expected": sum(s["ok"] for s in steps), "index_html_and_data_js_are_the_layers_without_the_development_index_and_with_the_overlay_switched_off": all(same.values()),
                            "the_development_index_is_named_in_index_html_or_data_js": bool(found["data.js"] or found["index.html"]), "the_readme_says_the_development_index_is_not_in_this_copy": README_SAYS in readme.lower(),
                            "overlay_js_in_the_copy": "overlay.js" in held, "overlay_js_asked_for": bool(asked_for_overlay()),
+                           "the_guide_in_the_copy_is_the_layers_character_for_character": guide_same, "pictures_drawn_in_the_guides_panel": sum(1 for q in g.get("pics", []) if q["done"] and q["w"] > 0),
                            "the_overlay_box_is_greyed_out_and_stays_unticked_when_clicked": ok,
                            "what_the_page_says_beside_the_greyed_overlay_box": said_at_rest,
                            "requests_to_the_network": 0 if ok else None, "script_errors_and_lines_of_the_browsers_log": [] if ok else "see the steps"}},

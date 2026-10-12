@@ -42,6 +42,10 @@ badges ("our placebo test fails here"), of the head of the grid's first column (
 About text's table of cells follow them. The check of the governance prompt now holds two things: that the page shows his new words, and that the
 decision table still carries the sentence of 8 October 2026 for every outside-village unit and for no other - the table is not rebuilt for one
 sentence (his ruling), and the page's words stand in for that sentence and for nothing else. No expected number, count or tolerance changed.
+CHANGED 13 OCTOBER 2026, with the owner's handoff of that day (a third button, Guide, and a loader): the check of the top's keys gained one more key,
+`guide_html`, the guide that button opens, and says why and what the key may hold. Nothing else in this script changed: no expected number, count
+or tolerance, and no check was taken out. That the guide is docs/GUIDE.md, and what the loader and the button do, are held by
+scripts/check_site_copy.py (its group g) and scripts/exercise_layer.py.
 """
 import csv, hashlib, json, re, sys
 from decimal import Decimal, ROUND_HALF_UP
@@ -84,7 +88,7 @@ check("the decision table holds each unit of the map once, and the map was built
 KEYS = {"title", "radio", "default_window", "windows", "cells", "tiers", "unranked", "tier_why", "cls", "counts", "dcounts", "rank", "rank_share", "sd", "so", "sf", "low", "loss", "near", "corro", "corro_letters", "corro_labels",
         "check", "check_labels", "governance", "fields", "st_codes", "grid", "work_note", "standing_min", "loss_min", "built", "overlay", "t"}
 TOP = {"title", "subtitle", "built", "bounds", "id", "f", "g", "out", "bar", "codes", "layers", "floors", "default_layer", "default_floor", "districts", "panel", "core_classes", "unit_types", "info_empty", "search_none",
-       "search_many", "about_html", "sources_html", "decision", "tips"}
+       "search_many", "about_html", "sources_html", "decision", "tips", "guide_html"}
 SUB = {"t": {"legend_title", "legend_note", "tier", "unranked", "order_default", "order_changed", "window_head", "tiers_head", "reset", "why_head", "why_window", "grid_cols", "why_cols", "why_rows", "why_low", "why_standing_some",
              "why_standing_little", "cmp_dense", "cmp_open", "why_loss_some", "why_loss_none", "why_cell", "why_order", "why_was", "why_unranked", "near", "standing_is", "why_share", "why_share_none", "no_share", "within_tier_share", "within_options", "corro_head", "work_head", "district_head", "rank_none", "within_tier",
              "rank_head", "rank_unranked", "rank_filter_note", "rank_out_kept", "rank_out_dropped", "keep_out_off", "district_pick", "keep_out", "export", "st_options", "cols", "kind", "export_cols"},
@@ -136,11 +140,16 @@ shapes = {"six cells, five of them in the tier order and one outside it": nc_ ==
 check("the lists inside the view have the lengths and kinds expected: " + "; ".join(shapes), all(shapes.values()), "not so: " + "; ".join(k for k, v in shapes.items() if not v))
 TIPS = {"floors", "units", "decision", "window_head", "tiers", "rank_none", "filter", "col_share"} | {"layer:" + x for x in LAYERS if x != "adi_2011"} | {f"panel:{k}" for k in range(1, 6)}      # every "i" whose words `tips` holds, by name
 tips = D.get("tips") if isinstance(D.get("tips"), dict) else {}
+guide = D.get("guide_html")
 check("the map's data has, at its top, the keys it had before the decision view, 'decision', and - since 11 October 2026 - one more, 'tips'. That key was added by the owner's handoff of that day, which reworded the page: a label is short, "
       "and what it left out stands in a small 'i' beside it. 'tips' holds the words of every such 'i' and nothing else: a flat list of texts under the names written out in this check, none of them empty, none for the development "
-      "index, and no figure, list or array among them. The layers are the eleven they were: no other key and no layer was added",
-      set(D) == TOP and [l.get("id") for l in D["layers"]] == LAYERS and isinstance(D.get("tips"), dict) and set(tips) == TIPS and all(isinstance(v, str) and v.strip() for v in tips.values()),
-      f"unknown: {sorted(set(D) - TOP)}; missing: {sorted(TOP - set(D))}; layers: {len(D['layers'])}; tips: {len(tips)}, unknown {sorted(set(tips) - TIPS)}, missing {sorted(TIPS - set(tips))}")
+      "index, and no figure, list or array among them. Since 13 October 2026 there is one key more, 'guide_html', added by the owner's handoff of that day: the guide that the page's third button opens. It is one text and nothing "
+      "else - not a list, not an array of figures - which begins with the guide's one first heading inside the element the page styles as the guide. (That it is docs/GUIDE.md, word for word and picture for picture, is held "
+      "by scripts/check_site_copy.py.) The layers are the eleven they were: no other key and no layer was added",
+      set(D) == TOP and [l.get("id") for l in D["layers"]] == LAYERS and isinstance(D.get("tips"), dict) and set(tips) == TIPS and all(isinstance(v, str) and v.strip() for v in tips.values())
+      and isinstance(guide, str) and guide.startswith('<div class="guide"><h1>') and guide.count("<h1>") == 1 and guide.endswith("</div>"),
+      f"unknown: {sorted(set(D) - TOP)}; missing: {sorted(TOP - set(D))}; layers: {len(D['layers'])}; tips: {len(tips)}, unknown {sorted(set(tips) - TIPS)}, missing {sorted(TIPS - set(tips))}; "
+      f"guide_html: {'one text of ' + format(len(guide), ',') + ' characters' if isinstance(guide, str) else 'NOT a text'}")
 check("the view's title, its switch's label and the note under every work-type field are the ones expected: the switch reads 'Decision view', and the 'i' the page draws beside it (tips.decision) asks what the label asked until 11 October "
       "2026, says the view lists a district's units, and says it is not a verdict",
       DV["title"] == "Decision view" and DV["radio"] == "Decision view" and tips.get("decision", "").startswith("Where is forest work needed, and what kind?") and "lists a district's units" in tips.get("decision", "")
