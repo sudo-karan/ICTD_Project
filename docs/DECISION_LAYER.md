@@ -1,6 +1,6 @@
 # The decision layer: where forest work is warranted
 
-*Written 2026-10-11T16:36:08Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
+*Written 2026-10-12T06:05:36Z by `scripts/write_decision_layer.py`. No figure in this document was typed: each was read from a
 file, and §20 says which. It describes the decision table built 2026-10-09T03:37:07Z and the layer built 2026-10-11T15:01:22Z.*
 
 ## 1. What this is
@@ -967,17 +967,17 @@ files under the rule above, which since 11 October 2026 carries the overlay's ch
 (§10) and a working overlay.
 
 **The copy is published.** On 11 October 2026 the owner decided to publish it, without a password, at
-https://sudo-karan.github.io/ICTD_Project/: GitHub Pages, from the branch `gh-pages` of the public repository (commit `907d0f905b33`), which
-holds the copy's three files and an empty `.nojekyll` and no other file of the repository. Until that day the copy's
+https://sudo-karan.github.io/ICTD_Project/. It was first published that day from a branch `gh-pages` of the public repository, which held the copy's three
+files and an empty `.nojekyll`. By his decision of the same day the repository has one branch, `main`, and the
+site is deployed from its folder `site/` by the workflow `.github/workflows/pages.yml`, GitHub's starter workflow
+for static pages narrowed to that folder; `gh-pages` is deleted. `scripts/publish_site.sh` fills `site/` with the
+copy's three files, and no other, and pushes `main`. The last commit to change `site/` is `852abdec8cc5`. Until that day the copy's
 README said that terms for passing it on were not yet agreed and asked that it not be published; it now gives the
-address, and says that each source keeps its own licence. **The copy on disk is not yet the one the site serves.** `scripts/check_pages_live.py` last checked the site
-on 2026-10-10T20:09:31Z: 9 of 9 checks passed, on the copy made 2026-10-10T20:05:42Z. The copy described
-in this section was made 2026-10-11T15:02:55Z, after the page's words were rewritten and six lines of it corrected
-(§17.4, §17.5), and had not been published when this was written. The owner gave his word for publishing it on
-11 October 2026, in his third handoff of that day. The session that built it could not publish it: its permission
-gate refused the publish script before the script ran, and nothing was done to get round that. It goes to the site
-when the owner runs that script or allows it, and this document is then written again, from a new check of the
-live site.
+address, and says that each source keeps its own licence. `scripts/check_pages_live.py` fetched the three files from
+the site and opened it in Chrome (2026-10-12T05:47:45Z): 9 of 9 checks passed. The bytes the site
+serves are the build's; the map draws every unit; the page logs no script error; and every request goes to the
+site's own host. The browser's own request for an icon, which the site does not have, is refused, and the check
+records it.
 
 **How it behaved under test.** In Chrome, with a connection, ticking the box drew 12 tiles of
 12 asked for, from the registered host and no other (one address asked for: `https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&end_year=2025`), with the
@@ -1074,10 +1074,10 @@ check was applied to what.
 
 **How the checks were run.** By `scripts/run_decision_checks.py`, one after another and never two at once, on the
 build described here; it writes down every run it makes, a failed one included (`60_layer/decision_runs.json`). In
-this pass it ran 6 checks, and 6 passed on their first run. The runs of each browser check are
+this pass it ran 6 checks, and 5 passed on their first run. The runs of each browser check are
 given with it below.
 
-**The pass on record was started 2026-10-11T15:44:03Z (UTC), on the layer as it was built again on 11 October 2026 for the
+**The pass on record was started 2026-10-11T18:09:25Z (UTC), on the layer as it was built again on 11 October 2026 for the
 owner's six lines (§17.5), and it is of the verifier as it now is.** In it `scripts/verify_decision.py` gave
 "62 of 62 checks passed", which is what the run this script made of the verifier as it wrote the document gave: "62 of 62 checks passed".
 The check added on 10 October 2026 (§17.3) is therefore in the pass. Three earlier passes are kept with the session's
@@ -1087,8 +1087,8 @@ decision view in WebKit did not run to its end. The machine had gone into standb
 pass, and afterwards the off-screen WebKit view stopped answering; the run was stopped by hand, and the runner wrote
 down "RuntimeError: the WebKit driver ended". The second, started 2026-10-10T22:41:56Z (UTC) on mains power with the machine kept awake, ran to
 its end, and every check in it passed. The third, started 2026-10-11T11:37:13Z (UTC), was of the layer as it was built for
-the page's words (built 2026-10-11T11:35:41Z; §17.4), before the six lines: every check passed on its last run; more than one run was needed by exercise_layer in WebKit (3 runs) and exercise_decision in WebKit (2 runs). In the pass on
-record every check passed, each on its first run.
+the page's words (built 2026-10-11T11:35:41Z; §17.4), before the six lines: every check passed on its last run; more than one run was needed by exercise_layer in WebKit (3 runs) and exercise_decision in WebKit (2 runs). A fourth was of this same build: started 2026-10-11T15:44:03Z (UTC), for the six lines, with every check passing on its first run. The runner keeps one record, and the pass on record replaced that one; it stands in this document as it was written at commit `6a06f58`, and its table is in `docs/stage4_run_log.md`. In the pass on
+record every check passed on its last run; more than one run was needed by exercise_decision in Chrome (2 runs), and what each such run failed on is given with the check below.
 
 **The regression gate: the existing views.**
 
@@ -1106,7 +1106,7 @@ record every check passed, each on its first run.
   in `docs/SITE_COPY.md` (the second of them in none of its own lines: it pins no reworded word itself, and what it
   expects of a unit's panel comes from the first).
 - **`scripts/exercise_layer_safari.py` in the Safari application: NOT RUN on this build.** The runner's
-  record names it as left out and gives the reason: "the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words". Its last record, still in `60_layer/`, is of the run
+  record names it as left out and gives the reason: "the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published". Its last record, still in `60_layer/`, is of the run
   of 2026-10-08T22:53:16Z on the layer built 2026-10-08T22:42:59Z, the build the owner ruled on: 48 addresses showed what they
   should and 1,265 values of the units' panels were in the page's text. So **the Safari third of the regression
   gate is not shown for the build described here.** Until 10 October 2026 one thing could be said without it: that
@@ -1176,7 +1176,8 @@ record every check passed, each on its first run.
   (nineteen a unit: lines that must be there, the share among them, lines that must not, and the block's place in the
   panel). A click that opens nothing, or a unit that does not touch the one aimed at, fails the run: there was none.
   0 clicks opened a touching neighbour. The page's script errors were read at the end of every part and
-  before every reload: none. Runs made of it on this build: 1; runs that passed: 1.
+  before every reload: none. Runs made of it on this build: 2; runs that passed: 1; steps that
+  failed in any run: [overlay] came back to the decision view (the box was unticked: True), ticked it, and clicked the box again at (24, 512); [overlay] clicked the box at (24, 653), with a connection; [overlay] ticked the box with a connection (0 tiles arrived), then cut the tile host off and moved the map by one tile's width; [overlay] with the tile host still cut off, moved the map to a place none of whose tiles were loaded. What the first of them recorded: "overlay.js was loaded and tiles came from tiles.globalforestwatch.org: 0 drawn of 12 asked for".
 - The same in WebKit: 47 of 47 steps, 46 units, 874 of 874 comparisons.
   There events are made inside the page, the exported text is read from the page and not from a saved file, and the
   browser cannot be put offline or have an address blocked. Runs made of it on this build: 1; runs that
@@ -1187,7 +1188,7 @@ record every check passed, each on its first run.
   657 of 657 lines of "why this tier" for 46 units were in the page's text in order. That
   build's block had one line fewer: the share was added since, and has been read in Chrome and WebKit only.
 
-**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-11T16:04:37Z, opened the copy in
+**The copy made to be passed on.** `scripts/exercise_share.py`, run 2026-10-11T18:38:33Z, opened the copy in
 `70_share/odisha_forest_decision_layer/` from disk in Chrome: 8 of 8 steps did what they
 should (§14).
 
@@ -1448,7 +1449,7 @@ This section is the script's own record of what it read. Paths are relative to t
 
 | as printed | file | where in the file |
 |---|---|---|
-| 2026-10-11T16:36:08Z | this run | the UTC time at which this script ran |
+| 2026-10-12T06:05:36Z | this run | the UTC time at which this script ran |
 | 2026-10-09T03:37:07Z | `55_decision/decision.provenance.json` | key `run_utc` |
 | 2026-10-11T15:01:22Z | `60_layer/layer.provenance.json` | key `run_utc` |
 | 10 | `55_decision/decision.provenance.json` | key `tables`: the number of tables it lists |
@@ -1688,11 +1689,9 @@ This section is the script's own record of what it read. Paths are relative to t
 | Chrome/154.0.8037.99 | `70_share/exercise_share_chrome.json` | key `browser` |
 | 8 | `70_share/exercise_share_chrome.json` | key `summary` → `steps` |
 | https://sudo-karan.github.io/ICTD_Project/ | `70_share/pages_publication.json` | key `address` |
-| 907d0f905b33 | `70_share/pages_publication.json` | key `gh_pages_commit_when_checked`, its first twelve characters |
-| 2026-10-10T20:09:31Z | `70_share/pages_live_check.json` | key `run_utc` |
+| 852abdec8cc5 | `70_share/pages_publication.json` | key `site_commit`, its first twelve characters |
+| 2026-10-12T05:47:45Z | `70_share/pages_live_check.json` | key `run_utc` |
 | 9 | `70_share/pages_live_check.json` | key `checks_made` |
-| 2026-10-10T20:05:42Z | `70_share/pages_live_check.json` | key `copy_run_utc` |
-| 2026-10-11T15:02:55Z | `70_share/share.provenance.json` | key `run_utc` |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its second figure, the tiles drawn |
 | 12 | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → the first → `tiles_drawn`: its first figure, the tiles asked for |
 | https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.13/dynamic/9/375/226.png?render_type=true_color&tree_cover_density_threshold=10&start_year=2018&en... | `60_layer/exercise_decision_chrome.json` | key `summary` → `overlay` → `notes` → `0` → `one_tile_address` |
@@ -1723,8 +1722,8 @@ This section is the script's own record of what it read. Paths are relative to t
 | 29 | `.session_scratch_2026-10-05/replicate_decision/final_comparison.json` *(working file)* | key `ambiguities_reported` |
 | 67 | `55_decision/condition_by_unit.csv` | its columns: their number |
 | 6 | `60_layer/decision_runs.json` | key `checks`: their number |
-| 6 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
-| 2026-10-11T15:44:03Z | `60_layer/decision_runs.json` | key `started_utc` |
+| 5 | `60_layer/decision_runs.json` | key `checks`: the checks whose first run passed |
+| 2026-10-11T18:09:25Z | `60_layer/decision_runs.json` | key `started_utc` |
 | 62 of 62 checks passed | `60_layer/decision_runs.json` | key `checks`: the first clause of the last line of the run of `verify_decision` in that pass |
 | 2026-10-09T04:08:22Z | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_words/decision_runs.json` *(working file)* | key `layer_run_utc` |
 | 2026-10-10T11:29:27Z | `.session_scratch_2026-10-05/decision_runs_2026-10-10_pass_not_finished_webkit_stalled.json` *(working file)* | key `started_utc` |
@@ -1735,7 +1734,8 @@ This section is the script's own record of what it read. Paths are relative to t
 | 2026-10-11T11:37:13Z | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/decision_runs.json` *(working file)* | key `started_utc` |
 | 2026-10-11T11:35:41Z | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/decision_runs.json` *(working file)* | key `layer_run_utc` |
 | every check passed on its last run; more than one run was needed by exercise_layer in WebKit (3 runs) and exercise_decision in WebKit (2 runs) | `.session_scratch_2026-10-05/60_layer_2026-10-11_before_six_fixes/decision_runs.json` *(working file)* | key `checks`: the checks of which more than one run was made, with the number of runs |
-| every check passed, each on its first run | `60_layer/decision_runs.json` | key `checks`: the checks of which more than one run was made, with the number of runs |
+|  A fourth was of this same build: started 2026-10-11T15:44:03Z (UTC), for the six lines, with every check passing on its first run. The runner keeps one reco... | `git show 6a06f58:docs/DECISION_LAYER.md` | the time at which the pass then on record was started, where that lies between the build of the layer on disk and the pass now on record |
+| every check passed on its last run; more than one run was needed by exercise_decision in Chrome (2 runs), and what each such run failed on is given with the ... | `60_layer/decision_runs.json` | key `checks`: the checks of which more than one run was made, with the number of runs |
 | Chrome/154.0.8037.99 | `60_layer/exercise_chrome.json` | key `summary` → `browser` |
 | 53 | `60_layer/exercise_chrome.json` | key `summary` → `controls_exercised` |
 | 29 | `60_layer/exercise_chrome.json` | key `summary` → `units_clicked` |
@@ -1749,7 +1749,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_layer in WebKit' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_layer in WebKit' |
 | none | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_layer in WebKit' |
-| the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes the page's words | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
+| the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published | `60_layer/decision_runs.json` | key `checks_not_run_in_this_pass`: `why` |
 | 2026-10-08T22:53:16Z | `60_layer/exercise_safari.json` | key `summary` → `run_utc` |
 | 2026-10-08T22:42:59Z | `60_layer/exercise_safari.json` | key `summary` → `layer_run_utc` |
 | 48 | `60_layer/exercise_safari.json` | key `summary` → `addresses_tried` |
@@ -1780,8 +1780,10 @@ This section is the script's own record of what it read. Paths are relative to t
 | 11 | `60_layer/exercise_decision_chrome.json` | key `summary` → `kinds_of_badge_there_are` |
 | 874 | `60_layer/exercise_decision_chrome.json` | key `summary` → `lines_compared` |
 | 0 | `60_layer/exercise_decision_chrome.json` | key `summary` → `units_opened_that_touch_the_one_aimed_at` |
-| 1 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in Chrome' |
+| 2 | `60_layer/decision_runs.json` | key `checks`: `runs_made` of the check 'exercise_decision in Chrome' |
 | 1 | `60_layer/decision_runs.json` | key `checks`: `runs_that_passed` of the check 'exercise_decision in Chrome' |
+| [overlay] came back to the decision view (the box was unticked: True), ticked it, and clicked the box again at (24, 512); [overlay] clicked the box at (24, 6... | `60_layer/decision_runs.json` | key `checks`: the `failed_lines` of the runs of 'exercise_decision in Chrome' |
+|  What the first of them recorded: "overlay.js was loaded and tiles came from tiles.globalforestwatch.org: 0 drawn of 12 asked for". | `60_layer/decision_runs.json` | key `checks`: of the first failed line of the runs of 'exercise_decision in Chrome', what happened, up to its first semicolon |
 | 47 | `60_layer/exercise_decision_webkit.json` | key `summary` → `steps` |
 | 46 | `60_layer/exercise_decision_webkit.json` | key `summary` → `units_opened` |
 | 874 | `60_layer/exercise_decision_webkit.json` | key `summary` → `lines_compared` |
@@ -1791,7 +1793,7 @@ This section is the script's own record of what it read. Paths are relative to t
 | 59 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `addresses_tried` |
 | 657 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `lines_compared` |
 | 46 | `60_layer/exercise_decision_safari.json` | key `summary` → `part2_the_decision_view` → `units_opened_by_address` |
-| 2026-10-11T16:04:37Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
+| 2026-10-11T18:38:33Z | `70_share/exercise_share_chrome.json` | key `run_utc` |
 | 2026-10-08T13:02:50Z | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `layer_run_utc` |
 | 3 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs` |
 | 1 | `.session_scratch_2026-10-05/decision_runs_2026-10-08.json` *(working file)* | key `unchanged_webkit_exercise` → `runs_with_a_failed_step` |
@@ -1866,6 +1868,7 @@ Every cell of a table that is not a typed label was read from the file and colum
 
 | file | bytes | sha256 | the run stamp it carries |
 |---|---|---|---|
+| `.github/workflows/pages.yml` | 1,488 | `292abd6fa028722f` | - |
 | `.session_scratch_2026-10-05/55_decision_2026-10-08_as_ruled_on/tiers.csv` *(working file)* | 2,893 | `a734d457e7718afa` | - |
 | `.session_scratch_2026-10-05/60_layer_2026-10-07/layer.provenance.json` *(working file)* | 14,664 | `6e93fd76b286d905` | 2026-10-07T12:05:18Z |
 | `.session_scratch_2026-10-05/60_layer_2026-10-08_as_ruled_on/decision_runs.json` *(working file)* | 6,680 | `6eec553b95fa0587` | - |
@@ -1923,27 +1926,30 @@ Every cell of a table that is not a typed label was read from the file and colum
 | `55_decision/work_rows_naming_forest.csv` | 2,055 | `a1c52ae8265c0c5c` | - |
 | `55_decision/work_types.csv` | 5,133 | `f6d27c0a66b4100a` | - |
 | `60_layer/data.js` | 22,289,335 | `2659642e6adf8b37` | - |
-| `60_layer/decision_runs.json` | 5,703 | `69823668e517aa5f` | - |
-| `60_layer/exercise_chrome.json` | 26,772 | `9bbd8c4589715f65` | 2026-10-11T15:48:36Z |
-| `60_layer/exercise_decision_chrome.json` | 52,956 | `fc9ac2b5cfd2aa13` | 2026-10-11T15:59:15Z |
+| `60_layer/decision_runs.json` | 7,656 | `58d78dc0cfe59e01` | - |
+| `60_layer/exercise_chrome.json` | 26,772 | `185ef4f92d9dd3a5` | 2026-10-11T18:15:26Z |
+| `60_layer/exercise_decision_chrome.json` | 52,956 | `a404ba1396edf929` | 2026-10-11T18:33:32Z |
 | `60_layer/exercise_decision_safari.json` | 59,230 | `4e0185fff677500e` | 2026-10-08T23:04:30Z |
-| `60_layer/exercise_decision_webkit.json` | 50,929 | `8b558c887e0700af` | 2026-10-11T16:04:02Z |
+| `60_layer/exercise_decision_webkit.json` | 50,930 | `474da39216947f20` | 2026-10-11T18:37:54Z |
 | `60_layer/exercise_safari.json` | 17,705 | `b7584629baaa8553` | 2026-10-08T22:53:16Z |
-| `60_layer/exercise_webkit.json` | 27,263 | `452031d4cdb0ab93` | 2026-10-11T15:53:32Z |
+| `60_layer/exercise_webkit.json` | 27,265 | `7174d05b8896a1e4` | 2026-10-11T18:21:03Z |
 | `60_layer/index.html` | 210,942 | `ca74b4cbc4b6dfa6` | - |
 | `60_layer/layer.provenance.json` | 24,384 | `f139fc0a19c6ef6b` | 2026-10-11T15:01:22Z |
-| `70_share/exercise_share_chrome.json` | 5,519 | `c19b19ba4254da3c` | 2026-10-11T16:04:37Z |
+| `70_share/exercise_share_chrome.json` | 5,519 | `e5bcee6162d0e4ef` | 2026-10-11T18:38:33Z |
 | `70_share/odisha_forest_decision_layer/README.txt` | 7,177 | `0c8754bbef8307c6` | - |
 | `70_share/odisha_forest_decision_layer/data.js` | 22,092,359 | `34f9bccff25d7583` | - |
 | `70_share/odisha_forest_decision_layer/index.html` | 210,912 | `4e98a6bf1248c5f2` | - |
-| `70_share/pages_live_check.json` | 4,511 | `151685df83b61163` | 2026-10-10T20:09:31Z |
-| `70_share/pages_publication.json` | 1,179 | `4f3655a396a1be8d` | - |
+| `70_share/pages_live_check.json` | 4,635 | `aa09a372da1c3278` | 2026-10-12T05:47:45Z |
+| `70_share/pages_publication.json` | 1,291 | `4d3ae04153bb5088` | - |
 | `70_share/share.provenance.json` | 5,785 | `3d7f3e90096686e0` | 2026-10-11T15:02:55Z |
 | `scripts/05_build_decision.py` | 88,855 | `1e1419645c581203` | - |
 | `scripts/_layer_decision.py` | 52,196 | `54a450c74142af4d` | - |
 | `scripts/layer_overlay.json` | 8,357 | `61000c5a09259cf5` | - |
 | `scripts/run_decision_checks.py` | 10,140 | `40cf7e95e9c69bc2` | - |
 | `scripts/write_results.py` | 114,011 | `b918073042879cfc` | - |
+| `site/README.txt` | 7,177 | `0c8754bbef8307c6` | - |
+| `site/data.js` | 22,092,359 | `34f9bccff25d7583` | - |
+| `site/index.html` | 210,912 | `4e98a6bf1248c5f2` | - |
 
 ### 20.4 Statements tested before they were written
 
@@ -2138,10 +2144,10 @@ Each of these is something the text says in words. The script tested it against 
 - the copy in `70_share/odisha_forest_decision_layer/` was made from the layer that is in `60_layer/`; its two files are the layer's without the development index of 2011, which neither names, and with the overlay switched off; its three files are the ones its record describes and it holds no other; and the check that opened it in Chrome was made on those files and passed every step
 - the field left out of the copy is `adi_2011`, its value was taken from the row of every unit, and `60_layer/data.js` still has it
 - in the copy the overlay's part of the data is `available` 0, the layer's label and one sentence; that sentence is what the page said under the greyed box in the browser and what the copy's record gives; the box stayed unticked when clicked and no `overlay.js` was asked for; and the full layer's overlay is available and keeps its own words for a missing file
+- the record of the publication is of the folder site/ of the branch main, with the commit at the head of main when it was checked; the workflow in the repository deploys that folder of that branch; and the three files of site/ are byte for byte the copy's
 - every label of an East Coast unit's badge carries one and the same note after its dash; it says that our placebo test fails there, and no label says that the check is CoRE Stack's own
 - the prompt of the empty ranked list says that units are ranked within a district and never across the state, and the "i" beside it carries the odds ratios and the words "not established"
 - the layer's About text says that what Hansen cannot see is thinning under a canopy that still stands, and no longer says that it cannot see change on land that was open in 2000
-- the last check of the live site passed every check, on a copy made before the one on disk; the page and the data the site then served are not the files on disk; and the README of the copy on disk gives the site's address
 - the copy on disk is the one the public site serves, or it is a later copy that has not been published yet: in the first case the check of the live site passed every check on this build, the three files it fetched are byte for byte those on disk, and the copy's README gives the site's address and no longer says that terms are not agreed
 - an exported row carries district, unit id, unit type, window, tier label, tier definition, the tier order in use and whether it was changed, what orders units within a tier, the six hectare figures, corroboration with its window, the outside-village flag and the build time
 - the export has the same columns in WebKit as in Chrome, and in the second list as in the first
@@ -2185,6 +2191,8 @@ Each of these is something the text says in words. The script tested it against 
 - in the unfinished pass the verifier gave the count this script's own run of it gave
 - the pass on record was made with the verifier as it now is: its count is the count of this script's own run of it
 - in the pass on record the check of the decision view in WebKit, which the earlier pass could not finish, ran to its end and passed
+- every step of the decision view's exercise in Chrome that failed in a run of the pass on record is a step of the overlay, which needs the tile provider's host to answer
+- where an earlier pass was made on the build on disk, this document as it was written then says that every check of it passed on its first run
 - the two records of the Safari checks in `60_layer/` are of an earlier build, the same one, and on it the layer's Safari script passed
 - the record gives one reason for leaving out both Safari checks
 - on an earlier build, the run of the layer's own WebKit exercise that failed a step was the first made of it, and the step was the map drag
@@ -2362,4 +2370,4 @@ Each of these is something the text says in words. The script tested it against 
 
 The text itself may hold no digit except inside a code span (a file, a column, a threshold written as code, a command) and in: a date; a financial year; a year; the number of a heading; a reference to a section; the number of a stage of the pipeline; a name: a satellite, a report, a licence, a datum. Everything else that is a number came from a file.
 
-*370 figures and 23 tables (708 cells) from 78 files; 252 statements tested; 153 totals compared. Written 2026-10-11T16:36:08Z by `scripts/write_decision_layer.py` (sha256 `623d9f56db6f7188`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*
+*371 figures and 23 tables (708 cells) from 82 files; 254 statements tested; 153 totals compared. Written 2026-10-12T06:05:36Z by `scripts/write_decision_layer.py` (sha256 `9aad778070cc0d08`), with the reading functions of `scripts/write_results.py` (sha256 `b918073042879cfc`).*

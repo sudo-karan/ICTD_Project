@@ -24,6 +24,11 @@ The owner's third handoff of that day (six lines of the page in his words, and p
 layer and the copy were built once more for it, so the second handoff's tables - the comparison of its Step 5 and the
 runs of its checks - are read in the same way from what was kept before the six lines.
 
+His fourth handoff of that day ("One branch: main") has the last section of the four: one branch, `main`, with the
+whole history, and the site deployed from the folder `site/` of `main`. Its checks were run on the same builds as the
+third handoff's, and the runner keeps one record; so the table of the third handoff's pass is reprinted from this log
+as it was written at the commit before (`THIRD_RUNS_AT`), and the record on disk is shown under the fourth.
+
 Writes one file, `docs/stage4_run_log.md`. The stage outputs it reads are not in git: if `50_gap/` is empty, run the
 builders in the order the log gives under "To rebuild" and then this script.
 """
@@ -876,7 +881,10 @@ THIRD_STEP_0 = """
 waiting, the copy made {waiting}. The publish script (`.session_scratch_2026-10-05/handoff/publish_to_github_pages.sh`)
 was not run: the session's permission gate refused the command as a production deploy before the script started, and
 so before git was reached. Nothing was done to get round the refusal. As the handoff says of a Step 0 that fails, the
-work went on to Step 1, and the site went on serving the copy of the first handoff's Step 0 (above).
+work went on to Step 1, and the site went on serving the copy of the first handoff's Step 0 (above). That build was
+never published by itself: the copy with the six lines, which followed it, was published by the fourth handoff, from
+`main` (below). The script named here made the branch `gh-pages`; since the fourth handoff it is retired, in
+`.session_scratch_2026-10-05/handoff/retired/`.
 """
 THIRD_STEP_1 = """
 Six lines of the page that the audit of the second handoff had listed for the owner were untrue or misleading, and he
@@ -937,16 +945,17 @@ def third_handoff() -> list[str]:
     published = bool(made) and live.get("copy_run_utc") == made and live.get("passed") is True
     waiting = json.loads((KEPT_SIX_SHARE / "share.provenance.json").read_text(encoding="utf-8"))["run_utc"]
     stage4 = THIRD_STEP_3_DONE and (GAP / "gates_site_words.csv").exists() and (KEPT_GAP_WORDS / "gates_site_words.csv").exists()
+    fourth = (ROOT / ".github" / "workflows" / "pages.yml").exists()            # the fourth handoff has begun: the workflow that deploys site/ is in the repository
     steps = [(0, "publish the build that is waiting", "not done: the publish script was refused before it ran (below)"), (1, "the six fixes", "done"), (2, "the checks", "done"),
              (3, "stage 4 follows the layer", "done" if stage4 else "not yet"), (4, "look at it", "done" if THIRD_STEP_4_DONE else "not yet"), (5, "the documents", "done" if THIRD_STEP_5_DONE else "not yet"),
-             (6, "publish, and write what the site serves", "done" if published else "not yet")]
+             (6, "publish, and write what the site serves", "not done: refused again, and replaced by the fourth handoff (below)" if fourth else "done" if published else "not yet")]
     out = ["## The owner's third handoff of 11 October 2026: publish what is waiting, six lines, publish again", "",
            "Later the same day the owner gave his yes to publishing, in a third note (`.session_scratch_2026-10-05/handoff/2026-10-11_six_fixes_and_publish.md`, not in git), which replaced the wait at Step 8 of the "
            "second handoff. It set seven steps: publish the build that was waiting; then put six lines of the page right, in his words; then check, look, write the documents and publish again.", "",
            "| step | what | state |", "|---|---|---|"]
     out += [f"| {n} | {what} | {state} |" for n, what, state in steps]
     out += ["", "### Step 0 of the third handoff: publish the build that was waiting", "", THIRD_STEP_0.strip().format(waiting=waiting), "",
-            "### Step 1 of the third handoff: the six lines", "", THIRD_STEP_1.strip(), "", "### Step 2 of the third handoff: the checks", "", THIRD_STEP_2.strip(), ""] + browser_runs()
+            "### Step 1 of the third handoff: the six lines", "", THIRD_STEP_1.strip(), "", "### Step 2 of the third handoff: the checks", "", THIRD_STEP_2.strip(), ""] + (third_runs_as_logged() if fourth else browser_runs())
     if stage4:
         out += ["### Step 3 of the third handoff: stage 4 follows the layer", "", THIRD_STEP_3.strip(), ""] + rebuild("site_words")
     if THIRD_STEP_4_DONE:
@@ -954,7 +963,11 @@ def third_handoff() -> list[str]:
     if THIRD_STEP_5_DONE:
         out += ["### Step 5 of the third handoff: the documents", "", THIRD_STEP_5.strip(), ""]
     out += ["### Step 6 of the third handoff: the copy on the site", ""]
-    if published:
+    if fourth:
+        out += [f"**Not done in this handoff.** The publish script was tried once more at this step, on the owner's word given in this handoff, and was refused by the session's permission gate before it ran, as at Step 0. "
+                f"Nothing was done to get round the refusal. The copy with the six lines (made {made}) stayed built, checked and unpublished until the owner's fourth handoff, which replaced this step: it was published "
+                "from the folder `site/` of `main`, and the documents that describe the publication were written then (below).", ""]
+    elif published:
         out += [f"The copy with the six lines (made {made}) was published by the owner's own script, on his word, and the live site was checked against it:", ""] + publication()
     else:
         out += [f"**Not yet published.** The copy with the six lines (made {made}) is built, checked and ready. The publish script was tried once more at this step, on the owner's word given in this handoff, and "
@@ -962,6 +975,123 @@ def third_handoff() -> list[str]:
                 "the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.", "",
                 "What is left once it is published, in this order: `scripts/check_pages_live.py --wait 10`; `scripts/write_decision_layer.py`, which then says that the site serves this copy; this log, with "
                 "`STEP_8_DONE` set; and `scripts/write_gap.py` last.", ""]
+    return out
+
+
+THIRD_RUNS_AT = "6a06f58"                                          # the commit at which this log last printed the runner's record of the third handoff's pass
+
+
+def third_runs_as_logged() -> list[str]:
+    """The table of the third handoff's pass of the checks, as this log printed it at THIRD_RUNS_AT: the runner keeps one record, and the pass of the fourth handoff replaced it."""
+    was = subprocess.run(["git", "show", f"{THIRD_RUNS_AT}:docs/stage4_run_log.md"], capture_output=True, text=True, cwd=ROOT).stdout.splitlines()
+    try:
+        a = next(i for i, l in enumerate(was) if l.startswith("### Step 2 of the third handoff"))
+        b = next(i for i in range(a, len(was)) if was[i].startswith("*`60_layer/decision_runs.json`: started"))
+        c = next(i for i in range(b, len(was)) if was[i].startswith("*Every check passed on its last run"))
+    except StopIteration:
+        raise SystemExit(f"the log of commit {THIRD_RUNS_AT} does not hold the table of the third handoff's pass")
+    return [f"*The runner keeps one record of the layer's checks, and the pass made in the fourth handoff, on the same builds, replaced the one this table is of. The table is reprinted from this log as it was written at "
+            f"commit `{THIRD_RUNS_AT}`; the record on disk is under the fourth handoff, below.*", ""] + was[b:c + 1] + [""]
+
+
+FOURTH_STEP_7_DONE, FOURTH_STEP_8_DONE = True, False              # the FOURTH handoff's last two steps: each set when the step is done
+FOURTH_DECISIONS = """
+**The owner's two decisions.**
+
+- **One branch, `main`, here and on GitHub.** It takes the whole working history as it is: the commits of
+  `two-measure-stage1`, joined to the two that `main` held on GitHub by a merge that keeps this history's tree.
+  `main`'s snapshot of 9 October was the tree of a commit of this history, so `main` held nothing this history
+  lacked and the join lost nothing. Nothing in the history is rewritten. `two-measure-stage1`, `github-main` and
+  `gh-pages` are then deleted, here and on GitHub, and `gh-pages` only after the live site has been checked serving
+  the new copy from `main`.
+- **The site is served from `main`.** The folder `site/` holds the published copy and nothing else; the workflow
+  `.github/workflows/pages.yml`, GitHub's own starter workflow for static pages narrowed to that folder, deploys it;
+  `scripts/publish_site.sh` fills `site/` from the gated copy and pushes `main`. Both files are the owner's.
+
+Work goes on `main` from now on. `main` is pushed on the owner's word, never with force, and nothing else is pushed.
+This replaces the rule of the earlier handoffs that no branch of this repository is pushed.
+"""
+FOURTH_STEP_1 = """
+The session's permission check refused the commands of this step, which move `main` to the working history, join
+the two commits of GitHub's `main` to it and set `main` to follow GitHub's. As the handoff says of a refusal, the
+commands were printed for the owner and no other route was tried; he ran them. The join is {join}: its parents are
+{parents}, its tree is that of `two-measure-stage1`, and its author and committer are the identity of the public
+snapshot. The setting that had mapped `github-main` to GitHub's `main` on a push is gone.
+"""
+FOURTH_STEP_3 = """
+The scripts that describe the publication were brought up to the new route, with what was true before kept as
+history: `scripts/check_pages_live.py` reads the head of `main`, holds the three files of `site/` against the recorded
+bytes and SHA-256 in its first check (the number of checks is as it was), and records the branch, the folder, the
+workflow, the commit at the head of `main` and the last commit to change `site/`; `scripts/write_decision_layer.py`
+and this script read either kind of record. The first publication's records, kept from before, are of `gh-pages` and
+stay as they are. The list of commits at the end of this log follows this history's own line, so that the two
+commits `main` held before the join are not listed as commits of the run.
+"""
+FOURTH_STEP_4 = """
+`site/` was filled with the three files of the gated copy, each held against the provenance record, and committed
+alone under the message the publish script uses. Then every check was run on the builds as they stood, which are
+the builds of the third handoff: this handoff changed no word and no figure of the page. `scripts/verify_layer.py`,
+unedited, `scripts/verify_decision.py`, `scripts/check_site_copy.py`, the gate on the copy and `scripts/verify_gap.py`
+each passed; `docs/SITE_COPY.md` and `docs/DECISION_LAYER.md` have the counts. The table is the runner's record. In
+this pass the decision view's exercise in Chrome needed a second run: on the first, no tile came from the tile
+provider's host, and its four online steps of the overlay failed; the second run passed every step.
+"""
+FOURTH_STEP_5 = """
+**The push, and the deployment.** On 12 October 2026 the owner asked for everything to be pushed to `main` on GitHub.
+The session ran `git push origin main:refs/heads/main`, a fast-forward without force, and the permission check let
+it through. The push started the workflow. GitHub refused its first run: the environment `github-pages` allowed
+only `gh-pages` to deploy. The owner added `main` to that environment's deployment branches, set the source of Pages
+to GitHub Actions, and started the workflow again by hand; that run succeeded. The session changed no setting on
+GitHub. The live site was then checked against the build:
+"""
+FOURTH_STEP_7 = """
+`docs/DATA_NOTES.md` was changed by hand in one paragraph, the one on the publication. That document is an input of
+stage 4, recorded with its SHA-256, so `scripts/08_gap_inputs.py` and `scripts/08_build_gap_districts.py` were run
+again in the stage-4 environment, and no other step. **No table of figures moved.** The verifier then passed every
+check. The comparison below sets every output beside a copy kept just before (`50_gap/before_one_branch/`).
+
+The documents were then written again, each by its own script: `docs/DECISION_LAYER.md`, this log, and `docs/GAP.md`
+last, as the owner listed; and before them `docs/RESULTS.md`, `docs/LAYER.md` and `docs/SITE_COPY.md`, which he had not
+listed. Those three cite the records of the layer's checks, and the checks of Step 4 had made those records again; so
+they were written again from the records on disk, in the usual order. In `docs/RESULTS.md` no sentence was changed.
+"""
+FOURTH_STEP_8 = """
+With the live site checked serving the new copy from `main`, the other branches were deleted: `two-measure-stage1`
+and `gh-pages` on GitHub, `two-measure-stage1` and `github-main` here. Every commit of `two-measure-stage1` and of
+`github-main` is in `main`. The commits of `gh-pages` held the first publication's three files and an empty
+`.nojekyll`; the files are those of the copy made on 10 October, kept with the session's working files.
+"""
+
+
+def fourth_handoff() -> list[str]:
+    """The owner's fourth handoff of 11 October 2026 ("One branch: main"): his two decisions, its steps, and what of it bears on stage 4."""
+    if not (ROOT / ".github" / "workflows" / "pages.yml").exists():
+        return []
+    join = subprocess.run(["git", "log", "--first-parent", "--merges", "-1", "--format=%h %p"], capture_output=True, text=True, cwd=ROOT).stdout.split()
+    share, check = ROOT / "70_share" / "share.provenance.json", ROOT / "70_share" / "pages_live_check.json"
+    made = json.loads(share.read_text(encoding="utf-8"))["run_utc"] if share.exists() else ""
+    live = json.loads(check.read_text(encoding="utf-8")) if check.exists() else {}
+    pub = json.loads((ROOT / "70_share" / "pages_publication.json").read_text(encoding="utf-8")) if (ROOT / "70_share" / "pages_publication.json").exists() else {}
+    published = bool(made) and live.get("copy_run_utc") == made and live.get("passed") is True and pub.get("branch") == "main"
+    stage4 = FOURTH_STEP_7_DONE and (GAP / "gates_one_branch.csv").exists()
+    steps = [(0, "where things stand", "done"), (1, "`main` takes the history", "done, by the owner: the session's permission check refused the commands"), (2, "the workflow and the publish script", "done"),
+             (3, "the scripts and documents that name `gh-pages`", "done"), (4, "fill `site/`, and run the checks", "done"), (5, "the owner publishes", "done" if published else "not yet"),
+             (6, "the live site", "done" if published else "not yet"), (7, "the documents", "done" if FOURTH_STEP_7_DONE else "not yet"), (8, "the other branches go", "done" if FOURTH_STEP_8_DONE else "not yet")]
+    out = ["## The owner's fourth handoff of 11 October 2026: one branch, `main`", "",
+           "Late the same day the owner decided how the repository is kept and how the site is published, in a fourth note (`.session_scratch_2026-10-05/handoff/2026-10-11_one_branch.md`, not in git). It replaced Step 6 of "
+           "the third handoff. Its first part was done with nothing pushed; its second part followed the owner's word, on 12 October 2026, that the copy was published.", "", FOURTH_DECISIONS.strip(), "",
+           "| step | what | state |", "|---|---|---|"]
+    out += [f"| {n} | {what} | {state} |" for n, what, state in steps]
+    out += ["", "### Step 1 of the fourth handoff: `main` takes the history", "",
+            FOURTH_STEP_1.strip().format(join=f"`{join[0]}`" if join else "not found", parents=" and ".join(f"`{x}`" for x in join[1:]) if join else "not found"), "",
+            "### Step 3 of the fourth handoff: the scripts that describe the publication", "", FOURTH_STEP_3.strip(), "",
+            "### Step 4 of the fourth handoff: `site/`, and the checks", "", FOURTH_STEP_4.strip(), ""] + browser_runs()
+    if published:
+        out += ["### Steps 5 and 6 of the fourth handoff: the copy on the site, from `main`", "", FOURTH_STEP_5.strip(), ""] + publication()
+    if stage4:
+        out += ["### Step 7 of the fourth handoff: the documents, and stage 4 after `docs/DATA_NOTES.md`", "", FOURTH_STEP_7.strip(), ""] + rebuild("one_branch")
+    if FOURTH_STEP_8_DONE:
+        out += ["### Step 8 of the fourth handoff: the other branches", "", FOURTH_STEP_8.strip(), ""]
     return out
 
 
@@ -1225,7 +1355,7 @@ def main() -> None:
                 "the section \"To rebuild\" at the end gives the order.", ""]
         if not (GAP / "gates_phase6.csv").exists():
             doc += [STOPPED_IN_PHASE_6.strip(), ""]
-        doc += handoff() + second_handoff() + third_handoff()
+        doc += handoff() + second_handoff() + third_handoff() + fourth_handoff()
     for number, title, gate_files, steps, notes in done:
         doc += [f"## Phase {number}: {title}", "", notes.strip(), ""]
         for g in gate_files:

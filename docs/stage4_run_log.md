@@ -1,6 +1,6 @@
 # Stage 4: the run log
 
-*Written 2026-10-11T16:41:28Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
+*Written 2026-10-12T06:06:16Z by `scripts/write_stage4_run_log.py`. The gate tables, the lists of files and the package versions are read from the files named beside them; the notes are typed and carry no figure of the analysis. The owner's prompt of 10 October 2026 set nine phases, 0 to 8, each ending in a commit.*
 
 ## Where the run stands
 
@@ -419,7 +419,7 @@ The documents that describe the page were written again, each by its own script 
 `docs/DEGRADATION.md` were edited by hand: their lines on NIRv in the owner's words, and in the README the rows of the
 copy's builder and its gate, rows for the two new scripts, and the layer section.
 
-**`docs/RESULTS.md`: no sentence was changed.** Of the 272 figures of its text, 3 are printed differently, 0 are gone and 0 are new, against the document of commit `f9bd4b8`; 4 lines of its text differ, each in those figures alone. They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`. The list under Phase 8 below,
+**`docs/RESULTS.md`: no sentence was changed.** Of the 272 figures of its text, 3 are printed differently, 0 are gone and 0 are new, against the document of commit `d0c022d`; 3 lines of its text differ, each in those figures alone. They are listed, old beside new, in `docs/SITE_COPY.md` (its section on the documents), from `60_layer/site_copy_results_changes.json`. The list under Phase 8 below,
 `50_gap/results_md_changes.csv`, was written by `scripts/08_gap_closing_checks.py`, which was not run again: it stays
 the record of the stage-4 run, and is of the document as that run left it.
 
@@ -446,7 +446,7 @@ Later the same day the owner gave his yes to publishing, in a third note (`.sess
 | 3 | stage 4 follows the layer | done |
 | 4 | look at it | done |
 | 5 | the documents | done |
-| 6 | publish, and write what the site serves | not yet |
+| 6 | publish, and write what the site serves | not done: refused again, and replaced by the fourth handoff (below) |
 
 ### Step 0 of the third handoff: publish the build that was waiting
 
@@ -454,7 +454,10 @@ Later the same day the owner gave his yes to publishing, in a third note (`.sess
 waiting, the copy made 2026-10-11T12:32:18Z. The publish script (`.session_scratch_2026-10-05/handoff/publish_to_github_pages.sh`)
 was not run: the session's permission gate refused the command as a production deploy before the script started, and
 so before git was reached. Nothing was done to get round the refusal. As the handoff says of a Step 0 that fails, the
-work went on to Step 1, and the site went on serving the copy of the first handoff's Step 0 (above).
+work went on to Step 1, and the site went on serving the copy of the first handoff's Step 0 (above). That build was
+never published by itself: the copy with the six lines, which followed it, was published by the fourth handoff, from
+`main` (below). The script named here made the branch `gh-pages`; since the fourth handoff it is retired, in
+`.session_scratch_2026-10-05/handoff/retired/`.
 
 ### Step 1 of the third handoff: the six lines
 
@@ -482,6 +485,8 @@ holds each build against the one kept before the six lines: the strings that dif
 exactly the owner's replacement, and nothing else differs. `docs/SITE_COPY.md` has the counts, the planted errors and
 every changed block of a check. The table below is the runner's record of the layer's checks on the build with the
 six lines; the two checks in the Safari application were left out as before.
+
+*The runner keeps one record of the layer's checks, and the pass made in the fourth handoff, on the same builds, replaced the one this table is of. The table is reprinted from this log as it was written at commit `6a06f58`; the record on disk is under the fourth handoff, below.*
 
 *`60_layer/decision_runs.json`: started 2026-10-11T15:44:03Z, ended 2026-10-11T16:04:05Z; the layer it checked was built 2026-10-11T15:01:22Z; one check at a time.*
 
@@ -544,9 +549,142 @@ printed differently are listed in `docs/SITE_COPY.md`), `docs/LAYER.md`, `docs/S
 
 ### Step 6 of the third handoff: the copy on the site
 
-**Not yet published.** The copy with the six lines (made 2026-10-11T15:02:55Z) is built, checked and ready. The publish script was tried once more at this step, on the owner's word given in this handoff, and was refused by the session's permission gate before it ran, as at Step 0. Nothing was done to get round the refusal. Until the owner runs the script himself, or allows it, the site serves the copy of the first handoff's Step 0, and the two records in `70_share/` are that publication's, put back beside the new copy after it was built.
+**Not done in this handoff.** The publish script was tried once more at this step, on the owner's word given in this handoff, and was refused by the session's permission gate before it ran, as at Step 0. Nothing was done to get round the refusal. The copy with the six lines (made 2026-10-11T15:02:55Z) stayed built, checked and unpublished until the owner's fourth handoff, which replaced this step: it was published from the folder `site/` of `main`, and the documents that describe the publication were written then (below).
 
-What is left once it is published, in this order: `scripts/check_pages_live.py --wait 10`; `scripts/write_decision_layer.py`, which then says that the site serves this copy; this log, with `STEP_8_DONE` set; and `scripts/write_gap.py` last.
+## The owner's fourth handoff of 11 October 2026: one branch, `main`
+
+Late the same day the owner decided how the repository is kept and how the site is published, in a fourth note (`.session_scratch_2026-10-05/handoff/2026-10-11_one_branch.md`, not in git). It replaced Step 6 of the third handoff. Its first part was done with nothing pushed; its second part followed the owner's word, on 12 October 2026, that the copy was published.
+
+**The owner's two decisions.**
+
+- **One branch, `main`, here and on GitHub.** It takes the whole working history as it is: the commits of
+  `two-measure-stage1`, joined to the two that `main` held on GitHub by a merge that keeps this history's tree.
+  `main`'s snapshot of 9 October was the tree of a commit of this history, so `main` held nothing this history
+  lacked and the join lost nothing. Nothing in the history is rewritten. `two-measure-stage1`, `github-main` and
+  `gh-pages` are then deleted, here and on GitHub, and `gh-pages` only after the live site has been checked serving
+  the new copy from `main`.
+- **The site is served from `main`.** The folder `site/` holds the published copy and nothing else; the workflow
+  `.github/workflows/pages.yml`, GitHub's own starter workflow for static pages narrowed to that folder, deploys it;
+  `scripts/publish_site.sh` fills `site/` from the gated copy and pushes `main`. Both files are the owner's.
+
+Work goes on `main` from now on. `main` is pushed on the owner's word, never with force, and nothing else is pushed.
+This replaces the rule of the earlier handoffs that no branch of this repository is pushed.
+
+| step | what | state |
+|---|---|---|
+| 0 | where things stand | done |
+| 1 | `main` takes the history | done, by the owner: the session's permission check refused the commands |
+| 2 | the workflow and the publish script | done |
+| 3 | the scripts and documents that name `gh-pages` | done |
+| 4 | fill `site/`, and run the checks | done |
+| 5 | the owner publishes | done |
+| 6 | the live site | done |
+| 7 | the documents | done |
+| 8 | the other branches go | not yet |
+
+### Step 1 of the fourth handoff: `main` takes the history
+
+The session's permission check refused the commands of this step, which move `main` to the working history, join
+the two commits of GitHub's `main` to it and set `main` to follow GitHub's. As the handoff says of a refusal, the
+commands were printed for the owner and no other route was tried; he ran them. The join is `0ef4377`: its parents are
+`6a06f58` and `2b44c0b`, its tree is that of `two-measure-stage1`, and its author and committer are the identity of the public
+snapshot. The setting that had mapped `github-main` to GitHub's `main` on a push is gone.
+
+### Step 3 of the fourth handoff: the scripts that describe the publication
+
+The scripts that describe the publication were brought up to the new route, with what was true before kept as
+history: `scripts/check_pages_live.py` reads the head of `main`, holds the three files of `site/` against the recorded
+bytes and SHA-256 in its first check (the number of checks is as it was), and records the branch, the folder, the
+workflow, the commit at the head of `main` and the last commit to change `site/`; `scripts/write_decision_layer.py`
+and this script read either kind of record. The first publication's records, kept from before, are of `gh-pages` and
+stay as they are. The list of commits at the end of this log follows this history's own line, so that the two
+commits `main` held before the join are not listed as commits of the run.
+
+### Step 4 of the fourth handoff: `site/`, and the checks
+
+`site/` was filled with the three files of the gated copy, each held against the provenance record, and committed
+alone under the message the publish script uses. Then every check was run on the builds as they stood, which are
+the builds of the third handoff: this handoff changed no word and no figure of the page. `scripts/verify_layer.py`,
+unedited, `scripts/verify_decision.py`, `scripts/check_site_copy.py`, the gate on the copy and `scripts/verify_gap.py`
+each passed; `docs/SITE_COPY.md` and `docs/DECISION_LAYER.md` have the counts. The table is the runner's record. In
+this pass the decision view's exercise in Chrome needed a second run: on the first, no tile came from the tile
+provider's host, and its four online steps of the overlay failed; the second run passed every step.
+
+*`60_layer/decision_runs.json`: started 2026-10-11T18:09:25Z, ended 2026-10-11T18:37:57Z; the layer it checked was built 2026-10-11T15:01:22Z; one check at a time.*
+
+| check | run | started | exit status | its last line | lines that failed |
+|---|---|---|---|---|---|
+| verify_layer | 1 | 2026-10-11T18:09:26Z | 0 | 92 of 92 checks passed; n = 11,468 units, 44 fields a unit, 18 class arrays | none |
+| verify_decision | 1 | 2026-10-11T18:09:39Z | 0 | 62 of 62 checks passed; n = 11,468 units, 4 windows, 6 cells, 30 districts | none |
+| exercise_layer in Chrome | 1 | 2026-10-11T18:09:55Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_layer in WebKit | 1 | 2026-10-11T18:15:30Z | 0 | 53 of 53 control actions did what they should; 29 units clicked on the map (0 clicks landed on a neighbour, which was then the unit compared); 1276 of 1276 displayed values equal the stage tables; script errors: none | none |
+| exercise_decision in Chrome | 1 | 2026-10-11T18:21:06Z | 1 | 49 of 53 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | FAIL  [overlay] clicked the box at (24, 653), with a connection -> overlay.js was loaded and tiles came from tiles.globalforestwatch.org: 0 drawn of 12 asked for; the box stayed ticked; the message beside the box and the note drawn on the map both carry the whole credit ('Source: Hansen/UMD/Google/USGS/NASA. Glo...') and name the window; no other host was asked (none); FAIL  [overlay] came back to the decision view (the box was unticked: True), ticked it, and clicked the box again at (24, 512) -> it came on again (False) and then off: its tiles are gone (0 left), nothing is written under the box again (''), and its 'i' still says it is off unless ticked; FAIL  [overlay] ticked the box with a connection (0 tiles arrived), then cut the tile host off and moved the map by one tile's width -> the new column of tiles failed, and the overlay stayed on and SAID so, beside the box ('Some tiles could not be loaded: where no pink is drawn, that...') and in the note drawn on the map (' 2000. A picture to find places by: do not measure from it. Source: Ha...'): missing pink is not shown as no loss; FAIL  [overlay] with the tile host still cut off, moved the map to a place none of whose tiles were loaded -> after eight tiles in a row had failed the overlay took itself off: the box is unticked, no tile is left, and it says: 'The overlay could not be reached: it needs a connection. Everything else on the map works as before.' |
+| exercise_decision in Chrome | 2 | 2026-10-11T18:28:58Z | 0 | 53 of 53 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+| exercise_decision in WebKit | 1 | 2026-10-11T18:33:34Z | 0 | 47 of 47 steps did what they should; 46 units opened on the map (46 as aimed, 0 touching the one aimed at; 0 clicks opened nothing); 874 of 874 lines of 'why this tier' are as the tables give them; exports: 6432 of 6432 cells; 14560 of 14560 cells; script errors: none | none |
+
+Not run in this pass: exercise_layer_safari, as written ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published"); exercise_decision_safari, by address ("the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch changes how the site is published").
+
+*Every check passed on its last run: yes; on its first run: no.*
+
+### Steps 5 and 6 of the fourth handoff: the copy on the site, from `main`
+
+**The push, and the deployment.** On 12 October 2026 the owner asked for everything to be pushed to `main` on GitHub.
+The session ran `git push origin main:refs/heads/main`, a fast-forward without force, and the permission check let
+it through. The push started the workflow. GitHub refused its first run: the environment `github-pages` allowed
+only `gh-pages` to deploy. The owner added `main` to that environment's deployment branches, set the source of Pages
+to GitHub Actions, and started the workflow again by hand; that run succeeded. The session changed no setting on
+GitHub. The live site was then checked against the build:
+
+- the site: https://sudo-karan.github.io/ICTD_Project/
+- deployed from the folder `site/` of the branch `main`, by the workflow `.github/workflows/pages.yml`
+- the commit at the head of `main` when it was checked: `852abdec8cc5b67ae4e78d1feea382e93540065a`; the last commit to change `site/` at that head: `852abdec8cc5b67ae4e78d1feea382e93540065a`
+- the copy: built 2026-10-11T15:02:55Z from the layer built 2026-10-11T15:01:22Z
+- the check of the live site (`scripts/check_pages_live.py`, run 2026-10-12T05:47:45Z): 9 of 9 checks passed
+
+| check | expected | found | pass |
+|---|---|---|---|
+| the copy on disk is the build its provenance record describes (bytes and SHA-256 of its three files), and so is the folder site/, which is what is published and holds no other file | 3 of 3, and 3 of 3 in site/ | 3 of 3, and 3 of 3 in site/ | yes |
+| https://sudo-karan.github.io/ICTD_Project/index.html: the bytes and SHA-256 the site serves are those the provenance record gives for index.html | 210912 bytes, sha256 4e98a6bf1248c5f2 | HTTP 200; 210912 bytes, sha256 4e98a6bf1248c5f2 | yes |
+| https://sudo-karan.github.io/ICTD_Project/data.js: the bytes and SHA-256 the site serves are those the provenance record gives for data.js | 22092359 bytes, sha256 34f9bccff25d7583 | HTTP 200; 22092359 bytes, sha256 34f9bccff25d7583 | yes |
+| https://sudo-karan.github.io/ICTD_Project/README.txt: the bytes and SHA-256 the site serves are those the provenance record gives for README.txt | 7177 bytes, sha256 0c8754bbef8307c6 | HTTP 200; 7177 bytes, sha256 0c8754bbef8307c6 | yes |
+| https://sudo-karan.github.io/ICTD_Project/ opened in headless Chrome and became ready | ready | ready after 12.9 s, in Chrome/154.0.8037.99 | yes |
+| units in the page's data, and units drawn on the map | 11468 and 11468 | 11468 and 11468 | yes |
+| script errors the page logged (exceptions, console errors and warnings) | 0 | 0 | yes |
+| errors in the browser's own log, against the addresses asked for that the site answers with 404 (a browser asks every site for /favicon.ico by itself; the site has none) | none but one 'Failed to load resource' for each favicon.ico the site does not have | 1 line(s): log: Failed to load resource: the server responded with a status of 404 (); answered 404: https://sudo-karan.github.io/favicon.ico | yes |
+| requests the page made over http or https, and those of them that did not go to https://sudo-karan.github.io | at least one, and none elsewhere | 3 (/ICTD_Project/, /ICTD_Project/data.js, /favicon.ico); elsewhere: 0 | yes |
+
+*From `70_share/pages_publication.json` and `70_share/pages_live_check.json`, which are not in git.*
+
+### Step 7 of the fourth handoff: the documents, and stage 4 after `docs/DATA_NOTES.md`
+
+`docs/DATA_NOTES.md` was changed by hand in one paragraph, the one on the publication. That document is an input of
+stage 4, recorded with its SHA-256, so `scripts/08_gap_inputs.py` and `scripts/08_build_gap_districts.py` were run
+again in the stage-4 environment, and no other step. **No table of figures moved.** The verifier then passed every
+check. The comparison below sets every output beside a copy kept just before (`50_gap/before_one_branch/`).
+
+The documents were then written again, each by its own script: `docs/DECISION_LAYER.md`, this log, and `docs/GAP.md`
+last, as the owner listed; and before them `docs/RESULTS.md`, `docs/LAYER.md` and `docs/SITE_COPY.md`, which he had not
+listed. Those three cite the records of the layer's checks, and the checks of Step 4 had made those records again; so
+they were written again from the records on disk, in the usual order. In `docs/RESULTS.md` no sentence was changed.
+
+**The rebuild against the build before it.**
+
+| gate | expected | found | pass |
+|---|---|---|---|
+| tables of figures in both builds (50_gap/before_one_branch/ and 50_gap/) with a cell, a column or a number of rows that differs | none | none (of 22 tables compared) | yes |
+| tables of figures of the earlier build that are gone | none | none | yes |
+| tables of figures that are byte for byte what they were | 22 of 22 | 22 of 22 | yes |
+| files that differ and are not among those expected to (a record with a time or a hash, a listing, a text file with its time) | none | none | yes |
+| gates of the later build that did not pass (every gate table of 50_gap/) | none | none | yes |
+
+*5 of 5 gates passed (`50_gap/gates_one_branch.csv`).*
+
+Files compared or listed: 59; byte for byte the same: 57. Every file that differs, is new or is gone (`50_gap/rebuild_one_branch_differences.csv`):
+
+| file | kind | what differs | why |
+|---|---|---|---|
+| `gap.provenance.json` | record | steps that differ, and in which keys - 08_build_gap_districts: inputs (docs/DATA_NOTES.md), run_utc; 08_gap_inputs: inputs (docs/DATA_NOTES.md), outputs (50_gap/inputs_listing.json), run_utc | a step that is run again is recorded anew: the record carries each run's time and the SHA-256 of the script, of the shared module and of every input and output |
+| `inputs_listing.json` | record | keys that differ: inputs, run_utc (inputs: 34 then, 34 now; the entries that differ: (docs/DATA_NOTES.md)) | the listing of inputs, with the time it was written; it holds more inputs wherever the list of inputs grew |
 
 ## Phase 0: inputs, crosswalk, gates
 
@@ -619,9 +757,9 @@ says what was undone and rebuilt.
 
 *36 of 36 gates passed (`50_gap/inputs_check.csv`).*
 
-### Files written by `scripts/08_gap_inputs.py` (run 2026-10-11T16:07:35Z)
+### Files written by `scripts/08_gap_inputs.py` (run 2026-10-12T05:49:25Z)
 
-- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `70664255fb000ca6`)
+- `50_gap/inputs_listing.json` (23,556 bytes, sha256 `b65a207d3f57b6aa`)
 - `50_gap/district_crosswalk.csv` (1,392 bytes, sha256 `8a127601ce0254c8`)
 - `50_gap/unit_district.csv` (630,249 bytes, sha256 `2a76e6ed9d5977a8`)
 - `50_gap/inputs_check.csv` (3,941 bytes, sha256 `524cc7de7a83aa12`)
@@ -650,7 +788,7 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 
 ### Inputs read, with their columns
 
-*Listed 2026-10-11T16:07:34Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
+*Listed 2026-10-12T05:49:23Z by `scripts/08_gap_inputs.py` (`50_gap/inputs_listing.json`, which also has each file's SHA-256).*
 
 - `00_raw/mis_reports/odisha_r620_district_fy_category_2014-2027.csv` (73,503 bytes; 1,170 rows): `fy`, `category`, `district`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`
 - `00_raw/mis_reports/odisha_r620_state_totals_2014-2027.csv` (2,958 bytes; 39 rows): `fy`, `category`, `blocks`, `works_ongoing`, `works_completed`, `pct_works`, `exp_cat_lakh`, `exp_all_lakh`, `pct_exp`, `last_updated`
@@ -669,7 +807,7 @@ The stage-4 environment as that step found it (python 3.12.13; `requirements-sta
 - `40_allocation/assets_district_fy.csv` (65,174 bytes; 579 rows): `district_file`, `district_property`, `pc11_district_code`, `fy_work_start`, `n_works`, `n_works_expenditure_na`, `expenditure_total`, `n_works_plantation_category`, `n_works_plantation_category_expenditure_na`, `expenditure_plantation_category`, `n_works_forestry_worktype`, `n_works_forestry_worktype_expenditure_na`, `expenditure_forestry_worktype`, `n_works_forest_named_worktype`, `n_works_forest_named_worktype_expenditure_na`, `expenditure_forest_named_worktype`, `n_works_water`, `n_works_water_expenditure_na`, `expenditure_water`, `n_works_category_unknown`, `persondays`, `n_works_persondays_reported`
 - `55_decision/condition_by_unit.csv` (7,275,979 bytes; 11,468 rows): `unit_id`, `unit_name`, `unit_level`, `outside_village`, `pc11_district_code`, `district`, `dense_2000_ha`, `open_2000_ha`, `low_2000_ha`, `standing_dense_ha`, `standing_open_ha`, `standing_forest_ha`, `standing_row`, `dense_open_ratio`, `near_dense_open_boundary`, `loss_dense_ha_2018_2025`, `loss_open_ha_2018_2025`, `forest_loss_ha_2018_2025`, `loss_low_ha_2018_2025`, `loss_column_2018_2025`, `cell_2018_2025`, `order_in_district_cell_2018_2025`, `forest_at_window_start_ha_2018_2025`, `forest_loss_share_pct_2018_2025`, `forest_loss_share_blank_because_2018_2025`, `order_in_district_cell_by_share_2018_2025`, `loss_dense_ha_2001_2025`, `loss_open_ha_2001_2025`, `forest_loss_ha_2001_2025`, `loss_low_ha_2001_2025`, `loss_column_2001_2025`, `cell_2001_2025`, `order_in_district_cell_2001_2025`, `forest_at_window_start_ha_2001_2025`, `forest_loss_share_pct_2001_2025`, `forest_loss_share_blank_because_2001_2025`, `order_in_district_cell_by_share_2001_2025`, `loss_dense_ha_2017_2023`, `loss_open_ha_2017_2023`, `forest_loss_ha_2017_2023`, `loss_low_ha_2017_2023`, `loss_column_2017_2023`, `cell_2017_2023`, `order_in_district_cell_2017_2023`, `forest_at_window_start_ha_2017_2023`, `forest_loss_share_pct_2017_2023`, `forest_loss_share_blank_because_2017_2023`, `order_in_district_cell_by_share_2017_2023`, `loss_dense_ha_2021_2025`, `loss_open_ha_2021_2025`, `forest_loss_ha_2021_2025`, `loss_low_ha_2021_2025`, `loss_column_2021_2025`, `cell_2021_2025`, `order_in_district_cell_2021_2025`, `forest_at_window_start_ha_2021_2025`, `forest_loss_share_pct_2021_2025`, `forest_loss_share_blank_because_2021_2025`, `order_in_district_cell_by_share_2021_2025`, `tier_provisional_2018_2025`, `corroboration`, `corroboration_basis`, `corroboration_window`, `agreement_reference_ha`, `agreement_corestack_valued_ha`, `district_check`, `governance_prompt`
 - `55_decision/tiers.csv` (3,015 bytes; 6 rows): `tier`, `cell`, `tier_label`, `cell_name`, `standing_row`, `loss_column`, `what_the_name_rests_on`, `why_this_place_in_the_order`, `status`
-- `docs/DATA_NOTES.md` (17,554 bytes)
+- `docs/DATA_NOTES.md` (17,952 bytes)
 - `docs/NEED.md` (19,029 bytes)
 - `00_raw/docs/Village_level_dataset_schema_31Oct2022.docx` (637,132 bytes)
 - `scripts/06_build_layer.py` (73,474 bytes)
@@ -839,7 +977,7 @@ will be written into `docs/GAP.md` by its writer.
 
 *30 of 30 gates passed (`50_gap/gates_phase2.csv`).*
 
-### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-11T16:09:06Z)
+### Files written by `scripts/08_build_gap_districts.py` (run 2026-10-12T05:52:15Z)
 
 - `50_gap/district_need.csv` (15,984 bytes, sha256 `ea978fc16f8500ca`)
 - `50_gap/district_allocation.csv` (8,152 bytes, sha256 `a98526993a9de84a`)
@@ -1594,6 +1732,14 @@ that the PNGs on disk are those. A figure drawn again and differently fails that
 
 *Read from `git log` when this log was written; the commit that carries this very version of the log is the one after the newest listed.*
 
+- `343fc27` One branch, Step 7: the decision layer's writer says what a failed run in Chrome failed on, and that an earlier pass was made on this build
+- `852abde` Publish the shared copy of the layer, built 2026-10-11T15:02:55Z
+- `999d1d0` One branch, Step 3: the scripts that describe the publication follow the new route - site/ on main, by a workflow
+- `f529441` One branch, Step 2: the workflow that deploys site/ and the script that fills it, as the owner prepared them
+- `0ef4377` Join main's two commits to the working history: main's snapshot of 9 October is the tree of 16b1efd, so main takes this history's tree and loses nothing
+- `6a06f58` Six fixes: docs/SITE_COPY.md written again, its list of where the old words still stand now complete
+- `18b46e3` Six fixes: docs/SITE_COPY.md looks for the owner's phrases across line breaks too
+- `a5e7495` Six fixes, Step 6: not published - the publish script was refused again by the session's permission gate; the run log says so
 - `d0c022d` Six fixes, Steps 4 and 5: the pictures looked at again; the documents written again by their scripts
 - `9f28c30` Six fixes, Step 5: in docs/SITE_COPY.md the lines the owner reworded stand last in its table of what was fixed, as its text says; a long string of the six lines is shown by the stretch that differs
 - `779c784` Six fixes, Step 5: the writers of the documents, committed before they are run
