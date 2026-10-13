@@ -1,6 +1,6 @@
 # The demo layer — `60_layer/`
 
-*Built by `scripts/06_build_layer.py` (run 2026-10-12T22:00:54Z) from the stage tables named below; page in
+*Built by `scripts/06_build_layer.py` (run 2026-10-12T23:44:55Z) from the stage tables named below; page in
 `scripts/layer_template.html`; checked by `scripts/verify_layer.py`. Every figure in this document is from
 `60_layer/layer.provenance.json`, a table it names, or the check record. n = 11,468 units throughout:
 3,492 outside-village units and 7,976 LGD panchayat units.*
@@ -12,13 +12,13 @@ Security. It needs no stage 4 and no NIRv, and it argues nothing: it shows what 
 
 | file | bytes | what |
 |---|---|---|
-| `index.html` | 214,465 | the map. Leaflet 1.9.4 (BSD 2-Clause) is inside it |
+| `index.html` | 214,891 | the map. Leaflet 1.9.4 (BSD 2-Clause) is inside it |
 | `data.js` | 23,213,146 | the unit shapes and every value and class the map shows; since 13 October 2026 also the guide, with its five pictures (§13). Keep it beside `index.html` |
 | `layer_by_unit.csv` | — | the numbers the map shows, one row per unit, 79 columns. Not needed to view the map |
 | `layer.provenance.json` | — | inputs with hashes, the UTC run time, the simplification and its error, classes, checks |
 | `overlay.js` | 1,213 | since 8 October 2026: the code of the decision view's optional online overlay, and nothing else. Not needed to view the map; **left out of the copy that is passed on** (§11) |
 
-**To open: double-click `index.html`.** The two files together are 23,427,611 bytes (23.43 MB; the limit set was
+**To open: double-click `index.html`.** The two files together are 23,428,037 bytes (23.43 MB; the limit set was
 25 MB) and 6.70 MB zipped, so they can be e-mailed as one zip. The page makes **0 network
 requests**: no map tiles, no fonts, no library fetched. It will open the same way with no connection, and in two
 years. (That is this folder, opened from disk. The copy on the website reaches its reader over the internet, and once
@@ -402,14 +402,14 @@ floor).
 **Every control, in a browser, on this build.** `scripts/exercise_layer.py` opens `60_layer/index.html` from disk, works
 each interactive element, and after each action reads what the page then shows. It then clicks a sample of units on
 the map and compares every value the panel displays with the stage tables, rebuilt without any of the builder's code.
-Both runs below are on the build of 2026-10-12T22:00:54Z (`index.html` sha256 `24aa94bb69db24f0…`, `data.js` `91d4bb2e68664583…`);
+Both runs below are on the build of 2026-10-12T23:44:55Z (`index.html` sha256 `4bb643bf18fae32d…`, `data.js` `5d3c6cd685cd0131…`);
 this document is not written unless they are.
 
 | | Chrome | WebKit |
 |---|---|---|
 | browser | Chrome/154.0.8037.99 | WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) |
 | how the events were made | real mouse and keyboard events sent through Chrome's DevTools protocol to a separate, headless Chrome | events dispatched inside the page (a control's own click(); mouse, wheel and key events built in script), in a WKWebView that lies off the screen |
-| run | 2026-10-12T22:06:50Z | 2026-10-12T22:11:09Z |
+| run | 2026-10-13T00:22:00Z | 2026-10-13T00:28:05Z |
 | actions that did what they should | 60 of 60 | 60 of 60 |
 | units clicked on the map | 29 | 29 |
 | displayed values equal to the stage tables | 1,276 of 1,276 | 1,276 of 1,276 |
@@ -420,7 +420,7 @@ this document is not written unless they are.
 
 | | control | what was done | what the page then showed |
 |---|---|---|---|
-| 1 | page | opened file://<repository>/60_layer/index.html in Chrome/154.0.8037.99 | ready in 4.2 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 1 | page | opened file://<repository>/60_layer/index.html in Chrome/154.0.8037.99 | ready in 13.1 s; files loaded: ['data.js', 'index.html']; script errors: none |
 | 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
 | 3 | loader | read the loader once the page said it was ready | it is no longer shown; the last thing it said was 'Drawing the units…'; in the page's own file its first words, 'Loading the map…', are plain markup that stands before the tag that asks for data.js |
 | 4 | layer switcher | clicked the radio button 'Forest in 2000 (Hansen)' at (26, 238) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
@@ -485,7 +485,7 @@ this document is not written unless they are.
 
 | | control | what was done | what the page then showed |
 |---|---|---|---|
-| 1 | page | opened file://<repository>/60_layer/index.html in WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | ready in 2.2 s; files loaded: ['data.js', 'index.html']; script errors: none |
+| 1 | page | opened file://<repository>/60_layer/index.html in WebKit 21624.5.1.11.3 (the engine of Safari 27.0 on this machine) | ready in 4.3 s; files loaded: ['data.js', 'index.html']; script errors: none |
 | 2 | page | read the starting state | layer hansen_loss, floor 100 ha, both kinds of unit shown (7,976 + 3,492 drawn), no unit selected, legend 'Tree cover loss 2001-2025 as a share of the unit's...' |
 | 3 | loader | read the loader once the page said it was ready | it is no longer shown; the last thing it said was 'Drawing the units…'; in the page's own file its first words, 'Loading the map…', are plain markup that stands before the tag that asks for data.js |
 | 4 | layer switcher | sent a click to the radio button 'Forest in 2000 (Hansen)' at (22, 235) | it became the checked layer; the legend's title and its 6 classes with their counts became this layer's; the address reads '#layer=forest_area&floor=100'; unit 132731 (class 'More than 60 %') is drawn #006d2c, the class colour #006d2c |
@@ -552,7 +552,7 @@ this document is not written unless they are.
 new window, then changes the window's address — the parts listed in §1 — and after each change reads back the
 window's title and the text the page shows. **Nothing is clicked**: running script in a page of Safari from outside
 needs a Safari setting that is the owner's to change. So this shows that the page loads, runs and shows the right text
-in Safari, for every layer, every minimum, the same 29 units, the search and the two text panels. **Not run on the build this document describes (2026-10-12T22:00:54Z): the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch adds the Guide button, its pictures and a loader. What follows is the record of its last run.** Run 2026-10-08T22:53:16Z, on the layer built 2026-10-08T22:42:59Z:
+in Safari, for every layer, every minimum, the same 29 units, the search and the two text panels. **Not run on the build this document describes (2026-10-12T23:44:55Z): the owner's ruling of 9 October 2026: no run in the Safari application in a batch applying his rulings; this batch adds the Guide button, its pictures and a loader. What follows is the record of its last run.** Run 2026-10-08T22:53:16Z, on the layer built 2026-10-08T22:42:59Z:
 **48 of 48 addresses showed what they should, and 1,265 of 1,265 values the units' panels should show
 were in the page's text, in the panel's order** (a value that is blank for a unit is not counted). Log:
 `60_layer/exercise_safari.json`.
@@ -761,7 +761,7 @@ provider's terms are unresolved and are the owner's: Two points, both the projec
 `00_raw/06_scheme/`. Which rows bear on which cell is a proposal, for the Foundation.
 
 **The copy made to be passed on, `70_share/odisha_forest_decision_layer/`.** `scripts/07_build_share.py` (run
-2026-10-12T22:01:24Z) writes `index.html` and `data.js` of the layer built 2026-10-12T22:00:54Z there without the
+2026-10-12T23:45:45Z) writes `index.html` and `data.js` of the layer built 2026-10-12T23:44:55Z there without the
 development index of 2011 - its layer, its value in the row of each of 11,468 units, its line of the panel, its
 column of the ranked list, its row of the sources - and, by the owner's ruling of 11 October 2026, with the overlay
 switched off: in the copy its box is greyed out and cannot be ticked, the overlay's part of the data is cut to three
@@ -769,7 +769,7 @@ keys, and one paragraph of *About this map* and one row of *Sources* say that th
 Otherwise the two files are as they are here. It leaves `overlay.js` out, adds a README and makes a zip of
 6.68 MB beside the folder. This folder, `60_layer/`, keeps the index and a working overlay.
 Until 10 October 2026 the copy's two files were this folder's byte for byte. `scripts/exercise_share.py` opened the
-copy from disk in Chrome/154.0.8037.99 (2026-10-12T22:20:44Z): 9 of 9 steps did what
+copy from disk in Chrome/154.0.8037.99 (2026-10-13T01:41:58Z): 9 of 9 steps did what
 they should. It holds the copy's two files against this folder's under that rule and finds the index named in
 neither; the page asked the network for nothing and for no `overlay.js`; the overlay's box stayed unticked when it
 was clicked; and under it the page says "Not in this copy, while we check the tile provider's terms of use."
@@ -814,6 +814,15 @@ use; *Close*, or a click outside, shuts it, and an address that ends in `#open=g
 now opens at its top. The three buttons stand on one line in a window 1280 px wide; in one 1000 px wide the side panel
 has no room for that, and Guide stands on a second line, under the other two.
 
+**No icon, and the page says so.** The page declares that it has no icon (`<link rel="icon" href="data:,">`), so that a
+browser asks the site for none. Without that line a browser asks every site for `/favicon.ico` by itself. Since the
+loader lets the page finish loading before the map is drawn, the address the page writes its state into changes after
+the load, and Chrome then asked the site for the missing icon a second time. `scripts/check_pages_live.py` allows that
+request once: it failed on the first copy published with the Guide button, the line was added, and the copy was built,
+checked and published again. That check was not changed. One helper of `scripts/exercise_layer.py` was: in WebKit it
+lists every address the page's own elements point at, and it now leaves out an address that carries its own bytes
+(`data:`), since nothing is loaded for it (`docs/SITE_COPY.md`, its table of the checks' changes).
+
 - **The guide is `docs/GUIDE.md`**, the owner's text (36,840 bytes; sha256 `90c1b4ec636624be…`), and that file is its one source.
   `scripts/_guide.py`, a converter of its own for what the guide uses (headings, paragraphs, bold, italics, inline
   code, links, pictures, lists, pipe tables; everything else is escaped; no package), turns it into HTML when the page
@@ -847,7 +856,7 @@ without them a browser reports no progress for `data.js`, so no percentage is sh
 page says so as before.
 
 **The sizes.** The two files were 22,500,277 bytes together before the guide (22.50 MB: `index.html` 210,942,
-`data.js` 22,289,335; the layer built 2026-10-11T15:01:22Z) and are 23,427,611 bytes now (23.43 MB: `index.html` 214,465,
+`data.js` 22,289,335; the layer built 2026-10-11T15:01:22Z) and are 23,428,037 bytes now (23.43 MB: `index.html` 214,891,
 `data.js` 23,213,146), against the 25 MB that `scripts/verify_layer.py` allows.
 
 **The checks.** `scripts/exercise_layer.py` gained 7 steps, in each browser (they are among the rows of §8.1 and §8.2;
