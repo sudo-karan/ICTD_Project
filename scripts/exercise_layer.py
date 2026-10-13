@@ -115,8 +115,11 @@ class InWebKit:
         return self.w.open(url, self.folder)
 
     def files(self):
-        # WebKit keeps no resource timings for local files: list instead every address the page's own elements point at
-        return sorted({u.split("/")[-1].split("#")[0] for u in [self.w.js("location.href")] + self.w.js("Array.from(document.querySelectorAll('[src], link[href]')).map(function(e){return e.src || e.href;})")})
+        # WebKit keeps no resource timings for local files: list instead every address the page's own elements point at.
+        # Since 13 October 2026 an address that carries its own bytes (data:) is left out of that list: it is not a file, and nothing is loaded for it. The page gained one that day, the line in its head by
+        # which it says that it has no icon; the guide's pictures, while its window is open, are five more. Chrome, which reports what it asked for, reports none of them at this step, and passed it unchanged.
+        return sorted({u.split("/")[-1].split("#")[0] for u in [self.w.js("location.href")] + self.w.js("Array.from(document.querySelectorAll('[src], link[href]')).map(function(e){return e.src || e.href;})")
+                       if not u.startswith("data:")})
 
     def centre(self, selector, nth=0):
         r = self.w.js(f"(function(){{var e=document.querySelectorAll({json.dumps(selector)})[{nth}]; if(!e) return null; e.scrollIntoView({{block:'nearest'}}); var b=e.getBoundingClientRect(); return [b.left+b.width/2, b.top+b.height/2, b.width, b.height];}})()")

@@ -2557,7 +2557,9 @@ figures) are the account. What bears on this document:
 - **The page says that it has no icon** (§14). The loader lets the page finish loading before the map is drawn, and
   Chrome then asked the site for a missing icon twice where it had asked once. The check of the live site lets that
   request stand once, and it failed on the first copy published with the Guide button. One line of the page now tells
-  a browser to ask for none; the copy was built, checked and published again; and no check was changed for it.
+  a browser to ask for none, and the copy was built, checked and published again. That check was not changed. One
+  helper of the exercises in WebKit was, and `docs/SITE_COPY.md` says how: it no longer counts an address that carries
+  its own bytes among the files the page loaded.
 
 ## 18. What this does not show
 

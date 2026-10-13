@@ -622,8 +622,15 @@ under the other two; at a phone's width the legend lies over it (section 10). An
 map is drawn, so the address the page writes its state into changes after the load, and Chrome then asked for the
 missing icon a second time. The first copy published with the Guide button failed that one check of the live site for
 it, twice, with every other check passed. The line was added, both builds were made again, every check and every
-picture of this document was made again on them, and the copy was published again. No check was changed for it;
-`scripts/check_site_copy.py` holds the line (check `g2`) and plants its removal.
+picture of this document was made again on them, and the copy was published again. The check of the live site was
+not changed; `scripts/check_site_copy.py` holds the line (check `g2`) and plants its removal.
+
+**One check accepts something it did not accept before.** The first step of a run in WebKit reads which files the
+page loaded. WebKit keeps no timings for local files, so that step lists every address the page's own elements point
+at, and the list had to be the page's two files. The new line points at an address that carries its own bytes
+(`data:`), for which nothing is loaded. The helper that makes the list, in `scripts/exercise_layer.py`, now leaves
+such an address out; the list must still be the two files and nothing else. In Chrome, which reports what it asked
+for, the step is as it was, and it passed with the line in the page. The change is a row of section 8.
 
 **The guide.** `docs/GUIDE.md` is the owner's text ({g_bytes} bytes) and the one source of that window.
 `scripts/_guide.py`, a converter of its own for what the guide uses, with no package, turns it into HTML when the

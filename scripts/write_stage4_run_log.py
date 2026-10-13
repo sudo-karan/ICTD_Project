@@ -58,6 +58,7 @@ KEPT_SIX_LAYER, KEPT_SIX_SHARE = KEPT / "60_layer_2026-10-11_before_six_fixes", 
 KEPT_GAP_WORDS = KEPT / "50_gap_2026-10-11_site_words_step5"       # the comparison of the second handoff's Step 5, as it stood before stage 4 followed the layer once more
 KEPT_LAYER, KEPT_SHARE = KEPT / "60_layer_2026-10-11_before_words", KEPT / "70_share_2026-10-11_before_words"      # the two builds as they stood before the page's words were rewritten
 KEPT_GUIDE_LAYER, KEPT_GUIDE_SHARE = KEPT / "60_layer_2026-10-13_before_guide", KEPT / "70_share_2026-10-13_before_guide"   # the two builds, with their records, as they stood before the Guide button (the handoff of 13 October 2026)
+FIRST_GUIDE_LAYER, FIRST_GUIDE_SHARE = KEPT / "60_layer_2026-10-13_guide_first_publication", KEPT / "70_share_2026-10-13_guide_first_publication"   # the first build with the Guide button, published and then replaced the same day, with its records
 
 # One entry per phase: (number, title, the gate files it wrote, the provenance sections it wrote, the notes).
 # A phase appears in the log once its first gate file exists. NOTES is typed prose; it carries no figure.
@@ -1150,7 +1151,7 @@ and `60_layer/layer_by_unit.csv`. Its records hold the bytes and SHA-256 of thos
 byte what it was. {verifier} `scripts/08_gap_inputs.py` and `scripts/08_build_gap_districts.py` were run again in the
 stage-4 environment, in that order, and no other step. **No table of figures moved**: the comparison below sets every
 output beside a copy kept just before (`50_gap/before_guide_button/`). The verifier then passed every check.
-`scripts/08_gap_closing_checks.py` and `scripts/08_gap_leftovers_check.py` were not run again.
+`scripts/08_gap_closing_checks.py` and `scripts/08_gap_leftovers_check.py` were not run again.{again}
 """
 FIFTH_6 = """
 The guide's table "How it was checked" gives each check's result. Its counts were set to the results of the runs on
@@ -1214,7 +1215,7 @@ def fifth_handoff() -> list[str]:
     out += ["", "### Steps 1 to 4 of the handoff of 13 October: the guide, the button, the loader, the pictures", "", FIFTH_1_TO_4.strip().format(sizes=sizes), "",
             "### Step 5 of the handoff of 13 October: the checks", "", FIFTH_5.strip(), ""] + browser_runs()
     if stage4:
-        out += ["**Stage 4 follows the layer.**", "", FIFTH_5_STAGE4.strip().format(verifier=fifth_verifier()), ""] + rebuild("guide_button")
+        out += ["**Stage 4 follows the layer.**", "", FIFTH_5_STAGE4.strip().format(verifier=fifth_verifier(), again=fifth_verifier_again()), ""] + rebuild("guide_button")
     out += ["### Step 6 of the handoff of 13 October: the guide's own counts", "", FIFTH_6.strip(), ""] + guide_figures_changed()
     if FIFTH_STEP_7_DONE:
         p = ROOT / "60_layer" / "site_copy_results_changes.json"
@@ -1225,9 +1226,12 @@ def fifth_handoff() -> list[str]:
                    f"{r['figures_added']} are new, against the document of commit `{r['before_is_the_document_of_commit']}` (`docs/SITE_COPY.md` lists them).")
         out += ["### Step 7 of the handoff of 13 October: the documents", "", FIFTH_7.strip().format(results=results), ""]
     out += ["### Step 8 of the handoff of 13 October: the copy on the site", ""]
+    first = fifth_first_publication()
     if published:
-        out += [f"The copy with the Guide button (made {made}) was published with the owner's script, `scripts/publish_site.sh`, on his word given in the handoff: the script held the copy's three files to the gated build, "
-                "filled `site/`, committed it and pushed `main`, and the workflow deployed that folder. The live site was then checked against the build:", ""] + publication()
+        out += ([f"The copy with the Guide button was published twice that day, each time with the owner's script, `scripts/publish_site.sh`, on his word given in the handoff: the script held the copy's three files to the gated "
+                 "build, filled `site/`, committed it and pushed `main`, and the workflow deployed that folder.", ""] + first + [f"**The second publication** is of the copy made {made}:", ""] if first else
+                [f"The copy with the Guide button (made {made}) was published with the owner's script, `scripts/publish_site.sh`, on his word given in the handoff: the script held the copy's three files to the gated build, "
+                 "filled `site/`, committed it and pushed `main`, and the workflow deployed that folder. The live site was then checked against the build:", ""]) + publication()
     else:
         out += [f"**Not yet published when this was written.** The copy with the Guide button (made {made}) is built and checked. The site still serves the copy of the fourth handoff, and the two records in `70_share/` "
                 "are that publication's, put back beside the new copy after it was built. Publishing is the next step: `bash scripts/publish_site.sh`, then `.venv/bin/python scripts/check_pages_live.py --wait 10`; "
@@ -1236,6 +1240,62 @@ def fifth_handoff() -> list[str]:
 
 
 FIFTH_LOGS = KEPT / "guide" / "logs"                               # what the verifier printed on 13 October 2026, kept with the session's working files (not in git)
+
+
+def fifth_verifier_again() -> str:
+    """The same, for the layer built again that day with the line by which the page says it has no icon (Step 8): from what the verifier printed before and after the two steps were run once more."""
+    before, after = FIFTH_LOGS / "verify_gap_before_stage4_follows_second.log", FIFTH_LOGS / "verify_gap_after_stage4_follows_second.log"
+    if not (before.exists() and after.exists()):
+        return ""
+    lines = {k: [l for l in f.read_text(encoding="utf-8").splitlines() if l.strip()] for k, f in (("before", before), ("after", after))}
+    failed = [l for l in lines["before"] if l.startswith("FAIL")]
+    n_pass, n_all = sum(1 for l in lines["before"] if l.startswith("PASS")), sum(1 for l in lines["before"] if l.startswith(("PASS", "FAIL")))
+    if not (lines["before"][-1] == f"{n_pass} of {n_all} checks passed" and lines["after"][-1] == f"{n_all} of {n_all} checks passed" and len(failed) == 2
+            and all("60_layer/data.js" in l and "scripts/06_build_layer.py" not in l and "`sha256`" in l for l in failed)):
+        raise SystemExit("the verifier's printed lines for the layer built again on 13 October 2026 do not say what the log says of them")
+    return (" The layer was built once more that day, with the line by which the page says that it has no icon (Step 8), and the same two steps were run once more. Before them the verifier again failed those "
+            f"{len(failed)} checks and no other, {n_pass} of {n_all}, this time on `60_layer/data.js` alone; after them it passed every check. The comparison below is of the stage as it then stood, set beside the same "
+            "copy kept before the Guide button.")
+
+
+FIFTH_8_CAUSE = """
+**The cause, and the change.** A browser asks every site for `/favicon.ico` by itself, and this site has none; the
+check of the live site lets that refused request stand once. The loader lets the page finish loading before the map
+is drawn, so the address the page writes its state into changes after the load, and Chrome then asks for the missing
+icon again. This was tried on this machine with the copy served from a local server: Chrome asked once for the copy
+kept before the Guide button, twice for the copy with it, and not at all once the page's head held one more line,
+`<link rel="icon" href="data:,">`, by which the page says that it has no icon. That line was added to
+`scripts/layer_template.html`. `scripts/check_pages_live.py` is as it was, and `scripts/check_site_copy.py` writes the
+line out as one more place of the page, holds it, and plants its removal. **One check accepts something it did not
+accept before**: in WebKit, which keeps no timings for local files, the first step of an exercise lists every address
+the page's own elements point at, and the new line points at one that carries its own bytes. The helper that makes
+that list (`scripts/exercise_layer.py`) now leaves such an address out, since nothing is loaded for it; the list must
+still be the page's two files, and in Chrome the step is as it was (`docs/SITE_COPY.md`, its table of the checks'
+changes).
+Both builds were then made again, and everything of Steps 4 to 7 was done again on them: the guide's pictures taken
+again and found byte for byte the same, the checks, stage 4, the pictures looked at, the documents. What this log
+says under those steps is of the builds made again.
+"""
+
+
+def fifth_first_publication() -> list[str]:
+    """The first copy published with the Guide button, which failed one check of the live site: from its records as they were kept before the copy was built again."""
+    pub, runs = FIRST_GUIDE_SHARE / "pages_publication.json", [FIRST_GUIDE_SHARE / "pages_live_check_run1.json", FIRST_GUIDE_SHARE / "pages_live_check.json"]
+    if not (pub.exists() and all(r.exists() for r in runs)):
+        return []
+    p, (c1, c2) = json.loads(pub.read_text(encoding="utf-8")), [json.loads(r.read_text(encoding="utf-8")) for r in runs]
+    made0 = json.loads((FIRST_GUIDE_SHARE / "share.provenance.json").read_text(encoding="utf-8"))["run_utc"]
+    failed = [[x["check"] for x in c["checks"] if not x["pass"]] for c in (c1, c2)]
+    asked = [u.rsplit("/", 1)[-1] for u in c2["the_page"]["requests"]]
+    if not (c1["copy_run_utc"] == c2["copy_run_utc"] == p["copy_built_utc"] == made0 and c1["run_utc"] < c2["run_utc"] and failed[0] == failed[1] and len(failed[0]) == 1 and "favicon.ico" in failed[0][0]
+            and asked.count("favicon.ico") == 2 and len(c2["the_page"]["errors_in_the_browsers_log"]) == 2 and not c2["the_page"]["script_errors"] and not c2["the_page"]["requests_to_another_host"]
+            and c1["checks_passed"] == c2["checks_passed"] == c2["checks_made"] - 1):
+        raise SystemExit("the kept records of the first copy published with the Guide button do not say what the log says of them")
+    return [f"**The first publication** was of the copy made {made0} (the last commit to change `site/`: `{p['site_commit'][:12]}`). `scripts/check_pages_live.py` then passed {c1['checks_passed']} of its {c1['checks_made']} checks "
+            f"(run {c1['run_utc']}), and the same {c2['checks_passed']} when it was run again ({c2['run_utc']}). The one check that failed, both times, is the check of the browser's own log: Chrome had asked the site for "
+            f"`/favicon.ico` {asked.count('favicon.ico')} times, and its log held {len(c2['the_page']['errors_in_the_browsers_log'])} lines where the check lets one stand. Everything else held: the bytes the site served were "
+            "the build's, the map drew every unit, the page logged no script error, and no request went to another host. The second of those two runs:", ""] \
+        + publication(FIRST_GUIDE_SHARE, "to add the line by which the page says that it has no icon") + [FIFTH_8_CAUSE.strip(), ""]
 
 
 def fifth_verifier() -> str:
