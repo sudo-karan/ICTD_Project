@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Odisha forest decision layer</title>
 <!--
+  Added 13 Oct 2026. This page has no icon, and the line below says so: with it a browser asks the site for none. Without it a browser
+  asks every site for /favicon.ico by itself; and since the loader lets this page finish loading before the map is drawn, the address this
+  page writes its state into changes after the load, and Chrome then asked for the missing icon a second time.
+-->
+<link rel="icon" href="data:,">
+<!--
   Built by scripts/06_build_layer.py. Self-contained: no network request is made. Keep data.js beside this file.
   Leaflet 1.9.4 (BSD 2-Clause, (c) Volodymyr Agafonkin, CloudMade) is embedded below, unmodified.
 -->

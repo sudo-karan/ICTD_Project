@@ -96,7 +96,7 @@ source keeps its own licence, listed above; the unit boundaries in data.js are a
 derived from DataMeet's and are under the Open Database Licence (ODbL 1.0).
 
 THIS COPY
-Made 2026-10-12T22:01:24Z (UTC) by scripts/07_build_share.py from the layer built 2026-10-12T22:00:54Z: that layer's two files without
+Made 2026-10-12T23:45:45Z (UTC) by scripts/07_build_share.py from the layer built 2026-10-12T23:44:55Z: that layer's two files without
 the development index, and with the overlay switched off.
-  index.html  214,435 bytes  sha256 ec704c2256678f7ee826d9fe336e137bf59641e2bcebffe0b41b5398eb1e809d
-  data.js  23,016,170 bytes  sha256 4f4a1ba75c5a762a8abd6ade431b9167eb93face43f860647a391c46eb9e37b6
+  index.html  214,861 bytes  sha256 b02559bcde1761e3238c1ea0a19b637e2995a5dfcc32ecf058b0a3831c00bb80
+  data.js  23,016,170 bytes  sha256 2669e3494bb2f0baa774697f24fb48968ba28c30d2ec0d552858f72d1b6748db
